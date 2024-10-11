@@ -76,7 +76,13 @@ extension Home {
         @Published var overrideHistory: [OverrideHistory] = []
         @Published var overrides: [Override] = []
         @Published var alwaysUseColors: Bool = true
+        // Dana UI Toggels
         @Published var timeSettings: Bool = true
+        @Published var danaIcon: Bool = true
+        @Published var legendsSwitch: Bool = true
+        @Published var danaBar: Bool = true
+        @Published var tempTargetbar: Bool = true
+        // Dana UI Toggels
         @Published var useCalc: Bool = true
         @Published var minimumSMB: Decimal = 0.3
         @Published var maxBolus: Decimal = 0
@@ -149,7 +155,15 @@ extension Home {
             useTargetButton = settingsManager.settings.useTargetButton
             hours = settingsManager.settings.hours
             alwaysUseColors = settingsManager.settings.alwaysUseColors
+
+            // Dana UI Toggels
             timeSettings = settingsManager.settings.timeSettings
+            danaIcon = settingsManager.settings.danaIcon
+            legendsSwitch = settingsManager.settings.legendsSwitch
+            danaBar = settingsManager.settings.danaBar
+            tempTargetbar = settingsManager.settings.tempTargetbar
+            // Dana UI Toggels
+
             useCalc = settingsManager.settings.useCalc
             minimumSMB = settingsManager.settings.minimumSMB
             maxBolus = settingsManager.pumpSettings.maxBolus
@@ -653,7 +667,15 @@ extension Home.StateModel:
         useTargetButton = settingsManager.settings.useTargetButton
         hours = settingsManager.settings.hours
         alwaysUseColors = settingsManager.settings.alwaysUseColors
+        // Dana UI Toggels
+
         timeSettings = settingsManager.settings.timeSettings
+        danaIcon = settingsManager.settings.danaIcon
+        legendsSwitch = settingsManager.settings.legendsSwitch
+        danaBar = settingsManager.settings.danaBar
+        tempTargetbar = settingsManager.settings.tempTargetbar
+
+        // Dana UI Toggels
         useCalc = settingsManager.settings.useCalc
         minimumSMB = settingsManager.settings.minimumSMB
         maxBolus = settingsManager.pumpSettings.maxBolus

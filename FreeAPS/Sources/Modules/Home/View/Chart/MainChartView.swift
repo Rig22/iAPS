@@ -211,56 +211,56 @@ struct MainChartView: View {
          } */
     }
 
-    var legendPanel: some View {
-        ZStack {
-            HStack {
-                if legends {
-                    Group {
-                        Circle().fill(Color.insulin).frame(width: 8, height: 8)
-                            .padding(.leading, 8)
-                        Text("IOB")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(.insulin)
-                    }
-                    Group {
-                        Circle().fill(Color.zt).frame(width: 8, height: 8)
-                            .padding(.leading, 8)
-                        Text("ZT")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(.zt)
-                    }
-                    Group {
-                        Circle().fill(Color.loopYellow).frame(width: 8, height: 8)
-                            .padding(.leading, 8)
-                        Text("COB")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(.loopYellow)
-                    }
-                    Group {
-                        Circle().fill(Color.uam).frame(width: 8, height: 8)
-                            .padding(.leading, 8)
-                        Text("UAM")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(.uam)
-                    }
-                } else {
-                    Group {
-                        Text(".")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(.insulin)
-                    }
-                    Group {
-                        Text(".")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(.zt)
-                    }
-                    Group {
-                        Text(".")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(.loopYellow)
-                    }
-                    Group {
-                        Text(".")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(.uam)
-                    }
-                }
-            }
-            .padding(.bottom, 8)
-        }
-    }
+    /* var legendPanel: some View {
+         ZStack {
+             HStack {
+                 if legends {
+                     Group {
+                         Circle().fill(Color.insulin).frame(width: 8, height: 8)
+                             .padding(.leading, 8)
+                         Text("IOB")
+                             .font(.system(size: 12, weight: .bold)).foregroundColor(.insulin)
+                     }
+                     Group {
+                         Circle().fill(Color.zt).frame(width: 8, height: 8)
+                             .padding(.leading, 8)
+                         Text("ZT")
+                             .font(.system(size: 12, weight: .bold)).foregroundColor(.zt)
+                     }
+                     Group {
+                         Circle().fill(Color.loopYellow).frame(width: 8, height: 8)
+                             .padding(.leading, 8)
+                         Text("COB")
+                             .font(.system(size: 12, weight: .bold)).foregroundColor(.loopYellow)
+                     }
+                     Group {
+                         Circle().fill(Color.uam).frame(width: 8, height: 8)
+                             .padding(.leading, 8)
+                         Text("UAM")
+                             .font(.system(size: 12, weight: .bold)).foregroundColor(.uam)
+                     }
+                 } else {
+                     Group {
+                         Text(".")
+                             .font(.system(size: 12, weight: .bold)).foregroundColor(.insulin)
+                     }
+                     Group {
+                         Text(".")
+                             .font(.system(size: 12, weight: .bold)).foregroundColor(.zt)
+                     }
+                     Group {
+                         Text(".")
+                             .font(.system(size: 12, weight: .bold)).foregroundColor(.loopYellow)
+                     }
+                     Group {
+                         Text(".")
+                             .font(.system(size: 12, weight: .bold)).foregroundColor(.uam)
+                     }
+                 }
+             }
+             .padding(.bottom, 8)
+         }
+     } */
 
     private func mainScrollView(fullSize: CGSize) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -269,12 +269,12 @@ struct MainChartView: View {
                     tempTargetsView(fullSize: fullSize).drawingGroup()
                     overridesView(fullSize: fullSize).drawingGroup()
                     basalView(fullSize: fullSize).drawingGroup()
-                    legendPanel.frame(
-                        maxWidth: .infinity,
-                        maxHeight: .infinity,
-                        alignment: .bottomTrailing
-                    )
-                    .padding(.trailing, legends ? 20 : 70).padding(.bottom, 20)
+                        // legendPanel.frame(
+                        //     maxWidth: .infinity,
+                        //     maxHeight: .infinity,
+                        //     alignment: .bottomTrailing
+                        // )
+                        .padding(.trailing, legends ? 20 : 70).padding(.bottom, 20)
                     mainView(fullSize: fullSize).id(Config.endID)
                         .drawingGroup()
                         .onChange(of: glucose) { _ in

@@ -14,7 +14,13 @@ extension StatConfig {
         @Published var useTargetButton: Bool = false
         @Published var hours: Decimal = 6
         @Published var alwaysUseColors: Bool = true
+        // Dana UI Toggels
         @Published var timeSettings: Bool = true
+        @Published var danaIcon: Bool = true
+        @Published var legendsSwitch: Bool = true
+        @Published var danaBar: Bool = true
+        @Published var tempTargetBar: Bool = true
+        // Dana UI Toggels
         @Published var minimumSMB: Decimal = 0.3
         @Published var useInsulinBars: Bool = false
         @Published var skipGlucoseChart: Bool = false
@@ -30,7 +36,15 @@ extension StatConfig {
             subscribeSetting(\.yGridLines, on: $yGridLines) { yGridLines = $0 }
             subscribeSetting(\.rulerMarks, on: $rulerMarks) { rulerMarks = $0 }
             subscribeSetting(\.skipGlucoseChart, on: $skipGlucoseChart) { skipGlucoseChart = $0 }
+            // Dana Toggels
+
             subscribeSetting(\.timeSettings, on: $timeSettings) { timeSettings = $0 }
+            subscribeSetting(\.danaIcon, on: $danaIcon) { danaIcon = $0 }
+            subscribeSetting(\.legendsSwitch, on: $legendsSwitch) { legendsSwitch = $0 }
+            subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
+            subscribeSetting(\.tempTargetbar, on: $tempTargetBar) { tempTargetBar = $0 }
+
+            // Dana Toggels
             subscribeSetting(\.alwaysUseColors, on: $alwaysUseColors) { alwaysUseColors = $0 }
             subscribeSetting(\.useFPUconversion, on: $useFPUconversion) { useFPUconversion = $0 }
             subscribeSetting(\.useTargetButton, on: $useTargetButton) { useTargetButton = $0 }

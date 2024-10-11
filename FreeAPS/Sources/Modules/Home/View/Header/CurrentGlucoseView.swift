@@ -9,21 +9,15 @@ struct CurrentGlucoseView: View {
     @Binding var lowGlucose: Decimal
     @Binding var highGlucose: Decimal
 
-    @State private var angularGradient = AngularGradient(colors: [
-    ], center: .center, startAngle: .degrees(270), endAngle: .degrees(-90))
     @State private var rotationDegrees: Double = 0
-    @State private var bumpEffect: Double = 0 // Separate Variable für den Bump
+    @State private var bumpEffect: Double = 0
 
-    @Environment(\.colorScheme) var colorScheme
+    // @Environment(\.colorScheme) var colorScheme
 
     private var glucoseFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 0
-        if units == .mmolL {
-            formatter.minimumFractionDigits = 1
-            formatter.maximumFractionDigits = 1
-        }
+        formatter.maximumFractionDigits = units == .mmolL ? 1 : 0
         formatter.roundingMode = .halfUp
         return formatter
     }
@@ -41,13 +35,6 @@ struct CurrentGlucoseView: View {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.maximumFractionDigits = 0
-        formatter.negativePrefix = ""
-        return formatter
-    }
-
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
         return formatter
     }
 
@@ -72,11 +59,17 @@ struct CurrentGlucoseView: View {
         )
 
         ZStack {
-            CircleShape(gradient: angularGradient)
+            Circle()
+                .fill(angularGradient)
+                .frame(width: 120, height: 120)
 
             TriangleShape(color: triangleColor)
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))
                 .animation(.easeInOut(duration: 3.0), value: rotationDegrees)
+
+            Circle()
+                .fill(Color.rig22Background.opacity(1.0))
+                .frame(width: 110, height: 110)
 
             VStack(alignment: .center) {
                 HStack {
@@ -88,19 +81,16 @@ struct CurrentGlucoseView: View {
                             } ?? "--"
                     )
                     .font(.system(size: 36, weight: .bold))
-                    .foregroundColor(alarm == nil ? colourGlucoseText : .loopYellow)
+                    .foregroundColor(alarm == nil ? colourGlucoseText : .yellow)
                 }
                 HStack {
                     let minutesAgo = -1 * (recentGlucose?.dateString.timeIntervalSinceNow ?? 0) / 60
-                    let text = timaAgoFormatter.string(for: Double(minutesAgo)) ?? ""
+                    let timeText = timaAgoFormatter.string(for: Double(minutesAgo)) ?? ""
                     Text(
-                        minutesAgo <= 1 ? "< 1 " + NSLocalizedString("min", comment: "Short form for minutes") : (
-                            text + " " +
-                                NSLocalizedString("min", comment: "Short form for minutes") + " "
-                        )
+                        minutesAgo <= 1 ? "< 1 min" : "\(timeText) min"
                     )
                     .font(.caption2)
-                    .foregroundColor(colorScheme == .dark ? Color.white.opacity(0.9) : Color.white)
+                    .foregroundStyle(Color.white)
 
                     Text(
                         delta
@@ -109,9 +99,8 @@ struct CurrentGlucoseView: View {
                             } ?? "--"
                     )
                     .font(.caption2)
-                    .foregroundColor(colorScheme == .dark ? Color.white.opacity(0.9) : Color.white)
+                    .foregroundStyle(Color.white)
                 }
-                .frame(alignment: .top)
             }
         }
         .onChange(of: recentGlucose?.direction) { newDirection in
@@ -137,35 +126,27 @@ struct CurrentGlucoseView: View {
             @unknown default:
                 rotationDegrees = 0
             }
-            // Schneller Bump-Effekt auf separater Variable
+
             withAnimation(.interpolatingSpring(stiffness: 100, damping: 5).delay(0.5)) {
-                bumpEffect = 5 // Schneller Bump nach der Rotation
-                bumpEffect = 0 // wird das auskommentiert gibt es eine langasame Animation
+                bumpEffect = 5
+                bumpEffect = 0
             }
-            /* withAnimation(.interpolatingSpring(stiffness: 120, damping: 8).delay(0.3)) {
-                 bumpEffect = 5
-             }
-             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                 withAnimation(.easeOut(duration: 1.0)) {
-                     bumpEffect = 0
-                 }
-             }*/
         }
     }
 
     var colourGlucoseText: Color {
         let whichGlucose = recentGlucose?.glucose ?? 0
-        let defaultColor: Color = colorScheme == .dark ? .white : .white
+        let defaultColor = Color.white
 
         guard lowGlucose < highGlucose else { return .primary }
 
         switch whichGlucose {
         case 0 ..< Int(lowGlucose):
-            return .loopYellow
+            return .yellow
         case Int(lowGlucose) ..< Int(highGlucose):
             return defaultColor
         case Int(highGlucose)...:
-            return .loopYellow
+            return .yellow
         default:
             return defaultColor
         }
@@ -173,8 +154,6 @@ struct CurrentGlucoseView: View {
 }
 
 struct TrendShape: View {
-    @Environment(\.colorScheme) var colorScheme
-
     let gradient: AngularGradient
     let color: Color
 
@@ -182,38 +161,9 @@ struct TrendShape: View {
         HStack(alignment: .center) {
             ZStack {
                 Group {
-                    CircleShape(gradient: gradient)
                     TriangleShape(color: color)
                 }
-                .shadow(
-                    color: Color.black.opacity(colorScheme == .dark ? 0.75 : 0.33),
-                    radius: colorScheme == .dark ? 5 : 3
-                )
             }
-        }
-    }
-}
-
-struct CircleShape: View {
-    @Environment(\.colorScheme) var colorScheme
-
-    let gradient: AngularGradient
-
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(LinearGradient(
-                    gradient: Gradient(colors: [Color.darkGray, Color.darkGray, Color.darkGray]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                ))
-                .frame(width: 120, height: 120)
-                .opacity(0.2)
-
-            Circle()
-                .stroke(gradient, lineWidth: 6)
-                .background(Circle().fill(Color("Chart")))
-                .frame(width: 120, height: 120)
         }
     }
 }

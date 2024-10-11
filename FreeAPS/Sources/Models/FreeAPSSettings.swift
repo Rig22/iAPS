@@ -54,7 +54,13 @@ struct FreeAPSSettings: JSON, Equatable {
     var useLiveActivity: Bool = false
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = true
+    // Dana UI Toggels
     var timeSettings: Bool = true
+    var danaIcon: Bool = true
+    var danaBar: Bool = true
+    var legendsSwitch: Bool = true
+    var tempTargetbar: Bool = true
+    // Dana UI Toggels
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
     var allowedRemoteBolusAmount: Decimal = 0.0
@@ -293,10 +299,30 @@ extension FreeAPSSettings: Decodable {
         if let alwaysUseColors = try? container.decode(Bool.self, forKey: .alwaysUseColors) {
             settings.alwaysUseColors = alwaysUseColors
         }
-
+        // Dana UI Toggels
         if let timeSettings = try? container.decode(Bool.self, forKey: .timeSettings) {
             settings.timeSettings = timeSettings
         }
+
+        if let danaIcon = try? container.decode(Bool.self, forKey: .danaIcon) {
+            settings.danaIcon = danaIcon
+        }
+
+        if let legendsSwitch = try? container.decode(Bool.self, forKey: .legendsSwitch) {
+            settings.legendsSwitch = legendsSwitch
+        }
+
+        if let danaBar = try? container.decode(
+            Bool.self,
+            forKey: .danaBar
+        ) {
+            settings.danaBar = danaBar
+        }
+
+        if let tempTargetbar = try? container.decode(Bool.self, forKey: .tempTargetbar) {
+            settings.tempTargetbar = tempTargetbar
+        }
+        // Dana Toggels
 
         if let profilesOrTempTargets = try? container.decode(Bool.self, forKey: .profilesOrTempTargets) {
             settings.profilesOrTempTargets = profilesOrTempTargets
