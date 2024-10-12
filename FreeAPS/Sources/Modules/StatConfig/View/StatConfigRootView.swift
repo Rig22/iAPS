@@ -34,13 +34,13 @@ extension StatConfig {
         var body: some View {
             VStack(alignment: .center) {
                 if state.danaIcon {
-                    Image("ic_dana_rs")
+                    Image("Dana_rs")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 200, height: 200)
                         .padding(.top, 20)
                 } else {
-                    Image("ic_dana_i")
+                    Image("Dana_i")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 200, height: 200)
@@ -52,20 +52,21 @@ extension StatConfig {
                         Toggle("Icon Dana-i or Dana RS", isOn: $state.danaIcon)
                         Toggle("DanaBar ⇢ off/on", isOn: $state.danaBar)
                         Toggle("LegendBar ⇢ off/on", isOn: $state.legendsSwitch)
+                        Toggle("TempTargetBar ⇢ off/on", isOn: $state.tempTargetBar)
                         Toggle("BottomBar ⇢ off/on", isOn: $state.timeSettings)
+                    } header: { Text("Dana UI/UX Settings ") }
+                    footer: { Text("DanaBar only works when using a Dana pump!") }
+
+                    Section {
+                        Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
+                        Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
+                        Toggle("Display Chart Threshold lines for Low and High", isOn: $state.rulerMarks)
                         HStack {
                             Text("Currently selected chart time")
                             Spacer()
                             DecimalTextField("6", value: $state.hours, formatter: carbsFormatter)
                             Text("hours").foregroundColor(.white)
                         }
-                        Toggle("TempTargetBar ⇢ off/on", isOn: $state.tempTargetBar)
-                    } header: { Text("Dana UI/UX Settings ") }
-
-                    Section {
-                        Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
-                        Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
-                        Toggle("Display Chart Threshold lines for Low and High", isOn: $state.rulerMarks)
                         Toggle("Standing / Laying TIR Chart", isOn: $state.oneDimensionalGraph)
                         Toggle("Use insulin bars", isOn: $state.useInsulinBars)
                         HStack {

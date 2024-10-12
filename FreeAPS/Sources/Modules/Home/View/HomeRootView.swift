@@ -771,15 +771,15 @@ extension Home {
 
                                 ZStack {
                                     if state.danaIcon {
-                                        Image("ic_dana_rs")
+                                        Image("Dana_rs")
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 50, height: 50)
+                                            .frame(width: 70, height: 70)
                                     } else {
-                                        Image("ic_dana_i")
+                                        Image("Dana_i")
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 50, height: 50)
+                                            .frame(width: 70, height: 70)
                                     }
                                 }
                                 .padding(.horizontal, 5)
