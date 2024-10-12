@@ -774,12 +774,12 @@ extension Home {
                                         Image("Dana_rs")
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 70, height: 70)
+                                            .frame(width: 60, height: 60)
                                     } else {
                                         Image("Dana_i")
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 70, height: 70)
+                                            .frame(width: 60, height: 60)
                                     }
                                 }
                                 .padding(.horizontal, 5)
