@@ -1053,8 +1053,8 @@ extension Home {
             Buttons(label: "3", number: "3", active: false, hours: 3, action: nil),
             Buttons(label: "6", number: "6", active: false, hours: 6, action: nil),
             Buttons(label: "12", number: "12", active: false, hours: 12, action: nil),
-            Buttons(label: "24", number: "24", active: false, hours: 24, action: nil),
-            Buttons(label: "UX", number: "UX", active: false, hours: nil, action: nil)
+            Buttons(label: "24", number: "24", active: false, hours: 24, action: nil)
+            //    Buttons(label: "UX", number: "UX", active: false, hours: nil, action: nil)
         ]
 
         func highlightButtons() {
@@ -1102,10 +1102,10 @@ extension Home {
                                     .foregroundStyle(Color.white)
                                     .font(.system(size: 15))
                             }
-                            .padding(.leading, 25)
+                            // .padding(.leading, 25)
                             .frame(maxWidth: 100, alignment: .leading)
                         }
-
+                        Spacer()
                         // Mittlerer Stack
 
                         HStack(spacing: 10) {
@@ -1135,7 +1135,7 @@ extension Home {
                             highlightButtons()
                             updateButtonActions()
                         }
-
+                        Spacer()
                         // Rechter Stack - TDD
 
                         HStack {
@@ -1269,6 +1269,19 @@ extension Home {
                                 state.showModal(for: .addTempTarget)
                             }
                     }
+                    Spacer()
+                    Button { state.showModal(for: .statisticsConfig) }
+                    label: {
+                        Image("ux")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 45, height: 45)
+                            .font(.system(size: 14))
+                            .buttonStyle(.borderless)
+                            .foregroundStyle(Color.white)
+                    }
+                    .buttonStyle(.borderless)
+                    .foregroundStyle(Color.white)
                     Spacer()
                     Button { state.showModal(for: .settings) }
                     label: {

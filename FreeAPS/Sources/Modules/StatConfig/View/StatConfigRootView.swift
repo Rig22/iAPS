@@ -37,25 +37,29 @@ extension StatConfig {
                     Image("Dana_rs")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 200, height: 200)
-                        .padding(.top, 20)
+                        .frame(width: 300, height: 200)
+                        .padding(.top, 0)
                 } else {
                     Image("Dana_i")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 200, height: 200)
-                        .padding(.top, 20)
+                        .frame(width: 300, height: 200)
+                        .padding(.top, 0)
                 }
 
                 Form {
                     Section {
                         Toggle("Icon Dana-i or Dana RS", isOn: $state.danaIcon)
                         Toggle("DanaBar ⇢ off/on", isOn: $state.danaBar)
+                        HStack {
+                            Text("DanaBar only works with Dana Pumps!")
+                                .font(.system(size: 13))
+                                .foregroundStyle(Color.orange)
+                        }
                         Toggle("LegendBar ⇢ off/on", isOn: $state.legendsSwitch)
                         Toggle("TempTargetBar ⇢ off/on", isOn: $state.tempTargetBar)
                         Toggle("BottomBar ⇢ off/on", isOn: $state.timeSettings)
                     } header: { Text("Dana UI/UX Settings ") }
-                    footer: { Text("DanaBar only works when using a Dana pump!") }
 
                     Section {
                         Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
