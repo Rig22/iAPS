@@ -193,11 +193,6 @@ extension Home {
                 let progress = CGFloat(configuration.fractionCompleted ?? 0)
 
                 ZStack {
-                    /* Circle()
-                     .stroke(lineWidth: 5)
-                     .opacity(0.3)
-                     .foregroundColor(Color.rig22Background)*/
-
                     Circle()
                         .trim(from: 0.0, to: progress)
                         .stroke(
@@ -211,7 +206,7 @@ extension Home {
                         .rotationEffect(Angle(degrees: 270))
                         .animation(.linear(duration: 0.25), value: progress)
                 }
-                .frame(width: 118, height: 118)
+                .frame(width: 119, height: 119)
             }
         }
 
@@ -566,7 +561,7 @@ extension Home {
                             Image("carbs3")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 60, height: 60)
+                                .frame(width: 45, height: 45)
                         }
                     }
                 }
@@ -852,7 +847,7 @@ extension Home {
 
                             HStack(spacing: 10) {
                                 let connectionFraction: CGFloat = state.isConnected ? 1.0 : 0.0
-                                let connectionColor: Color = state.isConnected ? .blue : .gray
+                                let connectionColor: Color = state.isConnected ? .green : .green
 
                                 ZStack {
                                     SmallFillablePieSegment(

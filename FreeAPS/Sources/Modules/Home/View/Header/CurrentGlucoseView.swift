@@ -12,8 +12,6 @@ struct CurrentGlucoseView: View {
     @State private var rotationDegrees: Double = 0
     @State private var bumpEffect: Double = 0
 
-    // @Environment(\.colorScheme) var colorScheme
-
     private var glucoseFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -61,7 +59,7 @@ struct CurrentGlucoseView: View {
         ZStack {
             Circle()
                 .fill(angularGradient)
-                .frame(width: 120, height: 120)
+                .frame(width: 123, height: 123)
 
             TriangleShape(color: triangleColor)
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))
