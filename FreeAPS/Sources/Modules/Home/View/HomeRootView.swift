@@ -1221,7 +1221,7 @@ extension Home {
                     }
                     ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom))
                         {
-                            Image(isOverride ? "personfill" : "person")
+                            Image(isOverride ? "profilefill" : "profile")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 45, height: 45)

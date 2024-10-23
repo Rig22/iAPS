@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 1320 1320" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="profilefill" transform="matrix(0.995124,0,0,0.878049,3.17855,75.9294)">
+        <g id="buttonpanel">
+            <g id="profilefill1" serif:id="profilefill">
+                <g id="rechts">
+                    <g transform="matrix(1.13329,0,0,1.0118,783.691,40.1437)">
+                        <path d="M369.717,444.097L369.717,1215L105,1215L105,444.097L369.717,444.097ZM343.245,473.747L131.472,473.747L131.472,1185.35L343.245,1185.35L343.245,473.747Z" style="fill:white;"/>
+                    </g>
+                    <g transform="matrix(0.906629,0,0,0.93397,837.49,104.708)">
+                        <rect x="105" y="444.097" width="264.717" height="770.903" style="fill:rgb(0,162,255);"/>
+                    </g>
+                </g>
+                <g id="mitte">
+                    <g transform="matrix(1.30629,0,0,1.1381,27.044,-69.3087)">
+                        <path d="M599.376,105L599.376,1185.75L369.717,1185.75L369.717,105L599.376,105ZM576.41,131.36L392.683,131.36L392.683,1159.39L576.41,1159.39L576.41,131.36Z" style="fill:white;"/>
+                    </g>
+                    <g transform="matrix(1.04503,0,0,1.08258,153.635,-33.4794)">
+                        <rect x="369.717" y="105" width="229.659" height="1080.75" style="fill:rgb(0,162,255);"/>
+                    </g>
+                </g>
+                <g id="links" transform="matrix(1,0,0,1,0,-16.2578)">
+                    <g transform="matrix(1.13329,0,0,1.24529,-1.60124,-216.582)">
+                        <path d="M369.717,444.097L369.717,1215L105,1215L105,444.097L369.717,444.097ZM343.245,468.188L131.472,468.188L131.472,1190.91L343.245,1190.91L343.245,468.188Z" style="fill:white;"/>
+                    </g>
+                    <g transform="matrix(0.906629,0,0,1.16746,52.1978,-152.017)">
+                        <rect x="105" y="444.097" width="264.717" height="770.903" style="fill:rgb(0,162,255);"/>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

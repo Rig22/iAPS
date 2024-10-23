@@ -112,40 +112,6 @@ struct LoopView: View {
     var body: some View {
         VStack {
             ZStack {
-                VStack {
-                    Circle()
-                        .fill(color)
-                        .frame(width: 6, height: 6)
-
-                    /* if closedLoop {
-                         if !isLooping, actualSuggestion?.timestamp != nil {
-                             if minutesAgo > 1440 {
-                                 Text("--")
-                                     .font(.system(size: 14))
-                                     .foregroundColor(.white)
-                                     .padding(.leading, 5)
-                             } else {
-                                 let timeString = "\(minutesAgo) " +
-                                     NSLocalizedString("min", comment: "Minutes ago since last loop")
-                                 Text(timeString)
-                                     .font(.system(size: 14))
-                                     .foregroundColor(.white)
-                             }
-                         }
-                     } else if !isLooping {
-                         Text("Open")
-                             .font(.system(size: 14))
-                             .foregroundColor(.white)
-                     }*/
-                }
-                .offset(y: 0) // widget nach oben verschieben
-
-                if isLooping {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: color))
-                        .frame(width: 45, height: 45)
-                }
-
                 FillablePieSegment(
                     pieSegmentViewModel: pieSegmentViewModel,
                     fillFraction: min(CGFloat(minutesAgo) / 8.0, 1.0),
@@ -158,6 +124,16 @@ struct LoopView: View {
                     .resizable()
                     .scaledToFit()
                     .frame(width: 67, height: 67)
+
+                Circle()
+                    .fill(color)
+                    .frame(width: 6, height: 6)
+
+                if isLooping {
+                    ProgressView()
+                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .frame(width: 50, height: 50)
+                }
             }
         }
         .onAppear {
@@ -187,7 +163,7 @@ struct LoopView: View {
         } else if delta <= 8.minutes.timeInterval {
             return .loopYellow
         } else {
-            return .loopRed
+            return .white
         }
     }
 
@@ -200,11 +176,11 @@ struct LoopView: View {
         let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
 
         if delta <= 5.minutes.timeInterval {
-            return .green.opacity(0.7) // Grün für 0-8 Minuten
+            return .green.opacity(0.7) // Grün für 0-5 Minuten
         } else if delta <= 8.minutes.timeInterval {
-            return .yellow.opacity(0.7) // Gelb für 8-12 Minuten
+            return .yellow.opacity(0.7) // Gelb für 6-8 Minuten
         } else {
-            return .red.opacity(0.7) // Rot für mehr als 12 Minuten
+            return .red // Rot für mehr als 8 Minuten
         }
     }
 
