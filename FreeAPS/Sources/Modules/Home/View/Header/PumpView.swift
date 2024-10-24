@@ -4,7 +4,6 @@ struct PumpView: View {
     @Binding var reservoir: Decimal?
     @Binding var battery: Battery?
     @Binding var name: String
-    //  @Binding var expiresAtDate: Date?
     @Binding var timerDate: Date
     @Binding var timeZone: TimeZone?
 
@@ -12,8 +11,6 @@ struct PumpView: View {
 
     @StateObject private var reservoirPieSegmentViewModel = PieSegmentViewModel()
     @StateObject private var batteryPieSegmentViewModel = PieSegmentViewModel()
-
-    @Environment(\.colorScheme) var colorScheme
 
     private var reservoirFormatter: NumberFormatter {
         let formatter = NumberFormatter()

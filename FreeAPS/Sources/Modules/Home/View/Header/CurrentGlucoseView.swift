@@ -37,19 +37,22 @@ struct CurrentGlucoseView: View {
     }
 
     var body: some View {
-        let triangleColor = Color(red: 0.18, green: 0.35, blue: 0.58)
+        // let triangleColor = Color(red: 0.18, green: 0.35, blue: 0.58)
+        // let triangleColor = Color.white.opacity(0.7)
+        let triangleColor = colourGlucoseText.opacity(0.7)
 
         let angularGradient = AngularGradient(
             gradient: Gradient(colors: [
-                Color.blue.opacity(0.7),
-                Color.blue.opacity(0.6),
-                Color.blue.opacity(0.6),
-                Color.blue.opacity(0.5),
-                Color.blue.opacity(0.5),
-                Color.blue.opacity(0.5),
-                Color.blue.opacity(0.6),
-                Color.blue.opacity(0.6),
-                Color.blue.opacity(0.7)
+                /* Color.blue.opacity(0.7),
+                 Color.blue.opacity(0.6),
+                 Color.blue.opacity(0.6),
+                 Color.blue.opacity(0.5),
+                 Color.blue.opacity(0.5),
+                 Color.blue.opacity(0.5),
+                 Color.blue.opacity(0.6),
+                 Color.blue.opacity(0.6),
+                 Color.blue.opacity(0.7)*/
+                Color.clear
             ]),
             center: .center,
             startAngle: .degrees(0),
@@ -60,6 +63,10 @@ struct CurrentGlucoseView: View {
             Circle()
                 .fill(angularGradient)
                 .frame(width: 123, height: 123)
+                .overlay(
+                    Circle()
+                        .stroke(Color.white, lineWidth: 1)
+                )
 
             TriangleShape(color: triangleColor)
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))
@@ -79,13 +86,14 @@ struct CurrentGlucoseView: View {
                             } ?? "--"
                     )
                     .font(.system(size: 36, weight: .bold))
-                    .foregroundColor(alarm == nil ? colourGlucoseText : .yellow)
+                    // .foregroundColor(alarm == nil ? colourGlucoseText : .yellow)
+                    .foregroundStyle(Color.white)
                 }
                 HStack {
                     let minutesAgo = -1 * (recentGlucose?.dateString.timeIntervalSinceNow ?? 0) / 60
                     let timeText = timaAgoFormatter.string(for: Double(minutesAgo)) ?? ""
                     Text(
-                        minutesAgo <= 1 ? "< 1 min" : "\(timeText) min"
+                        minutesAgo <= 1 ? "0 min" : "\(timeText) min"
                     )
                     .font(.caption2)
                     .foregroundStyle(Color.white)
@@ -140,7 +148,7 @@ struct CurrentGlucoseView: View {
 
         switch whichGlucose {
         case 0 ..< Int(lowGlucose):
-            return .yellow
+            return .red
         case Int(lowGlucose) ..< Int(highGlucose):
             return defaultColor
         case Int(highGlucose)...:

@@ -157,7 +157,7 @@ final class CoreDataStorage {
         if let version = versions {
             coredataContext.performAndWait { [self] in
                 let saveNr = VNr(context: self.coredataContext)
-                saveNr.nr = version.main
+                //     saveNr.nr = version.main
                 saveNr.dev = version.dev
                 saveNr.date = Date.now
                 try? self.coredataContext.save()

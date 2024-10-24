@@ -453,6 +453,10 @@ extension Home {
                             .fill(backgroundColor)
                             .opacity(0.3)
                             .frame(width: 60, height: 60)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 1)
+                            )
 
                         PieSliceView(
                             startAngle: .degrees(-90),
@@ -502,6 +506,10 @@ extension Home {
                             .fill(backgroundColor)
                             .opacity(0.3)
                             .frame(width: 40, height: 40)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 1)
+                            )
 
                         PieSliceView(
                             startAngle: .degrees(-90),
@@ -746,12 +754,20 @@ extension Home {
                                             .fill(Color.gray)
                                             .opacity(0.3)
                                             .frame(width: 40, height: 40)
+                                            .overlay(
+                                                Circle()
+                                                    .stroke(Color.white, lineWidth: 1)
+                                            )
 
                                         // Battery Fallback
                                         Image("battery")
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 40, height: 40)
+                                            .overlay(
+                                                Circle()
+                                                    .stroke(Color.white, lineWidth: 1)
+                                            )
                                     }
                                 }
                             }
@@ -765,16 +781,25 @@ extension Home {
                                     .padding(.trailing, 5)
 
                                 ZStack {
+                                    Circle()
+                                        .fill(Color.gray)
+                                        .opacity(0.3)
+                                        .frame(width: 60, height: 60)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.white, lineWidth: 1)
+                                        )
+
                                     if state.danaIcon {
                                         Image("Dana_rs")
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 60, height: 60)
+                                            .frame(width: 42, height: 42)
                                     } else {
                                         Image("Dana_i")
                                             .resizable()
                                             .scaledToFit()
-                                            .frame(width: 60, height: 60)
+                                            .frame(width: 42, height: 42)
                                     }
                                 }
                                 .padding(.horizontal, 5)

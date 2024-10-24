@@ -63,6 +63,10 @@ struct FillablePieSegment: View {
                     .fill(backgroundColor)
                     .opacity(0.3)
                     .frame(width: 45, height: 45)
+                    .overlay(
+                        Circle()
+                            .stroke(Color.white, lineWidth: 1)
+                    )
 
                 PieSliceView(
                     startAngle: .degrees(-90),
@@ -114,7 +118,7 @@ struct LoopView: View {
             ZStack {
                 FillablePieSegment(
                     pieSegmentViewModel: pieSegmentViewModel,
-                    fillFraction: min(CGFloat(minutesAgo) / 8.0, 1.0),
+                    fillFraction: min(CGFloat(minutesAgo) / 5.0, 1.0),
                     color: pieColor,
                     backgroundColor: .gray,
                     displayText: "\(minutesAgo) min",
@@ -138,11 +142,11 @@ struct LoopView: View {
         }
         .onAppear {
             // Update progress abhängig von "current minutes ago"
-            pieSegmentViewModel.updateProgress(to: min(CGFloat(minutesAgo) / 8.0, 1.0), animate: true)
+            pieSegmentViewModel.updateProgress(to: min(CGFloat(minutesAgo) / 5.0, 1.0), animate: true)
         }
         .onChange(of: minutesAgo) { _ in
             // Rekalkuliert den pie progress "as time passes"
-            pieSegmentViewModel.updateProgress(to: min(CGFloat(minutesAgo) / 8.0, 1.0), animate: true)
+            pieSegmentViewModel.updateProgress(to: min(CGFloat(minutesAgo) / 5.0, 1.0), animate: true)
         }
     }
 
@@ -155,12 +159,12 @@ struct LoopView: View {
         }
         let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
 
-        if delta <= 5.minutes.timeInterval {
+        if delta <= 6.minutes.timeInterval {
             guard actualSuggestion?.deliverAt != nil else {
                 return .loopYellow
             }
             return .green
-        } else if delta <= 8.minutes.timeInterval {
+        } else if delta <= 9.minutes.timeInterval {
             return .loopYellow
         } else {
             return .white
@@ -168,19 +172,21 @@ struct LoopView: View {
     }
 
     private var minutesAgo: Int {
-        let minAgo = Int((timerDate.timeIntervalSince(lastLoopDate) - Config.lag) / 60) + 1
+        let minAgo = Int((timerDate.timeIntervalSince(lastLoopDate) - Config.lag) / 60)
         return minAgo
     }
 
     private var pieColor: Color {
         let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
 
-        if delta <= 5.minutes.timeInterval {
-            return .green.opacity(0.7) // Grün für 0-5 Minuten
-        } else if delta <= 8.minutes.timeInterval {
-            return .yellow.opacity(0.7) // Gelb für 6-8 Minuten
+        if delta < 1.minutes.timeInterval {
+            return .clear // unter 1 Minute
+        } else if delta < 6.minutes.timeInterval {
+            return .green.opacity(0.7) // grün für 1-5 Minuten
+        } else if delta < 10.minutes.timeInterval {
+            return .yellow.opacity(0.7) // Gelb für 6-9 Minuten
         } else {
-            return .red // Rot für mehr als 8 Minuten
+            return .red // Rot ab Minute 10
         }
     }
 
