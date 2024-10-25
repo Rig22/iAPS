@@ -194,19 +194,20 @@ extension Home {
 
                 ZStack {
                     Circle()
-                        .trim(from: 0.0, to: progress)
+                        // .trim(from: 0.0, to: progress)
+                        .trim(from: 1.0 - progress, to: 1.0) // Progress läuft gegen den Uhrzeigersinn
                         .stroke(
                             LinearGradient(
-                                gradient: Gradient(colors: [Color.insulin, Color.blue]),
+                                gradient: Gradient(colors: [Color.rig22Background, Color.rig22Background]),
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                            style: StrokeStyle(lineWidth: 2, lineCap: .round)
                         )
                         .rotationEffect(Angle(degrees: 270))
                         .animation(.linear(duration: 0.25), value: progress)
                 }
-                .frame(width: 119, height: 119)
+                .frame(width: 123, height: 123)
             }
         }
 
@@ -562,7 +563,7 @@ extension Home {
                                 color: .loopYellow,
                                 backgroundColor: .gray,
                                 displayText: "\(numberFormatter.string(from: (state.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
-                                //  symbolSize: 35,
+                                //  symbolSize: 30,
                                 //  symbol: "",
                                 animateProgress: true
                             )
@@ -620,7 +621,7 @@ extension Home {
                         addBackground()
                         info
                     }
-                    .frame(maxWidth: .infinity, maxHeight: 80)
+                    .frame(maxWidth: .infinity, maxHeight: 90)
                 )
             } else {
                 return AnyView(EmptyView())
@@ -893,6 +894,7 @@ extension Home {
                                         .frame(width: 40, height: 40)
                                 }
                             }
+                            .padding(.top, 10)
                         }
                     }
                     .onReceive(timer) { _ in

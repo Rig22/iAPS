@@ -161,11 +161,11 @@ struct LoopView: View {
 
         if delta <= 6.minutes.timeInterval {
             guard actualSuggestion?.deliverAt != nil else {
-                return .loopYellow
+                return .white
             }
             return .green
         } else if delta <= 9.minutes.timeInterval {
-            return .loopYellow
+            return .white
         } else {
             return .white
         }
