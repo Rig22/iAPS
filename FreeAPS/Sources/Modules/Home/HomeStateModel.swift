@@ -109,6 +109,8 @@ extension Home {
         @Published var reservoirAge: String?
         @Published var insulinType: String?
         //
+        @Published var insulinBadge: Bool = false
+        @Published var insulinConcentration: Double = 1.0 // Initialer Wert
 
         let coredataContext = CoreDataStack.shared.persistentContainer.viewContext
 
@@ -163,6 +165,8 @@ extension Home {
             danaBar = settingsManager.settings.danaBar
             tempTargetbar = settingsManager.settings.tempTargetbar
             // Dana UI Toggels
+
+            insulinBadge = settingsManager.settings.insulinBadge
 
             useCalc = settingsManager.settings.useCalc
             minimumSMB = settingsManager.settings.minimumSMB

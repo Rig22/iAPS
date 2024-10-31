@@ -10,6 +10,7 @@ extension Settings {
         @Published var debugOptions = false
         @Published var animatedBackground = false
         @Published var disableCGMError = true
+        @Published var allowDilution = false
 
         private(set) var buildNumber = ""
         private(set) var versionNumber = ""
@@ -21,6 +22,7 @@ extension Settings {
             subscribeSetting(\.debugOptions, on: $debugOptions) { debugOptions = $0 }
             subscribeSetting(\.closedLoop, on: $closedLoop) { closedLoop = $0 }
             subscribeSetting(\.disableCGMError, on: $disableCGMError) { disableCGMError = $0 }
+            subscribeSetting(\.allowDilution, on: $allowDilution) { allowDilution = $0 }
 
             broadcaster.register(SettingsObserver.self, observer: self)
 
@@ -88,5 +90,6 @@ extension Settings.StateModel: SettingsObserver {
         closedLoop = settings.closedLoop
         debugOptions = settings.debugOptions
         disableCGMError = settings.disableCGMError
+        allowDilution = settings.allowDilution
     }
 }

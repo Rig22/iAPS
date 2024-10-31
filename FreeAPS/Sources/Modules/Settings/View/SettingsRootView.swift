@@ -15,6 +15,13 @@ extension Settings {
             )
         ) var fetchedVersionNumber: FetchedResults<VNr>
 
+        @FetchRequest(
+            entity: OverridePresets.entity(),
+            sortDescriptors: [NSSortDescriptor(key: "name", ascending: true)], predicate: NSPredicate(
+                format: "name != %@", "" as String
+            )
+        ) var fetchedProfiles: FetchedResults<OverridePresets>
+
         var body: some View {
             Form {
                 Section {
@@ -63,7 +70,7 @@ extension Settings {
 
                 Section {
                     Text("Pump Settings").navigationLink(to: .pumpSettingsEditor, from: self)
-                    Text("Basal Profile").navigationLink(to: .basalProfileEditor, from: self)
+                    Text("Basal Profile").navigationLink(to: .basalProfileEditor(saveNewConcentration: false), from: self)
                     Text("Insulin Sensitivities").navigationLink(to: .isfEditor, from: self)
                     Text("Carb Ratios").navigationLink(to: .crEditor, from: self)
                     Text("Target Glucose").navigationLink(to: .targetsEditor, from: self)
@@ -75,8 +82,7 @@ extension Settings {
                 } header: { Text("OpenAPS") }
 
                 Section {
-                    // Text("UI/UX").navigationLink(to: .statisticsConfig, from: self)
-                    Text("UI / UX").navigationLink(to: .statisticsConfig, from: self)
+                    Text("UI/UX").navigationLink(to: .statisticsConfig, from: self)
                     Text("App Icons").navigationLink(to: .iconConfig, from: self)
                     Text("Bolus Calculator").navigationLink(to: .bolusCalculatorConfig, from: self)
                     Text("Fat And Protein Conversion").navigationLink(to: .fpuConfig, from: self)
@@ -95,17 +101,22 @@ extension Settings {
                                     .frame(maxWidth: .infinity, alignment: .trailing)
                                     .buttonStyle(.borderedProminent)
                             }
-                            /*
-                             HStack {
-                                 Text("Delete All NS Overrides")
-                                 Button("Delete") { state.deleteOverrides() }
-                                     .frame(maxWidth: .infinity, alignment: .trailing)
-                                     .buttonStyle(.borderedProminent)
-                                     .tint(.red)
-                             }*/
+
+                            // Test code
+                            HStack {
+                                Text("Delete All NS Overrides")
+                                Button("Delete") { state.deleteOverrides() }
+                                    .frame(maxWidth: .infinity, alignment: .trailing)
+                                    .buttonStyle(.borderedProminent)
+                                    .tint(.red)
+                            }
 
                             HStack {
                                 Toggle("Ignore flat CGM readings", isOn: $state.disableCGMError)
+                            }
+
+                            HStack {
+                                Toggle("Allow diluted insulin concentration settings", isOn: $state.allowDilution)
                             }
                         }
                         Group {

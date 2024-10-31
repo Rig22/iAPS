@@ -473,6 +473,30 @@ Enact a temp Basal or a temp target */
 /* Max setting */
 "Max Bolus" = "Maximaler Bolus";
 
+/* Insulin alert message */
+"Please make sure you've selected the correct insulin concentration setting before saving.\n\nYour insulin should be labeled with the concentration, in units per ml. U100 means 100 units per ml and is the standard concentration." = "Bitte stellen Sie vor dem Speichern sicher, dass Sie die richtige Einstellung für die Insulinkonzentration ausgewählt haben.\n\nIhr Insulin sollte mit der Konzentration in Einheiten pro ml gekennzeichnet sein. U100 bedeutet 100 Einheiten pro ml und ist die Standardkonzentration.";
+/* Insulin Concentration View */
+"Concentration" = "Konzentration";
+/* Insulin Concentration View */
+"Insulin Concentration" = "Insulin Konzentration";
+/* Insulin Concentration View */
+"Change Insulin" = "Wechsel Insulin";
+/* Insulin Concentration View */
+"Insulin diluted to" = "Insulin verdünnt zu";
+/* Insulin Concentration View */
+"standard concentration:" = "Standard Konzentration:";
+/* Insulin Concentration View */
+"units per ml" = "Einheiten pro ml";
+/* Insulin Concentration View */
+"Standard concentration (U 100)" = "Standard Konzentration (U 100)";
+/* Insulin Concentration View */
+"Insulin concentration increased to" = "Insulin Konzentration erhöht zu";
+/* Insulin Concentration View */
+"Couldn't save to pump. Try again when pump isn't busy bolusing." = "Konnte nicht auf der Pumpe gespeichert werden. Versuche es noch einmal, wenn die Pumpe nicht mit einer Bolusabgabe beschäftigt ist.";
+/* Insulin Concentration View */
+"Saved" = "Saved";
+
+
 /* Max setting */
 "Max Carbs" = "Max Kohlenhydrate";
 

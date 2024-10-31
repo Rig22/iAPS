@@ -89,10 +89,11 @@ extension StatConfig {
 
                     Section {
                         Toggle("Never display the small glucose chart when scrolling", isOn: $state.skipGlucoseChart)
-                        Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
+                        // Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
+                        Toggle("Display Insulin Concentration", isOn: $state.insulinBadge)
                     } header: { Text("Header settings") }
-                    footer: {
-                        Text("Normally glucose is colored red only when over or under your notification limits for high/low") }
+                    /*  footer: {
+                     Text("Normally glucose is colored red only when over or under your notification limits for high/low") }*/
 
                     Section {
                         HStack {
@@ -120,7 +121,7 @@ extension StatConfig {
             }
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .onAppear(perform: configureView)
-            .navigationBarTitle("UI / UX")
+            .navigationBarTitle("UI/UX")
             // .navigationBarTitle("UI/UX")
             .navigationBarTitleDisplayMode(.automatic)
             .navigationBarItems(trailing: Button("Close", action: state.hideModal))

@@ -49,6 +49,19 @@ struct CompactSectionSpacing: ViewModifier {
     }
 }
 
+struct CarveOrDrop: ViewModifier {
+    let carve: Bool
+    func body(content: Content) -> some View {
+        if carve {
+            return content
+                .foregroundStyle(.shadow(.inner(color: .black, radius: 0.01, y: 1)))
+        } else {
+            return content
+                .foregroundStyle(.shadow(.drop(color: .black, radius: 0.02, y: 1)))
+        }
+    }
+}
+
 struct ScrollTargetLayoutModifier: ViewModifier {
     func body(content: Content) -> some View {
         if #available(iOS 17, *) {
@@ -328,6 +341,10 @@ extension View {
         modifier(RoundedBackground())
     }
 
+    func carvingOrRelief(carve: Bool) -> some View {
+        modifier(CarveOrDrop(carve: carve))
+    }
+
     func addShadows() -> some View {
         modifier(AddShadow())
     }
@@ -389,4 +406,22 @@ extension UnevenRoundedRectangle {
             bottomTrailingRadius: 50,
             topTrailingRadius: 50
         )
+}
+
+extension UIImage {
+    /// Code suggested by Mamad Farrahi, but slightly modified. Need to find some newer version later.
+    func fillImageUpToPortion(color: Color, portion: Double) -> Image {
+        let rect = CGRect(x: 0, y: 0, width: size.width, height: size.height)
+        UIGraphicsBeginImageContextWithOptions(size, false, scale)
+        draw(in: rect)
+        let context = UIGraphicsGetCurrentContext()!
+        context.setBlendMode(CGBlendMode.sourceIn)
+        context.setFillColor(color.cgColor ?? UIColor(.insulin.opacity(portion <= 3 ? 0.8 : 1)).cgColor)
+        let height: CGFloat = 1 - portion
+        let rectToFill = CGRect(x: 0, y: size.height * portion, width: size.width, height: size.height * height)
+        context.fill(rectToFill)
+        let newImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return Image(uiImage: newImage!)
+    }
 }

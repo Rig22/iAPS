@@ -92,7 +92,7 @@
 "Suggested at" = "Suggested at";
 
 /* Headline in enacted pop up (at: at what time) */
- "Error at" = "Error at";
+ "Status at" = "Status at";
 
 /* Bolus View Meal Summary Header */
 "Meal Summary" = "Meal Summary";
@@ -476,8 +476,59 @@ Enact a temp Basal or a temp target */
 /* Max setting */
 "Max Bolus" = "Max Bolus";
 
+/* Insulin alert message */
+"Please verify that you have selected the correct insulin concentration before saving your settings. The insulin vial or pen should indicate the concentration in units per milliliter (e.g., U100 indicates 100 units per milliliter, which is the standard concentration). Accurate selection is critical for proper dosing." = "Please verify that you have selected the correct insulin concentration before saving your settings. The insulin vial or pen should indicate the concentration in units per milliliter (e.g., U100 indicates 100 units per milliliter, which is the standard concentration). Accurate selection is critical for proper dosing.";
+
+/* Insulin Concentration View */
+"Concentration" = "Concentration";
+
+/* Insulin Concentration View */
+"Insulin Concentration" = "Insulin Concentration";
+
+/* Insulin Concentration View */
+"Change Insulin" = "Change Insulin";
+
+/* Insulin Concentration View */
+"Insulin diluted to" = "Insulin diluted to";
+
+/* Insulin Concentration View */
+"standard concentration:" = "standard concentration:";
+
+/* Insulin Concentration View */
+"units per ml" = "units per ml";
+
+/* Insulin Concentration View */
+"Standard concentration (U 100)" = "Standard concentration (U 100)";
+
+/* Insulin Concentration View */
+"Insulin concentration increased to" = "Insulin concentration increased to";
+
+/* Insulin Concentration View */
+"Couldn't save to pump. Try again when pump isn't busy bolusing." = "Couldn't save to pump. Try again when pump isn't busy bolusing.";
+
+/* Insulin Concentration View */
+"Saved" = "Saved";
+
+/* Label inusulin concentration, units per ml */
+"U100" = "U100";
+
+/* Label inusulin concentration, units per ml */
+"U200" = "U200";
+
+/* Label inusulin concentration, units per ml */
+"U50" = "U50";
+
+/* Label inusulin concentration, units per ml */
+"U10" = "U10";
+    
+/* Debug option, allow U50 and U10 (diluted insulin) */
+"Allow diluted insulin concentration settings" = "Allow diluted insulin concentration settings";
+    
 /* Max setting */
 "Max Carbs" = "Max Carbs";
+
+/* Max carbs description */
+"Maximum amount of carbs (g) you can add each entry" = "Maximum amount of carbs (g) you can add each entry";
 
 /* */
 "Pump Settings" = "Pump Settings";
@@ -637,6 +688,9 @@ Enact a temp Basal or a temp target */
 
 /* Treatments list */
 "Treatments" = "Treatments";
+
+/* Hypo Treatment Preset */
+"Treatment" = "Treatment";
 
 /* " min" in Treatments list */
 " min" = " min";
@@ -1246,7 +1300,7 @@ Enact a temp Basal or a temp target */
 "Can't enact the new loop cycle recommendation, because a Bolus is in progress. Wait for next loop cycle" = "Can't enact the new loop cycle recommendation, because a Bolus is in progress. Wait for next loop cycle";
 
 /* Pump Error */
-"Error: Pump is Busy." = "Error: Pump is Busy.";
+"Pump is Busy." = "Pump is Busy.";
 
 /* -------------- Developer settings ---------------------- */
 
@@ -1874,6 +1928,15 @@ Enact a temp Basal or a temp target */
 /* Loop Errors in statPanel */
 "Errors" = "Errors";
 
+/* Loop Statistics pop-up description */
+"Success = Started / Completed (loops)" = "Success = Started / Completed (loops)";
+
+/* Loop Statistics pop-up */
+"Most Frequent Error" = "Most Frequent Error";
+
+/* Loop Statistics pop-up */
+"Non-completed Loops" = "Non-completed Loops";
+
 /* Average loop interval */
 "Interval" = "Interval";
 
@@ -2455,6 +2518,21 @@ Enact a temp Basal or a temp target */
 /* Threshold Table Columns Title */
 "Threshold" = "Threshold";
 
+/* Dynamic settings View */
+"Averages" = "Averages";
+
+/* Dynamic settings View */
+"Average ISF" = "Average ISF";
+
+/* Dynamic settings View */
+"Average CR" = "Average CR";
+
+/* Dynamic settings View */
+"Average CSF" = "Average CSF";
+
+/* Dynamic settings View */
+"ISF: Insulin Sensitivity, CR: Carb Ratio,\nCSF: Carb Sensitivity = ISF/CR" = "ISF: Insulin Sensitivity, CR: Carb Ratio,\nCSF: Carb Sensitivity = ISF/CR";
+
 /* Header */
 "Calculator settings" = "Calculator settings";
 
@@ -2523,6 +2601,9 @@ Enact a temp Basal or a temp target */
 
 /* UI/UX option */
 "Disable Hypo Treatments" = "Disable Hypo Treatments";
+
+/* UI/UX option */
+"Display Glucose Delta" = "Display Glucose Delta";
 
 /* Setting title */
 "Bolus Calculator" = "Bolus Calculator";

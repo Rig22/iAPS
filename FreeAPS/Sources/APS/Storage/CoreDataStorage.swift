@@ -157,7 +157,7 @@ final class CoreDataStorage {
         if let version = versions {
             coredataContext.performAndWait { [self] in
                 let saveNr = VNr(context: self.coredataContext)
-                //     saveNr.nr = version.main
+                saveNr.nr = version.main
                 saveNr.dev = version.dev
                 saveNr.date = Date.now
                 try? self.coredataContext.save()
@@ -345,5 +345,15 @@ final class CoreDataStorage {
             try? lastLoop = coredataContext.fetch(requestLastLoop)
         }
         return lastLoop.first
+    }
+
+    func insulinConcentration() -> (concentration: Double, increment: Double) {
+        var conc = [InsulinConcentration]()
+        coredataContext.performAndWait {
+            let requestConc = InsulinConcentration.fetchRequest() as NSFetchRequest<InsulinConcentration>
+            try? conc = coredataContext.fetch(requestConc)
+        }
+        let recent = conc.last
+        return (recent?.concentration ?? 1.0, recent?.incrementSetting ?? 0.1)
     }
 }

@@ -143,14 +143,23 @@ extension Home {
         }
 
         var glucoseView: some View {
-            CurrentGlucoseView(
+            let doubleBolusProgress = Binding<Double?> {
+                state.bolusProgress.map { Double(truncating: $0 as NSNumber) }
+            } set: { newValue in
+                if let newDecimalValue = newValue.map({ Decimal($0) }) {
+                    state.bolusProgress = newDecimalValue
+                }
+            }
+
+            return CurrentGlucoseView(
                 recentGlucose: $state.recentGlucose,
                 timerDate: $state.timerDate,
                 delta: $state.glucoseDelta,
                 units: $state.units,
                 alarm: $state.alarm,
                 lowGlucose: $state.lowGlucose,
-                highGlucose: $state.highGlucose
+                highGlucose: $state.highGlucose,
+                bolusProgress: doubleBolusProgress
             )
             .onTapGesture {
                 if state.alarm == nil {
@@ -170,21 +179,21 @@ extension Home {
             }
         }
 
-        var pumpView: some View {
-            PumpView(
-                reservoir: $state.reservoir,
-                battery: $state.battery,
-                name: $state.pumpName,
-                // expiresAtDate: $state.pumpExpiresAtDate,
-                timerDate: $state.timerDate, timeZone: $state.timeZone,
-                state: state
-            )
-            .onTapGesture {
-                if state.pumpDisplayState != nil {
-                    state.setupPump = true
-                }
-            }
-        }
+        /*    var pumpView: some View {
+             PumpView(
+                 reservoir: $state.reservoir,
+                 battery: $state.battery,
+                 name: $state.pumpName,
+                 // expiresAtDate: $state.pumpExpiresAtDate,
+                 timerDate: $state.timerDate, timeZone: $state.timeZone,
+                 state: state
+             )
+             .onTapGesture {
+                 if state.pumpDisplayState != nil {
+                     state.setupPump = true
+                 }
+             }
+         }*/
 
         // Bolus Progressbar
 
@@ -368,6 +377,14 @@ extension Home {
                             .padding(.top, -15) // Oberer Rand
                         }
                         .offset(y: 90)
+
+                        // Fortschritt des Bolus in Prozent
+                        if let progress = state.bolusProgress {
+                            Text("\(Int(progress * 100))%")
+                                .font(.system(size: 20))
+                                .foregroundStyle(Color.white)
+                                .offset(x: 160, y: -30)
+                        }
 
                         // Unterer Bereich
                         VStack(spacing: 20) {
@@ -647,6 +664,37 @@ extension Home {
         @StateObject private var reservoirPieSegmentViewModel = PieSegmentViewModel()
         @StateObject private var connectionPieSegmentViewModel = PieSegmentViewModel()
 
+        @FetchRequest(
+            entity: InsulinConcentration.entity(), sortDescriptors: []
+        ) var concentration: FetchedResults<InsulinConcentration>
+
+        // Insulin Concentration Badge ->
+        struct NonStandardInsulin: View {
+            let concentration: Double
+            private var formatter: NumberFormatter {
+                let formatter = NumberFormatter()
+                formatter.numberStyle = .decimal
+                formatter.maximumFractionDigits = 0
+                return formatter
+            }
+
+            var body: some View {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(Color(.insulin).opacity(0.8))
+                        .frame(width: 33, height: 15)
+                        .overlay {
+                            Text("U" + (formatter.string(from: concentration * 100 as NSNumber) ?? ""))
+                                .font(.system(size: 8))
+                                .foregroundStyle(Color.white)
+                        }
+                }
+                .offset(x: -35, y: -20)
+            }
+        }
+
+        // Insulin Concentration Badge <-
+
         var info: some View {
             if state.danaBar {
                 return AnyView(
@@ -655,12 +703,9 @@ extension Home {
                             // Reservoir Stand
                             HStack(spacing: 10) {
                                 let maxValue = Decimal(300)
-                                // let reservoirSymbol = "cross.vial"
-
                                 if let reservoir = state.reservoirLevel {
                                     let fraction = CGFloat(
-                                        reservoir / NSDecimalNumber(decimal: maxValue)
-                                            .doubleValue
+                                        reservoir / NSDecimalNumber(decimal: maxValue).doubleValue
                                     )
                                     let fill = max(min(fraction, 1.0), 0.0)
                                     let reservoirColor = reservoirLevelColor(for: reservoir)
@@ -694,7 +739,6 @@ extension Home {
                             }
 
                             // PumpenBatterie
-
                             HStack(spacing: 10) {
                                 var batteryColor: Color {
                                     if let batteryChargeString = state.pumpBatteryChargeRemaining,
@@ -727,27 +771,24 @@ extension Home {
                                    let batteryCharge = Double(batteryChargeString)
                                 {
                                     let batteryFraction = CGFloat(batteryCharge) / 100.0
-                                    //  let batteryText = "\(Int(batteryFraction * 100))%"
 
-                                    HStack {
-                                        ZStack {
-                                            SmallFillablePieSegment(
-                                                pieSegmentViewModel: batteryPieSegmentViewModel,
-                                                fillFraction: batteryFraction,
-                                                color: batteryColor,
-                                                backgroundColor: .gray,
-                                                displayText: batteryText,
-                                                symbolSize: 24,
-                                                symbol: "",
-                                                animateProgress: true
-                                            )
+                                    ZStack {
+                                        SmallFillablePieSegment(
+                                            pieSegmentViewModel: batteryPieSegmentViewModel,
+                                            fillFraction: batteryFraction,
+                                            color: batteryColor,
+                                            backgroundColor: .gray,
+                                            displayText: batteryText,
+                                            symbolSize: 24,
+                                            symbol: "",
+                                            animateProgress: true
+                                        )
+                                        .frame(width: 40, height: 40)
+
+                                        Image("battery")
+                                            .resizable()
+                                            .scaledToFit()
                                             .frame(width: 40, height: 40)
-
-                                            Image("battery")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 40, height: 40)
-                                        }
                                     }
                                 } else {
                                     ZStack {
@@ -760,7 +801,6 @@ extension Home {
                                                     .stroke(Color.white, lineWidth: 1)
                                             )
 
-                                        // Battery Fallback
                                         Image("battery")
                                             .resizable()
                                             .scaledToFit()
@@ -774,7 +814,6 @@ extension Home {
                             }
 
                             // Dana Symbol
-
                             HStack(spacing: 10) {
                                 Text("⇠")
                                     .font(.system(size: 20))
@@ -790,6 +829,31 @@ extension Home {
                                             Circle()
                                                 .stroke(Color.white, lineWidth: 1)
                                         )
+
+                                    // Insulin Badge Anzeige Hier wird U100 nicht angezeigt
+                                    /* if (concentration.last?.concentration ?? 1) != 1,
+                                        state.settingsManager?.settings.insulinBadge == true
+                                     {
+                                         NonStandardInsulin(
+                                             concentration: concentration.last?.concentration ?? 1
+                                         )
+                                     }*/
+
+                                    // Hier wird U100 angezeigt. Aber die Badge Einstellung lässt sich nicht ausschalten.
+                                    /* if let concentrationValue = concentration.last?.concentration {
+                                         if concentrationValue != 1 || (concentrationValue == 1 && state.insulinBadge) {
+                                             NonStandardInsulin(
+                                                 concentration: concentrationValue
+                                             )
+                                         }
+                                     }*/
+                                    if state.settingsManager?.settings.insulinBadge == true {
+                                        if concentration.last?.concentration == 1 {
+                                            NonStandardInsulin(concentration: 1) // Zeit U100 als Standardwert an
+                                        } else if (concentration.last?.concentration ?? 1) != 1 {
+                                            NonStandardInsulin(concentration: concentration.last?.concentration ?? 1)
+                                        }
+                                    }
 
                                     if state.danaIcon {
                                         Image("Dana_rs")
@@ -817,7 +881,6 @@ extension Home {
                             }
 
                             // Kanülenalter
-
                             HStack(spacing: 10) {
                                 let cannulaFraction: CGFloat = {
                                     if let cannulaHours = state.cannulaHours {
@@ -851,10 +914,9 @@ extension Home {
                                 ZStack {
                                     SmallFillablePieSegment(
                                         pieSegmentViewModel: cannulaPieSegmentViewModel,
-                                        fillFraction: cannulaFraction, // Umgekehrte Füllung
+                                        fillFraction: cannulaFraction,
                                         color: cannulaColor,
                                         backgroundColor: .gray,
-                                        // displayText: "",
                                         displayText: state.cannulaHours != nil ? "\(Int(state.cannulaHours!))h" : "--",
                                         symbolSize: 22,
                                         symbol: "",
@@ -870,10 +932,9 @@ extension Home {
                             }
 
                             // Bluetooth Connection
-
                             HStack(spacing: 10) {
                                 let connectionFraction: CGFloat = state.isConnected ? 1.0 : 0.0
-                                let connectionColor: Color = state.isConnected ? .green : .green
+                                let connectionColor: Color = state.isConnected ? .green : .gray
 
                                 ZStack {
                                     SmallFillablePieSegment(
@@ -894,12 +955,19 @@ extension Home {
                                         .frame(width: 40, height: 40)
                                 }
                             }
-                            .padding(.top, 10)
                         }
+                        .padding(.top, 10)
                     }
                     .onReceive(timer) { _ in
                         state.specialDanaKitFunction()
-                    }.dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                    }
+                    .onChange(of: state.insulinConcentration) { newValue in
+                        if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {
+                            // Update the NonStandardInsulin badge view or trigger an animation
+                            // Hier kannst du den Badge anzeigen oder aktualisieren
+                        }
+                    }
+                    .dynamicTypeSize(...DynamicTypeSize.xxLarge)
                 )
             } else {
                 return AnyView(EmptyView())
@@ -952,7 +1020,7 @@ extension Home {
         }
 
         var chart: some View {
-            let ratio = state.timeSettings ? 1.9 : 1.8 // TimeSetting ein
+            let ratio = state.timeSettings ? 1.95 : 1.85 // TimeSetting ein
             let ratio2 = state.timeSettings ? 1.78 : 1.68 // TimeSetting aus
 
             return addBackground()
@@ -1098,7 +1166,7 @@ extension Home {
         var info2: some View {
             if state.timeSettings {
                 return AnyView(
-                    HStack(spacing: 25) {
+                    HStack(spacing: 15) {
                         // Linker Stack
 
                         if let currentISF = state.isf {
@@ -1111,8 +1179,8 @@ extension Home {
                                     .foregroundStyle(Color.white)
                                     .font(.system(size: 15))
                             }
-                            .padding(.leading, 25)
-                            .frame(maxWidth: 100, alignment: .leading) // Links ausgerichtet
+                            .padding(.leading, 20)
+                            .frame(maxWidth: 110, alignment: .leading) // Links ausgerichtet
                         } else {
                             HStack(spacing: 4) {
                                 Text("ISF:")
@@ -1124,7 +1192,7 @@ extension Home {
                                     .foregroundStyle(Color.white)
                                     .font(.system(size: 15))
                             }
-                            // .padding(.leading, 25)
+                            .padding(.leading, 20)
                             .frame(maxWidth: 100, alignment: .leading)
                         }
                         Spacer()
@@ -1146,13 +1214,13 @@ extension Home {
                                     .padding(.horizontal, 2)
                                     .foregroundStyle(Color.white)
                                     .background(button.active ? Color.blue.opacity(0.7) : Color.clear)
-                                    .cornerRadius(4)
+                                    // .cornerRadius(4)
+                                    .clipShape(Circle())
                             }
                             Spacer()
                         }
                         .font(buttonFont)
                         .frame(maxWidth: .infinity, alignment: .center)
-
                         .onAppear {
                             highlightButtons()
                             updateButtonActions()
@@ -1164,7 +1232,7 @@ extension Home {
                             Text("TDD: " + (numberFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0"))
                                 .font(.system(size: 14))
                                 .foregroundColor(.white)
-                                .padding(.trailing, 25)
+                                .padding(.trailing, 20)
                         }
                         .frame(maxWidth: 100, alignment: .trailing)
                     }
@@ -1183,7 +1251,7 @@ extension Home {
                     startPoint: .top,
                     endPoint: .bottom
                 )
-                .frame(height: 60 + geo.safeAreaInsets.bottom)
+                .frame(height: 50 + geo.safeAreaInsets.bottom)
                 let isOverride = fetchedPercent.first?.enabled ?? false
                 let isTarget = (state.tempTarget != nil)
 
@@ -1583,7 +1651,7 @@ extension Home {
                     }
                     //      .padding(.top, 10)
                     buttonPanel(geo)
-                        .frame(height: 60)
+                        .frame(height: 50)
                 }
                 .background(Color.rig22Background)
                 .ignoresSafeArea(edges: .vertical)

@@ -121,7 +121,9 @@ struct LoopView: View {
                     fillFraction: min(CGFloat(minutesAgo) / 5.0, 1.0),
                     color: pieColor,
                     backgroundColor: .gray,
-                    displayText: "\(minutesAgo) min",
+                    // displayText: "\(minutesAgo) min",
+                    // displayText: minutesAgo <= 1 ? "< 1 min" : "\(minutesAgo) min",
+                    displayText: minutesAgo == 0 ? "< 1 min" : "\(minutesAgo) min",
                     animateProgress: true
                 )
                 Image("Loop")
@@ -171,9 +173,15 @@ struct LoopView: View {
         }
     }
 
+    /*   private var minutesAgo: Int {
+         let elapsedSeconds = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
+         let minAgo = Int(elapsedSeconds / 60)
+         return minAgo
+     }*/
+
     private var minutesAgo: Int {
-        let minAgo = Int((timerDate.timeIntervalSince(lastLoopDate) - Config.lag) / 60)
-        return minAgo
+        let elapsedSeconds = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
+        return Int(elapsedSeconds / 60) // Wechselt bei exakt 60 Sekunden auf 1 Minute
     }
 
     private var pieColor: Color {
@@ -181,7 +189,7 @@ struct LoopView: View {
 
         if delta < 1.minutes.timeInterval {
             return .clear // unter 1 Minute
-        } else if delta < 6.minutes.timeInterval {
+        } else if delta <= 6.minutes.timeInterval {
             return .green.opacity(0.7) // grün für 1-5 Minuten
         } else if delta < 10.minutes.timeInterval {
             return .yellow.opacity(0.7) // Gelb für 6-9 Minuten

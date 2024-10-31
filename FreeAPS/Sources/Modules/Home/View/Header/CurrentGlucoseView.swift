@@ -8,9 +8,19 @@ struct CurrentGlucoseView: View {
     @Binding var alarm: GlucoseAlarm?
     @Binding var lowGlucose: Decimal
     @Binding var highGlucose: Decimal
+    @Binding var bolusProgress: Double?
 
     @State private var rotationDegrees: Double = 0
     @State private var bumpEffect: Double = 0
+
+    // Bedingte Farbauswahl für das Dreieck
+    private var currentTriangleColor: Color {
+        if let progress = bolusProgress, progress < 1.0 {
+            return Color.rig22Background
+        } else {
+            return colourGlucoseText
+        }
+    }
 
     private var glucoseFormatter: NumberFormatter {
         let formatter = NumberFormatter()
@@ -68,7 +78,8 @@ struct CurrentGlucoseView: View {
                         .stroke(Color.white, lineWidth: 1)
                 )
 
-            TriangleShape(color: triangleColor)
+            // TriangleShape(color: triangleColor)
+            TriangleShape(color: currentTriangleColor)
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))
                 .animation(.easeInOut(duration: 3.0), value: rotationDegrees)
 
@@ -90,10 +101,12 @@ struct CurrentGlucoseView: View {
                     .foregroundStyle(Color.white)
                 }
                 HStack {
-                    let minutesAgo = -1 * (recentGlucose?.dateString.timeIntervalSinceNow ?? 0) / 60
-                    let timeText = timaAgoFormatter.string(for: Double(minutesAgo)) ?? ""
+                    let elapsedSeconds = -1 * (recentGlucose?.dateString.timeIntervalSinceNow ?? 0)
+                    let elapsedMinutes = elapsedSeconds / 60
+                    let timeText = timaAgoFormatter.string(for: floor(elapsedMinutes)) ?? ""
+
                     Text(
-                        minutesAgo <= 1 ? "0 min" : "\(timeText) min"
+                        elapsedSeconds < 60 ? "Now" : "\(timeText) min"
                     )
                     .font(.caption2)
                     .foregroundStyle(Color.white)
