@@ -60,6 +60,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var danaBar: Bool = true
     var legendsSwitch: Bool = true
     var tempTargetbar: Bool = true
+    var colorRig22Background: Bool = true
     // Dana UI Toggels
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
@@ -324,6 +325,11 @@ extension FreeAPSSettings: Decodable {
         if let tempTargetbar = try? container.decode(Bool.self, forKey: .tempTargetbar) {
             settings.tempTargetbar = tempTargetbar
         }
+
+        if let colorRig22Background = try? container.decode(Bool.self, forKey: .colorRig22Background) {
+            settings.colorRig22Background = colorRig22Background
+        }
+
         // Dana Toggels
 
         if let profilesOrTempTargets = try? container.decode(Bool.self, forKey: .profilesOrTempTargets) {

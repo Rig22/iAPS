@@ -20,6 +20,7 @@ extension StatConfig {
         @Published var legendsSwitch: Bool = true
         @Published var danaBar: Bool = true
         @Published var tempTargetBar: Bool = true
+        @Published var colorRig22Background: Bool = true
         // Dana UI Toggels
         @Published var minimumSMB: Decimal = 0.3
         @Published var useInsulinBars: Bool = false
@@ -44,6 +45,7 @@ extension StatConfig {
             subscribeSetting(\.legendsSwitch, on: $legendsSwitch) { legendsSwitch = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
             subscribeSetting(\.tempTargetbar, on: $tempTargetBar) { tempTargetBar = $0 }
+            subscribeSetting(\.colorRig22Background, on: $colorRig22Background) { colorRig22Background = $0 }
 
             // Dana Toggels
             subscribeSetting(\.alwaysUseColors, on: $alwaysUseColors) { alwaysUseColors = $0 }

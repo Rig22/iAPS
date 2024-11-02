@@ -82,6 +82,7 @@ extension Home {
         @Published var legendsSwitch: Bool = true
         @Published var danaBar: Bool = true
         @Published var tempTargetbar: Bool = true
+        @Published var colorRig22Background: Bool = true
         // Dana UI Toggels
         @Published var useCalc: Bool = true
         @Published var minimumSMB: Decimal = 0.3
@@ -164,6 +165,7 @@ extension Home {
             legendsSwitch = settingsManager.settings.legendsSwitch
             danaBar = settingsManager.settings.danaBar
             tempTargetbar = settingsManager.settings.tempTargetbar
+            colorRig22Background = settingsManager.settings.colorRig22Background
             // Dana UI Toggels
 
             insulinBadge = settingsManager.settings.insulinBadge
@@ -678,6 +680,7 @@ extension Home.StateModel:
         legendsSwitch = settingsManager.settings.legendsSwitch
         danaBar = settingsManager.settings.danaBar
         tempTargetbar = settingsManager.settings.tempTargetbar
+        colorRig22Background = settingsManager.settings.colorRig22Background
 
         // Dana UI Toggels
         useCalc = settingsManager.settings.useCalc

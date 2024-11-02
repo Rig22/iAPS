@@ -83,9 +83,9 @@ struct CurrentGlucoseView: View {
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))
                 .animation(.easeInOut(duration: 3.0), value: rotationDegrees)
 
-            Circle()
-                .fill(Color.rig22Background.opacity(1.0))
-                .frame(width: 110, height: 110)
+            /* Circle()
+             .fill(Color.clear.opacity(1.0))
+             .frame(width: 110, height: 110)*/
 
             VStack(alignment: .center) {
                 HStack {

@@ -33,27 +33,36 @@ extension PumpSettingsEditor {
                 }
 
                 Section {
+                    HStack {
+                        Text("To change the values above, go to Settings ⇢ Debug Options ⇢ Settings ⇢ Pump Settings")
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color.orange)
+                    }
+                }
+
+                Section {
                     Text("Insulin Concentration")
                         .navigationLink(to: .basalProfileEditor(saveNewConcentration: true), from: self)
                 } header: { Text("Concentration") }
 
-                Section {
-                    HStack {
-                        if state.syncInProgress {
-                            ProgressView().padding(.trailing, 10)
-                        }
-                        Button { state.save() }
-                        label: {
-                            Text(state.syncInProgress ? "Saving..." : "Save on Pump")
-                        }
-                        .disabled(state.syncInProgress)
-                    }
-                }
+                    /* Section {
+                         HStack {
+                                 if state.syncInProgress {
+                              ProgressView().padding(.trailing, 10)
+                              }
+                              Button { state.save() }
+                              label: {
+                              Text(state.syncInProgress ? "Saving..." : "Save on Pump")
+                              }
+                              .disabled(state.syncInProgress)
+                              }
+                         }
+                     } */
+                    .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                    .onAppear(perform: configureView)
+                    .navigationTitle("Pump Settings")
+                    .navigationBarTitleDisplayMode(.inline)
             }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-            .onAppear(perform: configureView)
-            .navigationTitle("Pump Settings")
-            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

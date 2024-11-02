@@ -37,29 +37,31 @@ extension StatConfig {
                     Image("Dana_rs")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 300, height: 200)
+                        .frame(width: 200, height: 167)
                         .padding(.top, 0)
                 } else {
                     Image("Dana_i")
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 300, height: 200)
+                        .frame(width: 200, height: 167)
                         .padding(.top, 0)
                 }
 
                 Form {
                     Section {
                         Toggle("Icon Dana-i or Dana RS", isOn: $state.danaIcon)
-                        Toggle("DanaBar ⇢ off/on", isOn: $state.danaBar)
+                        Toggle("DanaBar ⇢ off | on", isOn: $state.danaBar)
                         HStack {
                             Text("DanaBar only works with Dana Pumps!")
                                 .font(.system(size: 13))
                                 .foregroundStyle(Color.orange)
                         }
-                        Toggle("LegendBar ⇢ off/on", isOn: $state.legendsSwitch)
-                        Toggle("TempTargetBar ⇢ off/on", isOn: $state.tempTargetBar)
-                        Toggle("BottomBar ⇢ off/on", isOn: $state.timeSettings)
-                    } header: { Text("Dana UI/UX Settings ") }
+                        Toggle("Display Insulin Concentration", isOn: $state.insulinBadge)
+                        Toggle("LegendBar ⇢ off | on", isOn: $state.legendsSwitch)
+                        Toggle("TempTargetBar ⇢ off | on", isOn: $state.tempTargetBar)
+                        Toggle("BottomBar ⇢ off | on", isOn: $state.timeSettings)
+                        Toggle("BackgroundColor ⇢ black | default", isOn: $state.colorRig22Background)
+                    } header: { Text("Dana UI | UX Settings ") }
 
                     Section {
                         Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
@@ -90,7 +92,6 @@ extension StatConfig {
                     Section {
                         Toggle("Never display the small glucose chart when scrolling", isOn: $state.skipGlucoseChart)
                         // Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
-                        Toggle("Display Insulin Concentration", isOn: $state.insulinBadge)
                     } header: { Text("Header settings") }
                     /*  footer: {
                      Text("Normally glucose is colored red only when over or under your notification limits for high/low") }*/

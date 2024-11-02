@@ -196,45 +196,49 @@ extension Home {
          }*/
 
         // Bolus Progressbar
-
         public struct CircularProgressViewStyle: ProgressViewStyle {
+            var backgroundColor: Color
+
             public func makeBody(configuration: Configuration) -> some View {
                 let progress = CGFloat(configuration.fractionCompleted ?? 0)
 
                 ZStack {
                     Circle()
-                        // .trim(from: 0.0, to: progress)
                         .trim(from: 1.0 - progress, to: 1.0) // Progress läuft gegen den Uhrzeigersinn
                         .stroke(
                             LinearGradient(
-                                gradient: Gradient(colors: [Color.rig22Background, Color.rig22Background]),
+                                gradient: Gradient(colors: [backgroundColor, backgroundColor]),
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
                             style: StrokeStyle(lineWidth: 2, lineCap: .round)
                         )
                         .rotationEffect(Angle(degrees: 270))
-                        .animation(.linear(duration: 0.25), value: progress)
+                        // .animation(.linear(duration: 0.25), value: progress)
+                        .animation(.linear(duration: 0.5), value: progress)
                 }
                 .frame(width: 123, height: 123)
             }
         }
 
-        func bolusProgressView(progress: Decimal, amount: Decimal) -> some View {
+        func bolusProgressView(progress: Decimal, amount: Decimal, backgroundColor: Color) -> some View {
             ZStack {
                 VStack(alignment: .leading, spacing: 5) {
-                    let bolused = bolusProgressFormatter.string(from: (amount * progress) as NSNumber) ?? ""
+                    // Berechne den formatierten Text separat, um die Expression zu vereinfachen
+                    let bolusAmount = amount * progress
+                    let bolused = bolusProgressFormatter.string(from: bolusAmount as NSNumber) ?? ""
+                    let totalAmount = amount.formatted(.number.precision(.fractionLength(2)))
+                    let displayText = bolused + " " + NSLocalizedString("of", comment: "") + " " + totalAmount +
+                        NSLocalizedString(" U", comment: " ")
 
-                    Text(
-                        bolused + " " + NSLocalizedString("of", comment: "") + " " + amount
-                            .formatted(.number.precision(.fractionLength(2))) +
-                            NSLocalizedString(" U", comment: " ")
-                    )
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.white)
-                    .offset(x: -120, y: 50)
+                    Text(displayText)
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.white)
+                        .offset(x: -120, y: 50)
+
+                    // Verwende ProgressView mit expliziter Übergabe von backgroundColor
                     ProgressView(value: Double(truncating: progress as NSNumber))
-                        .progressViewStyle(CircularProgressViewStyle())
+                        .progressViewStyle(CircularProgressViewStyle(backgroundColor: backgroundColor))
                         .padding(.top, 15)
                 }
             }
@@ -254,7 +258,7 @@ extension Home {
         }
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-            addBackground()
+            backgroundColor
                 .frame(
                     maxHeight: fontSize < .extraExtraLarge ? 230 + geo.safeAreaInsets.top : 145 + geo.safeAreaInsets.top
                 )
@@ -295,6 +299,8 @@ extension Home {
                                 }
 
                                 Spacer()
+                                
+                                //Mittlerer Stack
 
                                 glucoseView
                                     .frame(width: 120, height: 120)
@@ -302,13 +308,16 @@ extension Home {
                                         ZStack {
                                             if let progress = state.bolusProgress {
                                                 ProgressView(value: Double(truncating: progress as NSNumber))
-                                                    .progressViewStyle(CircularProgressViewStyle())
+                                                    .progressViewStyle(CircularProgressViewStyle(
+                                                        backgroundColor: backgroundColor
+                                                    ))
                                                     .frame(width: 120, height: 120)
                                                     .animation(.easeInOut, value: progress)
+
                                                 // Hintergrundfüllung für den Glucosering
                                                 Circle()
-                                                    .fill(Color.rig22Background.opacity(1.0))
-                                                    .frame(width: 110, height: 110)
+                                                    .fill(backgroundColor.opacity(1.0))
+                                                    .frame(width: 120, height: 120)
 
                                                 VStack {
                                                     Circle()
@@ -347,6 +356,7 @@ extension Home {
                                             }
                                         }
                                     )
+                               
                                 Spacer()
 
                                 // Rechter Block (eventualBG)
@@ -630,15 +640,15 @@ extension Home {
         }
 
         // DanaBar
-
         var infoPanel: some View {
             if state.danaBar {
                 return AnyView(
                     ZStack {
-                        addBackground()
+                        backgroundColor
+                            .frame(maxWidth: .infinity, maxHeight: 90)
+
                         info
                     }
-                    .frame(maxWidth: .infinity, maxHeight: 90)
                 )
             } else {
                 return AnyView(EmptyView())
@@ -830,26 +840,9 @@ extension Home {
                                                 .stroke(Color.white, lineWidth: 1)
                                         )
 
-                                    // Insulin Badge Anzeige Hier wird U100 nicht angezeigt
-                                    /* if (concentration.last?.concentration ?? 1) != 1,
-                                        state.settingsManager?.settings.insulinBadge == true
-                                     {
-                                         NonStandardInsulin(
-                                             concentration: concentration.last?.concentration ?? 1
-                                         )
-                                     }*/
-
-                                    // Hier wird U100 angezeigt. Aber die Badge Einstellung lässt sich nicht ausschalten.
-                                    /* if let concentrationValue = concentration.last?.concentration {
-                                         if concentrationValue != 1 || (concentrationValue == 1 && state.insulinBadge) {
-                                             NonStandardInsulin(
-                                                 concentration: concentrationValue
-                                             )
-                                         }
-                                     }*/
                                     if state.settingsManager?.settings.insulinBadge == true {
                                         if concentration.last?.concentration == 1 {
-                                            NonStandardInsulin(concentration: 1) // Zeit U100 als Standardwert an
+                                            NonStandardInsulin(concentration: 1) // Zeigt U100 als Standardwert an
                                         } else if (concentration.last?.concentration ?? 1) != 1 {
                                             NonStandardInsulin(concentration: concentration.last?.concentration ?? 1)
                                         }
@@ -963,8 +956,6 @@ extension Home {
                     }
                     .onChange(of: state.insulinConcentration) { newValue in
                         if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {
-                            // Update the NonStandardInsulin badge view or trigger an animation
-                            // Hier kannst du den Badge anzeigen oder aktualisieren
                         }
                     }
                     .dynamicTypeSize(...DynamicTypeSize.xxLarge)
@@ -1023,18 +1014,15 @@ extension Home {
             let ratio = state.timeSettings ? 1.95 : 1.85 // TimeSetting ein
             let ratio2 = state.timeSettings ? 1.78 : 1.68 // TimeSetting aus
 
-            return addBackground()
-                .overlay {
-                    VStack(spacing: 0) {
-                        infoPanel
-                        mainChart
-                        legendPanel
-                        tempTargetbar
-                            .frame(width: UIScreen.main.bounds.width * 0.99) // Breite der mainChart anpassen
-                    }
-                }
-                // Anpassung: Abhängig von timeSettings und Schriftgröße
-                .frame(minHeight: UIScreen.main.bounds.height / (state.timeSettings ? ratio : ratio2))
+            return VStack(spacing: 0) {
+                infoPanel
+                mainChart
+                legendPanel
+                tempTargetbar
+                    .frame(width: UIScreen.main.bounds.width * 0.99) // Breite der mainChart anpassen
+            }
+            .background(backgroundColor) // Dynamische Hintergrundfarbe anwenden
+            .frame(minHeight: UIScreen.main.bounds.height / (state.timeSettings ? ratio : ratio2))
         }
 
         var legendPanel: some View {
@@ -1078,11 +1066,8 @@ extension Home {
         var tempTargetbar: some View {
             ZStack {
                 if state.tempTargetbar {
-                    addBackground()
                     Targetbar
-                } else {
-                    addBackground()
-                }
+                } else {}
             }
             .frame(maxWidth: .infinity, maxHeight: state.tempTargetbar ? 25 : 0)
             .padding(.top, 12)
@@ -1123,7 +1108,7 @@ extension Home {
 
         var infoPanel2: some View {
             ZStack {
-                addBackground()
+                backgroundColor
                 info2
             }
             .frame(maxWidth: .infinity, maxHeight: 25)
@@ -1245,10 +1230,13 @@ extension Home {
 
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {
-                addBackground()
+                backgroundColor
                 LinearGradient(
-                    gradient: Gradient(colors: [.rig22bottomPanel, .rig22bottomPanel]),
-                    startPoint: .top,
+                    gradient: Gradient(
+                        colors: state
+                            .colorRig22Background ? [Color.rig22Background, Color.rig22Background] :
+                            [Color.black, Color.black]
+                    ), startPoint: .top,
                     endPoint: .bottom
                 )
                 .frame(height: 50 + geo.safeAreaInsets.bottom)
@@ -1447,7 +1435,7 @@ extension Home {
         }
 
         var preview: some View {
-            addBackground()
+            backgroundColor
                 .frame(minHeight: 200)
                 .overlay {
                     PreviewChart(readings: $state.readings, lowLimit: $state.lowGlucose, highLimit: $state.highGlucose)
@@ -1461,7 +1449,7 @@ extension Home {
         }
 
         var activeIOBView: some View {
-            addBackground()
+            backgroundColor
                 .frame(minHeight: 430)
                 .overlay {
                     ActiveIOBView(
@@ -1481,7 +1469,7 @@ extension Home {
         }
 
         var activeCOBView: some View {
-            addBackground()
+            backgroundColor
                 .frame(minHeight: 230)
                 .overlay {
                     ActiveCOBView(data: $state.iobData)
@@ -1492,7 +1480,7 @@ extension Home {
         }
 
         var loopPreview: some View {
-            addBackground()
+            backgroundColor
                 .frame(minHeight: 190)
                 .overlay {
                     LoopsView(loopStatistics: $state.loopStatistics)
@@ -1542,14 +1530,17 @@ extension Home {
         }
 
         @ViewBuilder private func glucoseHeaderView() -> some View {
-            addBackground()
+            backgroundColor
                 .frame(maxHeight: 90)
                 .overlay {
                     VStack {
                         ZStack {
                             LinearGradient(
-                                gradient: Gradient(colors: [.rig22Background, .rig22Background]),
-                                startPoint: .top,
+                                gradient: Gradient(
+                                    colors: state
+                                        .colorRig22Background ? [Color.rig22Background, Color.rig22Background] :
+                                        [Color.black, Color.black]
+                                ), startPoint: .top,
                                 endPoint: .bottom
                             )
                             glucosePreview.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
@@ -1611,6 +1602,10 @@ extension Home {
             .foregroundStyle(Color.white)
         }
 
+        var backgroundColor: Color {
+            state.colorRig22Background ? Color(red: 0.08, green: 0.15, blue: 0.20) : Color(red: 0.00, green: 0.00, blue: 0.00)
+        }
+
         var body: some View {
             GeometryReader { geo in
                 VStack(spacing: 0) {
@@ -1635,7 +1630,7 @@ extension Home {
                             }
                             .background(GeometryReader { geo in
                                 let offset = -geo.frame(in: .named(scrollSpace)).minY
-                                Color.rig22Background
+                                backgroundColor
                                     .preference(
                                         key: ScrollViewOffsetPreferenceKey.self,
                                         value: offset
@@ -1653,7 +1648,7 @@ extension Home {
                     buttonPanel(geo)
                         .frame(height: 50)
                 }
-                .background(Color.rig22Background)
+                .background(backgroundColor)
                 .ignoresSafeArea(edges: .vertical)
             }
             .onAppear(perform: startProgress)
@@ -1707,7 +1702,7 @@ extension Home {
                 }
             }
             .padding()
-            .background(Color.rig22Background)
+            .background(backgroundColor)
             .cornerRadius(10)
             .shadow(radius: 2)
         }

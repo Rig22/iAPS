@@ -202,6 +202,12 @@ extension BasalProfileEditor {
                     Text(set < 1 ? diluted : set == 1 ? standard : concentrated)
                 }
 
+                HStack {
+                    Text("Concentration change will only be displayed after restarting iAPS!")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.orange)
+                }
+
                 Section {
                     HStack {
                         if state.syncInProgress {
