@@ -12,9 +12,9 @@ on:
     - cron: '0 6 1 * *' # Builds the app on the 1st of every month at 06:00 UTC
 
 env:  
-  UPSTREAM_REPO: Artificial-Pancreas/iAPS
-  UPSTREAM_BRANCH: ${{ github.ref_name }} # branch on upstream repository to sync from (replace with specific branch name if needed)
-  TARGET_BRANCH: ${{ github.ref_name }} # target branch on fork to be kept in sync, and target branch on upstream to be kept alive (replace with specific branch name if needed)
+  UPSTREAM_REPO: Rig22/iAPS
+  UPSTREAM_BRANCH: Dana_Complications_Style
+  TARGET_BRANCH: Dana_Complications_Style
   ALIVE_BRANCH: alive
 
 jobs:
