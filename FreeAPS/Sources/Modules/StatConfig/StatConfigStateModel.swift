@@ -21,11 +21,12 @@ extension StatConfig {
         @Published var danaBar: Bool = true
         @Published var tempTargetBar: Bool = true
         @Published var colorRig22Background: Bool = true
+        @Published var insulinBadge: Bool = false
+        @Published var hideInsulinBadge: Bool = false
         // Dana UI Toggels
         @Published var minimumSMB: Decimal = 0.3
         @Published var useInsulinBars: Bool = false
         @Published var skipGlucoseChart: Bool = false
-        @Published var insulinBadge: Bool = false
 
         var units: GlucoseUnits = .mmolL
 
@@ -46,6 +47,8 @@ extension StatConfig {
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
             subscribeSetting(\.tempTargetbar, on: $tempTargetBar) { tempTargetBar = $0 }
             subscribeSetting(\.colorRig22Background, on: $colorRig22Background) { colorRig22Background = $0 }
+            subscribeSetting(\.insulinBadge, on: $insulinBadge) { insulinBadge = $0 }
+            subscribeSetting(\.hideInsulinBadge, on: $hideInsulinBadge) { hideInsulinBadge = $0 }
 
             // Dana Toggels
             subscribeSetting(\.alwaysUseColors, on: $alwaysUseColors) { alwaysUseColors = $0 }
@@ -54,8 +57,6 @@ extension StatConfig {
             subscribeSetting(\.skipBolusScreenAfterCarbs, on: $skipBolusScreenAfterCarbs) { skipBolusScreenAfterCarbs = $0 }
             subscribeSetting(\.oneDimensionalGraph, on: $oneDimensionalGraph) { oneDimensionalGraph = $0 }
             subscribeSetting(\.useInsulinBars, on: $useInsulinBars) { useInsulinBars = $0 }
-            subscribeSetting(\.insulinBadge, on: $insulinBadge) { insulinBadge = $0 }
-
             subscribeSetting(\.low, on: $low, initial: {
                 let value = max(min($0, 90), 40)
                 low = units == .mmolL ? value.asMmolL : value

@@ -50,6 +50,14 @@ extension Home {
             sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
         ) var enactedSliderTT: FetchedResults<TempTargetsSlider>
 
+        @FetchRequest(
+            entity: InsulinConcentration.entity(),
+            sortDescriptors: [NSSortDescriptor(
+                key: "date",
+                ascending: true
+            )]
+        ) var concentration: FetchedResults<InsulinConcentration>
+
         @State private var progress: Double = 0.0
 
         private var numberFormatter: NumberFormatter {
@@ -299,8 +307,8 @@ extension Home {
                                 }
 
                                 Spacer()
-                                
-                                //Mittlerer Stack
+
+                                // Mittlerer Stack
 
                                 glucoseView
                                     .frame(width: 120, height: 120)
@@ -356,7 +364,7 @@ extension Home {
                                             }
                                         }
                                     )
-                               
+
                                 Spacer()
 
                                 // Rechter Block (eventualBG)
@@ -674,10 +682,6 @@ extension Home {
         @StateObject private var reservoirPieSegmentViewModel = PieSegmentViewModel()
         @StateObject private var connectionPieSegmentViewModel = PieSegmentViewModel()
 
-        @FetchRequest(
-            entity: InsulinConcentration.entity(), sortDescriptors: []
-        ) var concentration: FetchedResults<InsulinConcentration>
-
         // Insulin Concentration Badge ->
         struct NonStandardInsulin: View {
             let concentration: Double
@@ -955,8 +959,7 @@ extension Home {
                         state.specialDanaKitFunction()
                     }
                     .onChange(of: state.insulinConcentration) { newValue in
-                        if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {
-                        }
+                        if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {}
                     }
                     .dynamicTypeSize(...DynamicTypeSize.xxLarge)
                 )

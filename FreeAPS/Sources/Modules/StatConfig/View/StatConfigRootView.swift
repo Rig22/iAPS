@@ -57,6 +57,7 @@ extension StatConfig {
                                 .foregroundStyle(Color.orange)
                         }
                         Toggle("Display Insulin Concentration", isOn: $state.insulinBadge)
+                        // Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
                         Toggle("LegendBar ⇢ off | on", isOn: $state.legendsSwitch)
                         Toggle("TempTargetBar ⇢ off | on", isOn: $state.tempTargetBar)
                         Toggle("BottomBar ⇢ off | on", isOn: $state.timeSettings)
