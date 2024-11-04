@@ -12,6 +12,10 @@ extension PumpSettingsEditor {
             return formatter
         }
 
+        @FetchRequest(
+            entity: InsulinConcentration.entity(), sortDescriptors: [NSSortDescriptor(key: "date", ascending: true)]
+        ) var concentration: FetchedResults<InsulinConcentration>
+
         var body: some View {
             Form {
                 Section(header: Text("Delivery limits")) {
@@ -34,14 +38,14 @@ extension PumpSettingsEditor {
 
                 Section {
                     HStack {
-                        Text("To change the values above, go to Settings ⇢ Debug Options ⇢ Settings ⇢ Pump Settings")
+                        Text("To change the values above, go to Settings ⇢ Debug Options ⇢ Pump Settings")
                             .font(.system(size: 14))
                             .foregroundStyle(Color.orange)
                     }
                 }
 
                 Section {
-                    Text("Insulin Concentration")
+                    Text("U " + (formatter.string(from: (concentration.last?.concentration ?? 1) * 100 as NSNumber) ?? ""))
                         .navigationLink(to: .basalProfileEditor(saveNewConcentration: true), from: self)
                 } header: { Text("Concentration") }
 

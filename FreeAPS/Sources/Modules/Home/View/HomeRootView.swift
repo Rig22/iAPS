@@ -696,10 +696,10 @@ extension Home {
                 ZStack {
                     RoundedRectangle(cornerRadius: 15)
                         .fill(Color(.insulin).opacity(0.8))
-                        .frame(width: 33, height: 15)
+                        .frame(width: 37, height: 17)
                         .overlay {
                             Text("U" + (formatter.string(from: concentration * 100 as NSNumber) ?? ""))
-                                .font(.system(size: 8))
+                                .font(.system(size: 10))
                                 .foregroundStyle(Color.white)
                         }
                 }
