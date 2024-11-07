@@ -50,18 +50,34 @@ extension StatConfig {
                 Form {
                     Section {
                         Toggle("Icon Dana-i or Dana RS", isOn: $state.danaIcon)
-                        Toggle("DanaBar ⇢ off | on", isOn: $state.danaBar)
-                        HStack {
-                            Text("DanaBar only works with Dana Pumps!")
-                                .font(.system(size: 13))
-                                .foregroundStyle(Color.orange)
+                        Toggle("Dana Bar", isOn: $state.danaBar)
+
+                        if state.danaBar {
+                            Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
                         }
-                        Toggle("Display Insulin Concentration", isOn: $state.insulinBadge)
-                        // Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
-                        Toggle("LegendBar ⇢ off | on", isOn: $state.legendsSwitch)
-                        Toggle("TempTargetBar ⇢ off | on", isOn: $state.tempTargetBar)
-                        Toggle("BottomBar ⇢ off | on", isOn: $state.timeSettings)
-                        Toggle("BackgroundColor ⇢ black | default", isOn: $state.colorRig22Background)
+                        Toggle("Legend Bar", isOn: $state.legendsSwitch)
+                        Toggle("TempTarget Bar", isOn: $state.tempTargetBar)
+                        Toggle("Bottom Bar", isOn: $state.timeSettings)
+
+                        if #available(iOS 18.0, *) {
+                            Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
+                                ForEach(BackgroundColorOption.allCases) { option in
+                                    HStack {
+                                        Rectangle()
+                                            .fill(option.color) // Vorschau der Farbe im Menü
+                                            .frame(width: 20, height: 20)
+                                            .cornerRadius(4)
+
+                                        Text(option.rawValue.capitalized) // Farb Name
+                                            .foregroundColor(.primary)
+                                    }
+                                    .tag(option.rawValue)
+                                }
+                            }
+                            .pickerStyle(NavigationLinkPickerStyle())
+                        } else {
+                            // Fallback für frühere iOS-Versionen
+                        }
                     } header: { Text("Dana UI | UX Settings ") }
 
                     Section {

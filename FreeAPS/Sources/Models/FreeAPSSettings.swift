@@ -1,7 +1,7 @@
 import Foundation
 
 // Originale FreeAPSSettings Struktur
-struct FreeAPSSettings: JSON, Equatable {
+struct FreeAPSSettings: JSON, Equatable, Codable {
     var units: GlucoseUnits = .mmolL
     var closedLoop: Bool = false
     var allowAnnouncements: Bool = false
@@ -55,14 +55,14 @@ struct FreeAPSSettings: JSON, Equatable {
     var useLiveActivity: Bool = false
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = true
-    // Dana UI Toggels
+    // Dana Toggels
     var timeSettings: Bool = true
     var danaIcon: Bool = true
     var danaBar: Bool = true
     var legendsSwitch: Bool = true
     var tempTargetbar: Bool = true
-    var colorRig22Background: Bool = true
-    // Dana UI Toggels
+    var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
+    // Dana Toggels
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
     var allowedRemoteBolusAmount: Decimal = 0.0
@@ -79,6 +79,16 @@ struct FreeAPSSettings: JSON, Equatable {
     var insulinBadge: Bool = false
     var hideInsulinBadge: Bool = false
     var allowDilution: Bool = false
+
+    // Computed property for background color option
+    var backgroundColorOption: BackgroundColorOption {
+        get {
+            BackgroundColorOption(rawValue: backgroundColorOptionRawValue) ?? .darkBlue
+        }
+        set {
+            backgroundColorOptionRawValue = newValue.rawValue
+        }
+    }
 }
 
 // Wrapper für FreeAPSSettings, um Encodable zu unterstützen
@@ -144,14 +154,14 @@ struct EncodableFreeAPSSettings: Encodable {
         case useTargetButton
         case alwaysUseColors
         // Dana Toggels
-        case timeSettings
         case danaIcon
         case danaBar
-        case legendsSwitch
-        case tempTargetbar
-        case colorRig22Background
         case insulinBadge
         case hideInsulinBadge
+        case legendsSwitch
+        case tempTargetbar
+        case timeSettings
+        case backgroundColorOptionRawValue
         // Dana Toggels
         case profilesOrTempTargets
         case allowBolusShortcut
@@ -173,6 +183,7 @@ struct EncodableFreeAPSSettings: Encodable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(settings.units, forKey: .units)
+        // ... (Encode all properties similar to settings.units)
         try container.encode(settings.closedLoop, forKey: .closedLoop)
         try container.encode(settings.allowAnnouncements, forKey: .allowAnnouncements)
         try container.encode(settings.useAutotune, forKey: .useAutotune)
@@ -226,14 +237,14 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.useTargetButton, forKey: .useTargetButton)
         try container.encode(settings.alwaysUseColors, forKey: .alwaysUseColors)
         // Dana Toogels
-        try container.encode(settings.timeSettings, forKey: .timeSettings)
         try container.encode(settings.danaIcon, forKey: .danaIcon)
         try container.encode(settings.danaBar, forKey: .danaBar)
-        try container.encode(settings.legendsSwitch, forKey: .legendsSwitch)
-        try container.encode(settings.tempTargetbar, forKey: .tempTargetbar)
-        try container.encode(settings.colorRig22Background, forKey: .colorRig22Background)
         try container.encode(settings.insulinBadge, forKey: .insulinBadge)
         try container.encode(settings.hideInsulinBadge, forKey: .hideInsulinBadge)
+        try container.encode(settings.legendsSwitch, forKey: .legendsSwitch)
+        try container.encode(settings.tempTargetbar, forKey: .tempTargetbar)
+        try container.encode(settings.timeSettings, forKey: .timeSettings)
+        try container.encode(settings.backgroundColorOptionRawValue, forKey: .backgroundColorOptionRawValue)
         // Dana Toggels
         try container.encode(settings.profilesOrTempTargets, forKey: .profilesOrTempTargets)
         try container.encode(settings.allowBolusShortcut, forKey: .allowBolusShortcut)

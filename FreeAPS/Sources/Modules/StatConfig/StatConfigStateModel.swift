@@ -15,14 +15,21 @@ extension StatConfig {
         @Published var hours: Decimal = 6
         @Published var alwaysUseColors: Bool = true
         // Dana UI Toggels
-        @Published var timeSettings: Bool = true
         @Published var danaIcon: Bool = true
-        @Published var legendsSwitch: Bool = true
         @Published var danaBar: Bool = true
-        @Published var tempTargetBar: Bool = true
-        @Published var colorRig22Background: Bool = true
         @Published var insulinBadge: Bool = false
         @Published var hideInsulinBadge: Bool = false
+        @Published var legendsSwitch: Bool = true
+        @Published var tempTargetBar: Bool = true
+        @Published var timeSettings: Bool = true
+        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
+        @Published var backgroundColorSelected: String = BackgroundColorOption.darkBlue.rawValue
+
+        // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
+        var selectedBackgroundColor: Color {
+            BackgroundColorOption(rawValue: backgroundColorOptionRawValue)?.color ?? .clear
+        }
+
         // Dana UI Toggels
         @Published var minimumSMB: Decimal = 0.3
         @Published var useInsulinBars: Bool = false
@@ -40,16 +47,15 @@ extension StatConfig {
             subscribeSetting(\.rulerMarks, on: $rulerMarks) { rulerMarks = $0 }
             subscribeSetting(\.skipGlucoseChart, on: $skipGlucoseChart) { skipGlucoseChart = $0 }
             // Dana Toggels
-
-            subscribeSetting(\.timeSettings, on: $timeSettings) { timeSettings = $0 }
             subscribeSetting(\.danaIcon, on: $danaIcon) { danaIcon = $0 }
-            subscribeSetting(\.legendsSwitch, on: $legendsSwitch) { legendsSwitch = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
-            subscribeSetting(\.tempTargetbar, on: $tempTargetBar) { tempTargetBar = $0 }
-            subscribeSetting(\.colorRig22Background, on: $colorRig22Background) { colorRig22Background = $0 }
             subscribeSetting(\.insulinBadge, on: $insulinBadge) { insulinBadge = $0 }
             subscribeSetting(\.hideInsulinBadge, on: $hideInsulinBadge) { hideInsulinBadge = $0 }
-
+            subscribeSetting(\.legendsSwitch, on: $legendsSwitch) { legendsSwitch = $0 }
+            subscribeSetting(\.tempTargetbar, on: $tempTargetBar) { tempTargetBar = $0 }
+            subscribeSetting(\.timeSettings, on: $timeSettings) { timeSettings = $0 }
+            subscribeSetting(\.backgroundColorOptionRawValue, on: $backgroundColorOptionRawValue) {
+                self.backgroundColorOptionRawValue = $0 }
             // Dana Toggels
             subscribeSetting(\.alwaysUseColors, on: $alwaysUseColors) { alwaysUseColors = $0 }
             subscribeSetting(\.useFPUconversion, on: $useFPUconversion) { useFPUconversion = $0 }

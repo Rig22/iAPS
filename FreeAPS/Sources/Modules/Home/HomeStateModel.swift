@@ -77,12 +77,14 @@ extension Home {
         @Published var overrides: [Override] = []
         @Published var alwaysUseColors: Bool = true
         // Dana UI Toggels
-        @Published var timeSettings: Bool = true
         @Published var danaIcon: Bool = true
-        @Published var legendsSwitch: Bool = true
         @Published var danaBar: Bool = true
+        @Published var insulinBadge: Bool = false
+        @Published var legendsSwitch: Bool = true
         @Published var tempTargetbar: Bool = true
-        @Published var colorRig22Background: Bool = true
+        @Published var timeSettings: Bool = true
+        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
+
         // Dana UI Toggels
         @Published var useCalc: Bool = true
         @Published var minimumSMB: Decimal = 0.3
@@ -109,11 +111,40 @@ extension Home {
         @Published var reservoirLevel: Double? = 0
         @Published var reservoirAge: String?
         @Published var insulinType: String?
-        //
-        @Published var insulinBadge: Bool = false
         @Published var insulinConcentration: Double = 1.0 // Initialer Wert
 
         let coredataContext = CoreDataStack.shared.persistentContainer.viewContext
+
+        /*  var backgroundColor: Color {
+             BackgroundColorOption(rawValue: backgroundColorOptionRawValue)?.color ?? .clear
+         }*/ // falls das triangel während des bolus progress die backgroundColor annehmen soll
+
+        var selectedBackgroundColor: Color {
+            switch BackgroundColorOption(rawValue: backgroundColorOptionRawValue) {
+            case .darkBlue:
+                return Color(red: 0.08, green: 0.15, blue: 0.20)
+            case .blue:
+                return Color(red: 0.10, green: 0.20, blue: 0.50)
+            case .teal:
+                return Color(red: 0.00, green: 0.36, blue: 0.36)
+            case .darkGreen:
+                return Color(red: 0.00, green: 0.39, blue: 0.00)
+            case .black:
+                return Color(red: 0.00, green: 0.00, blue: 0.00)
+            case .gray:
+                return Color(red: 0.12, green: 0.14, blue: 0.14)
+            case .blackBerry:
+                return Color(red: 0.23, green: 0.04, blue: 0.14)
+            case .red:
+                return Color(red: 0.4, green: 0.0, blue: 0.0)
+            case .burntOrange:
+                return Color(red: 0.45, green: 0.22, blue: 0.12)
+            case .purple:
+                return Color(red: 0.36, green: 0.20, blue: 0.72)
+            default:
+                return .clear // Standardfarbe, falls keine Übereinstimmung
+            }
+        }
 
         override func subscribe() {
             setupGlucose()
@@ -158,18 +189,15 @@ extension Home {
             useTargetButton = settingsManager.settings.useTargetButton
             hours = settingsManager.settings.hours
             alwaysUseColors = settingsManager.settings.alwaysUseColors
-
             // Dana UI Toggels
-            timeSettings = settingsManager.settings.timeSettings
             danaIcon = settingsManager.settings.danaIcon
-            legendsSwitch = settingsManager.settings.legendsSwitch
             danaBar = settingsManager.settings.danaBar
-            tempTargetbar = settingsManager.settings.tempTargetbar
-            colorRig22Background = settingsManager.settings.colorRig22Background
-            // Dana UI Toggels
-
             insulinBadge = settingsManager.settings.insulinBadge
-
+            legendsSwitch = settingsManager.settings.legendsSwitch
+            tempTargetbar = settingsManager.settings.tempTargetbar
+            timeSettings = settingsManager.settings.timeSettings
+            backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
+            // Dana UI Toggels
             useCalc = settingsManager.settings.useCalc
             minimumSMB = settingsManager.settings.minimumSMB
             maxBolus = settingsManager.pumpSettings.maxBolus
@@ -674,14 +702,12 @@ extension Home.StateModel:
         hours = settingsManager.settings.hours
         alwaysUseColors = settingsManager.settings.alwaysUseColors
         // Dana UI Toggels
-
-        timeSettings = settingsManager.settings.timeSettings
         danaIcon = settingsManager.settings.danaIcon
-        legendsSwitch = settingsManager.settings.legendsSwitch
         danaBar = settingsManager.settings.danaBar
+        legendsSwitch = settingsManager.settings.legendsSwitch
         tempTargetbar = settingsManager.settings.tempTargetbar
-        colorRig22Background = settingsManager.settings.colorRig22Background
-
+        timeSettings = settingsManager.settings.timeSettings
+        backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
         // Dana UI Toggels
         useCalc = settingsManager.settings.useCalc
         minimumSMB = settingsManager.settings.minimumSMB

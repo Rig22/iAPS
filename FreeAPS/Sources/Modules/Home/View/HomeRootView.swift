@@ -212,7 +212,8 @@ extension Home {
 
                 ZStack {
                     Circle()
-                        .trim(from: 1.0 - progress, to: 1.0) // Progress läuft gegen den Uhrzeigersinn
+                        // .trim(from: 1.0 - progress, to: 1.0) // Progress läuft gegen den Uhrzeigersinn
+                        .trim(from: 0.0, to: progress)
                         .stroke(
                             LinearGradient(
                                 gradient: Gradient(colors: [backgroundColor, backgroundColor]),
@@ -232,7 +233,7 @@ extension Home {
         func bolusProgressView(progress: Decimal, amount: Decimal, backgroundColor: Color) -> some View {
             ZStack {
                 VStack(alignment: .leading, spacing: 5) {
-                    // Berechne den formatierten Text separat, um die Expression zu vereinfachen
+                    // Berechnet den formatierten Text separat, um die Expression zu vereinfachen!
                     let bolusAmount = amount * progress
                     let bolused = bolusProgressFormatter.string(from: bolusAmount as NSNumber) ?? ""
                     let totalAmount = amount.formatted(.number.precision(.fractionLength(2)))
@@ -244,7 +245,7 @@ extension Home {
                         .foregroundStyle(Color.white)
                         .offset(x: -120, y: 50)
 
-                    // Verwende ProgressView mit expliziter Übergabe von backgroundColor
+                    // Verwendet ProgressView mit expliziter Übergabe von backgroundColor
                     ProgressView(value: Double(truncating: progress as NSNumber))
                         .progressViewStyle(CircularProgressViewStyle(backgroundColor: backgroundColor))
                         .padding(.top, 15)
@@ -266,164 +267,176 @@ extension Home {
         }
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-            backgroundColor
-                .frame(
-                    maxHeight: fontSize < .extraExtraLarge ? 230 + geo.safeAreaInsets.top : 145 + geo.safeAreaInsets.top
-                )
-                .overlay {
+            LinearGradient(
+                gradient: Gradient(colors: [.black, backgroundColor]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            // backgroundColor
+            .frame(
+                maxHeight: fontSize < .extraExtraLarge ? 230 + geo.safeAreaInsets.top : 145 + geo.safeAreaInsets.top
+            )
+            .overlay {
+                VStack {
+                    // Oberer Bereich
                     VStack {
-                        // Oberer Bereich
-                        VStack {
-                            HStack {
-                                // Linker Block
-                                VStack(alignment: .leading, spacing: 8) {
-                                    HStack(spacing: 5) {
-                                        Image(systemName: "chart.xyaxis.line")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 16, height: 16)
+                        HStack {
+                            // Linker Block
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(spacing: 5) {
+                                    Image(systemName: "chart.xyaxis.line")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 16, height: 16)
+                                        .foregroundColor(.white)
+
+                                    if let tempRate = state.tempRate {
+                                        let rateString = tempRatenumberFormatter.string(from: tempRate as NSNumber) ?? "0"
+                                        let manualBasalString = state.apsManager.isManualTempBasal
+                                            ? NSLocalizedString(" Manual", comment: "Manual Temp basal")
+                                            : ""
+
+                                        Text(rateString)
+                                            .font(.system(size: 16))
                                             .foregroundColor(.white)
-
-                                        if let tempRate = state.tempRate {
-                                            let rateString = tempRatenumberFormatter.string(from: tempRate as NSNumber) ?? "0"
-                                            let manualBasalString = state.apsManager.isManualTempBasal
-                                                ? NSLocalizedString(" Manual", comment: "Manual Temp basal")
-                                                : ""
-
-                                            Text(rateString)
-                                                .font(.system(size: 16))
-                                                .foregroundColor(.white)
-                                                +
-                                                Text(" U/hr")
-                                                .font(.system(size: 12))
-                                                .foregroundColor(.white)
-                                                +
-                                                Text(manualBasalString)
-                                                .font(.system(size: 16))
-                                                .foregroundColor(.white)
-                                        }
+                                            +
+                                            Text(" U/hr")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(.white)
+                                            +
+                                            Text(manualBasalString)
+                                            .font(.system(size: 16))
+                                            .foregroundColor(.white)
                                     }
-                                    .padding(.leading, 6)
                                 }
+                                .padding(.leading, 6)
+                            }
 
-                                Spacer()
+                            Spacer()
 
-                                // Mittlerer Stack
+                            // Mittlerer Stack
 
-                                glucoseView
-                                    .frame(width: 120, height: 120)
-                                    .overlay(
-                                        ZStack {
-                                            if let progress = state.bolusProgress {
-                                                ProgressView(value: Double(truncating: progress as NSNumber))
-                                                    .progressViewStyle(CircularProgressViewStyle(
-                                                        backgroundColor: backgroundColor
-                                                    ))
-                                                    .frame(width: 120, height: 120)
-                                                    .animation(.easeInOut, value: progress)
+                            glucoseView
+                                .frame(width: 120, height: 120)
+                                .overlay(
+                                    ZStack {
+                                        if let progress = state.bolusProgress {
+                                            ProgressView(value: Double(truncating: progress as NSNumber))
+                                                .progressViewStyle(CircularProgressViewStyle(
+                                                    backgroundColor: backgroundColor
+                                                ))
+                                                .frame(width: 120, height: 120)
+                                                .animation(.easeInOut, value: progress)
 
-                                                // Hintergrundfüllung für den Glucosering
+                                            // Hintergrundfüllung für den Glucosering während der Bolus Abgabe
+                                            Circle()
+                                                /* .fill(
+                                                     LinearGradient(
+                                                         gradient: Gradient(colors: [backgroundColor]),
+                                                         startPoint: .top,
+                                                         endPoint: .bottom
+                                                     )
+                                                 )*/
+                                                .fill(backgroundColor.opacity(1.0))
+                                                .frame(width: 120, height: 120)
+
+                                            VStack {
                                                 Circle()
-                                                    .fill(backgroundColor.opacity(1.0))
-                                                    .frame(width: 120, height: 120)
+                                                    .fill(Color.red.opacity(1.0))
+                                                    .frame(width: 20, height: 20)
+                                                    .overlay(
+                                                        Image(systemName: "xmark")
+                                                            .font(.system(size: 13))
+                                                            .foregroundColor(.white)
+                                                            .onTapGesture {
+                                                                state.cancelBolus()
+                                                            }
+                                                    )
+                                                    .padding(.bottom, 5)
 
-                                                VStack {
-                                                    Circle()
-                                                        .fill(Color.red.opacity(1.0))
-                                                        .frame(width: 20, height: 20)
-                                                        .overlay(
-                                                            Image(systemName: "xmark")
-                                                                .font(.system(size: 13))
-                                                                .foregroundColor(.white)
-                                                                .onTapGesture {
-                                                                    state.cancelBolus()
-                                                                }
-                                                        )
-                                                        .padding(.bottom, 5)
+                                                if let progress = state.bolusProgress, let amount = state.bolusAmount {
+                                                    let bolusedValue = amount * progress
+                                                    let bolused = bolusProgressFormatter
+                                                        .string(from: bolusedValue as NSNumber) ?? ""
+                                                    let formattedAmount = amount
+                                                        .formatted(.number.precision(.fractionLength(2)))
 
-                                                    if let progress = state.bolusProgress, let amount = state.bolusAmount {
-                                                        let bolusedValue = amount * progress
-                                                        let bolused = bolusProgressFormatter
-                                                            .string(from: bolusedValue as NSNumber) ?? ""
-                                                        let formattedAmount = amount
-                                                            .formatted(.number.precision(.fractionLength(2)))
+                                                    let bolusText = "\(bolused) / \(formattedAmount) U"
 
-                                                        let bolusText = "\(bolused) / \(formattedAmount) U"
-
-                                                        Text(bolusText)
-                                                            .font(.system(size: 14))
-                                                            .foregroundStyle(Color.white)
-                                                            .offset(y: 2)
-                                                    }
+                                                    Text(bolusText)
+                                                        .font(.system(size: 14))
+                                                        .foregroundStyle(Color.white)
+                                                        .offset(y: 2)
                                                 }
                                             }
-                                            VStack {
-                                                loopView
-                                                    .frame(maxHeight: .infinity)
-                                                    .padding(.top, 225)
-                                            }
                                         }
-                                    )
-
-                                Spacer()
-
-                                // Rechter Block (eventualBG)
-                                if let eventualBG = state.eventualBG {
-                                    HStack(spacing: 4) {
-                                        Text("⇢")
-                                            .font(.statusFont)
-                                            .foregroundStyle(.white)
-
-                                        let eventualBGValue = state.units == .mmolL ? eventualBG.asMmolL : Decimal(eventualBG)
-
-                                        if let formattedBG = fetchedTargetFormatter
-                                            .string(from: eventualBGValue as NSNumber)
-                                        {
-                                            Text(formattedBG)
-                                                .font(.system(size: 16))
-                                                .foregroundColor(.white)
+                                        VStack {
+                                            loopView
+                                                .frame(maxHeight: .infinity)
+                                                .padding(.top, 225)
                                         }
-
-                                        Text(state.units.rawValue)
-                                            .font(.system(size: 12))
-                                            .foregroundStyle(.white)
-                                            .padding(.leading, -4)
                                     }
+                                )
+
+                            Spacer()
+
+                            // Rechter Block (eventualBG)
+                            if let eventualBG = state.eventualBG {
+                                HStack(spacing: 4) {
+                                    Text("⇢")
+                                        .font(.statusFont)
+                                        .foregroundStyle(.white)
+
+                                    let eventualBGValue = state.units == .mmolL ? eventualBG.asMmolL : Decimal(eventualBG)
+
+                                    if let formattedBG = fetchedTargetFormatter
+                                        .string(from: eventualBGValue as NSNumber)
+                                    {
+                                        Text(formattedBG)
+                                            .font(.system(size: 16))
+                                            .foregroundColor(.white)
+                                    }
+
+                                    Text(state.units.rawValue)
+                                        .font(.system(size: 12))
+                                        .foregroundStyle(.white)
+                                        .padding(.leading, -4)
                                 }
                             }
-                            .padding(.horizontal, 22) // Seitenabstand für den HStack
-                            .padding(.top, -15) // Oberer Rand
                         }
-                        .offset(y: 90)
+                        .padding(.horizontal, 22) // Seitenabstand für den HStack
+                        .padding(.top, -15) // Oberer Rand
+                    }
+                    .offset(y: 90)
 
-                        // Fortschritt des Bolus in Prozent
-                        if let progress = state.bolusProgress {
-                            Text("\(Int(progress * 100))%")
-                                .font(.system(size: 20))
-                                .foregroundStyle(Color.white)
-                                .offset(x: 160, y: -30)
-                        }
+                    // Fortschritt des Bolus in Prozent
+                    if let progress = state.bolusProgress {
+                        Text("\(Int(progress * 100))%")
+                            .font(.system(size: 20))
+                            .foregroundStyle(Color.white)
+                            .offset(x: 160, y: -30)
+                    }
 
-                        // Unterer Bereich
-                        VStack(spacing: 20) {
+                    // Unterer Bereich
+                    VStack(spacing: 20) {
+                        Spacer()
+                        HStack {
                             Spacer()
-                            HStack {
-                                Spacer()
-                                carbsView
-                                    .frame(maxHeight: .infinity, alignment: .bottom)
-                                    .padding(.bottom, 20)
-                                Spacer(minLength: 200) // Abstand zwischen Carbs und IOB
-                                insulinView
-                                    .frame(maxHeight: .infinity, alignment: .bottom)
-                                    .padding(.bottom, 20)
-                                Spacer()
-                            }
-                            .dynamicTypeSize(...DynamicTypeSize.xLarge)
-                            .padding(.horizontal, 10)
+                            carbsView
+                                .frame(maxHeight: .infinity, alignment: .bottom)
+                                .padding(.bottom, 20)
+                            Spacer(minLength: 200) // Abstand zwischen Carbs und IOB
+                            insulinView
+                                .frame(maxHeight: .infinity, alignment: .bottom)
+                                .padding(.bottom, 20)
+                            Spacer()
                         }
+                        .dynamicTypeSize(...DynamicTypeSize.xLarge)
+                        .padding(.horizontal, 10)
                     }
                 }
-                .clipShape(Rectangle())
+            }
+            .clipShape(Rectangle())
         }
 
         // Pie Animation
@@ -648,6 +661,7 @@ extension Home {
         }
 
         // DanaBar
+
         var infoPanel: some View {
             if state.danaBar {
                 return AnyView(
@@ -683,6 +697,7 @@ extension Home {
         @StateObject private var connectionPieSegmentViewModel = PieSegmentViewModel()
 
         // Insulin Concentration Badge ->
+
         struct NonStandardInsulin: View {
             let concentration: Double
             private var formatter: NumberFormatter {
@@ -1233,16 +1248,13 @@ extension Home {
 
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {
-                backgroundColor
+                //  backgroundColor
                 LinearGradient(
-                    gradient: Gradient(
-                        colors: state
-                            .colorRig22Background ? [Color.rig22Background, Color.rig22Background] :
-                            [Color.black, Color.black]
-                    ), startPoint: .top,
+                    gradient: Gradient(colors: [backgroundColor, backgroundColor]),
+                    /* gradient: Gradient(colors: [backgroundColor, backgroundColor, Color.black, Color.black]), */
+                    startPoint: .top,
                     endPoint: .bottom
-                )
-                .frame(height: 50 + geo.safeAreaInsets.bottom)
+                ).frame(height: 50 + geo.safeAreaInsets.bottom)
                 let isOverride = fetchedPercent.first?.enabled ?? false
                 let isTarget = (state.tempTarget != nil)
 
@@ -1250,9 +1262,6 @@ extension Home {
                     Button { state.showModal(for: .addCarbs(editMode: false, override: false)) }
                     label: {
                         ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
-                            // Circle()
-                            //     .fill(Color.gray)
-                            //     .opacity(0.3)
                             Image("carbs")
                                 .resizable()
                                 .scaledToFit()
@@ -1533,26 +1542,28 @@ extension Home {
         }
 
         @ViewBuilder private func glucoseHeaderView() -> some View {
-            backgroundColor
-                .frame(maxHeight: 90)
-                .overlay {
-                    VStack {
-                        ZStack {
-                            LinearGradient(
-                                gradient: Gradient(
-                                    colors: state
-                                        .colorRig22Background ? [Color.rig22Background, Color.rig22Background] :
-                                        [Color.black, Color.black]
-                                ), startPoint: .top,
-                                endPoint: .bottom
-                            )
-                            glucosePreview.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                                .dynamicTypeSize(...DynamicTypeSize.medium)
-                        }
+            // backgroundColor
+            LinearGradient(
+                gradient: Gradient(colors: [.black, backgroundColor]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(maxHeight: 90)
+            .overlay {
+                VStack {
+                    ZStack {
+                        LinearGradient(
+                            gradient: Gradient(colors: [.black, backgroundColor]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                        glucosePreview.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                            .dynamicTypeSize(...DynamicTypeSize.medium)
                     }
                 }
-                .clipShape(Rectangle())
-                .foregroundStyle(Color.white)
+            }
+            .clipShape(Rectangle())
+            .foregroundStyle(Color.white)
         }
 
         var glucosePreview: some View {
@@ -1606,7 +1617,7 @@ extension Home {
         }
 
         var backgroundColor: Color {
-            state.colorRig22Background ? Color(red: 0.08, green: 0.15, blue: 0.20) : Color(red: 0.00, green: 0.00, blue: 0.00)
+            BackgroundColorOption(rawValue: state.backgroundColorOptionRawValue)?.color ?? .black
         }
 
         var body: some View {
