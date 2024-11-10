@@ -24,7 +24,7 @@ enum BackgroundColorOption: String, CaseIterable, Identifiable, Encodable {
         case .blue:
             return Color(red: 0.10, green: 0.20, blue: 0.50)
         case .teal:
-            return Color(red: 0.00, green: 0.36, blue: 0.36)
+            return Color(red: 0.00, green: 0.32, blue: 0.32)
         case .darkGreen:
             return Color(red: 0.10, green: 0.25, blue: 0.15)
         case .black:

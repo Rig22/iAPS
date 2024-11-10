@@ -38,7 +38,7 @@ class PieSegmentViewModel: ObservableObject {
 
     func updateProgress(to newValue: CGFloat, animate: Bool) {
         if animate {
-            withAnimation(.easeInOut(duration: 2.5)) { // Beispiel: Dauer der Animation anpassen
+            withAnimation(.easeInOut(duration: 2.5)) { // Dauer der Animation anpassen
                 self.progress = Double(newValue)
             }
         } else {
@@ -61,7 +61,7 @@ struct FillablePieSegment: View {
             ZStack {
                 Circle()
                     .fill(backgroundColor)
-                    .opacity(0.3)
+                    .opacity(0.0)
                     .frame(width: 45, height: 45)
                     .overlay(
                         Circle()
@@ -120,7 +120,7 @@ struct LoopView: View {
                     pieSegmentViewModel: pieSegmentViewModel,
                     fillFraction: min(CGFloat(minutesAgo) / 5.0, 1.0),
                     color: pieColor,
-                    backgroundColor: .gray,
+                    backgroundColor: .clear,
                     // displayText: "\(minutesAgo) min",
                     // displayText: minutesAgo <= 1 ? "< 1 min" : "\(minutesAgo) min",
                     displayText: minutesAgo == 0 ? "< 1 min" : "\(minutesAgo) min",

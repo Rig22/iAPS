@@ -187,23 +187,8 @@ extension Home {
             }
         }
 
-        /*    var pumpView: some View {
-             PumpView(
-                 reservoir: $state.reservoir,
-                 battery: $state.battery,
-                 name: $state.pumpName,
-                 // expiresAtDate: $state.pumpExpiresAtDate,
-                 timerDate: $state.timerDate, timeZone: $state.timeZone,
-                 state: state
-             )
-             .onTapGesture {
-                 if state.pumpDisplayState != nil {
-                     state.setupPump = true
-                 }
-             }
-         }*/
-
         // Bolus Progressbar
+
         public struct CircularProgressViewStyle: ProgressViewStyle {
             var backgroundColor: Color
 
@@ -233,7 +218,6 @@ extension Home {
         func bolusProgressView(progress: Decimal, amount: Decimal, backgroundColor: Color) -> some View {
             ZStack {
                 VStack(alignment: .leading, spacing: 5) {
-                    // Berechnet den formatierten Text separat, um die Expression zu vereinfachen!
                     let bolusAmount = amount * progress
                     let bolused = bolusProgressFormatter.string(from: bolusAmount as NSNumber) ?? ""
                     let totalAmount = amount.formatted(.number.precision(.fractionLength(2)))
@@ -245,7 +229,6 @@ extension Home {
                         .foregroundStyle(Color.white)
                         .offset(x: -120, y: 50)
 
-                    // Verwendet ProgressView mit expliziter Übergabe von backgroundColor
                     ProgressView(value: Double(truncating: progress as NSNumber))
                         .progressViewStyle(CircularProgressViewStyle(backgroundColor: backgroundColor))
                         .padding(.top, 15)
@@ -279,9 +262,11 @@ extension Home {
             .overlay {
                 VStack {
                     // Oberer Bereich
+
                     VStack {
                         HStack {
                             // Linker Block
+
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack(spacing: 5) {
                                     Image(systemName: "chart.xyaxis.line")
@@ -381,6 +366,7 @@ extension Home {
                             Spacer()
 
                             // Rechter Block (eventualBG)
+
                             if let eventualBG = state.eventualBG {
                                 HStack(spacing: 4) {
                                     Text("⇢")
@@ -410,6 +396,7 @@ extension Home {
                     .offset(y: 90)
 
                     // Fortschritt des Bolus in Prozent
+
                     if let progress = state.bolusProgress {
                         Text("\(Int(progress * 100))%")
                             .font(.system(size: 20))
@@ -418,6 +405,7 @@ extension Home {
                     }
 
                     // Unterer Bereich
+
                     VStack(spacing: 20) {
                         Spacer()
                         HStack {
@@ -513,7 +501,7 @@ extension Home {
                         )
                         .fill(color)
                         .frame(width: 60, height: 60)
-                        .opacity(0.7)
+                        .opacity(0.6)
 
                         /*   Image(systemName: symbol)
                          .resizable()
@@ -553,7 +541,7 @@ extension Home {
                     ZStack {
                         Circle()
                             .fill(backgroundColor)
-                            .opacity(0.3)
+                            .opacity(0.0)
                             .frame(width: 40, height: 40)
                             .overlay(
                                 Circle()
@@ -566,7 +554,7 @@ extension Home {
                         )
                         .fill(color)
                         .frame(width: 40, height: 40)
-                        .opacity(0.5) // Transparenz der Pie Farb Füllung
+                        .opacity(0.6) // Transparenz der Pie Farb Füllung
 
                         Image(systemName: symbol)
                             .resizable()
@@ -609,7 +597,7 @@ extension Home {
                                 pieSegmentViewModel: carbsPieSegmentViewModel,
                                 fillFraction: fill,
                                 color: .loopYellow,
-                                backgroundColor: .gray,
+                                backgroundColor: .clear,
                                 displayText: "\(numberFormatter.string(from: (state.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
                                 //  symbolSize: 30,
                                 //  symbol: "",
@@ -644,7 +632,7 @@ extension Home {
                                 pieSegmentViewModel: insulinPieSegmentViewModel,
                                 fillFraction: fill,
                                 color: substance < 0 ? .blue : .insulin,
-                                backgroundColor: .gray,
+                                backgroundColor: .clear,
                                 displayText: "\(insulinnumberFormatter.string(from: (state.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
                                 // symbolSize: 0,
                                 // symbol: "",
@@ -710,7 +698,7 @@ extension Home {
             var body: some View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 15)
-                        .fill(Color(.insulin).opacity(0.8))
+                        .fill(Color(.insulin).opacity(1.0))
                         .frame(width: 37, height: 17)
                         .overlay {
                             Text("U" + (formatter.string(from: concentration * 100 as NSNumber) ?? ""))
@@ -751,7 +739,7 @@ extension Home {
                                             pieSegmentViewModel: reservoirPieSegmentViewModel,
                                             fillFraction: fill,
                                             color: reservoirColor,
-                                            backgroundColor: .gray,
+                                            backgroundColor: .clear,
                                             displayText: displayText,
                                             symbolSize: 24,
                                             symbol: "",
@@ -768,6 +756,7 @@ extension Home {
                             }
 
                             // PumpenBatterie
+
                             HStack(spacing: 10) {
                                 var batteryColor: Color {
                                     if let batteryChargeString = state.pumpBatteryChargeRemaining,
@@ -806,7 +795,7 @@ extension Home {
                                             pieSegmentViewModel: batteryPieSegmentViewModel,
                                             fillFraction: batteryFraction,
                                             color: batteryColor,
-                                            backgroundColor: .gray,
+                                            backgroundColor: .clear,
                                             displayText: batteryText,
                                             symbolSize: 24,
                                             symbol: "",
@@ -822,7 +811,7 @@ extension Home {
                                 } else {
                                     ZStack {
                                         Circle()
-                                            .fill(Color.gray)
+                                            .fill(Color.clear)
                                             .opacity(0.3)
                                             .frame(width: 40, height: 40)
                                             .overlay(
@@ -843,6 +832,7 @@ extension Home {
                             }
 
                             // Dana Symbol
+
                             HStack(spacing: 10) {
                                 Text("⇠")
                                     .font(.system(size: 20))
@@ -851,7 +841,7 @@ extension Home {
 
                                 ZStack {
                                     Circle()
-                                        .fill(Color.gray)
+                                        .fill(Color.clear)
                                         .opacity(0.3)
                                         .frame(width: 60, height: 60)
                                         .overlay(
@@ -893,6 +883,7 @@ extension Home {
                             }
 
                             // Kanülenalter
+
                             HStack(spacing: 10) {
                                 let cannulaFraction: CGFloat = {
                                     if let cannulaHours = state.cannulaHours {
@@ -928,7 +919,7 @@ extension Home {
                                         pieSegmentViewModel: cannulaPieSegmentViewModel,
                                         fillFraction: cannulaFraction,
                                         color: cannulaColor,
-                                        backgroundColor: .gray,
+                                        backgroundColor: .clear,
                                         displayText: state.cannulaHours != nil ? "\(Int(state.cannulaHours!))h" : "--",
                                         symbolSize: 22,
                                         symbol: "",
@@ -1029,14 +1020,17 @@ extension Home {
         }
 
         var chart: some View {
-            let ratio = state.timeSettings ? 1.95 : 1.85 // TimeSetting ein
-            let ratio2 = state.timeSettings ? 1.78 : 1.68 // TimeSetting aus
+            // let ratio = state.timeSettings ? 1.95 : 1.85 // TimeSetting ein
+            // let ratio2 = state.timeSettings ? 1.78 : 1.68 // TimeSetting aus
+            let ratio = state.timeSettings ? 1.70 : 1.60 // TimeSetting ein
+            let ratio2 = state.timeSettings ? 1.65 : 1.55 // TimeSetting aus
 
             return VStack(spacing: 0) {
                 infoPanel
                 mainChart
                 legendPanel
                 tempTargetbar
+                infoPanel2
                     .frame(width: UIScreen.main.bounds.width * 0.99) // Breite der mainChart anpassen
             }
             .background(backgroundColor) // Dynamische Hintergrundfarbe anwenden
@@ -1130,7 +1124,7 @@ extension Home {
                 info2
             }
             .frame(maxWidth: .infinity, maxHeight: 25)
-            .padding(.top, 120)
+            .padding(.top, 20)
         }
 
         struct Buttons: Identifiable {
@@ -1199,6 +1193,7 @@ extension Home {
                             .frame(maxWidth: 100, alignment: .leading)
                         }
                         Spacer()
+
                         // Mittlerer Stack
 
                         HStack(spacing: 10) {
@@ -1229,6 +1224,7 @@ extension Home {
                             updateButtonActions()
                         }
                         Spacer()
+
                         // Rechter Stack - TDD
 
                         HStack {
@@ -1239,12 +1235,14 @@ extension Home {
                         }
                         .frame(maxWidth: 100, alignment: .trailing)
                     }
-                    .padding(.top, -110)
+                    // .padding(.top, -110)
                 )
             } else {
                 return AnyView(EmptyView())
             }
         }
+
+        // buttonPanel
 
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {
@@ -1634,7 +1632,7 @@ extension Home {
                         ScrollViewReader { _ in
                             LazyVStack {
                                 chart
-                                infoPanel2
+                                // infoPanel2
                                 preview
                                 loopPreview
                                 if state.iobData.count > 5 {
