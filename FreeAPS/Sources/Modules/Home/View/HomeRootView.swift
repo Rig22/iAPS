@@ -721,16 +721,21 @@ extension Home {
                             HStack(spacing: 10) {
                                 let maxValue = Decimal(300)
                                 if let reservoir = state.reservoirLevel {
-                                    let fraction = CGFloat(
-                                        reservoir / NSDecimalNumber(decimal: maxValue).doubleValue
-                                    )
+                                    let reservoirDecimal = Decimal(reservoir)
+                                    let fractionDecimal = reservoirDecimal / maxValue
+                                    let fraction = CGFloat(NSDecimalNumber(decimal: fractionDecimal).doubleValue)
+
                                     let fill = max(min(fraction, 1.0), 0.0)
                                     let reservoirColor = reservoirLevelColor(for: reservoir)
+
                                     let displayText: String = {
                                         if reservoir == 0 {
                                             return "--"
                                         } else {
-                                            return "\(reservoirFormatter.string(from: reservoir as NSNumber) ?? "")U"
+                                            let concentrationValue = Decimal(concentration.last?.concentration ?? 1.0)
+                                            let adjustedReservoir = reservoirDecimal * concentrationValue
+                                            // return reservoirFormatter.string(from: adjustedReservoir as NSNumber) ?? ""
+                                            return (reservoirFormatter.string(from: adjustedReservoir as NSNumber) ?? "") + "U"
                                         }
                                     }()
 
@@ -754,7 +759,6 @@ extension Home {
                                     }
                                 }
                             }
-
                             // PumpenBatterie
 
                             HStack(spacing: 10) {
@@ -937,7 +941,7 @@ extension Home {
                             // Bluetooth Connection
                             HStack(spacing: 10) {
                                 let connectionFraction: CGFloat = state.isConnected ? 1.0 : 0.0
-                                let connectionColor: Color = state.isConnected ? .green : .gray
+                                let connectionColor: Color = state.isConnected ? .green : .green
 
                                 ZStack {
                                     SmallFillablePieSegment(
