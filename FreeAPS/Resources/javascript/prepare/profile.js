@@ -68,23 +68,21 @@ function generate(pumpsettings_data, bgtargets_data, isf_data, basalprofile_data
                 preferences.insulinPeakTime =
                 Math.max(50, Math.min(preferences.insulinPeakTime, 120));
             } else { preferences.insulinPeakTime = 75; }
-        } 
+        }
         else if (preferences.curve === "ultra-rapid") {
             if (preferences.useCustomPeakTime) {
                 preferences.insulinPeakTime =
                 Math.max(35, Math.min(preferences.insulinPeakTime, 100));
             } else { preferences.insulinPeakTime = 55; }
         }
-        // Migrate missing conversion from original freeaps
-        if (preferences.resistanceLowersTarget) {
-            preferences.resistance_lowers_target = true;
-        }
     }
     
     var tdd_factor = { };
     var set_basal = false;
     var basal_rate = { };
-
+    var old_isf = { };
+    var old_cr = { };
+    
     var inputs = { };
     //add all preferences to the inputs
     for (var pref in preferences) {
@@ -112,6 +110,9 @@ function generate(pumpsettings_data, bgtargets_data, isf_data, basalprofile_data
     inputs.tddFactor = tdd_factor;
     inputs.set_basal = set_basal;
     inputs.basal_rate = basal_rate;
+    inputs.old_isf = old_isf;
+    inputs.old_cr = old_cr;
+    
     
     if (autotune_data) {
         if (autotune_data.basalprofile) { inputs.basals = autotune_data.basalprofile; }

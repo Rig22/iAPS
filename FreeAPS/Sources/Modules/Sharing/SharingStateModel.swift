@@ -8,27 +8,19 @@ extension Sharing {
         @Published var uploadStats: Bool = false
         @Published var identfier: String = ""
         @Published var birthDate = Date.distantPast
-        @Published var uploadVersion: Bool = true
         @Published var sexSetting: Int = 3
         @Published var sex: Sex = .secret
 
         override func subscribe() {
             uploadStats = settingsManager.settings.uploadStats
             subscribeSetting(\.uploadStats, on: $uploadStats) { uploadStats = $0 }
-            subscribeSetting(\.uploadVersion, on: $uploadVersion) { uploadVersion = $0 }
             subscribeSetting(\.birthDate, on: $birthDate) { birthDate = $0 }
             subscribeSetting(\.sexSetting, on: $sexSetting) { sexSetting = $0 }
             identfier = getIdentifier()
         }
 
         private func getIdentifier() -> String {
-            var identfier = keychain.getValue(String.self, forKey: IAPSconfig.id) ?? ""
-            guard identfier.count > 1 else {
-                identfier = UUID().uuidString
-                keychain.setValue(identfier, forKey: IAPSconfig.id)
-                return identfier
-            }
-            return identfier
+            keychain.getIdentifier()
         }
 
         func savedSettings() {
@@ -56,5 +48,17 @@ extension Sharing {
                 sexSetting = 3
             }
         }
+    }
+}
+
+extension Keychain {
+    func getIdentifier() -> String {
+        var identfier = getValue(String.self, forKey: IAPSconfig.id) ?? ""
+        guard identfier.count > 1 else {
+            identfier = UUID().uuidString
+            setValue(identfier, forKey: IAPSconfig.id)
+            return identfier
+        }
+        return identfier
     }
 }

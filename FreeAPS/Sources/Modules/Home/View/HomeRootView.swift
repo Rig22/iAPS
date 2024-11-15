@@ -58,6 +58,11 @@ extension Home {
             )]
         ) var concentration: FetchedResults<InsulinConcentration>
 
+        @FetchRequest(
+            entity: Onboarding.entity(),
+            sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
+        ) var onboarded: FetchedResults<Onboarding>
+
         @State private var progress: Double = 0.0
 
         private var numberFormatter: NumberFormatter {
@@ -316,11 +321,11 @@ extension Home {
                                             // Hintergrundfüllung für den Glucosering während der Bolus Abgabe
                                             Circle()
                                                 /* .fill(
-                                                     LinearGradient(
-                                                         gradient: Gradient(colors: [backgroundColor]),
-                                                         startPoint: .top,
-                                                         endPoint: .bottom
-                                                     )
+                                                 LinearGradient(
+                                                 gradient: Gradient(colors: [backgroundColor]),
+                                                 startPoint: .top,
+                                                 endPoint: .bottom
+                                                 )
                                                  )*/
                                                 .fill(backgroundColor.opacity(1.0))
                                                 .frame(width: 120, height: 120)
@@ -887,12 +892,11 @@ extension Home {
                             }
 
                             // Kanülenalter
-
                             HStack(spacing: 10) {
                                 let cannulaFraction: CGFloat = {
                                     if let cannulaHours = state.cannulaHours {
-                                        if cannulaHours > 71 {
-                                            return 72.0 // Voller Pie für Werte über 71 Stunden
+                                        if cannulaHours >= 72 {
+                                            return 1.0 // Voller Pie für Werte ab 72 Stunden
                                         } else {
                                             return CGFloat(max(1.0 - cannulaHours / 72.0, 0.0))
                                         }
@@ -906,12 +910,12 @@ extension Home {
                                         switch cannulaHours {
                                         case ..<48:
                                             return .green
-                                        case 48 ..< 71:
+                                        case 48 ..< 72:
                                             return .yellow
                                         case 72...:
                                             return Color.red.opacity(1.0)
                                         default:
-                                            return .gray
+                                            return .clear
                                         }
                                     } else {
                                         return Color.gray.opacity(0.3)
@@ -937,6 +941,58 @@ extension Home {
                                         .frame(width: 40, height: 40)
                                 }
                             }
+
+                            // Kanülenalter
+
+                            /* HStack(spacing: 10) {
+                             let cannulaFraction: CGFloat = {
+                             if let cannulaHours = state.cannulaHours {
+                             if cannulaHours > 71 {
+                             return 72.0 // Voller Pie für Werte über 71 Stunden
+                             } else {
+                             return CGFloat(max(1.0 - cannulaHours / 72.0, 0.0))
+                             }
+                             } else {
+                             return 0.0
+                             }
+                             }()
+
+                             let cannulaColor: Color = {
+                             if let cannulaHours = state.cannulaHours {
+                             switch cannulaHours {
+                             case ..<48:
+                             return .green
+                             case 48 ..< 71:
+                             return .yellow
+                             case 72...:
+                             return Color.red.opacity(1.0)
+                             default:
+                             return .clear
+                             }
+                             } else {
+                             return Color.gray.opacity(0.3)
+                             }
+                             }()
+
+                             ZStack {
+                             SmallFillablePieSegment(
+                             pieSegmentViewModel: cannulaPieSegmentViewModel,
+                             fillFraction: cannulaFraction,
+                             color: cannulaColor,
+                             backgroundColor: .clear,
+                             displayText: state.cannulaHours != nil ? "\(Int(state.cannulaHours!))h" : "--",
+                             symbolSize: 22,
+                             symbol: "",
+                             animateProgress: true
+                             )
+                             .frame(width: 40, height: 40)
+
+                             Image("infusion")
+                             .resizable()
+                             .scaledToFit()
+                             .frame(width: 40, height: 40)
+                             }
+                             }*/
 
                             // Bluetooth Connection
                             HStack(spacing: 10) {
@@ -1291,16 +1347,16 @@ extension Home {
                             .frame(width: 45, height: 45)
                     }
                     /*  label: {
-                         VStack {
-                             Image("insulin")
-                                 .resizable()
-                                 .scaledToFit()
-                                 .frame(width: 50, height: 50)
-                             Text("Bolus")
-                                 .font(.system(size: 14))
-                             // .padding(.top, 2) // optional, um etwas Abstand zu schaffen
-                         }
-                         .padding(.bottom, 10)
+                     VStack {
+                     Image("insulin")
+                     .resizable()
+                     .scaledToFit()
+                     .frame(width: 50, height: 50)
+                     Text("Bolus")
+                     .font(.system(size: 14))
+                     // .padding(.top, 2) // optional, um etwas Abstand zu schaffen
+                     }
+                     .padding(.bottom, 10)
                      }*/
                     .buttonStyle(.borderless)
                     .foregroundStyle(Color.white)
@@ -1622,73 +1678,161 @@ extension Home {
             BackgroundColorOption(rawValue: state.backgroundColorOptionRawValue)?.color ?? .black
         }
 
+        /*      var body: some View {
+         GeometryReader { geo in
+             if onboarded.first?.firstRun ?? true, let openAPSSettings = state.openAPSSettings {
+                 /// If old iAPS user pre v5.7.1 OpenAPS settings will be reset, but can be restored in View below
+                 importResetSettingsView(settings: openAPSSettings)
+             } else {
+                 VStack(spacing: 0) {
+                     headerView(geo)
+
+                     if !state.skipGlucoseChart, scrollOffset > scrollAmount {
+                         glucoseHeaderView()
+                             .transition(.move(edge: .top))
+                     }
+
+                     ScrollView {
+                         ScrollViewReader { _ in
+                             LazyVStack {
+                                 chart
+                                 // infoPanel2
+                                 preview
+                                 loopPreview
+                                 if state.iobData.count > 5 {
+                                     activeCOBView.padding(.top, 15)
+                                     activeIOBView.padding(.top, 15)
+                                 }
+                             }
+                             .background(GeometryReader { geo in
+                                 let offset = -geo.frame(in: .named(scrollSpace)).minY
+                                 backgroundColor
+                                     .preference(
+                                         key: ScrollViewOffsetPreferenceKey.self,
+                                         value: offset
+                                     )
+                             })
+                         }
+                     }
+                     .onPreferenceChange(ScrollViewOffsetPreferenceKey.self) { value in
+                         scrollOffset = value
+                         if !state.skipGlucoseChart, scrollOffset > scrollAmount {
+                             display.toggle()
+                         }
+                     }
+                     //      .padding(.top, 10)
+                     buttonPanel(geo)
+                         .frame(height: 50)
+                 }
+                 .background(backgroundColor)
+                 .ignoresSafeArea(edges: .vertical)
+             }
+                 .onAppear(perform: startProgress)
+                 .navigationTitle("Home")
+                 .navigationBarHidden(true)
+                 .ignoresSafeArea(.keyboard)
+                 .popup(isPresented: state.isStatusPopupPresented, alignment: .center, direction: .bottom) {
+                     popup
+                         .padding(10)
+                         .shadow(color: .white, radius: 2, x: 0, y: 0)
+                         .cornerRadius(10)
+                         .onTapGesture {
+                             state.isStatusPopupPresented = false
+                         }
+                         .gesture(
+                             DragGesture(minimumDistance: 10, coordinateSpace: .local)
+                                 .onEnded { value in
+                                     if value.translation.height < 0 {
+                                         state.isStatusPopupPresented = false
+                                     }
+                                 }
+                         )
+                 }
+                 .onAppear {
+                     if onboarded.first?.firstRun ?? true {
+                         state.fetchPreferences()
+                     }
+
+                         .onAppear(perform: configureView)
+                 }*/
+
         var body: some View {
             GeometryReader { geo in
-                VStack(spacing: 0) {
-                    headerView(geo)
+                if onboarded.first?.firstRun ?? true, let openAPSSettings = state.openAPSSettings {
+                    // Anzeige der Importansicht für alte iAPS-Benutzer
+                    importResetSettingsView(settings: openAPSSettings)
+                } else {
+                    VStack(spacing: 0) {
+                        headerView(geo)
 
-                    if !state.skipGlucoseChart, scrollOffset > scrollAmount {
-                        glucoseHeaderView()
-                            .transition(.move(edge: .top))
-                    }
-
-                    ScrollView {
-                        ScrollViewReader { _ in
-                            LazyVStack {
-                                chart
-                                // infoPanel2
-                                preview
-                                loopPreview
-                                if state.iobData.count > 5 {
-                                    activeCOBView.padding(.top, 15)
-                                    activeIOBView.padding(.top, 15)
-                                }
-                            }
-                            .background(GeometryReader { geo in
-                                let offset = -geo.frame(in: .named(scrollSpace)).minY
-                                backgroundColor
-                                    .preference(
-                                        key: ScrollViewOffsetPreferenceKey.self,
-                                        value: offset
-                                    )
-                            })
-                        }
-                    }
-                    .onPreferenceChange(ScrollViewOffsetPreferenceKey.self) { value in
-                        scrollOffset = value
                         if !state.skipGlucoseChart, scrollOffset > scrollAmount {
-                            display.toggle()
+                            glucoseHeaderView()
+                                .transition(.move(edge: .top))
                         }
-                    }
-                    //      .padding(.top, 10)
-                    buttonPanel(geo)
-                        .frame(height: 50)
-                }
-                .background(backgroundColor)
-                .ignoresSafeArea(edges: .vertical)
-            }
-            .onAppear(perform: startProgress)
-            .navigationTitle("Home")
-            .navigationBarHidden(true)
-            .ignoresSafeArea(.keyboard)
-            .popup(isPresented: state.isStatusPopupPresented, alignment: .center, direction: .bottom) {
-                popup
-                    .padding(10)
-                    .shadow(color: .white, radius: 2, x: 0, y: 0)
-                    .cornerRadius(10)
-                    .onTapGesture {
-                        state.isStatusPopupPresented = false
-                    }
-                    .gesture(
-                        DragGesture(minimumDistance: 10, coordinateSpace: .local)
-                            .onEnded { value in
-                                if value.translation.height < 0 {
-                                    state.isStatusPopupPresented = false
+
+                        ScrollView {
+                            ScrollViewReader { _ in
+                                LazyVStack {
+                                    chart
+                                    preview
+                                    loopPreview
+                                    if state.iobData.count > 5 {
+                                        activeCOBView.padding(.top, 15)
+                                        activeIOBView.padding(.top, 15)
+                                    }
                                 }
+                                .background(GeometryReader { geo in
+                                    let offset = -geo.frame(in: .named(scrollSpace)).minY
+                                    backgroundColor
+                                        .preference(
+                                            key: ScrollViewOffsetPreferenceKey.self,
+                                            value: offset
+                                        )
+                                })
                             }
-                    )
+                        }
+                        .onPreferenceChange(ScrollViewOffsetPreferenceKey.self) { value in
+                            scrollOffset = value
+                            if !state.skipGlucoseChart, scrollOffset > scrollAmount {
+                                display.toggle()
+                            }
+                        }
+                        buttonPanel(geo)
+                            .frame(height: 50)
+                    }
+                    .background(backgroundColor)
+                    .ignoresSafeArea(edges: .vertical)
+                    .onAppear(perform: startProgress)
+                    .navigationTitle("Home")
+                    .navigationBarHidden(true)
+                    .ignoresSafeArea(.keyboard) // Ignoriert die Tastatur bei Safe Area
+
+                    // Popup für Statusanzeige
+                    .popup(isPresented: state.isStatusPopupPresented, alignment: .center, direction: .bottom) {
+                        popup
+                            .padding(10)
+                            .shadow(color: .white, radius: 2, x: 0, y: 0)
+                            .cornerRadius(10)
+                            .onTapGesture {
+                                state.isStatusPopupPresented = false
+                            }
+                            .gesture(
+                                DragGesture(minimumDistance: 10, coordinateSpace: .local)
+                                    .onEnded { value in
+                                        if value.translation.height < 0 {
+                                            state.isStatusPopupPresented = false
+                                        }
+                                    }
+                            )
+                    }
+                    .onAppear {
+                        if onboarded.first?.firstRun ?? true {
+                            state.fetchPreferences()
+                        }
+                        configureView()
+                    }
+                }
             }
-            .onAppear(perform: configureView)
         }
 
         var popup: some View {
@@ -1721,6 +1865,13 @@ extension Home {
             .background(backgroundColor)
             .cornerRadius(10)
             .shadow(radius: 2)
+        }
+
+        private func importResetSettingsView(settings: Preferences) -> some View {
+            Restore.RootView(
+                resolver: resolver,
+                openAPS: settings
+            )
         }
     }
 }
