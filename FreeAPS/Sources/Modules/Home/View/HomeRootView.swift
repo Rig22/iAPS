@@ -19,6 +19,7 @@ extension Home {
         @State var triggerUpdate = false
         @State var scrollOffset = CGFloat.zero
         @State var display = false
+        @State var showBolusActiveAlert = false
 
         @Namespace var scrollSpace
 
@@ -942,58 +943,6 @@ extension Home {
                                 }
                             }
 
-                            // Kanülenalter
-
-                            /* HStack(spacing: 10) {
-                             let cannulaFraction: CGFloat = {
-                             if let cannulaHours = state.cannulaHours {
-                             if cannulaHours > 71 {
-                             return 72.0 // Voller Pie für Werte über 71 Stunden
-                             } else {
-                             return CGFloat(max(1.0 - cannulaHours / 72.0, 0.0))
-                             }
-                             } else {
-                             return 0.0
-                             }
-                             }()
-
-                             let cannulaColor: Color = {
-                             if let cannulaHours = state.cannulaHours {
-                             switch cannulaHours {
-                             case ..<48:
-                             return .green
-                             case 48 ..< 71:
-                             return .yellow
-                             case 72...:
-                             return Color.red.opacity(1.0)
-                             default:
-                             return .clear
-                             }
-                             } else {
-                             return Color.gray.opacity(0.3)
-                             }
-                             }()
-
-                             ZStack {
-                             SmallFillablePieSegment(
-                             pieSegmentViewModel: cannulaPieSegmentViewModel,
-                             fillFraction: cannulaFraction,
-                             color: cannulaColor,
-                             backgroundColor: .clear,
-                             displayText: state.cannulaHours != nil ? "\(Int(state.cannulaHours!))h" : "--",
-                             symbolSize: 22,
-                             symbol: "",
-                             animateProgress: true
-                             )
-                             .frame(width: 40, height: 40)
-
-                             Image("infusion")
-                             .resizable()
-                             .scaledToFit()
-                             .frame(width: 40, height: 40)
-                             }
-                             }*/
-
                             // Bluetooth Connection
                             HStack(spacing: 10) {
                                 let connectionFraction: CGFloat = state.isConnected ? 1.0 : 0.0
@@ -1334,11 +1283,18 @@ extension Home {
                         }
                     }.buttonStyle(.borderless)
                     Spacer()
+                    /* Button {
+                         state.showModal(for: .bolus(
+                             waitForSuggestion: state.useCalc ? true : false,
+                             fetch: false
+                         ))
+                     }*/
                     Button {
-                        state.showModal(for: .bolus(
-                            waitForSuggestion: state.useCalc ? true : false,
-                            fetch: false
-                        ))
+                        (state.bolusProgress != nil) ? showBolusActiveAlert = true :
+                            state.showModal(for: .bolus(
+                                waitForSuggestion: state.useCalc ? true : false,
+                                fetch: false
+                            ))
                     }
                     label: {
                         Image("insulin")
@@ -1678,88 +1634,10 @@ extension Home {
             BackgroundColorOption(rawValue: state.backgroundColorOptionRawValue)?.color ?? .black
         }
 
-        /*      var body: some View {
-         GeometryReader { geo in
-             if onboarded.first?.firstRun ?? true, let openAPSSettings = state.openAPSSettings {
-                 /// If old iAPS user pre v5.7.1 OpenAPS settings will be reset, but can be restored in View below
-                 importResetSettingsView(settings: openAPSSettings)
-             } else {
-                 VStack(spacing: 0) {
-                     headerView(geo)
-
-                     if !state.skipGlucoseChart, scrollOffset > scrollAmount {
-                         glucoseHeaderView()
-                             .transition(.move(edge: .top))
-                     }
-
-                     ScrollView {
-                         ScrollViewReader { _ in
-                             LazyVStack {
-                                 chart
-                                 // infoPanel2
-                                 preview
-                                 loopPreview
-                                 if state.iobData.count > 5 {
-                                     activeCOBView.padding(.top, 15)
-                                     activeIOBView.padding(.top, 15)
-                                 }
-                             }
-                             .background(GeometryReader { geo in
-                                 let offset = -geo.frame(in: .named(scrollSpace)).minY
-                                 backgroundColor
-                                     .preference(
-                                         key: ScrollViewOffsetPreferenceKey.self,
-                                         value: offset
-                                     )
-                             })
-                         }
-                     }
-                     .onPreferenceChange(ScrollViewOffsetPreferenceKey.self) { value in
-                         scrollOffset = value
-                         if !state.skipGlucoseChart, scrollOffset > scrollAmount {
-                             display.toggle()
-                         }
-                     }
-                     //      .padding(.top, 10)
-                     buttonPanel(geo)
-                         .frame(height: 50)
-                 }
-                 .background(backgroundColor)
-                 .ignoresSafeArea(edges: .vertical)
-             }
-                 .onAppear(perform: startProgress)
-                 .navigationTitle("Home")
-                 .navigationBarHidden(true)
-                 .ignoresSafeArea(.keyboard)
-                 .popup(isPresented: state.isStatusPopupPresented, alignment: .center, direction: .bottom) {
-                     popup
-                         .padding(10)
-                         .shadow(color: .white, radius: 2, x: 0, y: 0)
-                         .cornerRadius(10)
-                         .onTapGesture {
-                             state.isStatusPopupPresented = false
-                         }
-                         .gesture(
-                             DragGesture(minimumDistance: 10, coordinateSpace: .local)
-                                 .onEnded { value in
-                                     if value.translation.height < 0 {
-                                         state.isStatusPopupPresented = false
-                                     }
-                                 }
-                         )
-                 }
-                 .onAppear {
-                     if onboarded.first?.firstRun ?? true {
-                         state.fetchPreferences()
-                     }
-
-                         .onAppear(perform: configureView)
-                 }*/
-
         var body: some View {
             GeometryReader { geo in
                 if onboarded.first?.firstRun ?? true, let openAPSSettings = state.openAPSSettings {
-                    // Anzeige der Importansicht für alte iAPS-Benutzer
+                    // Anzeige der Importansicht für alte iAPS-Benutzer Einstellungen
                     importResetSettingsView(settings: openAPSSettings)
                 } else {
                     VStack(spacing: 0) {
