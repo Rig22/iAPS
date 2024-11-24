@@ -80,11 +80,11 @@ extension Home {
         @Published var openAPSSettings: Preferences?
         // Dana UI Toggels
         @Published var danaIcon: Bool = true
-        @Published var danaBar: Bool = true
+        @Published var danaBar: Bool = false
         @Published var insulinBadge: Bool = false
-        @Published var legendsSwitch: Bool = true
-        @Published var tempTargetbar: Bool = true
-        @Published var timeSettings: Bool = true
+        @Published var legendsSwitch: Bool = false
+        @Published var tempTargetbar: Bool = false
+        @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
 
         // Dana UI Toggels
@@ -124,7 +124,7 @@ extension Home {
         var selectedBackgroundColor: Color {
             switch BackgroundColorOption(rawValue: backgroundColorOptionRawValue) {
             default:
-                return .clear // Standardfarbe, falls keine Übereinstimmung gefunden wird
+                return .blue // Standardfarbe, falls keine Übereinstimmung gefunden wird
             }
         }
 

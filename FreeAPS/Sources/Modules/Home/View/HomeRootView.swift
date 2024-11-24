@@ -255,6 +255,8 @@ extension Home {
             }
         }
 
+        @StateObject private var bolusPieSegmentViewModel = PieSegmentViewModel()
+
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             LinearGradient(
                 gradient: Gradient(colors: [.black, backgroundColor]),
@@ -263,7 +265,7 @@ extension Home {
             )
             // backgroundColor
             .frame(
-                maxHeight: fontSize < .extraExtraLarge ? 230 + geo.safeAreaInsets.top : 145 + geo.safeAreaInsets.top
+                maxHeight: fontSize < .extraExtraLarge ? 250 + geo.safeAreaInsets.top : 145 + geo.safeAreaInsets.top
             )
             .overlay {
                 VStack {
@@ -307,69 +309,62 @@ extension Home {
 
                             // Mittlerer Stack
 
-                            glucoseView
-                                .frame(width: 120, height: 120)
-                                .overlay(
-                                    ZStack {
-                                        if let progress = state.bolusProgress {
-                                            ProgressView(value: Double(truncating: progress as NSNumber))
-                                                .progressViewStyle(CircularProgressViewStyle(
-                                                    backgroundColor: backgroundColor
-                                                ))
-                                                .frame(width: 120, height: 120)
-                                                .animation(.easeInOut, value: progress)
+                            HStack {
+                                Spacer() // Links
 
-                                            // Hintergrundfüllung für den Glucosering während der Bolus Abgabe
-                                            Circle()
-                                                /* .fill(
-                                                 LinearGradient(
-                                                 gradient: Gradient(colors: [backgroundColor]),
-                                                 startPoint: .top,
-                                                 endPoint: .bottom
-                                                 )
-                                                 )*/
-                                                .fill(backgroundColor.opacity(1.0))
-                                                .frame(width: 120, height: 120)
+                                if let progress = state.bolusProgress, let amount = state.bolusAmount {
+                                    // Bolus Progress anzeigen
+                                    VStack {
+                                        ZStack {
+                                            let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
+                                            let displayText: String = {
+                                                let bolusedValue = amount * progress
+                                                let bolused = bolusProgressFormatter.string(from: bolusedValue as NSNumber) ?? ""
+                                                let formattedAmount = amount.formatted(.number.precision(.fractionLength(2)))
+                                                return "\(bolused) / \(formattedAmount) U"
+                                            }()
 
-                                            VStack {
+                                            BigFillablePieSegment(
+                                                pieSegmentViewModel: bolusPieSegmentViewModel,
+                                                fillFraction: fillFraction,
+                                                color: backgroundColor, // Fortschrittsfarbe
+                                                displayText: displayText,
+                                                animateProgress: true
+                                            )
+                                            .frame(width: 105, height: 105)
+                                            .overlay(
                                                 Circle()
-                                                    .fill(Color.red.opacity(1.0))
-                                                    .frame(width: 20, height: 20)
+                                                    .fill(Color.red.opacity(0.8))
+                                                    .frame(width: 25, height: 25)
                                                     .overlay(
                                                         Image(systemName: "xmark")
-                                                            .font(.system(size: 13))
+                                                            .font(.system(size: 16))
                                                             .foregroundColor(.white)
-                                                            .onTapGesture {
-                                                                state.cancelBolus()
-                                                            }
                                                     )
-                                                    .padding(.bottom, 5)
-
-                                                if let progress = state.bolusProgress, let amount = state.bolusAmount {
-                                                    let bolusedValue = amount * progress
-                                                    let bolused = bolusProgressFormatter
-                                                        .string(from: bolusedValue as NSNumber) ?? ""
-                                                    let formattedAmount = amount
-                                                        .formatted(.number.precision(.fractionLength(2)))
-
-                                                    let bolusText = "\(bolused) / \(formattedAmount) U"
-
-                                                    Text(bolusText)
-                                                        .font(.system(size: 14))
-                                                        .foregroundStyle(Color.white)
-                                                        .offset(y: 2)
-                                                }
-                                            }
+                                                    .onTapGesture {
+                                                        state.cancelBolus()
+                                                    }
+                                            )
                                         }
-                                        VStack {
-                                            loopView
-                                                .frame(maxHeight: .infinity)
-                                                .padding(.top, 225)
-                                        }
+
+                                        loopView
+                                            .frame(maxHeight: .infinity)
+                                            .offset(y: 25)
                                     }
-                                )
+                                } else {
+                                    // GlucoseView anzeigen
+                                    VStack {
+                                        glucoseView
+                                            .frame(width: 105, height: 105)
 
-                            Spacer()
+                                        loopView
+                                            .frame(maxHeight: .infinity)
+                                            .offset(y: 25)
+                                    }
+                                }
+
+                                Spacer() // Rechts
+                            }
 
                             // Rechter Block (eventualBG)
 
@@ -401,14 +396,26 @@ extension Home {
                     }
                     .offset(y: 90)
 
+                    // Fortschritt des Bolus als Text
+                    /*      if let progress = state.bolusProgress, let amount = state.bolusAmount {
+                         let bolusedValue = amount * progress
+                         let bolused = bolusProgressFormatter.string(from: bolusedValue as NSNumber) ?? ""
+                         let formattedAmount = amount.formatted(.number.precision(.fractionLength(2)))
+
+                         Text("\(bolused) / \(formattedAmount) U")
+                             .font(.system(size: 16))
+                             .foregroundStyle(Color.white)
+                             .offset(x: 140, y: -30)
+                     }*/
+
                     // Fortschritt des Bolus in Prozent
 
-                    if let progress = state.bolusProgress {
-                        Text("\(Int(progress * 100))%")
-                            .font(.system(size: 20))
-                            .foregroundStyle(Color.white)
-                            .offset(x: 160, y: -30)
-                    }
+                    /*   if let progress = state.bolusProgress {
+                         Text("\(Int(progress * 100))%")
+                             .font(.system(size: 20))
+                             .foregroundStyle(Color.white)
+                             .offset(x: 160, y: -30)
+                     }*/
 
                     // Unterer Bereich
 
@@ -469,7 +476,7 @@ extension Home {
 
             func updateProgress(to newValue: CGFloat, animate: Bool) {
                 if animate {
-                    withAnimation(.easeInOut(duration: 2.5)) { // Beispiel: Dauer der Animation anpassen
+                    withAnimation(.easeInOut(duration: 2.5)) {
                         self.progress = Double(newValue)
                     }
                 } else {
@@ -584,6 +591,50 @@ extension Home {
             }
         }
 
+        struct BigFillablePieSegment: View {
+            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
+
+            var fillFraction: CGFloat
+            var color: Color
+            var displayText: String
+            var animateProgress: Bool
+
+            var body: some View {
+                VStack {
+                    ZStack {
+                        Circle()
+                            .fill(.clear)
+                            .opacity(1.0)
+                            .frame(width: 80, height: 80)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 1)
+                            )
+
+                        PieSliceView(
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                        )
+                        .fill(color)
+                        .frame(width: 78, height: 78)
+                        .opacity(1.0)
+                    }
+
+                    Text(displayText)
+                        .font(.system(size: 15))
+                        .foregroundColor(.white)
+                        .padding(.top, 5)
+                }
+                .offset(y: 14)
+                .onAppear {
+                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+                }
+                .onChange(of: fillFraction) { newValue in
+                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+                }
+            }
+        }
+
         // CarbView
 
         @StateObject private var carbsPieSegmentViewModel = PieSegmentViewModel()
@@ -661,7 +712,7 @@ extension Home {
                 return AnyView(
                     ZStack {
                         backgroundColor
-                            .frame(maxWidth: .infinity, maxHeight: 90)
+                            .frame(maxWidth: .infinity, maxHeight: 80)
 
                         info
                     }
@@ -851,7 +902,7 @@ extension Home {
 
                                 ZStack {
                                     Circle()
-                                        .fill(Color.clear)
+                                        .fill(Color.gray)
                                         .opacity(0.3)
                                         .frame(width: 60, height: 60)
                                         .overlay(
@@ -968,7 +1019,7 @@ extension Home {
                                 }
                             }
                         }
-                        .padding(.top, 10)
+                        .padding(.top, 0)
                     }
                     .onReceive(timer) { _ in
                         state.specialDanaKitFunction()
@@ -1028,11 +1079,11 @@ extension Home {
             .padding()
         }
 
+        let deviceWidthMultiplier: CGFloat = 1.07
+
         var chart: some View {
-            // let ratio = state.timeSettings ? 1.95 : 1.85 // TimeSetting ein
-            // let ratio2 = state.timeSettings ? 1.78 : 1.68 // TimeSetting aus
-            let ratio = state.timeSettings ? 1.70 : 1.60 // TimeSetting ein
-            let ratio2 = state.timeSettings ? 1.65 : 1.55 // TimeSetting aus
+            let ratio = state.timeSettings ? 1.71 : 1.61 // TimeSetting ein
+            let ratio2 = state.timeSettings ? 1.68 : 1.58 // TimeSetting aus
 
             return VStack(spacing: 0) {
                 infoPanel
@@ -1040,9 +1091,9 @@ extension Home {
                 legendPanel
                 tempTargetbar
                 infoPanel2
-                    .frame(width: UIScreen.main.bounds.width * 0.99) // Breite der mainChart anpassen
+                    .frame(width: UIScreen.main.bounds.width * deviceWidthMultiplier)
             }
-            .background(backgroundColor) // Dynamische Hintergrundfarbe anwenden
+            .background(backgroundColor)
             .frame(minHeight: UIScreen.main.bounds.height / (state.timeSettings ? ratio : ratio2))
         }
 
@@ -1244,7 +1295,6 @@ extension Home {
                         }
                         .frame(maxWidth: 100, alignment: .trailing)
                     }
-                    // .padding(.top, -110)
                 )
             } else {
                 return AnyView(EmptyView())
@@ -1283,12 +1333,6 @@ extension Home {
                         }
                     }.buttonStyle(.borderless)
                     Spacer()
-                    /* Button {
-                         state.showModal(for: .bolus(
-                             waitForSuggestion: state.useCalc ? true : false,
-                             fetch: false
-                         ))
-                     }*/
                     Button {
                         (state.bolusProgress != nil) ? showBolusActiveAlert = true :
                             state.showModal(for: .bolus(
@@ -1652,7 +1696,7 @@ extension Home {
                             ScrollViewReader { _ in
                                 LazyVStack {
                                     chart
-                                    preview
+                                    preview.padding(.top, 15)
                                     loopPreview
                                     if state.iobData.count > 5 {
                                         activeCOBView.padding(.top, 15)

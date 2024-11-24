@@ -16,12 +16,12 @@ extension StatConfig {
         @Published var alwaysUseColors: Bool = true
         // Dana UI Toggels
         @Published var danaIcon: Bool = true
-        @Published var danaBar: Bool = true
+        @Published var danaBar: Bool = false
         @Published var insulinBadge: Bool = false
         @Published var hideInsulinBadge: Bool = false
-        @Published var legendsSwitch: Bool = true
-        @Published var tempTargetBar: Bool = true
-        @Published var timeSettings: Bool = true
+        @Published var legendsSwitch: Bool = false
+        @Published var tempTargetBar: Bool = false
+        @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
         @Published var backgroundColorSelected: String = BackgroundColorOption.darkBlue.rawValue
 

@@ -74,7 +74,7 @@ struct CurrentGlucoseView: View {
         ZStack {
             Circle()
                 .fill(angularGradient)
-                .frame(width: 123, height: 123)
+                .frame(width: 105, height: 105)
                 .overlay(
                     Circle()
                         .stroke(Color.white, lineWidth: 1)
@@ -98,7 +98,7 @@ struct CurrentGlucoseView: View {
                                     .string(from: Double(units == .mmolL ? $0.asMmolL : Decimal($0)) as NSNumber)!
                             } ?? "--"
                     )
-                    .font(.system(size: 36, weight: .bold))
+                    .font(.system(size: 30, weight: .bold))
                     // .foregroundColor(alarm == nil ? colourGlucoseText : .yellow)
                     .foregroundStyle(Color.white)
                 }
@@ -195,9 +195,9 @@ struct TriangleShape: View {
     var body: some View {
         Triangle()
             .fill(color)
-            .frame(width: 35, height: 35)
+            .frame(width: 30, height: 30)
             .rotationEffect(.degrees(90))
-            .offset(x: 80)
+            .offset(x: 70)
     }
 }
 

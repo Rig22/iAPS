@@ -12,6 +12,7 @@ enum BackgroundColorOption: String, CaseIterable, Identifiable, Encodable {
     case blackBerry
     case darkRed
     case burntOrange
+    case autumnLeaf
     case mustard
     case aubergine
 
@@ -37,6 +38,8 @@ enum BackgroundColorOption: String, CaseIterable, Identifiable, Encodable {
             return Color(red: 0.25, green: 0.07, blue: 0.10)
         case .burntOrange:
             return Color(red: 0.45, green: 0.22, blue: 0.12)
+        case .autumnLeaf:
+            return Color(red: 0.58, green: 0.33, blue: 0.09)
         case .mustard:
             return Color(red: 0.28, green: 0.22, blue: 0.10)
         case .aubergine:

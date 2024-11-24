@@ -56,12 +56,12 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = true
     // Dana Toggels
-    var timeSettings: Bool = true
+    var timeSettings: Bool = false
     var danaIcon: Bool = true
-    var danaBar: Bool = true
-    var legendsSwitch: Bool = true
-    var tempTargetbar: Bool = true
-    var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
+    var danaBar: Bool = false
+    var legendsSwitch: Bool = false
+    var tempTargetbar: Bool = false
+    var backgroundColorOptionRawValue: String = BackgroundColorOption.blue.rawValue
     // Dana Toggels
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
@@ -83,7 +83,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     // Computed property for background color option
     var backgroundColorOption: BackgroundColorOption {
         get {
-            BackgroundColorOption(rawValue: backgroundColorOptionRawValue) ?? .darkBlue
+            BackgroundColorOption(rawValue: backgroundColorOptionRawValue) ?? .blue
         }
         set {
             backgroundColorOptionRawValue = newValue.rawValue
