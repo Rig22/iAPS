@@ -74,7 +74,7 @@ struct CurrentGlucoseView: View {
         ZStack {
             Circle()
                 .fill(angularGradient)
-                .frame(width: 105, height: 105)
+                .frame(width: 110, height: 110)
                 .overlay(
                     Circle()
                         .stroke(Color.white, lineWidth: 1)

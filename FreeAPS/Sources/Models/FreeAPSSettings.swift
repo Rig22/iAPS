@@ -39,8 +39,8 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var low: Decimal = 70
     var uploadStats: Bool = false
     var hours: Int = 6
-    var xGridLines: Bool = true
-    var yGridLines: Bool = true
+    var xGridLines: Bool = false
+    var yGridLines: Bool = false
     var oneDimensionalGraph: Bool = false
     var rulerMarks: Bool = false
     var maxCarbs: Decimal = 1000
@@ -52,7 +52,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var fattyMeals: Bool = false
     var fattyMealFactor: Decimal = 0.7
     var displayPredictions: Bool = true
-    var useLiveActivity: Bool = false
+    var useLiveActivity: Bool = true
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = true
     // Dana Toggels
@@ -61,7 +61,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var danaBar: Bool = false
     var legendsSwitch: Bool = false
     var tempTargetbar: Bool = false
-    var backgroundColorOptionRawValue: String = BackgroundColorOption.blue.rawValue
+    var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
     // Dana Toggels
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
@@ -69,7 +69,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var eventualBG: Bool = false
     var minumimPrediction: Bool = false
     var minimumSMB: Decimal = 0.3
-    var useInsulinBars: Bool = false
+    var useInsulinBars: Bool = true
     var disableCGMError: Bool = true
     var uploadVersion: Bool = true
     var skipGlucoseChart: Bool = false
@@ -83,7 +83,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     // Computed property for background color option
     var backgroundColorOption: BackgroundColorOption {
         get {
-            BackgroundColorOption(rawValue: backgroundColorOptionRawValue) ?? .blue
+            BackgroundColorOption(rawValue: backgroundColorOptionRawValue) ?? .darkBlue
         }
         set {
             backgroundColorOptionRawValue = newValue.rawValue

@@ -300,6 +300,10 @@ extension Home {
                                             Text(manualBasalString)
                                             .font(.system(size: 16))
                                             .foregroundColor(.white)
+                                    } else {
+                                        Text("---")
+                                            .font(.system(size: 16))
+                                            .foregroundColor(.white)
                                     }
                                 }
                                 .padding(.leading, 6)
@@ -331,14 +335,14 @@ extension Home {
                                                 displayText: displayText,
                                                 animateProgress: true
                                             )
-                                            .frame(width: 105, height: 105)
+                                            .frame(width: 110, height: 110)
                                             .overlay(
                                                 Circle()
                                                     .fill(Color.red.opacity(0.8))
                                                     .frame(width: 25, height: 25)
                                                     .overlay(
                                                         Image(systemName: "xmark")
-                                                            .font(.system(size: 16))
+                                                            .font(.system(size: 14))
                                                             .foregroundColor(.white)
                                                     )
                                                     .onTapGesture {
@@ -355,7 +359,7 @@ extension Home {
                                     // GlucoseView anzeigen
                                     VStack {
                                         glucoseView
-                                            .frame(width: 105, height: 105)
+                                            .frame(width: 110, height: 110)
 
                                         loopView
                                             .frame(maxHeight: .infinity)
@@ -388,6 +392,16 @@ extension Home {
                                         .font(.system(size: 12))
                                         .foregroundStyle(.white)
                                         .padding(.leading, -4)
+                                }
+                            } else {
+                                HStack(spacing: 4) {
+                                    Text("⇢")
+                                        .font(.statusFont)
+                                        .foregroundStyle(.white)
+
+                                    Text("---")
+                                        .font(.system(size: 16))
+                                        .foregroundColor(.white)
                                 }
                             }
                         }
@@ -605,7 +619,7 @@ extension Home {
                         Circle()
                             .fill(.clear)
                             .opacity(1.0)
-                            .frame(width: 80, height: 80)
+                            .frame(width: 85, height: 85)
                             .overlay(
                                 Circle()
                                     .stroke(Color.white, lineWidth: 1)
@@ -616,7 +630,7 @@ extension Home {
                             endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                         )
                         .fill(color)
-                        .frame(width: 78, height: 78)
+                        .frame(width: 83, height: 83)
                         .opacity(1.0)
                     }
 

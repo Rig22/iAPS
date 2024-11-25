@@ -32,7 +32,7 @@ extension StatConfig {
 
         // Dana UI Toggels
         @Published var minimumSMB: Decimal = 0.3
-        @Published var useInsulinBars: Bool = false
+        @Published var useInsulinBars: Bool = true
         @Published var skipGlucoseChart: Bool = false
 
         var units: GlucoseUnits = .mmolL

@@ -92,7 +92,7 @@ extension Home {
         @Published var minimumSMB: Decimal = 0.3
         @Published var maxBolus: Decimal = 0
         @Published var maxBolusValue: Decimal = 1
-        @Published var useInsulinBars: Bool = false
+        @Published var useInsulinBars: Bool = true
         @Published var iobData: [IOBData] = []
         @Published var neg: Int = 0
         @Published var tddChange: Decimal = 0
