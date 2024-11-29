@@ -33,42 +33,44 @@ extension StatConfig {
 
         var body: some View {
             VStack(alignment: .center) {
-                if state.danaIcon {
-                    Image("Dana_rs")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 200, height: 167)
-                        .padding(.top, 0)
-                } else {
-                    Image("Dana_i")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 200, height: 167)
-                        .padding(.top, 0)
-                }
+                /*  Image(state.danaIconRawValue)
+                 .resizable()
+                 .scaledToFit()
+                 .frame(width: 200, height: 200)
+                 .padding(.top, 20)*/
 
                 Form {
                     Section {
-                        Toggle("Icon Dana-i or Dana RS", isOn: $state.danaIcon)
-                        Toggle("Dana Bar", isOn: $state.danaBar)
+                        if #available(iOS 18.0, *) {
+                            Picker("Pumpen-Icon", selection: $state.danaIconRawValue) {
+                                ForEach(DanaIconOption.allCases, id: \.rawValue) { option in
+                                    HStack {
+                                        Image(option.rawValue)
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 100, height: 80)
 
-                        if state.danaBar {
-                            Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
+                                        Text(option.displayName)
+                                            .foregroundColor(.white)
+                                    }
+                                    .tag(option.rawValue)
+                                }
+                            }
+                            .pickerStyle(NavigationLinkPickerStyle())
+                        } else {
+                            // Fallback für frühere iOS-Versionen
                         }
-                        Toggle("Legend Bar", isOn: $state.legendsSwitch)
-                        Toggle("TempTarget Bar", isOn: $state.tempTargetBar)
-                        Toggle("Bottom Bar", isOn: $state.timeSettings)
 
                         if #available(iOS 18.0, *) {
                             Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
                                 ForEach(BackgroundColorOption.allCases) { option in
                                     HStack {
                                         Rectangle()
-                                            .fill(option.color) // Vorschau der Farbe im Menü
-                                            .frame(width: 20, height: 20)
+                                            .fill(option.color)
+                                            .frame(width: 25, height: 25)
                                             .cornerRadius(4)
 
-                                        Text(option.rawValue.capitalized) // Farb Name
+                                        Text(option.rawValue.capitalized)
                                             .foregroundColor(.primary)
                                     }
                                     .tag(option.rawValue)
@@ -78,6 +80,17 @@ extension StatConfig {
                         } else {
                             // Fallback für frühere iOS-Versionen
                         }
+
+                        Toggle("Dana Bar", isOn: $state.danaBar)
+
+                        if state.danaBar {
+                            Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
+                                .transition(.opacity)
+                                .animation(.default, value: state.danaBar)
+                        }
+                        Toggle("Legend Bar", isOn: $state.legendsSwitch)
+                        Toggle("TempTarget Bar", isOn: $state.tempTargetBar)
+                        Toggle("Bottom Bar", isOn: $state.timeSettings)
                     } header: { Text("Dana UI | UX Settings ") }
 
                     Section {

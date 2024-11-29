@@ -915,14 +915,14 @@ extension Home {
                                     .padding(.trailing, 5)
 
                                 ZStack {
-                                    Circle()
-                                        .fill(Color.gray)
-                                        .opacity(0.3)
-                                        .frame(width: 60, height: 60)
-                                        .overlay(
-                                            Circle()
-                                                .stroke(Color.white, lineWidth: 1)
-                                        )
+                                    /*    Circle()
+                                     .fill(Color.gray)
+                                     .opacity(0.3)
+                                     .frame(width: 60, height: 60)
+                                     .overlay(
+                                         Circle()
+                                             .stroke(Color.white, lineWidth: 1)
+                                     )*/
 
                                     if state.settingsManager?.settings.insulinBadge == true {
                                         if concentration.last?.concentration == 1 {
@@ -932,19 +932,15 @@ extension Home {
                                         }
                                     }
 
-                                    if state.danaIcon {
-                                        Image("Dana_rs")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 42, height: 42)
-                                    } else {
-                                        Image("Dana_i")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 42, height: 42)
-                                    }
+                                    Image(
+                                        state.danaIconOption
+                                            .rawValue
+                                    )
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 60, height: 40)
                                 }
-                                .padding(.horizontal, 5)
+                                //  .padding(.horizontal, 5)
 
                                 Text("⇢")
                                     .font(.system(size: 20))

@@ -26,31 +26,41 @@ extension Settings {
             Form {
                 Section {
                     Toggle("Closed loop", isOn: $state.closedLoop)
-                }
-                header: {
-                    VStack(alignment: .leading) {
-                        if let expirationDate = Bundle.main.profileExpiration {
-                            Text(
-                                "iAPS v\(state.versionNumber) (\(state.buildNumber))\nBranch: \(state.branch) \(state.copyrightNotice)" +
-                                    "\nBuild Expires: " + expirationDate
-                            ).textCase(nil)
-                        } else {
-                            Text(
-                                "iAPS v\(state.versionNumber) (\(state.buildNumber))\nBranch: \(state.branch) \(state.copyrightNotice)"
-                            )
+                } header: {
+                    HStack {
+                        // Linker Bereich mit Text
+                        VStack(alignment: .leading) {
+                            if let expirationDate = Bundle.main.profileExpiration {
+                                Text(
+                                    "iAPS v\(state.versionNumber) (\(state.buildNumber))\nBranch: \(state.branch) \(state.copyrightNotice)" +
+                                        "\nBuild Expires: " + expirationDate
+                                ).textCase(nil)
+                            } else {
+                                Text(
+                                    "iAPS v\(state.versionNumber) (\(state.buildNumber))\nBranch: \(state.branch) \(state.copyrightNotice)"
+                                )
+                            }
+
+                            if let latest = fetchedVersionNumber.first,
+                               ((latest.nr ?? "") > state.versionNumber) ||
+                               ((latest.nr ?? "") < state.versionNumber && (latest.dev ?? "") > state.versionNumber)
+                            {
+                                Text(
+                                    "Latest version on GitHub: " +
+                                        ((latest.nr ?? "") < state.versionNumber ? (latest.dev ?? "") : (latest.nr ?? "")) + "\n"
+                                )
+                                .foregroundStyle(.orange).bold()
+                                .multilineTextAlignment(.leading)
+                            }
                         }
 
-                        if let latest = fetchedVersionNumber.first,
-                           ((latest.nr ?? "") > state.versionNumber) ||
-                           ((latest.nr ?? "") < state.versionNumber && (latest.dev ?? "") > state.versionNumber)
-                        {
-                            Text(
-                                "Latest version on GitHub: " +
-                                    ((latest.nr ?? "") < state.versionNumber ? (latest.dev ?? "") : (latest.nr ?? "")) + "\n"
-                            )
-                            .foregroundStyle(.orange).bold()
-                            .multilineTextAlignment(.leading)
-                        }
+                        Spacer()
+
+                        Image("rig22")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 45, height: 45)
+                            .offset(x: 0, y: 0)
                     }
                 }
 

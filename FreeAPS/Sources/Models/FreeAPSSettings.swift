@@ -55,14 +55,14 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var useLiveActivity: Bool = true
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = true
-    // Dana Toggels
+    // Dana-Toggles
     var timeSettings: Bool = false
-    var danaIcon: Bool = true
+    var danaIconRawValue: String = "ic_dana_rs"
     var danaBar: Bool = false
     var legendsSwitch: Bool = false
     var tempTargetbar: Bool = false
     var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
-    // Dana Toggels
+    // Dana-Toggles
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
     var allowedRemoteBolusAmount: Decimal = 0.0
@@ -87,6 +87,16 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
         }
         set {
             backgroundColorOptionRawValue = newValue.rawValue
+        }
+    }
+
+    // Computed property for Dana Icon
+    var danaIconOption: DanaIconOption {
+        get {
+            DanaIconOption(rawValue: danaIconRawValue) ?? .danaRS
+        }
+        set {
+            danaIconRawValue = newValue.rawValue
         }
     }
 }
@@ -153,8 +163,8 @@ struct EncodableFreeAPSSettings: Encodable {
         case useLiveActivity
         case useTargetButton
         case alwaysUseColors
-        // Dana Toggels
-        case danaIcon
+        // Dana Toggles
+        case danaIconRawValue
         case danaBar
         case insulinBadge
         case hideInsulinBadge
@@ -162,7 +172,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case tempTargetbar
         case timeSettings
         case backgroundColorOptionRawValue
-        // Dana Toggels
+        // Dana Toggles
         case profilesOrTempTargets
         case allowBolusShortcut
         case allowedRemoteBolusAmount
@@ -183,7 +193,7 @@ struct EncodableFreeAPSSettings: Encodable {
         var container = encoder.container(keyedBy: CodingKeys.self)
 
         try container.encode(settings.units, forKey: .units)
-        // ... (Encode all properties similar to settings.units)
+        try container.encode(settings.closedLoop, forKey: .closedLoop)
         try container.encode(settings.closedLoop, forKey: .closedLoop)
         try container.encode(settings.allowAnnouncements, forKey: .allowAnnouncements)
         try container.encode(settings.useAutotune, forKey: .useAutotune)
@@ -237,7 +247,6 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.useTargetButton, forKey: .useTargetButton)
         try container.encode(settings.alwaysUseColors, forKey: .alwaysUseColors)
         // Dana Toogels
-        try container.encode(settings.danaIcon, forKey: .danaIcon)
         try container.encode(settings.danaBar, forKey: .danaBar)
         try container.encode(settings.insulinBadge, forKey: .insulinBadge)
         try container.encode(settings.hideInsulinBadge, forKey: .hideInsulinBadge)

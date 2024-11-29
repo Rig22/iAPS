@@ -197,7 +197,7 @@ struct TriangleShape: View {
             .fill(color)
             .frame(width: 30, height: 30)
             .rotationEffect(.degrees(90))
-            .offset(x: 70)
+            .offset(x: 75)
     }
 }
 
@@ -207,7 +207,7 @@ struct Triangle: Shape {
 
         path.move(to: CGPoint(x: rect.midX, y: rect.minY + 15))
         path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addQuadCurve(to: CGPoint(x: rect.minX, y: rect.maxY), control: CGPoint(x: rect.midX, y: rect.midY + 13))
+        path.addQuadCurve(to: CGPoint(x: rect.minX, y: rect.maxY), control: CGPoint(x: rect.midX, y: rect.midY + 10))
         path.closeSubpath()
 
         return path

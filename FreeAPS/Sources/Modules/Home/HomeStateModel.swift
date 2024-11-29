@@ -79,7 +79,7 @@ extension Home {
         @Published var alwaysUseColors: Bool = true
         @Published var openAPSSettings: Preferences?
         // Dana UI Toggels
-        @Published var danaIcon: Bool = true
+        @Published var danaIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
         @Published var insulinBadge: Bool = false
         @Published var legendsSwitch: Bool = false
@@ -128,6 +128,15 @@ extension Home {
             }
         }
 
+        var danaIconOption: DanaIconOption {
+            get {
+                DanaIconOption(rawValue: danaIconRawValue) ?? .danaRS // Standardwert, falls der Raw-Wert nicht gefunden wird
+            }
+            set {
+                danaIconRawValue = newValue.rawValue
+            }
+        }
+
         override func subscribe() {
             setupGlucose()
             setupBasals()
@@ -172,7 +181,7 @@ extension Home {
             hours = settingsManager.settings.hours
             alwaysUseColors = settingsManager.settings.alwaysUseColors
             // Dana UI Toggels
-            danaIcon = settingsManager.settings.danaIcon
+            danaIconRawValue = settingsManager.settings.danaIconRawValue
             danaBar = settingsManager.settings.danaBar
             insulinBadge = settingsManager.settings.insulinBadge
             legendsSwitch = settingsManager.settings.legendsSwitch
@@ -701,7 +710,7 @@ extension Home.StateModel:
         hours = settingsManager.settings.hours
         alwaysUseColors = settingsManager.settings.alwaysUseColors
         // Dana UI Toggels
-        danaIcon = settingsManager.settings.danaIcon
+        danaIconRawValue = settingsManager.settings.danaIconRawValue
         danaBar = settingsManager.settings.danaBar
         legendsSwitch = settingsManager.settings.legendsSwitch
         tempTargetbar = settingsManager.settings.tempTargetbar

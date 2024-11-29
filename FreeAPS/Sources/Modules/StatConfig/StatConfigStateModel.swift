@@ -15,7 +15,7 @@ extension StatConfig {
         @Published var hours: Decimal = 6
         @Published var alwaysUseColors: Bool = true
         // Dana UI Toggels
-        @Published var danaIcon: Bool = true
+        @Published var danaIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
         @Published var insulinBadge: Bool = false
         @Published var hideInsulinBadge: Bool = false
@@ -24,16 +24,15 @@ extension StatConfig {
         @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
         @Published var backgroundColorSelected: String = BackgroundColorOption.darkBlue.rawValue
+        // Dana UI Toggels
+        @Published var minimumSMB: Decimal = 0.3
+        @Published var useInsulinBars: Bool = true
+        @Published var skipGlucoseChart: Bool = false
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
         var selectedBackgroundColor: Color {
             BackgroundColorOption(rawValue: backgroundColorOptionRawValue)?.color ?? .clear
         }
-
-        // Dana UI Toggels
-        @Published var minimumSMB: Decimal = 0.3
-        @Published var useInsulinBars: Bool = true
-        @Published var skipGlucoseChart: Bool = false
 
         var units: GlucoseUnits = .mmolL
 
@@ -47,7 +46,7 @@ extension StatConfig {
             subscribeSetting(\.rulerMarks, on: $rulerMarks) { rulerMarks = $0 }
             subscribeSetting(\.skipGlucoseChart, on: $skipGlucoseChart) { skipGlucoseChart = $0 }
             // Dana Toggels
-            subscribeSetting(\.danaIcon, on: $danaIcon) { danaIcon = $0 }
+            subscribeSetting(\.danaIconRawValue, on: $danaIconRawValue) { danaIconRawValue = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
             subscribeSetting(\.insulinBadge, on: $insulinBadge) { insulinBadge = $0 }
             subscribeSetting(\.hideInsulinBadge, on: $hideInsulinBadge) { hideInsulinBadge = $0 }
