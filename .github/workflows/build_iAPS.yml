@@ -13,8 +13,8 @@ on:
 
 env:  
   UPSTREAM_REPO: Rig22/iAPS
-  UPSTREAM_BRANCH: Dana_Complications_Style
-  TARGET_BRANCH: Dana_Complications_Style
+  UPSTREAM_BRANCH: Dana_Sphere
+  TARGET_BRANCH: Dana_Sphere
   ALIVE_BRANCH: alive
 
 jobs:
