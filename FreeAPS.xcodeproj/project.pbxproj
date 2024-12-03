@@ -4013,7 +4013,7 @@
 		};
 		CEB434FB28B90B7C00B70274 /* XCRemoteSwiftPackageReference "SwiftCharts" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/ivanschuetz/SwiftCharts";
+			repositoryURL = "https://github.com/ivanschuetz/SwiftCharts.git";
 			requirement = {
 				branch = master;
 				kind = branch;

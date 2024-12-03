@@ -1572,6 +1572,11 @@ Enact a temp Basal or a temp target */
 /* */
 "Meal Presets" = "Mahlzeit Voreinstellungen";
 
+/* Back button */
+"Back" = "Zurück";
+/* Search Saved Food presets */
+"Search" = "Suche";
+
 /* */
 "Empty" = "Leer";
 

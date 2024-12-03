@@ -938,7 +938,7 @@ extension Home {
                                     )
                                     .resizable()
                                     .scaledToFit()
-                                    .frame(width: 60, height: 40)
+                                    .frame(width: 75, height: 50)
                                 }
                                 //  .padding(.horizontal, 5)
 
