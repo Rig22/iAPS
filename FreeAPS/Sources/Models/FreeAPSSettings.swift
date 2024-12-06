@@ -62,6 +62,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var legendsSwitch: Bool = false
     var tempTargetbar: Bool = false
     var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
+    var danaBarViewOption: String = "view1"
     // Dana-Toggles
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
@@ -172,6 +173,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case tempTargetbar
         case timeSettings
         case backgroundColorOptionRawValue
+        case danaBarViewOption
         // Dana Toggles
         case profilesOrTempTargets
         case allowBolusShortcut
@@ -254,6 +256,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.tempTargetbar, forKey: .tempTargetbar)
         try container.encode(settings.timeSettings, forKey: .timeSettings)
         try container.encode(settings.backgroundColorOptionRawValue, forKey: .backgroundColorOptionRawValue)
+        try container.encode(settings.danaBarViewOption, forKey: .danaBarViewOption)
         // Dana Toggels
         try container.encode(settings.profilesOrTempTargets, forKey: .profilesOrTempTargets)
         try container.encode(settings.allowBolusShortcut, forKey: .allowBolusShortcut)

@@ -86,7 +86,7 @@ extension Home {
         @Published var tempTargetbar: Bool = false
         @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
-
+        @Published var danaBarViewOption: String = "view1"
         // Dana UI Toggels
         @Published var useCalc: Bool = true
         @Published var minimumSMB: Decimal = 0.3
@@ -188,6 +188,7 @@ extension Home {
             tempTargetbar = settingsManager.settings.tempTargetbar
             timeSettings = settingsManager.settings.timeSettings
             backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
+            danaBarViewOption = settingsManager.settings.danaBarViewOption
             // Dana UI Toggels
             useCalc = settingsManager.settings.useCalc
             minimumSMB = settingsManager.settings.minimumSMB
@@ -361,7 +362,7 @@ extension Home {
                 reservoirAge = formatToDaysAndHours(reservoirDate)
 
             } else {
-                reservoirAge = "--" // Wenn kein Datum vorhanden ist
+                reservoirAge = "--"
             }
 
             reservoirLevel = pumpManager.state.reservoirLevel
@@ -375,19 +376,19 @@ extension Home {
             let secondsInADay: TimeInterval = 86400
             let secondsInAnHour: TimeInterval = 3600
 
-            let days = String(format: "%.0f", -date.timeIntervalSinceNow / secondsInADay)
-            let hours = String(
-                format: "%.0f",
-                (-date.timeIntervalSinceNow.truncatingRemainder(dividingBy: secondsInADay)) / secondsInAnHour
-            )
+            // Berechnung der ganzen Tage und verbleibenden Stunden
+            let totalSeconds = -date.timeIntervalSinceNow
+            let days = Int(totalSeconds / secondsInADay)
+            let hours = Int(totalSeconds.truncatingRemainder(dividingBy: secondsInADay) / secondsInAnHour)
 
-            return "\(days)d \(hours)h"
+            return "\(days)d\(hours)h"
         }
 
         private func formatToTotalHours(_ date: Date) -> String {
             let secondsInAnHour: TimeInterval = 3600
             let totalHours = -date.timeIntervalSinceNow / secondsInAnHour
-            return String(format: "%.0fh", totalHours)
+
+            return String(format: "%.0fh", totalHours) // Ganze Stunden
         }
 
         func cancelTempTarget() {
@@ -716,6 +717,7 @@ extension Home.StateModel:
         tempTargetbar = settingsManager.settings.tempTargetbar
         timeSettings = settingsManager.settings.timeSettings
         backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
+        danaBarViewOption = settingsManager.settings.danaBarViewOption
         // Dana UI Toggels
         useCalc = settingsManager.settings.useCalc
         minimumSMB = settingsManager.settings.minimumSMB

@@ -42,26 +42,6 @@ extension StatConfig {
             Form {
                 Section {
                     if #available(iOS 18.0, *) {
-                        Picker("Pumpen-Icon", selection: $state.danaIconRawValue) {
-                            ForEach(DanaIconOption.allCases, id: \.rawValue) { option in
-                                HStack {
-                                    Image(option.rawValue)
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 100, height: 80)
-
-                                    Text(option.displayName)
-                                        .foregroundColor(.white)
-                                }
-                                .tag(option.rawValue)
-                            }
-                        }
-                        .pickerStyle(NavigationLinkPickerStyle())
-                    } else {
-                        // Fallback für frühere iOS-Versionen
-                    }
-
-                    if #available(iOS 18.0, *) {
                         Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
                             ForEach(BackgroundColorOption.allCases) { option in
                                 HStack {
@@ -84,10 +64,36 @@ extension StatConfig {
                     Toggle("Dana Bar", isOn: $state.danaBar)
 
                     if state.danaBar {
-                        Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
-                            .transition(.opacity)
-                            .animation(.default, value: state.danaBar)
+                        Picker("Wähle eine Ansicht", selection: $state.danaBarViewOption) {
+                            Text("DanaBar 1").tag("view1")
+                            Text("DanaBar 2").tag("view2")
+                        }
+                        .pickerStyle(SegmentedPickerStyle())
+
+                        // Zeigt den Pumpen-Icon-Picker nur an, wenn "DanaBar 2" gewählt ist
+                        if state.danaBarViewOption == "view2" {
+                            if #available(iOS 18.0, *) {
+                                Picker("Pumpen-Icon", selection: $state.danaIconRawValue) {
+                                    ForEach(DanaIconOption.allCases, id: \.rawValue) { option in
+                                        HStack {
+                                            Image(option.rawValue)
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 100, height: 80)
+
+                                            Text(option.displayName)
+                                                .foregroundColor(.white)
+                                        }
+                                        .tag(option.rawValue)
+                                    }
+                                }
+                                .pickerStyle(NavigationLinkPickerStyle())
+                            } else {
+                                // Fallback für frühere iOS-Versionen
+                            }
+                        }
                     }
+                    Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
                     Toggle("Legend Bar", isOn: $state.legendsSwitch)
                     Toggle("TempTarget Bar", isOn: $state.tempTargetBar)
                     Toggle("Bottom Bar", isOn: $state.timeSettings)

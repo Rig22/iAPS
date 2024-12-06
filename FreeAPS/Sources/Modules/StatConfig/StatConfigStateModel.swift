@@ -24,6 +24,7 @@ extension StatConfig {
         @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
         @Published var backgroundColorSelected: String = BackgroundColorOption.darkBlue.rawValue
+        @Published var danaBarViewOption: String = "view1"
         // Dana UI Toggels
         @Published var minimumSMB: Decimal = 0.3
         @Published var useInsulinBars: Bool = true
@@ -48,6 +49,8 @@ extension StatConfig {
             // Dana Toggels
             subscribeSetting(\.danaIconRawValue, on: $danaIconRawValue) { danaIconRawValue = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
+            subscribeSetting(\.danaBarViewOption, on: $danaBarViewOption) { danaBarViewOption = $0 }
+
             subscribeSetting(\.insulinBadge, on: $insulinBadge) { insulinBadge = $0 }
             subscribeSetting(\.hideInsulinBadge, on: $hideInsulinBadge) { hideInsulinBadge = $0 }
             subscribeSetting(\.legendsSwitch, on: $legendsSwitch) { legendsSwitch = $0 }

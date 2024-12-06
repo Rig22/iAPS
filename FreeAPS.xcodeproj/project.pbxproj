@@ -314,6 +314,7 @@
 		72F1BD388F42FCA6C52E4500 /* ConfigEditorProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44080E4709E3AE4B73054563 /* ConfigEditorProvider.swift */; };
 		792E4EC32CF8C95800ADE3DC /* DanaIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */; };
 		792F32F62CD9DCAF009E7F7A /* BackgroundColorOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */; };
+		793F48E22D0203D30029BC95 /* DanaBarViewOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793F48E12D0203BF0029BC95 /* DanaBarViewOption.swift */; };
 		79D4708E2CE483EE0095B89A /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D4708D2CE483DD0095B89A /* Token.swift */; };
 		7BCFACB97C821041BA43A114 /* ManualTempBasalRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C377490C77661D75E8C50649 /* ManualTempBasalRootView.swift */; };
 		7F7B756BE8543965D9FDF1A2 /* DataTableDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A401509D21F7F35D4E109EDA /* DataTableDataFlow.swift */; };
@@ -934,6 +935,7 @@
 		72778B68C3004F71F6E79BDC /* PumpSettingsEditorStateModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PumpSettingsEditorStateModel.swift; sourceTree = "<group>"; };
 		792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaIconOption.swift; sourceTree = "<group>"; };
 		792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundColorOption.swift; sourceTree = "<group>"; };
+		793F48E12D0203BF0029BC95 /* DanaBarViewOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaBarViewOption.swift; sourceTree = "<group>"; };
 		79BDA519C9B890FD9A5DFCF3 /* ISFEditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ISFEditorDataFlow.swift; sourceTree = "<group>"; };
 		79D4708D2CE483DD0095B89A /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		7E22146D3DF4853786C78132 /* CREditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CREditorDataFlow.swift; sourceTree = "<group>"; };
@@ -1535,6 +1537,7 @@
 		3811DE2C25C9D49500A708ED /* View */ = {
 			isa = PBXGroup;
 			children = (
+				793F48E12D0203BF0029BC95 /* DanaBarViewOption.swift */,
 				792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */,
 				792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */,
 				7910CDA62CD53A0E001E77AC /* Chart */,
@@ -3262,6 +3265,7 @@
 				903D18976088B09110BCBE29 /* LibreConfigStateModel.swift in Sources */,
 				9050F378F0063C064D7FFC86 /* LibreConfigRootView.swift in Sources */,
 				192A9A122C0F5361000BBC29 /* MealsShortcuts.swift in Sources */,
+				793F48E22D0203D30029BC95 /* DanaBarViewOption.swift in Sources */,
 				B7C465E9472624D8A2BE2A6A /* CalibrationsDataFlow.swift in Sources */,
 				320D030F724170A637F06D50 /* CalibrationsProvider.swift in Sources */,
 				19E1F7E829D082D0005C8D20 /* IconConfigDataFlow.swift in Sources */,
@@ -3596,7 +3600,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = 5.7.4;
+				MARKETING_VERSION = 5.9.0;
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					CoreNFC,
@@ -3639,7 +3643,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = 5.7.4;
+				MARKETING_VERSION = 5.9.0;
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					CoreNFC,
@@ -3676,7 +3680,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = iAPS;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(BUNDLE_IDENTIFIER)";
-				MARKETING_VERSION = 5.7.4;
+				MARKETING_VERSION = 5.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_IDENTIFIER).watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -3712,7 +3716,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = iAPS;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(BUNDLE_IDENTIFIER)";
-				MARKETING_VERSION = 5.7.4;
+				MARKETING_VERSION = 5.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_IDENTIFIER).watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -3752,7 +3756,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 5.7.4;
+				MARKETING_VERSION = 5.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_IDENTIFIER).watchkitapp.watchkitextension";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
@@ -3793,7 +3797,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 5.7.4;
+				MARKETING_VERSION = 5.9.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_IDENTIFIER).watchkitapp.watchkitextension";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
