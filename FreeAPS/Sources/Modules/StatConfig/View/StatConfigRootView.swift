@@ -71,32 +71,34 @@ extension StatConfig {
                                 // Fallback für frühere iOS-Versionen
                             }
                         }
-                    }
-                    Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
 
-                    Picker("Max Reservoir Insulin Age", selection: $state.insulinAgeOption) {
-                        Text("1 Tag").tag("Ein_Tag")
-                        Text("2 Tage").tag("Zwei_Tage")
-                        Text("3 Tage").tag("Drei_Tage")
-                        Text("4 Tage").tag("Vier_Tage")
-                        Text("5 Tage").tag("Fuenf_Tage")
-                        Text("6 Tage").tag("Sechs_Tage")
-                        Text("7 Tage").tag("Sieben_Tage")
-                        Text("8 Tage").tag("Acht_Tage")
-                        Text("9 Tage").tag("Neun_Tage")
-                        Text("10 Tage").tag("Zehn_Tage")
-                    }
-                    .pickerStyle(NavigationLinkPickerStyle())
+                        if state.danaBarViewOption == "view1" {
+                            Picker("Max Reservoir Insulin Age", selection: $state.insulinAgeOption) {
+                                Text("1 Tag").tag("Ein_Tag")
+                                Text("2 Tage").tag("Zwei_Tage")
+                                Text("3 Tage").tag("Drei_Tage")
+                                Text("4 Tage").tag("Vier_Tage")
+                                Text("5 Tage").tag("Fuenf_Tage")
+                                Text("6 Tage").tag("Sechs_Tage")
+                                Text("7 Tage").tag("Sieben_Tage")
+                                Text("8 Tage").tag("Acht_Tage")
+                                Text("9 Tage").tag("Neun_Tage")
+                                Text("10 Tage").tag("Zehn_Tage")
+                            }
+                            .pickerStyle(NavigationLinkPickerStyle())
+                        }
 
-                    Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
-                        Text("1 Tag").tag("Ein_Tag")
-                        Text("2 Tage").tag("Zwei_Tage")
-                        Text("3 Tage").tag("Drei_Tage")
-                        Text("4 Tage").tag("Vier_Tage")
-                        Text("5 Tage").tag("Fuenf_Tage")
-                    }
-                    .pickerStyle(NavigationLinkPickerStyle())
+                        Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
+                            Text("1 Tag").tag("Ein_Tag")
+                            Text("2 Tage").tag("Zwei_Tage")
+                            Text("3 Tage").tag("Drei_Tage")
+                            Text("4 Tage").tag("Vier_Tage")
+                            Text("5 Tage").tag("Fuenf_Tage")
+                        }
+                        .pickerStyle(NavigationLinkPickerStyle())
 
+                        Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
+                    }
                 } header: {
                     Text("Dana Bar settings")
                 } footer: {
