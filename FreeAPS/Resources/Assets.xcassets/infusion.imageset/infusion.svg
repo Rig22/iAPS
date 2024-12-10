@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 1320 1320" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g id="cannula">
+    <g id="infusion">
         <g id="Nadel" transform="matrix(5.74731,0,0,6.44866,6.92236,-9.93048)">
             <path d="M111.842,163.501L111.515,163.501L111.515,115.24L115.986,115.24L115.986,158.379L111.842,163.501Z" style="fill:white;"/>
         </g>
@@ -13,6 +13,9 @@
         </g>
         <g id="Kappe" transform="matrix(5.56916,0,0,6.66081,30.6145,-173.887)">
             <path d="M77.444,116.195L77.444,105.199C77.444,99.993 81.949,95.767 87.497,95.767L138.769,95.767C144.319,95.767 148.826,99.995 148.826,105.202L148.826,116.236C137.8,115.62 125.597,115.277 112.762,115.277C100.216,115.277 88.273,115.604 77.444,116.195Z" style="fill:white;"/>
+        </g>
+        <g transform="matrix(1.05238,0,0,0.95183,1.3074e-12,-3.69482e-13)">
+            <path d="M627.15,0C973.284,0 1254.3,310.703 1254.3,693.401C1254.3,1076.1 973.284,1386.8 627.15,1386.8C281.017,1386.8 0,1076.1 0,693.401C0,310.703 281.017,0 627.15,0ZM627.15,34.67C955.977,34.67 1222.94,329.838 1222.94,693.401C1222.94,1056.96 955.977,1352.13 627.15,1352.13C298.323,1352.13 31.358,1056.96 31.358,693.401C31.358,329.838 298.323,34.67 627.15,34.67Z" style="fill:white;"/>
         </g>
     </g>
 </svg>

@@ -63,6 +63,8 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var tempTargetbar: Bool = false
     var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
     var danaBarViewOption: String = "view1"
+    var insulinAgeOption: String = "Drei_Tage"
+    var cannulaAgeOption: String = "Drei_Tage"
     // Dana-Toggles
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
@@ -174,6 +176,8 @@ struct EncodableFreeAPSSettings: Encodable {
         case timeSettings
         case backgroundColorOptionRawValue
         case danaBarViewOption
+        case insulinAgeOption
+        case cannulaAgeOption
         // Dana Toggles
         case profilesOrTempTargets
         case allowBolusShortcut
@@ -257,6 +261,8 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.timeSettings, forKey: .timeSettings)
         try container.encode(settings.backgroundColorOptionRawValue, forKey: .backgroundColorOptionRawValue)
         try container.encode(settings.danaBarViewOption, forKey: .danaBarViewOption)
+        try container.encode(settings.insulinAgeOption, forKey: .insulinAgeOption)
+        try container.encode(settings.cannulaAgeOption, forKey: .cannulaAgeOption)
         // Dana Toggels
         try container.encode(settings.profilesOrTempTargets, forKey: .profilesOrTempTargets)
         try container.encode(settings.allowBolusShortcut, forKey: .allowBolusShortcut)

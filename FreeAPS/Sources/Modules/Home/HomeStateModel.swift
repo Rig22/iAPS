@@ -82,6 +82,8 @@ extension Home {
         @Published var danaIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
         @Published var insulinBadge: Bool = false
+        @Published var insulinAgeOption: String = "Drei_Tage"
+        @Published var cannulaAgeOption: String = "Drei_Tage"
         @Published var legendsSwitch: Bool = false
         @Published var tempTargetbar: Bool = false
         @Published var timeSettings: Bool = false
@@ -189,6 +191,8 @@ extension Home {
             timeSettings = settingsManager.settings.timeSettings
             backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
             danaBarViewOption = settingsManager.settings.danaBarViewOption
+            insulinAgeOption = settingsManager.settings.insulinAgeOption
+            cannulaAgeOption = settingsManager.settings.cannulaAgeOption
             // Dana UI Toggels
             useCalc = settingsManager.settings.useCalc
             minimumSMB = settingsManager.settings.minimumSMB
@@ -713,6 +717,8 @@ extension Home.StateModel:
         // Dana UI Toggels
         danaIconRawValue = settingsManager.settings.danaIconRawValue
         danaBar = settingsManager.settings.danaBar
+        insulinAgeOption = settingsManager.settings.insulinAgeOption
+        cannulaAgeOption = settingsManager.settings.cannulaAgeOption
         legendsSwitch = settingsManager.settings.legendsSwitch
         tempTargetbar = settingsManager.settings.tempTargetbar
         timeSettings = settingsManager.settings.timeSettings

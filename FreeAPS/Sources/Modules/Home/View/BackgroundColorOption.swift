@@ -1,5 +1,9 @@
-// Created by Rig22
-// 05.11.2024
+//
+//  BackgroundColorOption.swift
+//  FreeAPS
+//
+//  Created by Richard on 05.11.24.
+//
 import SwiftUICore
 
 enum BackgroundColorOption: String, CaseIterable, Identifiable, Encodable {

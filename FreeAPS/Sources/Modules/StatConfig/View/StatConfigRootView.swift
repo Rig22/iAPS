@@ -41,26 +41,6 @@ extension StatConfig {
 
             Form {
                 Section {
-                    if #available(iOS 18.0, *) {
-                        Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
-                            ForEach(BackgroundColorOption.allCases) { option in
-                                HStack {
-                                    Rectangle()
-                                        .fill(option.color)
-                                        .frame(width: 25, height: 25)
-                                        .cornerRadius(4)
-
-                                    Text(option.rawValue.capitalized)
-                                        .foregroundColor(.primary)
-                                }
-                                .tag(option.rawValue)
-                            }
-                        }
-                        .pickerStyle(NavigationLinkPickerStyle())
-                    } else {
-                        // Fallback für frühere iOS-Versionen
-                    }
-
                     Toggle("Dana Bar", isOn: $state.danaBar)
 
                     if state.danaBar {
@@ -70,10 +50,9 @@ extension StatConfig {
                         }
                         .pickerStyle(SegmentedPickerStyle())
 
-                        // Zeigt den Pumpen-Icon-Picker nur an, wenn "DanaBar 2" gewählt ist
                         if state.danaBarViewOption == "view2" {
                             if #available(iOS 18.0, *) {
-                                Picker("Pumpen-Icon", selection: $state.danaIconRawValue) {
+                                Picker("Pump Icon", selection: $state.danaIconRawValue) {
                                     ForEach(DanaIconOption.allCases, id: \.rawValue) { option in
                                         HStack {
                                             Image(option.rawValue)
@@ -94,6 +73,56 @@ extension StatConfig {
                         }
                     }
                     Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
+
+                    Picker("Max Reservoir Insulin Age", selection: $state.insulinAgeOption) {
+                        Text("1 Tag").tag("Ein_Tag")
+                        Text("2 Tage").tag("Zwei_Tage")
+                        Text("3 Tage").tag("Drei_Tage")
+                        Text("4 Tage").tag("Vier_Tage")
+                        Text("5 Tage").tag("Fuenf_Tage")
+                        Text("6 Tage").tag("Sechs_Tage")
+                        Text("7 Tage").tag("Sieben_Tage")
+                        Text("8 Tage").tag("Acht_Tage")
+                        Text("9 Tage").tag("Neun_Tage")
+                        Text("10 Tage").tag("Zehn_Tage")
+                    }
+                    .pickerStyle(NavigationLinkPickerStyle())
+
+                    Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
+                        Text("1 Tag").tag("Ein_Tag")
+                        Text("2 Tage").tag("Zwei_Tage")
+                        Text("3 Tage").tag("Drei_Tage")
+                        Text("4 Tage").tag("Vier_Tage")
+                        Text("5 Tage").tag("Fuenf_Tage")
+                    }
+                    .pickerStyle(NavigationLinkPickerStyle())
+
+                } header: {
+                    Text("Dana Bar settings")
+                } footer: {
+                    Text("Personalize your Dana Bar")
+                }
+
+                Section {
+                    if #available(iOS 18.0, *) {
+                        Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
+                            ForEach(BackgroundColorOption.allCases) { option in
+                                HStack {
+                                    Rectangle()
+                                        .fill(option.color)
+                                        .frame(width: 25, height: 25)
+                                        .cornerRadius(4)
+
+                                    Text(option.rawValue.capitalized)
+                                        .foregroundColor(.primary)
+                                }
+                                .tag(option.rawValue)
+                            }
+                        }
+                        .pickerStyle(NavigationLinkPickerStyle())
+                    } else {
+                        // Fallback für frühere iOS-Versionen
+                    }
                     Toggle("Legend Bar", isOn: $state.legendsSwitch)
                     Toggle("TempTarget Bar", isOn: $state.tempTargetBar)
                     Toggle("Bottom Bar", isOn: $state.timeSettings)

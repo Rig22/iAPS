@@ -572,7 +572,7 @@ extension Home {
                             .frame(width: 40, height: 40)
                             .overlay(
                                 Circle()
-                                    .stroke(Color.white, lineWidth: 1)
+                                    .stroke(Color.white, lineWidth: 0)
                             )
 
                         PieSliceView(
@@ -740,48 +740,20 @@ extension Home {
             guard let level = reservoirLevel else { return Color.gray.opacity(0.0) }
 
             if level < 20 {
-                return .red.opacity(1.0)
+                return .red.opacity(0.7)
             } else if level < 50 {
-                return .yellow
+                return .yellow.opacity(0.7)
             } else if level <= 300 {
-                return .green
+                return .green.opacity(0.7)
             } else {
-                return .gray
-            }
-        }
-
-        func reservoirColor(for reservoirAge: String?) -> Color {
-            guard let reservoirAge = reservoirAge else { return .white }
-
-            // Split "Xd Yh" into components
-            let components = reservoirAge.split(separator: " ")
-            var totalHours: Int = 0
-
-            for component in components {
-                if component.hasSuffix("d"),
-                   let days = Int(component.dropLast())
-                {
-                    totalHours += days * 24
-                } else if component.hasSuffix("h"),
-                          let hours = Int(component.dropLast())
-                {
-                    totalHours += hours
-                }
-            }
-
-            switch totalHours {
-            case 240...:
-                return .red
-            case 192 ..< 240:
-                return .yellow
-            default:
-                return .white
+                return .gray.opacity(0.7)
             }
         }
 
         @StateObject private var cannulaPieSegmentViewModel = PieSegmentViewModel()
         @StateObject private var batteryPieSegmentViewModel = PieSegmentViewModel()
         @StateObject private var reservoirPieSegmentViewModel = PieSegmentViewModel()
+        @StateObject private var reservoirAgePieSegmentViewModel = PieSegmentViewModel()
         @StateObject private var connectionPieSegmentViewModel = PieSegmentViewModel()
 
         // Insulin Concentration Badge ->
@@ -825,6 +797,7 @@ extension Home {
                                     let fraction = CGFloat(NSDecimalNumber(decimal: fractionDecimal).doubleValue)
 
                                     let fill = max(min(fraction, 1.0), 0.0)
+
                                     let reservoirColor = reservoirLevelColor(for: reservoir)
 
                                     let displayText: String = {
@@ -833,7 +806,6 @@ extension Home {
                                         } else {
                                             let concentrationValue = Decimal(concentration.last?.concentration ?? 1.0)
                                             let adjustedReservoir = reservoirDecimal * concentrationValue
-                                            // return reservoirFormatter.string(from: adjustedReservoir as NSNumber) ?? ""
                                             return (reservoirFormatter.string(from: adjustedReservoir as NSNumber) ?? "") + "U"
                                         }
                                     }()
@@ -868,67 +840,152 @@ extension Home {
                             }
 
                             // Reservoir Alter
-
                             HStack(spacing: 10) {
-                                let reservoirAgeNoSpaces: String = state.reservoirAge?
-                                    .replacingOccurrences(of: " ", with: "") ?? "--"
-
-                                let insulinFraction: CGFloat = {
-                                    guard let reservoirDate = state.reservoirDate else { return 0.0 }
-
-                                    let totalHours = -reservoirDate.timeIntervalSinceNow / 3600 // Gesamtstunden
-                                    let maxInsulinAge: CGFloat = 216.0 // Maximale Stunden (9 Tage)
-
-                                    let fraction = 1.0 - CGFloat(totalHours) / maxInsulinAge
-
-                                    return min(max(fraction, 0.0), 1.0)
-                                }()
-
+                                let reservoirAge: String = state.reservoirAge ?? "--"
                                 let insulinColor: Color = {
                                     if let reservoirAge = state.reservoirAge {
-                                        // Split "Xd Yh" into components
-                                        let components = reservoirAge.split(separator: " ")
+                                        let pattern = #"(?:(\d+)d)?(?:(\d+)h)?"#
+                                        let regex = try? NSRegularExpression(pattern: pattern)
                                         var totalHours: Int = 0
 
-                                        for component in components {
-                                            if component.hasSuffix("d"),
-                                               let days = Int(component.dropLast())
+                                        if let match = regex?.firstMatch(
+                                            in: reservoirAge,
+                                            range: NSRange(reservoirAge.startIndex..., in: reservoirAge)
+                                        ) {
+                                            if let dayRange = Range(match.range(at: 1), in: reservoirAge),
+                                               let days = Int(reservoirAge[dayRange])
                                             {
                                                 totalHours += days * 24
-                                            } else if component.hasSuffix("h"),
-                                                      let hours = Int(component.dropLast())
+                                            }
+                                            if let hourRange = Range(match.range(at: 2), in: reservoirAge),
+                                               let hours = Int(reservoirAge[hourRange])
                                             {
                                                 totalHours += hours
                                             }
                                         }
 
-                                        switch totalHours {
-                                        case 216...:
-                                            return .red
-                                        case 96 ..< 216:
-                                            return .yellow
+                                        var warningThreshold: CGFloat = 0
+                                        var dangerThreshold: CGFloat = 0
+
+                                        if let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption),
+                                           let maxInsulinAge = Double(insulinAgeOption.displayName)
+                                        {
+                                            warningThreshold = CGFloat(maxInsulinAge * 0.75)
+                                            dangerThreshold = CGFloat(maxInsulinAge)
+                                        } else {}
+
+                                        switch CGFloat(totalHours) {
+                                        case dangerThreshold...:
+                                            return .red.opacity(0.7)
+                                        case warningThreshold ..< dangerThreshold:
+                                            return .yellow.opacity(0.7)
                                         default:
-                                            return .green
+                                            return .green.opacity(0.7)
                                         }
                                     } else {
-                                        return .white
+                                        return .clear // Fallback-Wert, falls reservoirAge nil ist
+                                    }
+                                }()
+
+                                let fillFraction: CGFloat = {
+                                    if let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption),
+                                       let maxInsulinAge = Double(insulinAgeOption.displayName),
+                                       let reservoirAge = state.reservoirAge
+                                    {
+                                        let pattern = #"(?:(\d+)d)?(?:(\d+)h)?"#
+                                        let regex = try? NSRegularExpression(pattern: pattern)
+                                        var totalHours: Int = 0
+
+                                        if let match = regex?.firstMatch(
+                                            in: reservoirAge,
+                                            range: NSRange(reservoirAge.startIndex..., in: reservoirAge)
+                                        ) {
+                                            if let dayRange = Range(match.range(at: 1), in: reservoirAge),
+                                               let days = Int(reservoirAge[dayRange])
+                                            {
+                                                totalHours += days * 24
+                                            }
+                                            if let hourRange = Range(match.range(at: 2), in: reservoirAge),
+                                               let hours = Int(reservoirAge[hourRange])
+                                            {
+                                                totalHours += hours
+                                            }
+                                        }
+                                        let fraction = CGFloat(min(max(Double(totalHours) / maxInsulinAge, 0.0), 1.0))
+                                        return fraction
+                                    } else {
+                                        return 0.0 // Fallback-Wert
                                     }
                                 }()
 
                                 ZStack {
                                     SmallFillablePieSegment(
-                                        pieSegmentViewModel: reservoirPieSegmentViewModel,
-                                        fillFraction: insulinFraction,
+                                        pieSegmentViewModel: reservoirAgePieSegmentViewModel,
+                                        fillFraction: fillFraction,
                                         color: insulinColor,
                                         backgroundColor: .clear,
-                                        displayText: reservoirAgeNoSpaces,
+                                        displayText: reservoirAge,
+                                        symbolSize: 0,
+                                        symbol: "timer",
+                                        animateProgress: true
+                                    )
+                                    .frame(width: 45, height: 45)
+
+                                    Image("vial_timer")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 40, height: 40)
+                                }
+                            }
+
+                            // Kanülenalter
+                            HStack(spacing: 10) {
+                                let cannulaFraction: CGFloat = {
+                                    if let cannulaHours = state.cannulaHours,
+                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption),
+                                       cannulaHours <= cannulaAgeOption.maxCannulaAge
+                                    {
+                                        return CGFloat(min(max(1.0 - cannulaHours / cannulaAgeOption.maxCannulaAge, 0.0), 1.0))
+                                    } else {
+                                        return 0.0
+                                    }
+                                }()
+
+                                let cannulaColor: Color = {
+                                    if let cannulaHours = state.cannulaHours,
+                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
+                                    {
+                                        let maxCannulaAge = cannulaAgeOption.maxCannulaAge
+                                        let warningThreshold = maxCannulaAge * 0.75
+                                        let dangerThreshold = maxCannulaAge
+
+                                        switch CGFloat(cannulaHours) {
+                                        case dangerThreshold...:
+                                            return .red.opacity(0.7)
+                                        case warningThreshold ..< dangerThreshold:
+                                            return .yellow.opacity(0.7)
+                                        default:
+                                            return .green.opacity(0.7)
+                                        }
+                                    } else {
+                                        return .clear // Fallback-Farbe für unbekanntes Alter
+                                    }
+                                }()
+
+                                ZStack {
+                                    SmallFillablePieSegment(
+                                        pieSegmentViewModel: cannulaPieSegmentViewModel,
+                                        fillFraction: cannulaFraction,
+                                        color: cannulaColor,
+                                        backgroundColor: .clear,
+                                        displayText: state.cannulaHours != nil ? "\(Int(state.cannulaHours!))h" : "--",
                                         symbolSize: 0,
                                         symbol: "cross.vial",
                                         animateProgress: true
                                     )
                                     .frame(width: 45, height: 45)
 
-                                    Image("vial")
+                                    Image("infusion")
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 40, height: 40)
@@ -936,7 +993,6 @@ extension Home {
                             }
 
                             // PumpenBatterie
-
                             HStack(spacing: 10) {
                                 var batteryColor: Color {
                                     if let batteryChargeString = state.pumpBatteryChargeRemaining,
@@ -944,14 +1000,14 @@ extension Home {
                                     {
                                         switch batteryCharge {
                                         case ...25:
-                                            return .red
+                                            return .red.opacity(0.7)
                                         case ...50:
-                                            return .yellow
+                                            return .yellow.opacity(0.7)
                                         default:
-                                            return .green
+                                            return .green.opacity(0.7)
                                         }
                                     } else {
-                                        return Color.gray.opacity(0.0)
+                                        return Color.gray.opacity(0.3)
                                     }
                                 }
 
@@ -996,7 +1052,7 @@ extension Home {
                                             .frame(width: 40, height: 40)
                                             .overlay(
                                                 Circle()
-                                                    .stroke(Color.white, lineWidth: 1)
+                                                    .stroke(Color.white, lineWidth: 0)
                                             )
 
                                         Image("battery")
@@ -1005,57 +1061,6 @@ extension Home {
                                             .frame(width: 40, height: 40)
                                     }
                                     .padding(.bottom, 1)
-                                }
-                            }
-
-                            // Kanülenalter
-                            HStack(spacing: 10) {
-                                let cannulaFraction: CGFloat = {
-                                    if let cannulaHours = state.cannulaHours {
-                                        if cannulaHours >= 72 {
-                                            return 1.0 // Voller Pie für Werte ab 72 Stunden
-                                        } else {
-                                            return CGFloat(max(1.0 - cannulaHours / 72.0, 0.0))
-                                        }
-                                    } else {
-                                        return 0.0
-                                    }
-                                }()
-
-                                let cannulaColor: Color = {
-                                    if let cannulaHours = state.cannulaHours {
-                                        switch cannulaHours {
-                                        case ..<48:
-                                            return .green
-                                        case 48 ..< 72:
-                                            return .yellow
-                                        case 72...:
-                                            return Color.red.opacity(1.0)
-                                        default:
-                                            return .clear
-                                        }
-                                    } else {
-                                        return Color.gray.opacity(0.3)
-                                    }
-                                }()
-
-                                ZStack {
-                                    SmallFillablePieSegment(
-                                        pieSegmentViewModel: cannulaPieSegmentViewModel,
-                                        fillFraction: cannulaFraction,
-                                        color: cannulaColor,
-                                        backgroundColor: .clear,
-                                        displayText: state.cannulaHours != nil ? "\(Int(state.cannulaHours!))h" : "--",
-                                        symbolSize: 0,
-                                        symbol: "cross.vial",
-                                        animateProgress: true
-                                    )
-                                    .frame(width: 45, height: 45)
-
-                                    Image("infusion")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 40, height: 40)
                                 }
                             }
 
@@ -1136,7 +1141,6 @@ extension Home {
                                         } else {
                                             let concentrationValue = Decimal(concentration.last?.concentration ?? 1.0)
                                             let adjustedReservoir = reservoirDecimal * concentrationValue
-                                            // return reservoirFormatter.string(from: adjustedReservoir as NSNumber) ?? ""
                                             return (reservoirFormatter.string(from: adjustedReservoir as NSNumber) ?? "") + "U"
                                         }
                                     }()
@@ -1170,8 +1174,89 @@ extension Home {
                                 }
                             }
 
-                            // PumpenBatterie
+                            // Kanülenalter
+                            HStack(spacing: 10) {
+                                let cannulaFraction: CGFloat = {
+                                    if let cannulaHours = state.cannulaHours,
+                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption),
+                                       cannulaHours <= cannulaAgeOption.maxCannulaAge
+                                    {
+                                        return CGFloat(min(max(1.0 - cannulaHours / cannulaAgeOption.maxCannulaAge, 0.0), 1.0))
+                                    } else {
+                                        return 0.0
+                                    }
+                                }()
 
+                                let cannulaColor: Color = {
+                                    if let cannulaHours = state.cannulaHours,
+                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
+                                    {
+                                        let maxCannulaAge = cannulaAgeOption.maxCannulaAge
+                                        let warningThreshold = maxCannulaAge * 0.75
+                                        let dangerThreshold = maxCannulaAge
+
+                                        switch CGFloat(cannulaHours) {
+                                        case dangerThreshold...:
+                                            return .red.opacity(0.7)
+                                        case warningThreshold ..< dangerThreshold:
+                                            return .yellow.opacity(0.7)
+                                        default:
+                                            return .green.opacity(0.7)
+                                        }
+                                    } else {
+                                        return Color.gray.opacity(0.3) // Fallback-Farbe für unbekanntes Alter
+                                    }
+                                }()
+
+                                ZStack {
+                                    SmallFillablePieSegment(
+                                        pieSegmentViewModel: cannulaPieSegmentViewModel,
+                                        fillFraction: cannulaFraction,
+                                        color: cannulaColor,
+                                        backgroundColor: .clear,
+                                        displayText: state.cannulaHours != nil ? "\(Int(state.cannulaHours!))h" : "--",
+                                        symbolSize: 0,
+                                        symbol: "cross.vial",
+                                        animateProgress: true
+                                    )
+                                    .frame(width: 45, height: 45)
+
+                                    Image("infusion")
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 40, height: 40)
+                                }
+                            }
+
+                            // Dana Symbol
+                            HStack(spacing: 10) {
+                                Text("⇠")
+                                    .font(.system(size: 20))
+                                    .foregroundStyle(Color.white)
+                                    .padding(.trailing, 5)
+
+                                ZStack {
+                                    Image(
+                                        state.danaIconOption
+                                            .rawValue
+                                    )
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 75, height: 50)
+                                }
+
+                                Text("⇢")
+                                    .font(.system(size: 20))
+                                    .foregroundStyle(Color.white)
+                                    .padding(.trailing, 5)
+                            }
+                            .onTapGesture {
+                                if state.pumpDisplayState != nil {
+                                    state.setupPump = true
+                                }
+                            }
+
+                            // PumpenBatterie
                             HStack(spacing: 10) {
                                 var batteryColor: Color {
                                     if let batteryChargeString = state.pumpBatteryChargeRemaining,
@@ -1179,14 +1264,14 @@ extension Home {
                                     {
                                         switch batteryCharge {
                                         case ...25:
-                                            return .red
+                                            return .red.opacity(1.0)
                                         case ...50:
-                                            return .yellow
+                                            return .yellow.opacity(0.7)
                                         default:
-                                            return .green
+                                            return .green.opacity(0.7)
                                         }
                                     } else {
-                                        return Color.gray.opacity(0.0)
+                                        return Color.gray.opacity(0.3)
                                     }
                                 }
 
@@ -1231,7 +1316,7 @@ extension Home {
                                             .frame(width: 40, height: 40)
                                             .overlay(
                                                 Circle()
-                                                    .stroke(Color.white, lineWidth: 1)
+                                                    .stroke(Color.white, lineWidth: 0)
                                             )
 
                                         Image("battery")
@@ -1243,87 +1328,6 @@ extension Home {
                                                     .stroke(Color.white, lineWidth: 1)
                                             )
                                     }
-                                }
-                            }
-
-                            // Dana Symbol
-
-                            HStack(spacing: 10) {
-                                Text("⇠")
-                                    .font(.system(size: 20))
-                                    .foregroundStyle(Color.white)
-                                    .padding(.trailing, 5)
-
-                                ZStack {
-                                    Image(
-                                        state.danaIconOption
-                                            .rawValue
-                                    )
-                                    .resizable()
-                                    .scaledToFit()
-                                    .frame(width: 75, height: 50)
-                                }
-                                //  .padding(.horizontal, 5)
-
-                                Text("⇢")
-                                    .font(.system(size: 20))
-                                    .foregroundStyle(Color.white)
-                                    .padding(.trailing, 5)
-                            }
-                            .onTapGesture {
-                                if state.pumpDisplayState != nil {
-                                    state.setupPump = true
-                                }
-                            }
-
-                            // Kanülenalter
-                            HStack(spacing: 10) {
-                                let cannulaFraction: CGFloat = {
-                                    if let cannulaHours = state.cannulaHours {
-                                        if cannulaHours >= 72 {
-                                            return 1.0 // Voller Pie für Werte ab 72 Stunden
-                                        } else {
-                                            return CGFloat(max(1.0 - cannulaHours / 72.0, 0.0))
-                                        }
-                                    } else {
-                                        return 0.0
-                                    }
-                                }()
-
-                                let cannulaColor: Color = {
-                                    if let cannulaHours = state.cannulaHours {
-                                        switch cannulaHours {
-                                        case ..<48:
-                                            return .green
-                                        case 48 ..< 72:
-                                            return .yellow
-                                        case 72...:
-                                            return Color.red.opacity(1.0)
-                                        default:
-                                            return .clear
-                                        }
-                                    } else {
-                                        return Color.gray.opacity(0.3)
-                                    }
-                                }()
-
-                                ZStack {
-                                    SmallFillablePieSegment(
-                                        pieSegmentViewModel: cannulaPieSegmentViewModel,
-                                        fillFraction: cannulaFraction,
-                                        color: cannulaColor,
-                                        backgroundColor: .clear,
-                                        displayText: state.cannulaHours != nil ? "\(Int(state.cannulaHours!))h" : "--",
-                                        symbolSize: 0,
-                                        symbol: "cross.vial",
-                                        animateProgress: true
-                                    )
-                                    .frame(width: 40, height: 40)
-
-                                    Image("infusion")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 40, height: 40)
                                 }
                             }
 
