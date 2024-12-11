@@ -942,10 +942,13 @@ extension Home {
                             HStack(spacing: 10) {
                                 let cannulaFraction: CGFloat = {
                                     if let cannulaHours = state.cannulaHours,
-                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption),
-                                       cannulaHours <= cannulaAgeOption.maxCannulaAge
+                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
                                     {
-                                        return CGFloat(min(max(1.0 - cannulaHours / cannulaAgeOption.maxCannulaAge, 0.0), 1.0))
+                                        if cannulaHours >= cannulaAgeOption.maxCannulaAge {
+                                            return 1.0
+                                        } else {
+                                            return CGFloat(min(max(cannulaHours / cannulaAgeOption.maxCannulaAge, 0.0), 1.0))
+                                        }
                                     } else {
                                         return 0.0
                                     }

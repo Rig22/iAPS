@@ -74,26 +74,26 @@ extension StatConfig {
 
                         if state.danaBarViewOption == "view1" {
                             Picker("Max Reservoir Insulin Age", selection: $state.insulinAgeOption) {
-                                Text("1 Tag").tag("Ein_Tag")
-                                Text("2 Tage").tag("Zwei_Tage")
-                                Text("3 Tage").tag("Drei_Tage")
-                                Text("4 Tage").tag("Vier_Tage")
-                                Text("5 Tage").tag("Fuenf_Tage")
-                                Text("6 Tage").tag("Sechs_Tage")
-                                Text("7 Tage").tag("Sieben_Tage")
-                                Text("8 Tage").tag("Acht_Tage")
-                                Text("9 Tage").tag("Neun_Tage")
-                                Text("10 Tage").tag("Zehn_Tage")
+                                Text("1 Day").tag("Ein_Tag")
+                                Text("2 Days").tag("Zwei_Tage")
+                                Text("3 Days").tag("Drei_Tage")
+                                Text("4 Days").tag("Vier_Tage")
+                                Text("5 Days").tag("Fuenf_Tage")
+                                Text("6 Days").tag("Sechs_Tage")
+                                Text("7 Days").tag("Sieben_Tage")
+                                Text("8 Days").tag("Acht_Tage")
+                                Text("9 Days").tag("Neun_Tage")
+                                Text("10 Days").tag("Zehn_Tage")
                             }
                             .pickerStyle(NavigationLinkPickerStyle())
                         }
 
                         Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
-                            Text("1 Tag").tag("Ein_Tag")
-                            Text("2 Tage").tag("Zwei_Tage")
-                            Text("3 Tage").tag("Drei_Tage")
-                            Text("4 Tage").tag("Vier_Tage")
-                            Text("5 Tage").tag("Fuenf_Tage")
+                            Text("1 Day").tag("Ein_Tag")
+                            Text("2 Days").tag("Zwei_Tage")
+                            Text("3 Days").tag("Drei_Tage")
+                            Text("4 Days").tag("Vier_Tage")
+                            Text("5 Days").tag("Fuenf_Tage")
                         }
                         .pickerStyle(NavigationLinkPickerStyle())
 
