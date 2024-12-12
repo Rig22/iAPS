@@ -1181,10 +1181,13 @@ extension Home {
                             HStack(spacing: 10) {
                                 let cannulaFraction: CGFloat = {
                                     if let cannulaHours = state.cannulaHours,
-                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption),
-                                       cannulaHours <= cannulaAgeOption.maxCannulaAge
+                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
                                     {
-                                        return CGFloat(min(max(1.0 - cannulaHours / cannulaAgeOption.maxCannulaAge, 0.0), 1.0))
+                                        if cannulaHours >= cannulaAgeOption.maxCannulaAge {
+                                            return 1.0
+                                        } else {
+                                            return CGFloat(min(max(cannulaHours / cannulaAgeOption.maxCannulaAge, 0.0), 1.0))
+                                        }
                                     } else {
                                         return 0.0
                                     }
@@ -1207,7 +1210,7 @@ extension Home {
                                             return .green.opacity(0.7)
                                         }
                                     } else {
-                                        return Color.gray.opacity(0.3) // Fallback-Farbe für unbekanntes Alter
+                                        return .clear // Fallback-Farbe für unbekanntes Alter
                                     }
                                 }()
 
@@ -1951,28 +1954,28 @@ extension Home {
         }
 
         @ViewBuilder private func glucoseHeaderView() -> some View {
-            // backgroundColor
-            LinearGradient(
-                gradient: Gradient(colors: [.black, backgroundColor]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(maxHeight: 90)
-            .overlay {
-                VStack {
-                    ZStack {
-                        LinearGradient(
-                            gradient: Gradient(colors: [.black, backgroundColor]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                        glucosePreview.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                            .dynamicTypeSize(...DynamicTypeSize.medium)
+            backgroundColor
+                /*  LinearGradient(
+                     gradient: Gradient(colors: [.black, backgroundColor]),
+                     startPoint: .top,
+                     endPoint: .bottom
+                 )*/
+                .frame(maxHeight: 90)
+                .overlay {
+                    VStack {
+                        ZStack {
+                            LinearGradient(
+                                gradient: Gradient(colors: [.clear, .clear]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                            glucosePreview.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                                .dynamicTypeSize(...DynamicTypeSize.medium)
+                        }
                     }
                 }
-            }
-            .clipShape(Rectangle())
-            .foregroundStyle(Color.white)
+                .clipShape(Rectangle())
+                .foregroundStyle(Color.white)
         }
 
         var glucosePreview: some View {
