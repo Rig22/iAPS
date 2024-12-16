@@ -1169,14 +1169,15 @@ extension MainChartView {
             // Display active Override
             if let last = latest, last.enabled {
                 var old = Array(rects)
-                let duration = Double(last.duration ?? 0)
+                let duration = Double(truncating: last.duration ?? 0)
                 // Looks better when target isn't == 0 in Home View Main Chart
                 let targetRaw = last.target ?? 0
-                let target = Int(targetRaw) < 6 ? 6 : targetRaw
+                let target = Int(truncating: targetRaw) < 6 ? 6 : targetRaw
 
                 if duration > 0 {
                     let x1 = timeToXCoordinate((latest?.date ?? Date.now).timeIntervalSince1970, fullSize: fullSize)
-                    let plusNow = (last.date ?? Date.now).addingTimeInterval(Int(latest?.duration ?? 0).minutes.timeInterval)
+                    let plusNow = (last.date ?? Date.now)
+                        .addingTimeInterval(Int(truncating: latest?.duration ?? 0).minutes.timeInterval)
                     let x2 = timeToXCoordinate(plusNow.timeIntervalSince1970, fullSize: fullSize)
                     let oneMore = CGRect(
                         x: x1,

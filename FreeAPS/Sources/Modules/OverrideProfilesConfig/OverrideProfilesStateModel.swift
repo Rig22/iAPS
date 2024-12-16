@@ -100,7 +100,7 @@ extension OverrideProfilesConfig {
                     saveOverride.overrideMaxIOB = overrideMaxIOB
                 }
 
-                let duration = (self.duration as NSDecimalNumber) == 0 ? 2880 : Int(self.duration as NSDecimalNumber)
+                let duration = (self.duration as NSDecimalNumber) == 0 ? 2880 : Int(truncating: self.duration as NSDecimalNumber)
                 ns.uploadOverride(self.percentage.formatted(), Double(duration), saveOverride.date ?? Date.now)
 
                 try? self.coredataContext.save()
@@ -206,7 +206,7 @@ extension OverrideProfilesConfig {
             coredataContext.perform { try? self.coredataContext.save() }
 
             // Uploads new Override to NS
-            ns.uploadOverride(profile.name ?? "", Double(saveOverride.duration ?? 0), saveOverride.date ?? Date())
+            ns.uploadOverride(profile.name ?? "", Double(truncating: saveOverride.duration ?? 0), saveOverride.date ?? Date())
         }
 
         func savedSettings() {

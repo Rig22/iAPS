@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 1320 1320" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g id="Loop" transform="matrix(6.07153e-17,1.01671,-1.02926,6.245e-17,1287.46,82.833)">
-        <g transform="matrix(1.22837e-16,-1.89597,2.11693,1.09691e-16,-713.712,2086.87)">
+    <g id="Loop" transform="matrix(5.90168e-17,0.987717,-0.978066,5.93318e-17,1163.28,137.687)">
+        <g transform="matrix(5.52152e-17,-0.898922,0.905897,5.34383e-17,-65.8519,1131.07)">
+            <path d="M0,668.557L27.239,668.557C27.239,1013.23 305.384,1292.64 648.493,1292.64L648.493,1320C290.34,1320 0,1028.34 0,668.557Z" style="fill:white;"/>
+        </g>
+        <g transform="matrix(1.23313e-16,-1.05332,2.11693,5.95319e-17,-713.183,1700.75)">
             <path d="M554.678,494.314L623.858,591.884L485.499,591.884L554.678,494.314Z" style="fill:white;"/>
         </g>
-        <g transform="matrix(-3.57555e-16,1.89597,-2.11693,-3.66501e-16,1792.24,-866.795)">
+        <g transform="matrix(0.0106535,0.89886,-0.905835,0.010476,1049.44,-115.732)">
+            <path d="M0,668.557L27.239,668.557C27.239,1013.23 305.384,1292.64 648.493,1292.64L648.493,1320C290.34,1320 0,1028.34 0,668.557Z" style="fill:white;"/>
+        </g>
+        <g transform="matrix(0.0124833,1.05324,-2.11678,0.0244805,1690.95,-686.077)">
             <path d="M554.678,494.314L623.858,591.884L485.499,591.884L554.678,494.314Z" style="fill:white;"/>
         </g>
     </g>

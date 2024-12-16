@@ -68,9 +68,9 @@ final class OverrideStorage {
                 history.duration = -1 * (latest.date ?? Date()).timeIntervalSinceNow.minutes
                 history.date = latest.date ?? Date()
                 // Looks better in Home View Main Chart when target isn't == 0.
-                if Double(latest.target ?? 100) < 6 {
+                if Double(truncating: latest.target ?? 100) < 6 {
                     history.target = 6
-                } else { history.target = Double(latest.target ?? 100) }
+                } else { history.target = Double(truncating: latest.target ?? 100) }
                 duration = history.duration
             }
             profiles.enabled = false
@@ -138,7 +138,7 @@ final class OverrideStorage {
             return nil
         }
 
-        guard (last.date ?? Date.now).addingTimeInterval(Int(last.duration ?? 0).minutes.timeInterval) > Date(),
+        guard (last.date ?? Date.now).addingTimeInterval(Int(truncating: last.duration ?? 0).minutes.timeInterval) > Date(),
               (last.date ?? Date.now) <= Date.now,
               last.duration != 0
         else {
@@ -160,7 +160,7 @@ final class OverrideStorage {
     }
 
     func activateOverride(_ override: Override) {
-        var overrideArray = [Override]()
+        _ = [Override]()
         coredataContext.performAndWait {
             let save = Override(context: coredataContext)
             save.date = Date.now

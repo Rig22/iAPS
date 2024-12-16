@@ -60,12 +60,13 @@ struct FillablePieSegment: View {
         VStack {
             ZStack {
                 Circle()
-                    .fill(backgroundColor)
-                    .opacity(0.0)
+                    // .fill(backgroundColor)
+                    // .opacity(0.0)
+                    .fill(Color.darkGray.opacity(0.5))
                     .frame(width: 45, height: 45)
                     .overlay(
                         Circle()
-                            .stroke(Color.white, lineWidth: 1)
+                            .stroke(Color.white, lineWidth: 0)
                     )
 
                 PieSliceView(
@@ -121,15 +122,13 @@ struct LoopView: View {
                     fillFraction: min(CGFloat(minutesAgo) / 5.0, 1.0),
                     color: pieColor,
                     backgroundColor: .clear,
-                    // displayText: "\(minutesAgo) min",
-                    // displayText: minutesAgo <= 1 ? "< 1 min" : "\(minutesAgo) min",
                     displayText: minutesAgo == 0 ? "< 1 min" : "\(minutesAgo) min",
                     animateProgress: true
                 )
                 Image("Loop")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 67, height: 67)
+                    .frame(width: 48, height: 48)
 
                 Circle()
                     .fill(color)

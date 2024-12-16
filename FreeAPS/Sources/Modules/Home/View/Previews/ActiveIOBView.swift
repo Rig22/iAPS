@@ -29,24 +29,69 @@ struct ActiveIOBView: View {
 
     var body: some View {
         VStack {
-            Text("Active Insulin").font(.previewHeadline).padding(.top, 20)
+            Text("Active Insulin").font(.previewHeadline).padding(.top, 20).padding(.bottom, 15)
             iobView().frame(maxHeight: 130).padding(.horizontal, 20)
-            sumView().frame(maxHeight: 250).padding(.vertical, 30)
-                .foregroundStyle(Color.white)
+            sumView().frame(maxHeight: 250).padding(.top, 20).padding(.bottom, 10)
         }.dynamicTypeSize(...DynamicTypeSize.xLarge)
     }
 
     @ViewBuilder private func iobView() -> some View {
-        let minimum = data.map(\.iob).min() ?? 0
+        // Data
+        let negIOBData = negIOBdata(data)
+        // Domain
+        let minimum = min(data.map(\.iob).min() ?? 0, negIOBData.map(\.iob).min() ?? 0)
         let minimumRange = min(0, minimum * 1.3)
         let maximum = (data.map(\.iob).max() ?? 0) * 1.1
 
-        Chart(data) {
-            AreaMark(
-                x: .value("Time", $0.date),
-                y: .value("IOB", $0.iob)
-            ).foregroundStyle(Color(.insulin))
+        Chart {
+            ForEach(data) { item in
+                LineMark(
+                    x: .value("Time", item.date),
+                    y: .value("IOB", item.iob)
+                ).foregroundStyle(by: .value("Time", "Line IOB > 0"))
+                    .lineStyle(StrokeStyle(lineWidth: 0.8))
+
+                AreaMark(
+                    x: .value("Time", item.date),
+                    y: .value("IOB", item.iob)
+                ).foregroundStyle(by: .value("Time", "IOB > 0"))
+            }
+            ForEach(negIOBData) { item in
+                AreaMark(
+                    x: .value("Time", item.date),
+                    yStart: .value("IOB", 0),
+                    yEnd: .value("IOB", item.iob)
+                ).foregroundStyle(by: .value("Time", "IOB < 0"))
+            }
         }
+        .chartForegroundStyleScale(
+            [
+                "IOB > 0": LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.insulin.opacity(1),
+                        Color.insulin.opacity(0.4)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                ),
+                "IOB < 0": LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.red.opacity(1),
+                        Color.red.opacity(1)
+                    ]),
+                    startPoint: .bottom,
+                    endPoint: .top
+                ),
+                "Line IOB > 0": LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.insulin.opacity(1),
+                        Color.insulin.opacity(1)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+            ]
+        )
         .chartXAxis {
             AxisMarks(values: .stride(by: .hour, count: 2)) { _ in
                 AxisValueLabel(
@@ -54,11 +99,11 @@ struct ActiveIOBView: View {
                         .locale(Locale(identifier: "sv"))
                 )
                 .foregroundStyle(Color.white) // Achsenbeschriftung auf Weiß setzen
-
                 AxisGridLine()
-                    .foregroundStyle(Color.white) // Gitterlinien auf Weiß setzen
+                    .foregroundStyle(Color.white) // Achsenbeschriftung auf Weiß setzen
             }
         }
+
         .chartYAxis {
             AxisMarks(values: .automatic(desiredCount: 3)) { _ in
                 AxisValueLabel()
@@ -74,6 +119,7 @@ struct ActiveIOBView: View {
         .chartXScale(
             domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
         )
+        .chartLegend(.hidden)
         .foregroundStyle(Color.white) // Allgemeiner Stil auf Weiß setzen
     }
 
@@ -104,10 +150,10 @@ struct ActiveIOBView: View {
                 color: Color(.clear)
             ),
             BolusSummary(
-                variable: NSLocalizedString("Average Insulin past 24h", comment: ""),
+                variable: NSLocalizedString("Average Insulin 10 days", comment: ""),
                 formula: NSLocalizedString(" U", comment: ""),
                 insulin: tddActualAverage,
-                color: .secondary
+                color: .white
             ),
             BolusSummary(
                 variable: "",
@@ -119,19 +165,19 @@ struct ActiveIOBView: View {
                 variable: NSLocalizedString("TDD yesterday", comment: ""),
                 formula: NSLocalizedString(" U", comment: ""),
                 insulin: tddYesterday,
-                color: .secondary
+                color: .white
             ),
             BolusSummary(
                 variable: NSLocalizedString("TDD 2 days ago", comment: ""),
                 formula: NSLocalizedString(" U", comment: ""),
                 insulin: tdd2DaysAgo,
-                color: .secondary
+                color: .white
             ),
             BolusSummary(
                 variable: NSLocalizedString("TDD 3 days ago", comment: ""),
                 formula: NSLocalizedString(" U", comment: ""),
                 insulin: tdd3DaysAgo,
-                color: .secondary
+                color: .white
             )
         ]
 
@@ -139,20 +185,22 @@ struct ActiveIOBView: View {
 
         Grid {
             ForEach(insulinData) { entry in
-
                 GridRow(alignment: .firstTextBaseline) {
-                    Text(entry.variable).foregroundStyle(.white).frame(maxWidth: .infinity, alignment: .leading)
+                    // Schriftfarbe für alle Variablen setzen
+                    Text(entry.variable)
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     Text("")
-                        .foregroundStyle(Color.white)
                     if entry.insulin != 0 {
                         Text(
                             ((isTDD(entry.insulin) ? tddFormatter : formatter).string(for: entry.insulin) ?? "") + entry
                                 .formula
                         )
-                        .foregroundStyle(Color.white)
-                        .bold(entry == entries.first).foregroundStyle(entry.color)
+                        .bold(entry == entries.first)
+                        .foregroundStyle(entry.color)
                     } else if entry.variable != "" {
-                        Text("0").foregroundStyle(.white)
+                        Text("0")
+                            .foregroundColor(.white)
                     }
                 }
             }
@@ -170,5 +218,22 @@ struct ActiveIOBView: View {
             return data.dropFirst().map({ a -> BolusSummary in a })
         }
         return data
+    }
+
+    private func negIOBdata(_ data: [IOBData]) -> [IOBData] {
+        var array = [IOBData]()
+        var previous = data.first
+        for item in data {
+            if item.iob < 0 {
+                if previous?.iob ?? 0 >= 0 {
+                    array.append(IOBData(date: previous?.date ?? .distantPast, iob: 0, cob: 0))
+                }
+                array.append(IOBData(date: item.date, iob: item.iob, cob: 0))
+            } else if previous?.iob ?? 0 < 0 {
+                array.append(IOBData(date: item.date, iob: 0, cob: 0))
+            }
+            previous = item
+        }
+        return array
     }
 }

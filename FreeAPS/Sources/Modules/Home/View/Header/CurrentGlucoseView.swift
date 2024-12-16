@@ -64,7 +64,7 @@ struct CurrentGlucoseView: View {
                  Color.blue.opacity(0.6),
                  Color.blue.opacity(0.6),
                  Color.blue.opacity(0.7)*/
-                Color.clear
+                Color.darkGray.opacity(0.4)
             ]),
             center: .center,
             startAngle: .degrees(0),
@@ -77,7 +77,7 @@ struct CurrentGlucoseView: View {
                 .frame(width: 110, height: 110)
                 .overlay(
                     Circle()
-                        .stroke(Color.white, lineWidth: 1)
+                        .stroke(Color.white, lineWidth: 0)
                 )
 
             // TriangleShape(color: triangleColor)
@@ -140,7 +140,7 @@ struct CurrentGlucoseView: View {
                  .singleDown,
                  .tripleDown:
                 rotationDegrees = 90
-            case .none,
+            case .none?,
                  .notComputable,
                  .rateOutOfRange:
                 rotationDegrees = 0
@@ -197,7 +197,7 @@ struct TriangleShape: View {
             .fill(color)
             .frame(width: 30, height: 30)
             .rotationEffect(.degrees(90))
-            .offset(x: 75)
+            .offset(x: 70)
     }
 }
 

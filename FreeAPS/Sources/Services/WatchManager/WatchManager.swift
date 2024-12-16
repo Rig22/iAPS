@@ -117,7 +117,7 @@ final class BaseWatchManager: NSObject, WatchManager, Injectable {
                     let untilDate = overrideStorage.fetchLatestOverride().first.flatMap { currentOverride -> Date? in
                         guard currentOverride.id == preset.id, currentOverride.enabled else { return nil }
 
-                        let duration = Double(currentOverride.duration ?? 0)
+                        let duration = Double(truncating: currentOverride.duration ?? 0)
                         let overrideDate: Date = currentOverride.date ?? Date.now
 
                         let date = duration == 0 ? Date.distantFuture : overrideDate.addingTimeInterval(duration * 60)
@@ -134,7 +134,7 @@ final class BaseWatchManager: NSObject, WatchManager, Injectable {
             // Is there an active override but no preset?
             let currentButNoOverrideNotPreset = self.state.overrides.filter({ $0.until != nil }).first
             if let last = overrideStorage.fetchLatestOverride().first, last.enabled, currentButNoOverrideNotPreset == nil {
-                let duration = Double(last.duration ?? 0)
+                let duration = Double(truncating: last.duration ?? 0)
                 let overrideDate: Date = last.date ?? Date.now
                 let date_ = duration == 0 ? Date.distantFuture : overrideDate.addingTimeInterval(duration * 60)
                 let date = date_ > Date.now ? date_ : nil
@@ -509,7 +509,7 @@ extension BaseWatchManager: WCSessionDelegate {
                     let name = storage.isPresetName()
 
                     if let duration = storage.cancelProfile() {
-                        let presetName = preset.name
+                        _ = preset.name
                         let nsString = name != nil ? name! : activeOveride.percentage.formatted()
                         nightscout.editOverride(nsString, duration, activeOveride.date ?? Date())
                     }
@@ -518,7 +518,7 @@ extension BaseWatchManager: WCSessionDelegate {
                 storage.overrideFromPreset(preset)
                 nightscout.uploadOverride(
                     preset.name ?? "",
-                    Double(preset.duration ?? 0),
+                    Double(truncating: preset.duration ?? 0),
                     storage.fetchLatestOverride().first?.date ?? Date.now
                 )
                 replyHandler(["confirmation": true])

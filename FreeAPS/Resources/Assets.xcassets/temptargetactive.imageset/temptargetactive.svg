@@ -1,24 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
 <svg width="100%" height="100%" viewBox="0 0 1320 1320" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g id="temptargetactive" transform="matrix(1.1196,0,0,1.0973,52.3846,-10.9812)">
+    <g transform="matrix(-0.948985,1.01763,-0.882691,-0.823151,1487.64,899.758)">
         <g id="buttonpanel">
-            <g id="temptargetactive1" serif:id="temptargetactive">
-                <g transform="matrix(1.5782,0,0,1.55582,-717.352,-327.56)">
-                    <ellipse cx="798.414" cy="642.741" rx="268.938" ry="281.535" style="fill:rgb(0,162,255);fill-opacity:0.99;"/>
-                </g>
-                <g transform="matrix(0.660807,-0.759354,0.948682,0.859456,-753.448,510.536)">
-                    <rect x="546.914" y="775.869" width="284.925" height="43.162" style="fill:white;fill-opacity:0.99;"/>
-                </g>
-                <g transform="matrix(0.733467,0.686718,-0.857758,0.95376,796.789,-569.868)">
-                    <rect x="546.914" y="775.869" width="284.925" height="43.162" style="fill:white;fill-opacity:0.99;"/>
-                </g>
-                <g transform="matrix(1.83603,-3.10125,2.51267,1.54864,-2658.56,1927.51)">
-                    <path d="M694.635,574.28L702.597,590.962C665.438,616.914 642.548,664.875 642.548,716.779C642.548,796.961 696.362,862.059 762.647,862.059C828.932,862.059 882.747,796.961 882.747,716.779C882.747,691.276 877.197,666.224 866.656,644.138L880.447,634.507C892.385,659.521 898.671,687.895 898.671,716.779C898.671,807.592 837.721,881.321 762.647,881.321C687.574,881.321 626.624,807.592 626.624,716.779C626.624,657.993 652.55,603.673 694.635,574.28Z" style="fill:white;fill-opacity:0.99;"/>
-                </g>
-                <g transform="matrix(1.35784e-16,-2.21508,2.34102,1.48956e-16,-831.156,1446.58)">
-                    <path d="M554.678,494.314L623.858,591.884L485.499,591.884L554.678,494.314Z" style="fill:white;fill-opacity:0.99;"/>
-                </g>
+            <g id="temptargetactive_small">
+                <path d="M183.883,739.377L583.269,727.193L584.697,789.381L133.053,803.159L132.965,799.287L129.922,799.287L129.922,278.42L183.883,278.42L183.883,739.377Z" style="fill:rgb(0,162,255);"/>
             </g>
         </g>
     </g>

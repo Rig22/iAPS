@@ -214,7 +214,6 @@ extension Home {
                             style: StrokeStyle(lineWidth: 2, lineCap: .round)
                         )
                         .rotationEffect(Angle(degrees: 270))
-                        // .animation(.linear(duration: 0.25), value: progress)
                         .animation(.linear(duration: 0.5), value: progress)
                 }
                 .frame(width: 123, height: 123)
@@ -506,20 +505,21 @@ extension Home {
             var color: Color
             var backgroundColor: Color
             var displayText: String
-            //  var symbolSize: CGFloat
-            //  var symbol: String
+            var symbolSize: CGFloat
+            var symbol: String
             var animateProgress: Bool
 
             var body: some View {
                 VStack {
                     ZStack {
                         Circle()
-                            .fill(backgroundColor)
-                            .opacity(0.3)
+                            // .fill(backgroundColor)
+                            // .opacity(0.3)
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: 60, height: 60)
                             .overlay(
                                 Circle()
-                                    .stroke(Color.white, lineWidth: 1)
+                                    .stroke(Color.white, lineWidth: 0)
                             )
 
                         PieSliceView(
@@ -567,8 +567,8 @@ extension Home {
                 VStack {
                     ZStack {
                         Circle()
-                            .fill(backgroundColor)
-                            .opacity(0.0)
+                            // .fill(backgroundColor)
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: 40, height: 40)
                             .overlay(
                                 Circle()
@@ -617,12 +617,11 @@ extension Home {
                 VStack {
                     ZStack {
                         Circle()
-                            .fill(.clear)
-                            .opacity(1.0)
-                            .frame(width: 85, height: 85)
+                            .fill(Color.darkGray.opacity(0.5))
+                            .frame(width: 110, height: 110)
                             .overlay(
                                 Circle()
-                                    .stroke(Color.white, lineWidth: 1)
+                                    .stroke(Color.white, lineWidth: 0)
                             )
 
                         PieSliceView(
@@ -630,7 +629,7 @@ extension Home {
                             endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                         )
                         .fill(color)
-                        .frame(width: 83, height: 83)
+                        .frame(width: 110, height: 110)
                         .opacity(1.0)
                     }
 
@@ -670,8 +669,8 @@ extension Home {
                                 color: .loopYellow,
                                 backgroundColor: .clear,
                                 displayText: "\(numberFormatter.string(from: (state.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
-                                //  symbolSize: 30,
-                                //  symbol: "",
+                                symbolSize: 0,
+                                symbol: "syringe",
                                 animateProgress: true
                             )
                             Image("carbs3")
@@ -705,21 +704,21 @@ extension Home {
                                 color: substance < 0 ? .blue : .insulin,
                                 backgroundColor: .clear,
                                 displayText: "\(insulinnumberFormatter.string(from: (state.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
-                                // symbolSize: 0,
-                                // symbol: "",
+                                symbolSize: 0,
+                                symbol: "syringe",
                                 animateProgress: true
                             )
                             Image("iob")
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 60, height: 60)
+                                .frame(width: 45, height: 45)
                         }
                     }
                 }
             }
         }
 
-        // DanaBar
+        // DanaBars
 
         var infoPanel: some View {
             if state.danaBar {
@@ -783,6 +782,8 @@ extension Home {
 
         // Insulin Concentration Badge <-
 
+        // DanaBar 1
+
         var info: some View {
             if state.danaBar {
                 return AnyView(
@@ -836,6 +837,11 @@ extension Home {
                                             .scaledToFit()
                                             .frame(width: 40, height: 40)
                                     }
+                                }
+                            }
+                            .onTapGesture {
+                                if state.pumpDisplayState != nil {
+                                    state.setupPump = true
                                 }
                             }
 
@@ -934,7 +940,7 @@ extension Home {
                                     Image("vial_timer")
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 40, height: 40)
+                                        .frame(width: 45, height: 45)
                                 }
                             }
 
@@ -1050,8 +1056,9 @@ extension Home {
                                 } else {
                                     ZStack {
                                         Circle()
-                                            .fill(Color.clear)
-                                            .opacity(0.3)
+                                            // .fill(Color.clear)
+                                            // .opacity(0.3)
+                                            .fill(Color.darkGray.opacity(0.5))
                                             .frame(width: 40, height: 40)
                                             .overlay(
                                                 Circle()
@@ -1174,6 +1181,11 @@ extension Home {
                                             .scaledToFit()
                                             .frame(width: 40, height: 40)
                                     }
+                                }
+                            }
+                            .onTapGesture {
+                                if state.pumpDisplayState != nil {
+                                    state.setupPump = true
                                 }
                             }
 
@@ -1425,9 +1437,6 @@ extension Home {
         let deviceWidthMultiplier: CGFloat = 1.07
 
         var chart: some View {
-            //    let ratio = state.timeSettings ? 1.9 : 1.8 // TimeSetting ein
-            //    let ratio2 = state.timeSettings ? 1.7 : 1.6 // TimeSetting aus
-
             let ratio = state.timeSettings ? 1.76 : 1.66 // TimeSetting ein
             let ratio2 = state.timeSettings ? 1.71 : 1.61 // TimeSetting aus
 
@@ -1659,144 +1668,69 @@ extension Home {
 
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {
-                //  backgroundColor
                 LinearGradient(
                     gradient: Gradient(colors: [backgroundColor, backgroundColor]),
-                    /* gradient: Gradient(colors: [backgroundColor, backgroundColor, Color.black, Color.black]), */
                     startPoint: .top,
                     endPoint: .bottom
-                ).frame(height: 50 + geo.safeAreaInsets.bottom)
+                )
+                .frame(height: 50 + geo.safeAreaInsets.bottom)
+
                 let isOverride = fetchedPercent.first?.enabled ?? false
                 let isTarget = (state.tempTarget != nil)
 
                 HStack {
-                    Button { state.showModal(for: .addCarbs(editMode: false, override: false)) }
-                    label: {
-                        ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
-                            Image("carbs")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 45, height: 45)
-                            if let carbsReq = state.carbsRequired {
-                                Text(numberFormatter.string(from: carbsReq as NSNumber)!)
-                                    .font(.caption)
-                                    .foregroundStyle(Color.white)
-                                    .padding(4)
-                                    .background(Capsule().fill(Color.red))
-                            }
-                        }
-                    }.buttonStyle(.borderless)
+                    buttonWithCircle(iconName: "carbs3", circleColor: Color.darkGray.opacity(0.5)) {
+                        state.showModal(for: .addCarbs(editMode: false, override: false))
+                    }
                     Spacer()
-                    Button {
+
+                    buttonWithCircle(iconName: "iob", circleColor: Color.darkGray.opacity(0.5)) {
                         (state.bolusProgress != nil) ? showBolusActiveAlert = true :
                             state.showModal(for: .bolus(
-                                waitForSuggestion: state.useCalc ? true : false,
+                                waitForSuggestion: state.useCalc,
                                 fetch: false
                             ))
                     }
-                    label: {
-                        Image("insulin")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 45, height: 45)
-                    }
-                    /*  label: {
-                     VStack {
-                     Image("insulin")
-                     .resizable()
-                     .scaledToFit()
-                     .frame(width: 50, height: 50)
-                     Text("Bolus")
-                     .font(.system(size: 14))
-                     // .padding(.top, 2) // optional, um etwas Abstand zu schaffen
-                     }
-                     .padding(.bottom, 10)
-                     }*/
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(Color.white)
                     Spacer()
+
                     if state.allowManualTemp {
-                        Button { state.showModal(for: .manualTempBasal) }
-                        label: {
-                            Image("insulin")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 45, height: 45)
+                        buttonWithCircle(iconName: "insulin", circleColor: Color.darkGray.opacity(0.5)) {
+                            state.showModal(for: .manualTempBasal)
                         }
-                        .foregroundStyle(Color.white)
                         Spacer()
                     }
-                    ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom))
-                        {
-                            Image(isOverride ? "profilefill" : "profile")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 45, height: 45)
-                                .font(.system(size: 14))
-                                .foregroundStyle(.white)
-                                .padding(8)
-                            // .background(isOverride ? .blue.opacity(0.3) : .clear)
-                            // .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
-                        .onTapGesture {
-                            if isOverride {
-                                showCancelAlert.toggle()
-                            } else {
-                                state.showModal(for: .overrideProfilesConfig)
-                            }
-                        }
-                        .onLongPressGesture {
+
+                    buttonWithCircle(iconName: isOverride ? "profilefill" : "profile", circleColor: Color.darkGray.opacity(0.5)) {
+                        if isOverride {
+                            showCancelAlert.toggle()
+                        } else {
                             state.showModal(for: .overrideProfilesConfig)
                         }
+                    }
+                    Spacer()
+
                     if state.useTargetButton {
-                        Spacer()
-                        Image(isTarget ? "temptargetactive" : "temptarget")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 45, height: 45)
-                            .font(.system(size: 14))
-                            .buttonStyle(.borderless)
-                            .padding(8)
-                            .foregroundStyle(Color.white)
-                            // .background(isTarget ? .blue.opacity(0.15) : .clear)
-                            // .clipShape(RoundedRectangle(cornerRadius: 10))
-                            .onTapGesture {
-                                if isTarget {
-                                    showCancelTTAlert.toggle()
-                                } else {
-                                    state.showModal(for: .addTempTarget)
-                                }
-                            }
-                            .onLongPressGesture {
+                        buttonWithCircle(
+                            iconName: isTarget ? "temptargetactive" : "temptarget",
+                            circleColor: Color.darkGray.opacity(0.5)
+                        ) {
+                            if isTarget {
+                                showCancelTTAlert.toggle()
+                            } else {
                                 state.showModal(for: .addTempTarget)
                             }
+                        }
+                        Spacer()
+                    }
+
+                    buttonWithCircle(iconName: "ux", circleColor: Color.darkGray.opacity(0.5)) {
+                        state.showModal(for: .statisticsConfig)
                     }
                     Spacer()
-                    Button { state.showModal(for: .statisticsConfig) }
-                    label: {
-                        Image("ux")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 45, height: 45)
-                            .font(.system(size: 14))
-                            .buttonStyle(.borderless)
-                            .foregroundStyle(Color.white)
+
+                    buttonWithCircle(iconName: "settings2", circleColor: Color.darkGray.opacity(0.5)) {
+                        state.showModal(for: .settings)
                     }
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(Color.white)
-                    Spacer()
-                    Button { state.showModal(for: .settings) }
-                    label: {
-                        Image("settings2")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 45, height: 45)
-                            .font(.system(size: 14))
-                            .buttonStyle(.borderless)
-                            .foregroundStyle(Color.white)
-                    }
-                    .buttonStyle(.borderless)
-                    .foregroundStyle(Color.white)
                 }
                 .padding(.horizontal, state.allowManualTemp ? 5 : 24)
                 .padding(.bottom, geo.safeAreaInsets.bottom)
@@ -1813,7 +1747,27 @@ extension Home {
                     state.cancelTempTarget()
                 }
             }
-            .padding(.bottom, 20)
+            .padding(.bottom, 10)
+        }
+
+        @ViewBuilder private func buttonWithCircle(
+            iconName: String,
+            circleColor: Color,
+            action: @escaping () -> Void
+        ) -> some View {
+            Button(action: action) {
+                ZStack {
+                    Circle()
+                        .fill(circleColor)
+                        .frame(width: 50, height: 50)
+                    Image(iconName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 40, height: 40)
+                }
+            }
+            .buttonStyle(.borderless)
+            .foregroundStyle(Color.white)
         }
 
         var loopView: some View {
@@ -1991,12 +1945,14 @@ extension Home {
             return Chart(data) {
                 PointMark(
                     x: .value("Time", $0.dateString),
-                    y: .value("Glucose", Double($0.glucose ?? 0) * (state.units == .mmolL ? 0.0555 : 1.0))
+                    y: .value(
+                        "Glucose",
+                        Double($0.glucose ?? 0) * (state.units == .mmolL ? 0.0555 : 1.0)
+                    )
                 )
                 .foregroundStyle(
-                    (($0.glucose ?? 0) > veryHigh || Decimal($0.glucose ?? 0) < low) ? Color(.red) :
-                        Decimal($0.glucose ?? 0) >
-                        high ? Color(.yellow) : Color(.darkGreen)
+                    (($0.glucose ?? 0) > veryHigh || Decimal($0.glucose ?? 0) < low) ? Color.red :
+                        Decimal($0.glucose ?? 0) > high ? Color.yellow : Color.darkGreen
                 )
                 .symbolSize(7)
             }
@@ -2004,14 +1960,21 @@ extension Home {
                 AxisMarks(values: .stride(by: .hour, count: 2)) { _ in
                     AxisValueLabel(
                         format: .dateTime.hour(.defaultDigits(amPM: .omitted))
-                            .locale(Locale(identifier: "sv"))
+                            .locale(Locale(identifier: "sv")) // 24h-Format
                     )
+                    .foregroundStyle(Color.white)
                     AxisGridLine()
                         .foregroundStyle(Color.white)
                 }
             }
             .chartYAxis {
-                AxisMarks(values: .automatic(desiredCount: 3))
+                AxisMarks(values: .automatic(desiredCount: 3)) { _ in
+                    AxisValueLabel()
+                        .foregroundStyle(Color.white)
+
+                    AxisGridLine()
+                        .foregroundStyle(Color.white)
+                }
             }
             .chartYScale(
                 domain: minimumRange * (state.units == .mmolL ? 0.0555 : 1.0) ... maximum *
@@ -2074,7 +2037,7 @@ extension Home {
                             }
                         }
                         buttonPanel(geo)
-                            .frame(height: 50)
+                            .frame(height: 60)
                     }
                     .background(backgroundColor)
                     .ignoresSafeArea(edges: .vertical)
