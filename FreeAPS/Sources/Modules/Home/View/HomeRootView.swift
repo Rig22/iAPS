@@ -946,6 +946,20 @@ extension Home {
 
                             // Kanülenalter
                             HStack(spacing: 10) {
+                                let cannulaDisplayText: String = {
+                                    if let cannulaHours = state.cannulaHours {
+                                        let days = Int(cannulaHours) / 24
+                                        let hours = Int(cannulaHours) % 24
+                                        if days > 0 {
+                                            return "\(days)d\(hours)h"
+                                        } else {
+                                            return "\(hours)h"
+                                        }
+                                    } else {
+                                        return "--"
+                                    }
+                                }()
+
                                 let cannulaFraction: CGFloat = {
                                     if let cannulaHours = state.cannulaHours,
                                        let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
@@ -987,7 +1001,7 @@ extension Home {
                                         fillFraction: cannulaFraction,
                                         color: cannulaColor,
                                         backgroundColor: .clear,
-                                        displayText: state.cannulaHours != nil ? "\(Int(state.cannulaHours!))h" : "--",
+                                        displayText: cannulaDisplayText,
                                         symbolSize: 0,
                                         symbol: "cross.vial",
                                         animateProgress: true
@@ -1129,6 +1143,8 @@ extension Home {
             }
         }
 
+        // DanaBar 2
+
         var info3: some View {
             if state.danaBar {
                 return AnyView(
@@ -1191,6 +1207,20 @@ extension Home {
 
                             // Kanülenalter
                             HStack(spacing: 10) {
+                                let cannulaDisplayText: String = {
+                                    if let cannulaHours = state.cannulaHours {
+                                        let days = Int(cannulaHours) / 24
+                                        let hours = Int(cannulaHours) % 24
+                                        if days > 0 {
+                                            return "\(days)d\(hours)h"
+                                        } else {
+                                            return "\(hours)h"
+                                        }
+                                    } else {
+                                        return "--"
+                                    }
+                                }()
+
                                 let cannulaFraction: CGFloat = {
                                     if let cannulaHours = state.cannulaHours,
                                        let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
@@ -1232,7 +1262,7 @@ extension Home {
                                         fillFraction: cannulaFraction,
                                         color: cannulaColor,
                                         backgroundColor: .clear,
-                                        displayText: state.cannulaHours != nil ? "\(Int(state.cannulaHours!))h" : "--",
+                                        displayText: cannulaDisplayText,
                                         symbolSize: 0,
                                         symbol: "cross.vial",
                                         animateProgress: true
