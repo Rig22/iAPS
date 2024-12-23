@@ -53,6 +53,11 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var fattyMealFactor: Decimal = 0.7
     var displayPredictions: Bool = true
     var useLiveActivity: Bool = true
+    var liveActivityEventualArrow: Bool = false
+    var liveActivityChart = true
+    var liveActivityChartShowPredictions = true
+    var liveActivityChartThresholdLines = true
+    var liveActivityChartDynamicRange = true
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = true
     // Dana-Toggles
@@ -164,6 +169,12 @@ struct EncodableFreeAPSSettings: Encodable {
         case fattyMealFactor
         case displayPredictions
         case useLiveActivity
+        case liveActivityEventualArrow
+        case liveActivityChart
+        case liveActivityChartShowPredictions
+        case liveActivityChartThresholdLines
+        case liveActivityChartDynamicRange
+        case liveActivityThresholdLines
         case useTargetButton
         case alwaysUseColors
         // Dana Toggles
@@ -250,6 +261,13 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.fattyMealFactor, forKey: .fattyMealFactor)
         try container.encode(settings.displayPredictions, forKey: .displayPredictions)
         try container.encode(settings.useLiveActivity, forKey: .useLiveActivity)
+        try container.encode(settings.liveActivityEventualArrow, forKey: .liveActivityEventualArrow)
+        // --- live activity chart
+        try container.encode(settings.liveActivityChart, forKey: .liveActivityChart)
+        try container.encode(settings.liveActivityChartShowPredictions, forKey: .liveActivityChartShowPredictions)
+        try container.encode(settings.liveActivityChartThresholdLines, forKey: .liveActivityChartThresholdLines)
+        try container.encode(settings.liveActivityChartDynamicRange, forKey: .liveActivityChartDynamicRange)
+        // ----
         try container.encode(settings.useTargetButton, forKey: .useTargetButton)
         try container.encode(settings.alwaysUseColors, forKey: .alwaysUseColors)
         // Dana Toogels

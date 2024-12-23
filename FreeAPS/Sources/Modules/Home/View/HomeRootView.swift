@@ -254,6 +254,201 @@ extension Home {
             }
         }
 
+        // Pie Animation
+
+        struct PieSliceView: Shape {
+            var startAngle: Angle
+            var endAngle: Angle
+            var animatableData: AnimatablePair<Double, Double> {
+                get {
+                    AnimatablePair(startAngle.degrees, endAngle.degrees)
+                }
+                set {
+                    startAngle = Angle(degrees: newValue.first)
+                    endAngle = Angle(degrees: newValue.second)
+                }
+            }
+
+            func path(in rect: CGRect) -> Path {
+                var path = Path()
+                let center = CGPoint(x: rect.midX, y: rect.midY)
+                path.move(to: center)
+                path.addArc(
+                    center: center,
+                    radius: rect.width / 2,
+                    startAngle: startAngle,
+                    endAngle: endAngle,
+                    clockwise: false
+                )
+                path.closeSubpath()
+                return path
+            }
+        }
+
+        class PieSegmentViewModel: ObservableObject {
+            @Published var progress: Double = 0.0
+
+            func updateProgress(to newValue: CGFloat, animate: Bool) {
+                if animate {
+                    withAnimation(.easeInOut(duration: 2.5)) {
+                        self.progress = Double(newValue)
+                    }
+                } else {
+                    progress = Double(newValue)
+                }
+            }
+        }
+
+        struct FillablePieSegment: View {
+            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
+
+            var fillFraction: CGFloat
+            var color: Color
+            var backgroundColor: Color
+            var displayText: String
+            var symbolSize: CGFloat
+            var symbol: String
+            var animateProgress: Bool
+
+            var body: some View {
+                VStack {
+                    ZStack {
+                        Circle()
+                            // .fill(backgroundColor)
+                            // .opacity(0.3)
+                            .fill(Color.darkGray.opacity(0.5))
+                            .frame(width: 60, height: 60)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 0)
+                            )
+
+                        PieSliceView(
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                        )
+                        .fill(color)
+                        .frame(width: 60, height: 60)
+                        .opacity(0.6)
+
+                        /*   Image(systemName: symbol)
+                         .resizable()
+                         .scaledToFit()
+                         .frame(width: symbolSize, height: symbolSize)
+                         .foregroundColor(.white)*/
+                    }
+
+                    Text(displayText)
+                        .font(.system(size: 16))
+                        .foregroundColor(.white)
+                        .padding(.top, 0)
+                }
+                .offset(y: 10)
+                .onAppear {
+                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+                }
+                .onChange(of: fillFraction) { newValue in
+                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+                }
+            }
+        }
+
+        struct SmallFillablePieSegment: View {
+            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
+
+            var fillFraction: CGFloat
+            var color: Color
+            var backgroundColor: Color
+            var displayText: String
+            var symbolSize: CGFloat
+            var symbol: String
+            var animateProgress: Bool
+
+            var body: some View {
+                VStack {
+                    ZStack {
+                        Circle()
+                            // .fill(backgroundColor)
+                            .fill(Color.darkGray.opacity(0.5))
+                            .frame(width: 40, height: 40)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 0)
+                            )
+
+                        PieSliceView(
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                        )
+                        .fill(color)
+                        .frame(width: 40, height: 40)
+                        .opacity(0.6) // Transparenz der Pie Farb Füllung
+
+                        Image(systemName: symbol)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: symbolSize, height: symbolSize)
+                            .foregroundColor(.white)
+                    }
+
+                    Text(displayText)
+                        .font(.system(size: 14))
+                        .foregroundColor(.white)
+                        .padding(.top, 0)
+                }
+                .offset(y: 10)
+                .onAppear {
+                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+                }
+                .onChange(of: fillFraction) { newValue in
+                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+                }
+            }
+        }
+
+        struct BigFillablePieSegment: View {
+            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
+
+            var fillFraction: CGFloat
+            var color: Color
+            var displayText: String
+            var animateProgress: Bool
+
+            var body: some View {
+                VStack {
+                    ZStack {
+                        Circle()
+                            .fill(Color.black.opacity(1.0))
+                            .frame(width: 110, height: 110)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 0)
+                            )
+
+                        PieSliceView(
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                        )
+                        .fill(color)
+                        .frame(width: 110, height: 110)
+                        .opacity(1.0)
+                    }
+
+                    Text(displayText)
+                        .font(.system(size: 15))
+                        .foregroundColor(.white)
+                        .padding(.top, 5)
+                }
+                .offset(y: 14)
+                .onAppear {
+                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+                }
+                .onChange(of: fillFraction) { newValue in
+                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+                }
+            }
+        }
+
         @StateObject private var bolusPieSegmentViewModel = PieSegmentViewModel()
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
@@ -451,201 +646,6 @@ extension Home {
                 }
             }
             .clipShape(Rectangle())
-        }
-
-        // Pie Animation
-
-        struct PieSliceView: Shape {
-            var startAngle: Angle
-            var endAngle: Angle
-            var animatableData: AnimatablePair<Double, Double> {
-                get {
-                    AnimatablePair(startAngle.degrees, endAngle.degrees)
-                }
-                set {
-                    startAngle = Angle(degrees: newValue.first)
-                    endAngle = Angle(degrees: newValue.second)
-                }
-            }
-
-            func path(in rect: CGRect) -> Path {
-                var path = Path()
-                let center = CGPoint(x: rect.midX, y: rect.midY)
-                path.move(to: center)
-                path.addArc(
-                    center: center,
-                    radius: rect.width / 2,
-                    startAngle: startAngle,
-                    endAngle: endAngle,
-                    clockwise: false
-                )
-                path.closeSubpath()
-                return path
-            }
-        }
-
-        class PieSegmentViewModel: ObservableObject {
-            @Published var progress: Double = 0.0
-
-            func updateProgress(to newValue: CGFloat, animate: Bool) {
-                if animate {
-                    withAnimation(.easeInOut(duration: 2.5)) {
-                        self.progress = Double(newValue)
-                    }
-                } else {
-                    progress = Double(newValue)
-                }
-            }
-        }
-
-        struct FillablePieSegment: View {
-            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
-
-            var fillFraction: CGFloat
-            var color: Color
-            var backgroundColor: Color
-            var displayText: String
-            var symbolSize: CGFloat
-            var symbol: String
-            var animateProgress: Bool
-
-            var body: some View {
-                VStack {
-                    ZStack {
-                        Circle()
-                            // .fill(backgroundColor)
-                            // .opacity(0.3)
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: 60, height: 60)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
-
-                        PieSliceView(
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                        )
-                        .fill(color)
-                        .frame(width: 60, height: 60)
-                        .opacity(0.6)
-
-                        /*   Image(systemName: symbol)
-                         .resizable()
-                         .scaledToFit()
-                         .frame(width: symbolSize, height: symbolSize)
-                         .foregroundColor(.white)*/
-                    }
-
-                    Text(displayText)
-                        .font(.system(size: 16))
-                        .foregroundColor(.white)
-                        .padding(.top, 0)
-                }
-                .offset(y: 10)
-                .onAppear {
-                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-                }
-                .onChange(of: fillFraction) { newValue in
-                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-                }
-            }
-        }
-
-        struct SmallFillablePieSegment: View {
-            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
-
-            var fillFraction: CGFloat
-            var color: Color
-            var backgroundColor: Color
-            var displayText: String
-            var symbolSize: CGFloat
-            var symbol: String
-            var animateProgress: Bool
-
-            var body: some View {
-                VStack {
-                    ZStack {
-                        Circle()
-                            // .fill(backgroundColor)
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: 40, height: 40)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
-
-                        PieSliceView(
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                        )
-                        .fill(color)
-                        .frame(width: 40, height: 40)
-                        .opacity(0.6) // Transparenz der Pie Farb Füllung
-
-                        Image(systemName: symbol)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: symbolSize, height: symbolSize)
-                            .foregroundColor(.white)
-                    }
-
-                    Text(displayText)
-                        .font(.system(size: 14))
-                        .foregroundColor(.white)
-                        .padding(.top, 0)
-                }
-                .offset(y: 10)
-                .onAppear {
-                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-                }
-                .onChange(of: fillFraction) { newValue in
-                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-                }
-            }
-        }
-
-        struct BigFillablePieSegment: View {
-            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
-
-            var fillFraction: CGFloat
-            var color: Color
-            var displayText: String
-            var animateProgress: Bool
-
-            var body: some View {
-                VStack {
-                    ZStack {
-                        Circle()
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: 110, height: 110)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
-
-                        PieSliceView(
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                        )
-                        .fill(color)
-                        .frame(width: 110, height: 110)
-                        .opacity(1.0)
-                    }
-
-                    Text(displayText)
-                        .font(.system(size: 15))
-                        .foregroundColor(.white)
-                        .padding(.top, 5)
-                }
-                .offset(y: 14)
-                .onAppear {
-                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-                }
-                .onChange(of: fillFraction) { newValue in
-                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-                }
-            }
         }
 
         // CarbView
@@ -2016,8 +2016,8 @@ extension Home {
             .frame(maxHeight: 70)
             .padding(.leading, 30)
             .padding(.trailing, 32)
-            .padding(.top, 10)
-            .padding(.bottom, 10)
+            .padding(.top, 0)
+            .padding(.bottom, 0)
             .foregroundStyle(Color.white)
         }
 
@@ -2042,12 +2042,12 @@ extension Home {
                         ScrollView {
                             ScrollViewReader { _ in
                                 LazyVStack {
-                                    chart.padding(.top, 10)
-                                    preview.padding(.top, 15)
-                                    loopPreview
+                                    chart.padding(.top, 0)
+                                    preview.padding(.top, 0)
+                                    loopPreview.padding(.top, -10)
                                     if state.iobData.count > 5 {
-                                        activeCOBView.padding(.top, 15)
-                                        activeIOBView.padding(.top, 15)
+                                        activeCOBView.padding(.top, 0)
+                                        activeIOBView.padding(.top, 0)
                                     }
                                 }
                                 .background(GeometryReader { geo in
