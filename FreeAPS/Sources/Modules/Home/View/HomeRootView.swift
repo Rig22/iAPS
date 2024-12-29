@@ -532,7 +532,7 @@ extension Home {
                                             .frame(width: 110, height: 110)
                                             .overlay(
                                                 Circle()
-                                                    .fill(Color.red.opacity(0.8))
+                                                    .fill(Color.red)
                                                     .frame(width: 25, height: 25)
                                                     .overlay(
                                                         Image(systemName: "xmark")
@@ -712,6 +712,11 @@ extension Home {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 45, height: 45)
+                        }
+                    }
+                    .onTapGesture {
+                        if state.pumpDisplayState != nil {
+                            state.setupPump = true
                         }
                     }
                 }
@@ -1303,7 +1308,6 @@ extension Home {
                                     state.setupPump = true
                                 }
                             }
-
                             // PumpenBatterie
                             HStack(spacing: 10) {
                                 var batteryColor: Color {
@@ -1312,7 +1316,7 @@ extension Home {
                                     {
                                         switch batteryCharge {
                                         case ...25:
-                                            return .red.opacity(1.0)
+                                            return .red.opacity(0.7)
                                         case ...50:
                                             return .yellow.opacity(0.7)
                                         default:
@@ -1349,7 +1353,7 @@ extension Home {
                                             symbol: "cross.vial",
                                             animateProgress: true
                                         )
-                                        .frame(width: 40, height: 40)
+                                        .frame(width: 45, height: 45)
 
                                         Image("battery")
                                             .resizable()
@@ -1359,8 +1363,9 @@ extension Home {
                                 } else {
                                     ZStack {
                                         Circle()
-                                            .fill(Color.clear)
-                                            .opacity(0.3)
+                                            // .fill(Color.clear)
+                                            // .opacity(0.3)
+                                            .fill(Color.darkGray.opacity(0.5))
                                             .frame(width: 40, height: 40)
                                             .overlay(
                                                 Circle()
@@ -1371,11 +1376,8 @@ extension Home {
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 40, height: 40)
-                                            .overlay(
-                                                Circle()
-                                                    .stroke(Color.white, lineWidth: 1)
-                                            )
                                     }
+                                    .padding(.bottom, 1)
                                 }
                             }
 
