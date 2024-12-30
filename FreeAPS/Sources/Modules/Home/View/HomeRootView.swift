@@ -548,6 +548,7 @@ extension Home {
                                         loopView
                                             .frame(maxHeight: .infinity)
                                             .offset(y: 25)
+                                            .padding(.top, 10)
                                     }
                                 } else {
                                     // GlucoseView anzeigen
@@ -558,6 +559,7 @@ extension Home {
                                         loopView
                                             .frame(maxHeight: .infinity)
                                             .offset(y: 25)
+                                            .padding(.top, 10)
                                     }
                                 }
 
