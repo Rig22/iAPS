@@ -12,13 +12,50 @@ extension AutoISF {
         @State var descriptionHeader = Text("")
         @State var scrollView = false
         @State var graphics: (any View)?
+        @State var presentHistory = false
 
         @Environment(\.colorScheme) var colorScheme
         @Environment(\.sizeCategory) private var fontSize
 
+        @FetchRequest(
+            entity: Reasons.entity(),
+            sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)],
+            predicate: NSPredicate(format: "date > %@", DateFilter().day)
+        ) var reasons: FetchedResults<Reasons>
+
         private var formatter: NumberFormatter {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
+            formatter.decimalSeparator = "." // Homogenize as the ratios are always formatted using "."
+            return formatter
+        }
+
+        private var glucoseFormatter: NumberFormatter {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.decimalSeparator = "."
+            if state.settingsManager.settings.units == .mmolL {
+                formatter.maximumFractionDigits = 1
+                formatter.minimumFractionDigits = 1
+            } else {
+                formatter.maximumFractionDigits = 0
+            }
+            return formatter
+        }
+
+        private var reqFormatter: NumberFormatter {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.decimalSeparator = "."
+            formatter.minimumFractionDigits = 2
+            return formatter
+        }
+
+        private var dateFormatter: DateFormatter {
+            let formatter = DateFormatter()
+            formatter.locale = Locale(identifier: "sv")
+            formatter.dateStyle = .none
+            formatter.timeStyle = .short
             return formatter
         }
 
@@ -53,35 +90,37 @@ extension AutoISF {
                                     }
                             }.disabled(isPresented)
                         }
-
-                        HStack {
-                            Toggle(isOn: $state.enableautoISFwithCOB) {
-                                Text("Enable DuraISF effect even with COB")
-                                    .onTapGesture {
-                                        info(
-                                            header: "Enable DuraISF effect even with COB",
-                                            body: "Enable DuraISF even if COB is present not just for UAM.",
-                                            useGraphics: nil
-                                        )
-                                    }
-                            }.disabled(isPresented)
-                        }
-
-                        HStack {
-                            Toggle(isOn: $state.postMealISFalways) {
-                                Text("Enable postprandial ISF adaption always")
-                                    .onTapGesture {
-                                        info(
-                                            header: "Enable postprandial ISF always",
-                                            body: "Enable the postprandial ISF adaptation all the time regardless of when the last meal was taken.",
-                                            useGraphics: nil
-                                        )
-                                    }
-                            }.disabled(isPresented)
-                        }
                     } header: { Text("Toggles") }
 
                     Section {
+                        HStack {
+                            Text("Auto ISF Max")
+                                .onTapGesture {
+                                    info(
+                                        header: "Auto ISF Max",
+                                        body: "Default value: 1.2 The upper limit of ISF adjustment",
+                                        useGraphics: nil
+                                    )
+                                }
+                            Spacer()
+                            DecimalTextField("0", value: $state.autoisf_max, formatter: formatter)
+                                .disabled(isPresented)
+                        }
+
+                        HStack {
+                            Text("Auto ISF Min")
+                                .onTapGesture {
+                                    info(
+                                        header: "Auto ISF Min",
+                                        body: "Default value: 0.8 The lower limit of ISF adjustment",
+                                        useGraphics: nil
+                                    )
+                                }
+                            Spacer()
+                            DecimalTextField("0", value: $state.autoisf_min, formatter: formatter)
+                                .disabled(isPresented)
+                        }
+
                         HStack {
                             Text("SMB Delivery Ratio Minimum")
                                 .onTapGesture {
@@ -115,14 +154,17 @@ extension AutoISF {
                                 .onTapGesture {
                                     info(
                                         header: "SMB Delivery Ratio BG Range",
-                                        body: "Default value: 0, Sensible is bteween 40 and 120. The linearly increasing SMB delivery ratio is mapped to the glucose range [target_bg, target_bg+bg_range]. At target_bg the SMB ratio is smb_delivery_ratio_min, at target_bg+bg_range it is smb_delivery_ratio_max. With 0 the linearly increasing SMB ratio is disabled and the standard smb_delivery_ratio is used.",
+                                        body: "Default value: 0, Sensible is between 40 mg/dL and 120 mg/dL. The linearly increasing SMB delivery ratio is mapped to the glucose range [target_bg, target_bg+bg_range]. At target_bg the SMB ratio is smb_delivery_ratio_min, at target_bg+bg_range it is smb_delivery_ratio_max. With 0 the linearly increasing SMB ratio is disabled and the standard smb_delivery_ratio is used.",
                                         useGraphics: nil
                                     )
                                 }
                             Spacer()
-                            DecimalTextField("0", value: $state.smbDeliveryRatioBGrange, formatter: formatter)
-                                .disabled(isPresented)
-                            Text("mg/dl").foregroundStyle(.secondary)
+                            BGTextField(
+                                "0",
+                                mgdlValue: $state.smbDeliveryRatioBGrange,
+                                units: $state.units,
+                                isDisabled: isPresented
+                            )
                         }
 
                         HStack {
@@ -168,20 +210,6 @@ extension AutoISF {
                         }
 
                         HStack {
-                            Text("ISF weight for higher BG deltas")
-                                .onTapGesture {
-                                    info(
-                                        header: "ISF weight for higher BG deltas",
-                                        body: "Default value: 0.0 This is the weight applied to the polygon which adapts ISF higher deltas. With 0.0 the effect is effectively disabled.",
-                                        useGraphics: nil
-                                    )
-                                }
-                            Spacer()
-                            DecimalTextField("0", value: $state.deltaISFrangeWeight, formatter: formatter)
-                                .disabled(isPresented)
-                        }
-
-                        HStack {
                             Text("ISF weight for postprandial BG rise")
                                 .onTapGesture {
                                     info(
@@ -192,20 +220,6 @@ extension AutoISF {
                                 }
                             Spacer()
                             DecimalTextField("0", value: $state.postMealISFweight, formatter: formatter)
-                                .disabled(isPresented)
-                        }
-
-                        HStack {
-                            Text("Duration ISF postprandial adaption")
-                                .onTapGesture {
-                                    info(
-                                        header: "Duration ISF postprandial adaption",
-                                        body: "Default value: 3. This is the duration in hours how long after a meal the effect will be active. Oref will delete carb timing after 10 hours latest no matter what you enter.",
-                                        useGraphics: nil
-                                    )
-                                }
-                            Spacer()
-                            DecimalTextField("0", value: $state.postMealISFduration, formatter: formatter)
                                 .disabled(isPresented)
                         }
 
@@ -236,6 +250,20 @@ extension AutoISF {
                             DecimalTextField("0", value: $state.bgBrakeISFweight, formatter: formatter)
                                 .disabled(isPresented)
                         }
+
+                        HStack {
+                            Text("Max IOB Threshold Percent")
+                                .onTapGesture {
+                                    info(
+                                        header: "Max IOB Threshold Percent",
+                                        body: "Percent of the max IOB setting to use for SMBs while Auto ISF is enabled.\n\nWhile current IOB is below the threshold, the SMB amount can exceed the threshold by 30%, however never the max IOB setting.\n\nAt 100% this setting is disabled.",
+                                        useGraphics: nil
+                                    )
+                                }
+                            Spacer()
+                            DecimalTextField("0", value: $state.iobThresholdPercent, formatter: formatter)
+                                .disabled(isPresented)
+                        }
                     } header: { Text("Settings") }
 
                     Section {
@@ -254,91 +282,102 @@ extension AutoISF {
                             }.disabled(isPresented)
                         }
 
-                        HStack {
-                            Text("Minimum Start Bolus size")
-                                .onTapGesture {
-                                    info(
-                                        header: "Minimum Start Bolus size",
-                                        body: "Minimum manual bolus to start a B30 adaption.",
-                                        useGraphics: nil
-                                    )
-                                }
-                            Spacer()
-                            DecimalTextField("0", value: $state.iTime_Start_Bolus, formatter: formatter)
-                                .disabled(isPresented)
-                        }
+                        if state.use_B30 {
+                            HStack {
+                                Text("Minimum Start Bolus size")
+                                    .onTapGesture {
+                                        info(
+                                            header: "Minimum Start Bolus size",
+                                            body: "Minimum manual bolus to start a B30 adaption.",
+                                            useGraphics: nil
+                                        )
+                                    }
+                                Spacer()
+                                DecimalTextField("0", value: $state.iTime_Start_Bolus, formatter: formatter)
+                                    .disabled(isPresented)
+                            }
 
-                        HStack {
-                            Text("Target Level in mg/dl for B30 to be enacted")
-                                .onTapGesture {
-                                    info(
-                                        header: "Target Level in mg/dl for B30 to be enacted",
-                                        body: "An EatingSoon Override Target (or a Temporary Target) needs to be activated to start the B30 adaption. Target needs to be below or equal this  setting for B30 AIMI to start. Default is 90 mg/dl. If you cancel this EatingSoon Target, the B30 basal rate will stop.",
-                                        useGraphics: nil
-                                    )
-                                }
-                            Spacer()
-                            DecimalTextField("0", value: $state.b30targetLevel, formatter: formatter)
-                                .disabled(isPresented)
-                            Text("mg/dl").foregroundStyle(.secondary)
-                        }
+                            HStack {
+                                Text("Target Level for B30 to be enacted")
+                                    .onTapGesture {
+                                        info(
+                                            header: "Target Level for B30 to be enacted",
+                                            body: "An EatingSoon Override Target (or a Temporary Target) needs to be activated to start the B30 adaption. Target needs to be below or equal this  setting for B30 AIMI to start. Default is 90 mg/dl. If you cancel this EatingSoon Target, the B30 basal rate will stop.",
+                                            useGraphics: nil
+                                        )
+                                    }
+                                Spacer()
+                                BGTextField(
+                                    "0",
+                                    mgdlValue: $state.b30targetLevel,
+                                    units: $state.units,
+                                    isDisabled: isPresented
+                                )
+                            }
 
-                        HStack {
-                            Text("Upper BG limit in mg/dl for B30")
-                                .onTapGesture {
-                                    info(
-                                        header: "Upper BG limit in mg/dl for B30",
-                                        body: "B30 will only run as long as BG stays underneath that level, if above regular autoISF takes over. Default is 130 mg/dl.",
-                                        useGraphics: nil
-                                    )
-                                }
-                            Spacer()
-                            DecimalTextField("0", value: $state.b30upperLimit, formatter: formatter)
-                                .disabled(isPresented)
-                            Text("mg/dl").foregroundStyle(.secondary)
-                        }
+                            HStack {
+                                Text("Upper BG limit")
+                                    .onTapGesture {
+                                        info(
+                                            header: "Upper BG limit",
+                                            body: "SMBs will be diabled when under this limit, while a B30 Basal rate is running. Default is 130 mg/dl (7.2 mmol/l).",
+                                            useGraphics: nil
+                                        )
+                                    }
+                                Spacer()
+                                BGTextField(
+                                    "0",
+                                    mgdlValue: $state.b30upperLimit,
+                                    units: $state.units,
+                                    isDisabled: isPresented
+                                )
+                            }
 
-                        HStack {
-                            Text("Upper Delta limit in mg/dl for B30")
-                                .onTapGesture {
-                                    info(
-                                        header: "Upper Delta limit in mg/dl for B30",
-                                        body: "B30 will only run as long as BG delta stays below that level, if above regular autoISF takes over. Default is 8 mg/dl.",
-                                        useGraphics: nil
-                                    )
-                                }
-                            Spacer()
-                            DecimalTextField("0", value: $state.b30upperdelta, formatter: formatter)
-                                .disabled(isPresented)
-                            Text("mg/dl").foregroundStyle(.secondary)
-                        }
+                            HStack {
+                                Text("Upper Delta limit")
+                                    .onTapGesture {
+                                        info(
+                                            header: "Upper Delta limit",
+                                            body: "SMBs will be diabled when under this limit, while a B30 Basal rate is running. Default is 8 mg/dl (0.5 mmol/l).",
+                                            useGraphics: nil
+                                        )
+                                    }
+                                Spacer()
+                                BGTextField(
+                                    "0",
+                                    mgdlValue: $state.b30upperdelta,
+                                    units: $state.units,
+                                    isDisabled: isPresented
+                                )
+                            }
 
-                        HStack {
-                            Text("B30 Basal rate increase factor")
-                                .onTapGesture {
-                                    info(
-                                        header: "B30 Basal rate increase factor",
-                                        body: "Factor that multiplies your normal regular basal rate for B30. Max Basal rate enacted is the max of your pump max Basal setting. Default is 5.",
-                                        useGraphics: nil
-                                    )
-                                }
-                            Spacer()
-                            DecimalTextField("0", value: $state.b30factor, formatter: formatter)
-                                .disabled(isPresented)
-                        }
+                            HStack {
+                                Text("B30 Basal rate increase factor")
+                                    .onTapGesture {
+                                        info(
+                                            header: "B30 Basal rate increase factor",
+                                            body: "Factor that multiplies your normal regular basal rate for B30. Max Basal rate enacted is the max of your pump max Basal setting. Default is 5.",
+                                            useGraphics: nil
+                                        )
+                                    }
+                                Spacer()
+                                DecimalTextField("0", value: $state.b30factor, formatter: formatter)
+                                    .disabled(isPresented)
+                            }
 
-                        HStack {
-                            Text("Duration of increased B30 basal rate")
-                                .onTapGesture {
-                                    info(
-                                        header: "Duration of increased B30 basal rate",
-                                        body: "Duration of increased basal rate that saturates the infusion site with insulin. Default 30 minutes, as in B30. The EatingSoon TT needs to be running at least for this duration, otherthise B30 will stopp after the TT runs out.",
-                                        useGraphics: nil
-                                    )
-                                }
-                            Spacer()
-                            DecimalTextField("0", value: $state.b30_duration, formatter: formatter)
-                                .disabled(isPresented)
+                            HStack {
+                                Text("Duration of increased B30 basal rate")
+                                    .onTapGesture {
+                                        info(
+                                            header: "Duration of increased B30 basal rate",
+                                            body: "Duration of increased basal rate that saturates the infusion site with insulin. Default 30 minutes, as in B30. The EatingSoon TT needs to be running at least for this duration, otherthise B30 will stopp after the TT runs out.",
+                                            useGraphics: nil
+                                        )
+                                    }
+                                Spacer()
+                                DecimalTextField("0", value: $state.b30_duration, formatter: formatter)
+                                    .disabled(isPresented)
+                            }
                         }
                     } header: { Text("AIMI B30 Settings") }
 
@@ -415,6 +454,14 @@ extension AutoISF {
                             }
                         }
                     } header: { Text("Keto Protection") }
+
+                    Section {
+                        HStack {
+                            Text("History")
+                            Spacer()
+                            Text(">").foregroundStyle(.secondary)
+                        }.onTapGesture { presentHistory.toggle() }
+                    } header: { Text("History") }
                 }
             }
             .blur(radius: isPresented ? 5 : 0)
@@ -425,23 +472,27 @@ extension AutoISF {
             .onAppear(perform: configureView)
             .navigationBarTitle("Auto ISF")
             .navigationBarTitleDisplayMode(.automatic)
+
+            .sheet(isPresented: $presentHistory) {
+                history
+            }
         }
 
-        func info(header: String, body: String, useGraphics: (any View)?) {
+        private func info(header: String, body: String, useGraphics: (any View)?) {
             isPresented.toggle()
-            description = Text(NSLocalizedString(body, comment: "Auto ISF Setting"))
+            description = Text(LocalizedStringKey(body))
             descriptionHeader = Text(NSLocalizedString(header, comment: "Auto ISF Setting Title"))
             graphics = useGraphics
         }
 
-        var info: some View {
+        private var info: some View {
             VStack(spacing: 20) {
                 descriptionHeader.font(.title2).bold()
                 description.font(.body)
             }
         }
 
-        func infoView() -> some View {
+        private func infoView() -> some View {
             info
                 .formatDescription()
                 .onTapGesture {
@@ -449,7 +500,7 @@ extension AutoISF {
                 }
         }
 
-        func infoScrollView() -> some View {
+        private func infoScrollView() -> some View {
             ScrollView {
                 VStack(spacing: 20) {
                     info
@@ -466,22 +517,18 @@ extension AutoISF {
             }
         }
 
-        var list: some View {
+        private var list: some View {
             let entries = [
                 Table(
-                    point: "•",
                     localizedString: "Needs an EatingSoon specific Glucose Target set by a profile override or a temp target"
                 ),
                 Table(
-                    point: "•",
                     localizedString: "Once this Target is cancelled, the B30 high TBR will be cancelled"
                 ),
                 Table(
-                    point: "•",
                     localizedString: "In order to activate B30 a minimum manual Bolus needs to be given"
                 ),
                 Table(
-                    point: "•",
                     localizedString: "You can specify how long B30 run and how high it is"
                 )
             ]
@@ -501,6 +548,138 @@ extension AutoISF {
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill(colorScheme == .dark ? Color(.black).opacity(0.3) : Color(.white))
             )
+        }
+
+        private var history: some View {
+            VStack(spacing: 0) {
+                Button { presentHistory.toggle() }
+                label: { Image(systemName: "chevron.backward") }.tint(.blue).opacity(0.8).buttonStyle(.borderless)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .font(.system(size: 22))
+                    .padding(10)
+                // Title
+                Text("Auto ISF History")
+                    .padding(.bottom, 20)
+                    .font(.system(size: 26))
+
+                // SubTitle
+                HStack {
+                    Text("Final Ratio").foregroundStyle(.red)
+                    Spacer()
+                    Text("Adjustments").foregroundStyle(.orange).offset(x: -20)
+                    Spacer()
+                    Text("Insulin").foregroundStyle(Color(.insulin))
+                }
+                .font(.system(size: 18))
+                .padding(.bottom, 5)
+                .padding(.horizontal, 20)
+
+                Divider()
+
+                // SubTitle
+                // Non-localized variable acronyms
+                HStack(spacing: 10) {
+                    Text("Time").foregroundStyle(.primary)
+                    Text("BG  ").foregroundStyle(Color(.loopGreen))
+                    Text("Final").foregroundStyle(.red)
+                    Spacer(minLength: 3)
+                    Text("acce").foregroundStyle(.orange).offset(x: -3)
+                    Text("bg  ").foregroundStyle(.orange)
+                    Text("dura  ").foregroundStyle(.orange)
+                    Text("pp  ").foregroundStyle(.orange)
+                    Spacer(minLength: 3)
+                    Text("Req. ").foregroundColor(.secondary)
+                    Text("TBR ").foregroundColor(.blue)
+                    Text("SMB ").foregroundColor(.blue)
+                }
+                .padding(.horizontal, 5)
+                .font(.system(size: 12))
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 4)
+
+                Divider()
+
+                List {
+                    // Non-localized data table
+                    ForEach(reasons) { item in
+                        if let glucose = item.glucose, glucose != 0, let aisf_reaons = item.reasons {
+                            // Prepare an array of Strings
+                            let reasonParsed = aisf_reaons.string.components(separatedBy: ",")
+                                .filter({ $0 != "AIMI B30 active" }).map(
+                                    { item in
+                                        let check = item.components(separatedBy: ":").last ?? ""
+                                        return check == " 1" ? " -- " : check
+                                    }
+                                )
+                            let converted = state.units == .mmolL ? (glucose as Decimal)
+                                .asMmolL : (glucose as Decimal)
+                            Grid(horizontalSpacing: 0) {
+                                GridRow {
+                                    // Time
+                                    Text(dateFormatter.string(from: item.date ?? Date()))
+                                        .foregroundStyle(.primary)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .offset(x: 7)
+                                    Spacer(minLength: 5)
+                                    // Glucose
+                                    Text(glucoseFormatter.string(from: converted as NSNumber) ?? "")
+                                        .foregroundStyle(Color(.loopGreen))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .offset(x: 4)
+                                    // Ratio
+                                    Text((formatter.string(from: item.ratio ?? 1) ?? "") + "  ").foregroundStyle(.red)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                                    if reasonParsed.count >= 4 {
+                                        // acce.
+                                        Text((reasonParsed.first ?? "") + "  ")
+                                            .foregroundStyle(.orange)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .offset(x: 5)
+                                        // bg
+                                        Text(reasonParsed[1] + "  ")
+                                            .foregroundStyle(.orange)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .offset(x: 8)
+                                        // dura
+                                        Text(reasonParsed[2] + "  ")
+                                            .foregroundStyle(.orange)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .offset(x: 5)
+                                        // pp
+                                        Text(reasonParsed[3] + "  ")
+                                            .foregroundStyle(.orange)
+                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .offset(x: 3)
+                                    }
+                                    Spacer(minLength: 13)
+                                    // Insunlin Required
+                                    let insReqString = reqFormatter.string(from: (item.insulinReq ?? 0) as NSNumber) ?? ""
+                                    Text(insReqString != "0.00" ? insReqString + " " : "0  ")
+                                        .foregroundColor(.secondary)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    Spacer(minLength: 2)
+                                    // Basal Rate
+                                    Text((formatter.string(from: (item.rate ?? 0) as NSNumber) ?? "") + " ")
+                                        .foregroundColor(Color(.insulin))
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    // SMBs
+                                    Text(
+                                        (item.smb ?? 0) != 0 ?
+                                            "\(formatter.string(from: (item.smb ?? 0) as NSNumber) ?? "")  "
+                                            : "   "
+                                    )
+                                    .foregroundColor(Color(.insulin))
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                }
+                            }
+                        }
+                    }
+                    .listRowBackground(colorScheme == .dark ? Color(.black) : Color(.white))
+                }
+                .font(.system(size: 12))
+                .listStyle(.plain)
+            }
         }
     }
 }

@@ -2,7 +2,7 @@
 
 function generate(iob, currenttemp, glucose, profile, autosens = null, meal = null, microbolusAllowed = true, reservoir = null, clock, dynamicVariables, pumpHistory) {
     // Needs to be updated here due to time format).
-    clock = new Date()
+    clock = new Date();
     
     var autosens_data = null;
     if (autosens) {
@@ -102,6 +102,10 @@ function generate(iob, currenttemp, glucose, profile, autosens = null, meal = nu
     if (profile.iaps.autoisf) {
         autosens_data.ratio = profile.aisf;
         console.log("Auto ISF ratio: " + autosens_data.ratio);
+        if (microbolusAllowed && !profile.microbolusAllowed) {
+            microbolusAllowed = false;
+            console.log("SMBs disabled by Auto ISF layer");
+        }
     }
 
     // In case Basal Rate been set in midleware or AIMI

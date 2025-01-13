@@ -6,25 +6,21 @@ extension AutoISF {
         @Injected() var storage: FileStorage!
 
         @Published var autoisf: Bool = false
-        @Published var enableautoISFwithCOB: Bool = true
-        @Published var postMealISFalways: Bool = false
         @Published var enableBGacceleration: Bool = true
         @Published var use_B30 = false
 
+        @Published var autoisf_min: Decimal = 0.8
+        @Published var autoisf_max: Decimal = 1.2
         @Published var smbDeliveryRatioBGrange: Decimal = 0
-
-        @Published var smbDeliveryRatioBGrangeMmol: Decimal = 0
-
         @Published var smbDeliveryRatioMin: Decimal = 0.5
         @Published var smbDeliveryRatioMax: Decimal = 0.5
         @Published var autoISFhourlyChange: Decimal = 1
         @Published var higherISFrangeWeight: Decimal = 0
         @Published var lowerISFrangeWeight: Decimal = 0
-        @Published var deltaISFrangeWeight: Decimal = 0
         @Published var postMealISFweight: Decimal = 0.01
-        @Published var postMealISFduration: Decimal = 3
         @Published var bgAccelISFweight: Decimal = 0
         @Published var bgBrakeISFweight: Decimal = 0.10
+        @Published var iobThresholdPercent: Decimal = 100
 
         // AIMI
         @Published var iTime_Start_Bolus: Decimal = 1.5
@@ -41,27 +37,27 @@ extension AutoISF {
         @Published var ketoProtectBasalPercent: Decimal = 20
         @Published var ketoProtectBasalAbsolut: Decimal = 0
 
+        // General settings
+        @Published var units: GlucoseUnits = .mgdL
+
         override func subscribe() {
             subscribeSetting(\.autoisf, on: $autoisf) { autoisf = $0 }
-            subscribeSetting(\.enableautoISFwithCOB, on: $enableautoISFwithCOB) { enableautoISFwithCOB = $0 }
-            subscribeSetting(\.postMealISFalways, on: $postMealISFalways) { postMealISFalways = $0 }
             subscribeSetting(\.enableBGacceleration, on: $enableBGacceleration) { enableBGacceleration = $0 }
             subscribeSetting(\.smbDeliveryRatioBGrange, on: $smbDeliveryRatioBGrange) { smbDeliveryRatioBGrange = $0 }
 
-            subscribeSetting(\.smbDeliveryRatioBGrange, on: $smbDeliveryRatioBGrange) { smbDeliveryRatioBGrangeMmol = $0.asMmolL }
-
+            subscribeSetting(\.autoisf_min, on: $autoisf_min) { autoisf_min = $0 }
+            subscribeSetting(\.autoisf_max, on: $autoisf_max) { autoisf_max = $0 }
             subscribeSetting(\.smbDeliveryRatioMin, on: $smbDeliveryRatioMin) { smbDeliveryRatioMin = $0 }
             subscribeSetting(\.smbDeliveryRatioMax, on: $smbDeliveryRatioMax) { smbDeliveryRatioMax = $0 }
             subscribeSetting(\.autoISFhourlyChange, on: $autoISFhourlyChange) { autoISFhourlyChange = $0 }
             subscribeSetting(\.higherISFrangeWeight, on: $higherISFrangeWeight) { higherISFrangeWeight = $0 }
             subscribeSetting(\.lowerISFrangeWeight, on: $lowerISFrangeWeight) { lowerISFrangeWeight = $0 }
-            subscribeSetting(\.deltaISFrangeWeight, on: $deltaISFrangeWeight) { deltaISFrangeWeight = $0 }
             subscribeSetting(\.postMealISFweight, on: $postMealISFweight) { postMealISFweight = $0 }
-            subscribeSetting(\.postMealISFduration, on: $postMealISFduration) { postMealISFduration = $0 }
             subscribeSetting(\.bgAccelISFweight, on: $bgAccelISFweight) { bgAccelISFweight = $0 }
             subscribeSetting(\.bgBrakeISFweight, on: $bgBrakeISFweight) { bgBrakeISFweight = $0 }
-            subscribeSetting(\.use_B30, on: $use_B30) { use_B30 = $0 }
+            subscribeSetting(\.iobThresholdPercent, on: $iobThresholdPercent) { iobThresholdPercent = $0 }
 
+            subscribeSetting(\.use_B30, on: $use_B30) { use_B30 = $0 }
             subscribeSetting(\.iTime_Start_Bolus, on: $iTime_Start_Bolus) { iTime_Start_Bolus = $0 }
             subscribeSetting(\.b30targetLevel, on: $b30targetLevel) { b30targetLevel = $0 }
             subscribeSetting(\.b30upperLimit, on: $b30upperLimit) { b30upperLimit = $0 }
@@ -74,6 +70,8 @@ extension AutoISF {
             subscribeSetting(\.ketoProtectAbsolut, on: $ketoProtectAbsolut) { ketoProtectAbsolut = $0 }
             subscribeSetting(\.ketoProtectBasalPercent, on: $ketoProtectBasalPercent) { ketoProtectBasalPercent = $0 }
             subscribeSetting(\.ketoProtectBasalAbsolut, on: $ketoProtectBasalAbsolut) { ketoProtectBasalAbsolut = $0 }
+
+            subscribeSetting(\.units, on: $units) { units = $0 }
         }
     }
 }
