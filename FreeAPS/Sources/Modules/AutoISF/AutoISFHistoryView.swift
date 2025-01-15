@@ -15,7 +15,7 @@ struct AutoISFHistoryView: View {
     private var formatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
-        formatter.decimalSeparator = "." // Homogenize as the ratios are always formatted using "."
+        formatter.decimalSeparator = "."
         return formatter
     }
 
@@ -36,7 +36,7 @@ struct AutoISFHistoryView: View {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.decimalSeparator = "."
-        formatter.minimumFractionDigits = 2
+        formatter.maximumFractionDigits = 2
         return formatter
     }
 
@@ -79,19 +79,25 @@ struct AutoISFHistoryView: View {
 
             // SubTitle
             // Non-localized variable acronyms
+            let device = UIDevice.current.getDeviceId
+            let proMaxOffset_1: CGFloat = (device == "iPhone17,2" || device == "iPhone 15 Pro Max") ? -20 :
+                -7
+            let proMaxOffset_2: CGFloat = (device == "iPhone17,2" || device == "iPhone 15 Pro Max") ? -10 :
+                0
+
             HStack(spacing: 10) {
                 Text("Time").foregroundStyle(.primary)
                 Spacer(minLength: 1)
-                Text("BG  ").foregroundStyle(Color(.loopGreen)).offset(x: -7)
-                Text("Final").foregroundStyle(.red).offset(x: -7)
-                Text("acce").foregroundStyle(.orange).offset(x: 2)
-                Text("bg  ").foregroundStyle(.orange).offset(x: 6)
+                Text("BG  ").foregroundStyle(Color(.loopGreen)).offset(x: proMaxOffset_1)
+                Text("Final").foregroundStyle(.red).offset(x: proMaxOffset_1)
+                Text("acce").foregroundStyle(.orange).offset(x: 2 + proMaxOffset_2)
+                Text("bg  ").foregroundStyle(.orange).offset(x: 6 + proMaxOffset_2)
                 Text("dura  ").foregroundStyle(.orange).offset(x: 6)
                 Text("pp  ").foregroundStyle(.orange).offset(x: 4)
                 Spacer(minLength: 3)
-                Text("Req. ").foregroundColor(.secondary)
-                Text("TBR ").foregroundColor(.blue)
-                Text("SMB ").foregroundColor(.blue)
+                Text("Req. ").foregroundColor(.secondary).offset(x: proMaxOffset_2 / 2)
+                Text("TBR ").foregroundColor(.blue).offset(x: proMaxOffset_2 / 2)
+                Text("SMB ").foregroundColor(.blue).offset(x: proMaxOffset_2 / 2)
             }
             .padding(.horizontal, 5)
             .font(.system(size: 12))
@@ -155,11 +161,13 @@ struct AutoISFHistoryView: View {
                                     // Insunlin Required
                                     let insReqString = reqFormatter.string(from: (item.insulinReq ?? 0) as NSNumber) ?? ""
                                     Text(insReqString != "0.00" ? insReqString + " " : "0  ")
+                                        .offset(x: -1 * proMaxOffset_2)
                                         .foregroundColor(.secondary)
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                     Spacer(minLength: 2)
                                     // Basal Rate
                                     Text((formatter.string(from: (item.rate ?? 0) as NSNumber) ?? "") + " ")
+                                        .offset(x: -1 * proMaxOffset_2)
                                         .foregroundColor(Color(.insulin))
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                     // SMBs
@@ -168,6 +176,7 @@ struct AutoISFHistoryView: View {
                                             "\(formatter.string(from: (item.smb ?? 0) as NSNumber) ?? "")  "
                                             : "   "
                                     )
+                                    .offset(x: -1 * proMaxOffset_2)
                                     .foregroundColor(Color(.insulin))
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 }

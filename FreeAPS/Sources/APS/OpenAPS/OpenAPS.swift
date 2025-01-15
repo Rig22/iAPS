@@ -398,11 +398,13 @@ final class OpenAPS {
             }
             orString += " Target \(targetGlucose ?? 0)"
 
-            let index = reasonString.firstIndex(of: ";") ?? reasonString.index(reasonString.startIndex, offsetBy: -1)
-            reasonString.insert(contentsOf: orString, at: index)
+            if let index = reasonString.firstIndex(of: ";") {
+                reasonString.insert(contentsOf: orString, at: index)
+            }
         } else if let target = targetGlucose {
-            let index = reasonString.firstIndex(of: ";") ?? reasonString.index(reasonString.startIndex, offsetBy: -1)
-            reasonString.insert(contentsOf: ", Target: \(target)", at: index)
+            if let index = reasonString.firstIndex(of: ";") {
+                reasonString.insert(contentsOf: ", Target: \(target)", at: index)
+            }
         }
 
         // SMB Delivery ratio
@@ -446,17 +448,23 @@ final class OpenAPS {
                 saveSuggestion.isf = isf as NSDecimalNumber
                 saveSuggestion.cr = cr as NSDecimalNumber
                 saveSuggestion.iob = iob as NSDecimalNumber
+                saveSuggestion.iob = iob as NSDecimalNumber
                 saveSuggestion.cob = cob as NSDecimalNumber
                 saveSuggestion.target = target as NSDecimalNumber
                 saveSuggestion.minPredBG = minPredBG as NSDecimalNumber
                 saveSuggestion.eventualBG = Decimal(suggestion.eventualBG ?? 100) as NSDecimalNumber
                 saveSuggestion.insulinReq = (suggestion.insulinReq ?? 0) as NSDecimalNumber
                 saveSuggestion.smb = (suggestion.units ?? 0) as NSDecimalNumber
-                saveSuggestion.rate = (suggestion.rate ?? 0) as NSDecimalNumber
                 saveSuggestion.reasons = aisfReasons
                 saveSuggestion.glucose = (suggestion.bg ?? 0) as NSDecimalNumber
                 saveSuggestion.ratio = (suggestion.sensitivityRatio ?? 1) as NSDecimalNumber
                 saveSuggestion.date = Date.now
+
+                if let rate = suggestion.rate {
+                    saveSuggestion.rate = rate as NSDecimalNumber
+                } else if let rate = readRate(comment: suggestion.reason) {
+                    saveSuggestion.rate = rate as NSDecimalNumber
+                }
 
                 if let units = readJSON(json: profile, variable: "out_units"), units.contains("mmol/L") {
                     saveSuggestion.mmol = true
@@ -486,12 +494,12 @@ final class OpenAPS {
         guard let maxIOB = readReason(reason: profile, variable: "max_iob"),
               let deliveryRatio = readReason(reason: profile, variable: "smb_delivery_ratio")
         else { return nil }
-        guard iob < maxIOB, iob + insReq > maxIOB, iob + insReq * deliveryRatio < maxIOB * 1.3 else { return nil }
+        guard iob < maxIOB, iob + insReq * deliveryRatio > maxIOB, iob + insReq * deliveryRatio < maxIOB * 1.3 else { return nil }
         guard let openAPSsettings = preferences,
               let basal = readReason(reason: profile, variable: "current_basal") else { return nil }
         guard basal <= 0, bolus * 1.3 <= basal * openAPSsettings.maxSMBBasalMinutes * deliveryRatio else { return nil }
 
-        // Adjust SMB and the ventual basal rate
+        // Adjust SMB and the eventual basal rate
         var output = suggestion
         output.units = Swift.max(bolus, 1.3 * settings.iobThresholdPercent * maxIOB / 100)
         output.reason += " 130% of microbolus: \((bolus * 1.3).roundBolus(increment: 0.10)). "
@@ -517,7 +525,7 @@ final class OpenAPS {
               let basal_rate_is = readJSON(json: alteredProfile, variable: "basal_rate") else { return nil }
 
         var returnSuggestion = oref0Suggestion
-        var basal_rate = Decimal(string: basal_rate_is) ?? 0
+        let basal_rate = Decimal(string: basal_rate_is) ?? 0
 
         returnSuggestion.rate = basal_rate
         returnSuggestion.duration = 30
@@ -603,6 +611,17 @@ final class OpenAPS {
             let targetComponents = string.components(separatedBy: ":")
             if targetComponents.count == 2 {
                 let trimmedString = targetComponents[1].trimmingCharacters(in: .whitespaces)
+                let decimal = Decimal(string: trimmedString) ?? 0
+                return decimal
+            }
+        }
+        return nil
+    }
+
+    private func readRate(comment: String) -> Decimal? {
+        if let string = comment.components(separatedBy: ", ").filter({ $0.contains("maxSafeBasal:") }).last {
+            if let targetComponents = string.components(separatedBy: ":").last {
+                let trimmedString = targetComponents.trimmingCharacters(in: .whitespaces)
                 let decimal = Decimal(string: trimmedString) ?? 0
                 return decimal
             }
@@ -928,6 +947,8 @@ final class OpenAPS {
             worker.evaluate(script: Script(name: Prepare.determineBasal))
             worker.evaluate(script: Script(name: Bundle.basalSetTemp))
             worker.evaluate(script: Script(name: Bundle.getLastGlucose))
+
+            // For testing replace with: worker.evaluate(script: Script(name: Test.test))
             worker.evaluate(script: Script(name: Bundle.determineBasal))
 
             if let middleware = self.middlewareScript(name: OpenAPS.Middleware.determineBasal) {
