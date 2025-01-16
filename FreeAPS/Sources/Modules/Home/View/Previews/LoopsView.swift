@@ -12,30 +12,30 @@ struct LoopsView: View {
             let readings = loopStatistics.1
             let percentage = loopStatistics.2
 
-            Text(NSLocalizedString("Loops", comment: "") + " / " + NSLocalizedString("Readings", comment: ""))
-                .padding(.bottom, 10).font(.previewHeadline)
-                .foregroundStyle(Color.white)
+            /* Text(NSLocalizedString("Loops", comment: "") + " / " + NSLocalizedString("Readings", comment: ""))
+             .padding(.bottom, 10).font(.previewHeadline)
+             .foregroundStyle(Color.white)*/
             loopChart(percentage: percentage)
 
             HStack {
                 Text("Average Interval")
                 Text(loopStatistics.3)
             }
-            .font(.system(size: 13))
+            .font(.system(size: 15))
             .foregroundStyle(Color.white)
 
             HStack {
                 Text("Readings")
                 Text("\(readings)")
             }
-            .font(.system(size: 13))
+            .font(.system(size: 15))
             .foregroundStyle(Color.white)
 
             HStack {
                 Text("Loops")
                 Text("\(loops)")
             }
-            .font(.system(size: 13))
+            .font(.system(size: 15))
             .foregroundStyle(Color.white)
         }
         .padding(.top, 20)
@@ -62,13 +62,13 @@ struct LoopsView: View {
                 )
                 .annotation(position: .overlay) {
                     Text(percentage.formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) + " %")
-                        .font(.system(size: 15))
+                        .font(.system(size: 16))
                         .foregroundStyle(Color.white)
                         .dynamicTypeSize(...DynamicTypeSize.accessibility1)
                 }
             }
             .chartXAxis(.hidden)
-            .frame(maxWidth: 200, maxHeight: 25)
+            .frame(maxWidth: 200, maxHeight: 30)
         }
     }
 }

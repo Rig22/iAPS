@@ -14,15 +14,16 @@ struct ActiveCOBView: View {
 
     var body: some View {
         VStack {
-            Text("Active Carbohydrates")
-                .font(.previewHeadline)
-                .foregroundColor(.white) // Textfarbe auf Weiß setzen
-                .padding(.top, 20)
-                .padding(.bottom, 15)
+            /* Text("Active Carbohydrates")
+             .font(.previewHeadline)
+             .foregroundColor(.white) // Textfarbe auf Weiß setzen
+             .padding(.top, 20)
+             .padding(.bottom, 15)*/
 
             cobView()
-                .frame(maxHeight: 130)
+                .frame(maxHeight: 200)
                 .padding(.bottom, 10)
+                .padding(.top, 10)
                 .padding(.horizontal, 20)
         }
         .dynamicTypeSize(...DynamicTypeSize.xLarge)

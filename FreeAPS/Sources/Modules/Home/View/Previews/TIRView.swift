@@ -121,7 +121,7 @@ struct PreviewChart: View {
         data = prepareData(data_: data)
 
         return VStack {
-            Text("Time In Range").padding(.bottom, 10).font(.previewHeadline).foregroundColor(.white) // Textfarbe auf weiß setzen
+            // Text("Time In Range").padding(.bottom, 10).font(.previewHeadline).foregroundColor(.white) // Textfarbe auf weiß setzen
 
             Chart(data) { item in
                 BarMark(
@@ -166,7 +166,7 @@ struct PreviewChart: View {
                             Text(item.group)
                                 .foregroundStyle(Color.white) }
                             .offset(x: 0, y: item.offset)
-                            .font(.loopFont)
+                            .font(.system(size: 15))
                             .padding(.leading, 10)
                     } else if item.group == NSLocalizedString(
                         "High",
@@ -183,7 +183,7 @@ struct PreviewChart: View {
                             Text(item.group)
                                 .foregroundStyle(Color.white) }
                             .offset(x: 0, y: item.offset)
-                            .font(.loopFont)
+                            .font(.system(size: 15))
                             .padding(.leading, 10)
                     } else if item.group == NSLocalizedString(
                         "Very High",
@@ -200,7 +200,7 @@ struct PreviewChart: View {
                                 .foregroundStyle(Color.white)
                         }
                         .offset(x: 0, y: item.offset)
-                        .font(.loopFont)
+                        .font(.system(size: 15))
                         .padding(.leading, 10)
                     } else if item.group == NSLocalizedString(
                         "Very Low",
@@ -218,7 +218,7 @@ struct PreviewChart: View {
                                 .foregroundStyle(Color.white)
                         }
                         .offset(x: 0, y: item.offset)
-                        .font(.loopFont)
+                        .font(.system(size: 15))
                         .padding(.leading, 10)
                         .foregroundStyle(Color.white)
                     }
@@ -242,17 +242,18 @@ struct PreviewChart: View {
                     "Very Low",
                     comment: ""
                 ): .darkRed,
-                "Separator": colorScheme == .dark ? .black : .white
+                "Separator": colorScheme == .dark ? .clear : .clear
             ])
             .chartXAxis(.hidden)
             .chartYAxis(.hidden)
             .chartLegend(.hidden)
-            .padding(.bottom, 15)
+            .padding(.bottom, 0)
             .foregroundStyle(Color.white)
+            .chartYScale(domain: 0 ... 80) // Skala angepasst
             .frame(maxWidth: UIScreen.main.bounds.width / 5)
             .offset(x: -UIScreen.main.bounds.width / 5, y: 0)
         }.frame(maxHeight: 200)
-            .padding(.top, 20)
+            .padding(.top, 40)
             .dynamicTypeSize(...DynamicTypeSize.xLarge)
             .foregroundStyle(Color.white)
     }

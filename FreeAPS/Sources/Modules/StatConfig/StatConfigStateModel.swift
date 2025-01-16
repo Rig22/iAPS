@@ -27,6 +27,7 @@ extension StatConfig {
         @Published var danaBarViewOption: String = "view1"
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
+        @Published var loopViewOption: String = LoopViewOption.view1.rawValue
 
         // Dana UI Toggels
         @Published var minimumSMB: Decimal = 0.3
@@ -55,6 +56,7 @@ extension StatConfig {
             subscribeSetting(\.danaBarViewOption, on: $danaBarViewOption) { danaBarViewOption = $0 }
             subscribeSetting(\.insulinAgeOption, on: $insulinAgeOption) { insulinAgeOption = $0 }
             subscribeSetting(\.cannulaAgeOption, on: $cannulaAgeOption) { cannulaAgeOption = $0 }
+            subscribeSetting(\.loopViewOption, on: $loopViewOption) { loopViewOption = $0 }
             subscribeSetting(\.insulinBadge, on: $insulinBadge) { insulinBadge = $0 }
             subscribeSetting(\.hideInsulinBadge, on: $hideInsulinBadge) { hideInsulinBadge = $0 }
             subscribeSetting(\.legendsSwitch, on: $legendsSwitch) { legendsSwitch = $0 }

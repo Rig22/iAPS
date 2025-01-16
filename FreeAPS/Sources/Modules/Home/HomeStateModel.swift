@@ -89,6 +89,7 @@ extension Home {
         @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
         @Published var danaBarViewOption: String = "view1"
+        @Published var loopViewOption: String = LoopViewOption.view1.rawValue
         // Dana UI Toggels
         @Published var useCalc: Bool = true
         @Published var minimumSMB: Decimal = 0.3
@@ -193,6 +194,7 @@ extension Home {
             danaBarViewOption = settingsManager.settings.danaBarViewOption
             insulinAgeOption = settingsManager.settings.insulinAgeOption
             cannulaAgeOption = settingsManager.settings.cannulaAgeOption
+            loopViewOption = settingsManager.settings.loopViewOption
             // Dana UI Toggels
             useCalc = settingsManager.settings.useCalc
             minimumSMB = settingsManager.settings.minimumSMB
@@ -724,6 +726,7 @@ extension Home.StateModel:
         timeSettings = settingsManager.settings.timeSettings
         backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
         danaBarViewOption = settingsManager.settings.danaBarViewOption
+        loopViewOption = settingsManager.settings.loopViewOption
         // Dana UI Toggels
         useCalc = settingsManager.settings.useCalc
         minimumSMB = settingsManager.settings.minimumSMB

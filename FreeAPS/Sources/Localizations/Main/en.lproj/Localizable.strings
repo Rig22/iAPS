@@ -1465,6 +1465,9 @@ Enact a temp Basal or a temp target */
 /* */
 "Override Profiles" = "Override Profiles";
 
+/* Extend max override percentage */
+"Max Override 400%" = "Max Override 400%";
+
 /* */
 "Normal " = "Normal ";
 

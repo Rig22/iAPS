@@ -70,6 +70,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var danaBarViewOption: String = "view1"
     var insulinAgeOption: String = "Drei_Tage"
     var cannulaAgeOption: String = "Drei_Tage"
+    var loopViewOption: String = LoopViewOption.view1.rawValue
     // Dana-Toggles
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
@@ -87,6 +88,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var insulinBadge: Bool = false
     var hideInsulinBadge: Bool = false
     var allowDilution: Bool = false
+    var extended_overrides = false
 
     // Computed property for background color option
     var backgroundColorOption: BackgroundColorOption {
@@ -189,6 +191,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case danaBarViewOption
         case insulinAgeOption
         case cannulaAgeOption
+        case loopViewOption
         // Dana Toggles
         case profilesOrTempTargets
         case allowBolusShortcut
@@ -204,6 +207,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case sexSetting
         case disableHypoTreatment
         case allowDilution
+        case extendedOverride
     }
 
     func encode(to encoder: Encoder) throws {
@@ -281,6 +285,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.danaBarViewOption, forKey: .danaBarViewOption)
         try container.encode(settings.insulinAgeOption, forKey: .insulinAgeOption)
         try container.encode(settings.cannulaAgeOption, forKey: .cannulaAgeOption)
+        try container.encode(settings.loopViewOption, forKey: .loopViewOption)
         // Dana Toggels
         try container.encode(settings.profilesOrTempTargets, forKey: .profilesOrTempTargets)
         try container.encode(settings.allowBolusShortcut, forKey: .allowBolusShortcut)
@@ -296,5 +301,6 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.sexSetting, forKey: .sexSetting)
         try container.encode(settings.disableHypoTreatment, forKey: .disableHypoTreatment)
         try container.encode(settings.allowDilution, forKey: .allowDilution)
+        try container.encode(settings.extended_overrides, forKey: .extendedOverride)
     }
 }

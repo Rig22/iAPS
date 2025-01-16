@@ -451,25 +451,89 @@ extension Home {
 
         @StateObject private var bolusPieSegmentViewModel = PieSegmentViewModel()
 
+        @ViewBuilder private func bolusProgressView() -> some View {
+            if let progress = state.bolusProgress, let amount = state.bolusAmount {
+                let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
+                let bolusedValue = amount * progress
+                let bolused = bolusProgressFormatter.string(from: bolusedValue as NSNumber) ?? ""
+                let formattedAmount = amount.formatted(.number.precision(.fractionLength(2)))
+                let displayText = "\(bolused) / \(formattedAmount) U"
+
+                VStack {
+                    ZStack {
+                        BigFillablePieSegment(
+                            pieSegmentViewModel: bolusPieSegmentViewModel,
+                            fillFraction: fillFraction,
+                            color: backgroundColor,
+                            displayText: displayText,
+                            animateProgress: true
+                        )
+                        .frame(width: 110, height: 110)
+                        .overlay(
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 25, height: 25)
+                                .overlay(
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white)
+                                )
+                                .onTapGesture {
+                                    state.cancelBolus()
+                                }
+                        )
+                    }
+
+                    loopViewSelector()
+                }
+            }
+        }
+
+        @ViewBuilder private func glucoseAndLoopView() -> some View {
+            VStack {
+                glucoseView
+                    .frame(width: 110, height: 110)
+                loopViewSelector()
+            }
+        }
+
+        @ViewBuilder private func loopViewSelector() -> some View {
+            if let loopOption = LoopViewOption(rawValue: state.loopViewOption) {
+                switch loopOption {
+                case .view1:
+                    loopView
+                        .frame(maxHeight: .infinity)
+                        .offset(y: 25)
+                case .view2:
+                    loopView2
+                        .frame(maxHeight: .infinity)
+                        .offset(y: 25)
+                        .padding(.top, 10)
+                }
+            } else {
+                // Fallback-Ansicht, falls der String-Wert ungültig ist
+                Text("Ungültige Ansichtsauswahl")
+                    .foregroundColor(.red)
+            }
+        }
+
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             LinearGradient(
-                gradient: Gradient(colors: [.black, backgroundColor]),
+                gradient: Gradient(colors: [.black, .clear]),
                 startPoint: .top,
                 endPoint: .bottom
             )
-            // backgroundColor
             .frame(
                 maxHeight: fontSize < .extraExtraLarge ? 250 + geo.safeAreaInsets.top : 145 + geo.safeAreaInsets.top
             )
             .overlay {
                 VStack {
                     // Oberer Bereich
-
                     VStack {
                         HStack {
                             // Linker Block
-
                             VStack(alignment: .leading, spacing: 8) {
+                                // TempRate anzeigen
                                 HStack(spacing: 5) {
                                     Image(systemName: "chart.xyaxis.line")
                                         .resizable()
@@ -506,64 +570,16 @@ extension Home {
                             Spacer()
 
                             // Mittlerer Stack
-
                             HStack {
-                                Spacer() // Links
+                                Spacer()
 
-                                if let progress = state.bolusProgress, let amount = state.bolusAmount {
-                                    // Bolus Progress anzeigen
-                                    VStack {
-                                        ZStack {
-                                            let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
-                                            let displayText: String = {
-                                                let bolusedValue = amount * progress
-                                                let bolused = bolusProgressFormatter.string(from: bolusedValue as NSNumber) ?? ""
-                                                let formattedAmount = amount.formatted(.number.precision(.fractionLength(2)))
-                                                return "\(bolused) / \(formattedAmount) U"
-                                            }()
-
-                                            BigFillablePieSegment(
-                                                pieSegmentViewModel: bolusPieSegmentViewModel,
-                                                fillFraction: fillFraction,
-                                                color: backgroundColor, // Fortschrittsfarbe
-                                                displayText: displayText,
-                                                animateProgress: true
-                                            )
-                                            .frame(width: 110, height: 110)
-                                            .overlay(
-                                                Circle()
-                                                    .fill(Color.red)
-                                                    .frame(width: 25, height: 25)
-                                                    .overlay(
-                                                        Image(systemName: "xmark")
-                                                            .font(.system(size: 14))
-                                                            .foregroundColor(.white)
-                                                    )
-                                                    .onTapGesture {
-                                                        state.cancelBolus()
-                                                    }
-                                            )
-                                        }
-
-                                        loopView
-                                            .frame(maxHeight: .infinity)
-                                            .offset(y: 25)
-                                            .padding(.top, 10)
-                                    }
+                                if state.bolusProgress != nil && state.bolusAmount != nil {
+                                    bolusProgressView()
                                 } else {
-                                    // GlucoseView anzeigen
-                                    VStack {
-                                        glucoseView
-                                            .frame(width: 110, height: 110)
-
-                                        loopView
-                                            .frame(maxHeight: .infinity)
-                                            .offset(y: 25)
-                                            .padding(.top, 10)
-                                    }
+                                    glucoseAndLoopView()
                                 }
 
-                                Spacer() // Rechts
+                                Spacer()
                             }
 
                             // Rechter Block (eventualBG)
@@ -606,29 +622,9 @@ extension Home {
                     }
                     .offset(y: 90)
 
-                    // Fortschritt des Bolus als Text
-                    /*      if let progress = state.bolusProgress, let amount = state.bolusAmount {
-                         let bolusedValue = amount * progress
-                         let bolused = bolusProgressFormatter.string(from: bolusedValue as NSNumber) ?? ""
-                         let formattedAmount = amount.formatted(.number.precision(.fractionLength(2)))
-
-                         Text("\(bolused) / \(formattedAmount) U")
-                             .font(.system(size: 16))
-                             .foregroundStyle(Color.white)
-                             .offset(x: 140, y: -30)
-                     }*/
-
-                    // Fortschritt des Bolus in Prozent
-
-                    /*   if let progress = state.bolusProgress {
-                         Text("\(Int(progress * 100))%")
-                             .font(.system(size: 20))
-                             .foregroundStyle(Color.white)
-                             .offset(x: 160, y: -30)
-                     }*/
+                    Spacer() // Rechts
 
                     // Unterer Bereich
-
                     VStack(spacing: 20) {
                         Spacer()
                         HStack {
@@ -636,7 +632,7 @@ extension Home {
                             carbsView
                                 .frame(maxHeight: .infinity, alignment: .bottom)
                                 .padding(.bottom, 20)
-                            Spacer(minLength: 200) // Abstand zwischen Carbs und IOB
+                            Spacer(minLength: 200)
                             insulinView
                                 .frame(maxHeight: .infinity, alignment: .bottom)
                                 .padding(.bottom, 20)
@@ -731,8 +727,14 @@ extension Home {
             if state.danaBar {
                 return AnyView(
                     ZStack {
-                        backgroundColor
-                            .frame(maxWidth: .infinity, maxHeight: 0)
+                        // backgroundColor
+                        LinearGradient(
+                            gradient: Gradient(colors: [.clear, .clear]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+
+                        .frame(maxWidth: .infinity, maxHeight: 0)
 
                         // info
                     }
@@ -775,7 +777,7 @@ extension Home {
             var body: some View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 15)
-                        .fill(Color(.insulin).opacity(1.0))
+                        .fill(Color(.insulin).opacity(0.5))
                         .frame(width: 37, height: 17)
                         .overlay {
                             Text("U" + (formatter.string(from: concentration * 100 as NSNumber) ?? ""))
@@ -783,11 +785,9 @@ extension Home {
                                 .foregroundStyle(Color.white)
                         }
                 }
-                .offset(x: -25, y: -20)
+                .offset(x: -25, y: -10)
             }
         }
-
-        // Insulin Concentration Badge <-
 
         // DanaBar 1
 
@@ -819,14 +819,6 @@ extension Home {
                                     }()
 
                                     ZStack {
-                                        if state.settingsManager?.settings.insulinBadge == true {
-                                            if concentration.last?.concentration == 1 {
-                                                NonStandardInsulin(concentration: 1) // Zeigt U100 als Standardwert an
-                                            } else if (concentration.last?.concentration ?? 1) != 1 {
-                                                NonStandardInsulin(concentration: concentration.last?.concentration ?? 1)
-                                            }
-                                        }
-
                                         SmallFillablePieSegment(
                                             pieSegmentViewModel: reservoirPieSegmentViewModel,
                                             fillFraction: fill,
@@ -843,6 +835,14 @@ extension Home {
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 40, height: 40)
+
+                                        if state.settingsManager?.settings.insulinBadge == true {
+                                            if concentration.last?.concentration == 1 {
+                                                NonStandardInsulin(concentration: 1) // Zeigt U100 als Standardwert an
+                                            } else if (concentration.last?.concentration ?? 1) != 1 {
+                                                NonStandardInsulin(concentration: concentration.last?.concentration ?? 1)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -853,52 +853,9 @@ extension Home {
                             }
 
                             // Reservoir Alter
+
                             HStack(spacing: 10) {
                                 let reservoirAge: String = state.reservoirAge ?? "--"
-                                let insulinColor: Color = {
-                                    if let reservoirAge = state.reservoirAge {
-                                        let pattern = #"(?:(\d+)d)?(?:(\d+)h)?"#
-                                        let regex = try? NSRegularExpression(pattern: pattern)
-                                        var totalHours: Int = 0
-
-                                        if let match = regex?.firstMatch(
-                                            in: reservoirAge,
-                                            range: NSRange(reservoirAge.startIndex..., in: reservoirAge)
-                                        ) {
-                                            if let dayRange = Range(match.range(at: 1), in: reservoirAge),
-                                               let days = Int(reservoirAge[dayRange])
-                                            {
-                                                totalHours += days * 24
-                                            }
-                                            if let hourRange = Range(match.range(at: 2), in: reservoirAge),
-                                               let hours = Int(reservoirAge[hourRange])
-                                            {
-                                                totalHours += hours
-                                            }
-                                        }
-
-                                        var warningThreshold: CGFloat = 0
-                                        var dangerThreshold: CGFloat = 0
-
-                                        if let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption),
-                                           let maxInsulinAge = Double(insulinAgeOption.displayName)
-                                        {
-                                            warningThreshold = CGFloat(maxInsulinAge * 0.75)
-                                            dangerThreshold = CGFloat(maxInsulinAge)
-                                        } else {}
-
-                                        switch CGFloat(totalHours) {
-                                        case dangerThreshold...:
-                                            return .red.opacity(0.7)
-                                        case warningThreshold ..< dangerThreshold:
-                                            return .yellow.opacity(0.7)
-                                        default:
-                                            return .green.opacity(0.7)
-                                        }
-                                    } else {
-                                        return .clear // Fallback-Wert, falls reservoirAge nil ist
-                                    }
-                                }()
 
                                 let fillFraction: CGFloat = {
                                     if let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption),
@@ -924,11 +881,64 @@ extension Home {
                                                 totalHours += hours
                                             }
                                         }
-                                        let fraction = CGFloat(min(max(Double(totalHours) / maxInsulinAge, 0.0), 1.0))
-                                        return fraction
+
+                                        if totalHours >= Int(maxInsulinAge) {
+                                            return 1.0 // Überschritten: vollständig rot gefüllt
+                                        } else {
+                                            // Berechnung für verbleibende Zeit
+                                            return CGFloat(min(
+                                                max((maxInsulinAge - Double(totalHours)) / maxInsulinAge, 0.0),
+                                                1.0
+                                            ))
+                                        }
                                     } else {
                                         return 0.0 // Fallback-Wert
                                     }
+                                }()
+
+                                let insulinColor: Color = {
+                                    if let reservoirAge = state.reservoirAge {
+                                        let pattern = #"(?:(\d+)d)?(?:(\d+)h)?"#
+                                        let regex = try? NSRegularExpression(pattern: pattern)
+                                        var totalHours: Int = 0
+
+                                        if let match = regex?.firstMatch(
+                                            in: reservoirAge,
+                                            range: NSRange(reservoirAge.startIndex..., in: reservoirAge)
+                                        ) {
+                                            if let dayRange = Range(match.range(at: 1), in: reservoirAge),
+                                               let days = Int(reservoirAge[dayRange])
+                                            {
+                                                totalHours += days * 24
+                                            }
+                                            if let hourRange = Range(match.range(at: 2), in: reservoirAge),
+                                               let hours = Int(reservoirAge[hourRange])
+                                            {
+                                                totalHours += hours
+                                            }
+                                        }
+
+                                        if let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption),
+                                           let maxInsulinAge = Double(insulinAgeOption.displayName)
+                                        {
+                                            if CGFloat(totalHours) >= CGFloat(maxInsulinAge) {
+                                                return .red.opacity(1.0) // Überschritten: Rot
+                                            }
+
+                                            let warningThreshold = maxInsulinAge * 0.75
+                                            let dangerThreshold = maxInsulinAge
+
+                                            switch CGFloat(totalHours) {
+                                            case dangerThreshold...:
+                                                return .red.opacity(1.0)
+                                            case warningThreshold ..< dangerThreshold:
+                                                return .yellow.opacity(0.7)
+                                            default:
+                                                return .green.opacity(0.7)
+                                            }
+                                        }
+                                    }
+                                    return .clear // Fallback-Farbe
                                 }()
 
                                 ZStack {
@@ -957,11 +967,7 @@ extension Home {
                                     if let cannulaHours = state.cannulaHours {
                                         let days = Int(cannulaHours) / 24
                                         let hours = Int(cannulaHours) % 24
-                                        if days > 0 {
-                                            return "\(days)d\(hours)h"
-                                        } else {
-                                            return "\(hours)h"
-                                        }
+                                        return "\(days)d\(hours)h"
                                     } else {
                                         return "--"
                                     }
@@ -969,29 +975,44 @@ extension Home {
 
                                 let cannulaFraction: CGFloat = {
                                     if let cannulaHours = state.cannulaHours,
-                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
+                                       let cannulaAgeOption = CannulaAgeOption(
+                                           rawValue: state
+                                               .cannulaAgeOption
+                                       )
                                     {
-                                        if cannulaHours >= cannulaAgeOption.maxCannulaAge {
-                                            return 1.0
+                                        let remainingHours = cannulaAgeOption
+                                            .maxCannulaAge - cannulaHours
+                                        if remainingHours <= 0 {
+                                            return 1.0 // Vollständig gefüllt bei Überschreitung
                                         } else {
-                                            return CGFloat(min(max(cannulaHours / cannulaAgeOption.maxCannulaAge, 0.0), 1.0))
+                                            return CGFloat(min(max(
+                                                remainingHours / cannulaAgeOption.maxCannulaAge,
+                                                0.0
+                                            ), 1.0))
                                         }
                                     } else {
-                                        return 0.0
+                                        return 0.0 // Leer, wenn keine Werte vorhanden sind
                                     }
                                 }()
 
                                 let cannulaColor: Color = {
                                     if let cannulaHours = state.cannulaHours,
-                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
+                                       let cannulaAgeOption = CannulaAgeOption(
+                                           rawValue: state
+                                               .cannulaAgeOption
+                                       )
                                     {
                                         let maxCannulaAge = cannulaAgeOption.maxCannulaAge
                                         let warningThreshold = maxCannulaAge * 0.75
                                         let dangerThreshold = maxCannulaAge
 
+                                        if cannulaHours >= maxCannulaAge {
+                                            return .red.opacity(1.0) // Überschritten: Rot
+                                        }
+
                                         switch CGFloat(cannulaHours) {
                                         case dangerThreshold...:
-                                            return .red.opacity(0.7)
+                                            return .red.opacity(1.0)
                                         case warningThreshold ..< dangerThreshold:
                                             return .yellow.opacity(0.7)
                                         default:
@@ -1120,7 +1141,7 @@ extension Home {
                                 }
                             }
                         }
-                        .padding(.bottom, 5)
+                        .padding(.top, 10)
                     }
                     .onReceive(timer) { _ in
                         state.specialDanaKitFunction()
@@ -1139,8 +1160,13 @@ extension Home {
             if state.danaBar {
                 return AnyView(
                     ZStack {
-                        backgroundColor
-                            .frame(maxWidth: .infinity, maxHeight: 0)
+                        // backgroundColor
+                        LinearGradient(
+                            gradient: Gradient(colors: [.clear, .clear]),
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                        .frame(maxWidth: .infinity, maxHeight: 0)
 
                         info3
                     }
@@ -1179,14 +1205,6 @@ extension Home {
                                     }()
 
                                     ZStack {
-                                        if state.settingsManager?.settings.insulinBadge == true {
-                                            if concentration.last?.concentration == 1 {
-                                                NonStandardInsulin(concentration: 1) // Zeigt U100 als Standardwert an
-                                            } else if (concentration.last?.concentration ?? 1) != 1 {
-                                                NonStandardInsulin(concentration: concentration.last?.concentration ?? 1)
-                                            }
-                                        }
-
                                         SmallFillablePieSegment(
                                             pieSegmentViewModel: reservoirPieSegmentViewModel,
                                             fillFraction: fill,
@@ -1203,6 +1221,14 @@ extension Home {
                                             .resizable()
                                             .scaledToFit()
                                             .frame(width: 40, height: 40)
+
+                                        if state.settingsManager?.settings.insulinBadge == true {
+                                            if concentration.last?.concentration == 1 {
+                                                NonStandardInsulin(concentration: 1) // Zeigt U100 als Standardwert an
+                                            } else if (concentration.last?.concentration ?? 1) != 1 {
+                                                NonStandardInsulin(concentration: concentration.last?.concentration ?? 1)
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -1218,11 +1244,7 @@ extension Home {
                                     if let cannulaHours = state.cannulaHours {
                                         let days = Int(cannulaHours) / 24
                                         let hours = Int(cannulaHours) % 24
-                                        if days > 0 {
-                                            return "\(days)d\(hours)h"
-                                        } else {
-                                            return "\(hours)h"
-                                        }
+                                        return "\(days)d\(hours)h"
                                     } else {
                                         return "--"
                                     }
@@ -1230,29 +1252,44 @@ extension Home {
 
                                 let cannulaFraction: CGFloat = {
                                     if let cannulaHours = state.cannulaHours,
-                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
+                                       let cannulaAgeOption = CannulaAgeOption(
+                                           rawValue: state
+                                               .cannulaAgeOption
+                                       )
                                     {
-                                        if cannulaHours >= cannulaAgeOption.maxCannulaAge {
-                                            return 1.0
+                                        let remainingHours = cannulaAgeOption
+                                            .maxCannulaAge - cannulaHours
+                                        if remainingHours <= 0 {
+                                            return 1.0 // Vollständig gefüllt bei Überschreitung
                                         } else {
-                                            return CGFloat(min(max(cannulaHours / cannulaAgeOption.maxCannulaAge, 0.0), 1.0))
+                                            return CGFloat(min(max(
+                                                remainingHours / cannulaAgeOption.maxCannulaAge,
+                                                0.0
+                                            ), 1.0))
                                         }
                                     } else {
-                                        return 0.0
+                                        return 0.0 // Voll gefüllt, wenn keine Stunden bekannt sind
                                     }
                                 }()
 
                                 let cannulaColor: Color = {
                                     if let cannulaHours = state.cannulaHours,
-                                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
+                                       let cannulaAgeOption = CannulaAgeOption(
+                                           rawValue: state
+                                               .cannulaAgeOption
+                                       )
                                     {
                                         let maxCannulaAge = cannulaAgeOption.maxCannulaAge
                                         let warningThreshold = maxCannulaAge * 0.75
                                         let dangerThreshold = maxCannulaAge
 
+                                        if cannulaHours >= maxCannulaAge {
+                                            return .red.opacity(1.0) // Überschritten: Rot
+                                        }
+
                                         switch CGFloat(cannulaHours) {
                                         case dangerThreshold...:
-                                            return .red.opacity(0.7)
+                                            return .red.opacity(1.0)
                                         case warningThreshold ..< dangerThreshold:
                                             return .yellow.opacity(0.7)
                                         default:
@@ -1282,6 +1319,21 @@ extension Home {
                                         .frame(width: 40, height: 40)
                                 }
                             }
+
+                            // Der Pie füllt sich
+                            /*    let cannulaFraction: CGFloat = {
+                                 if let cannulaHours = state.cannulaHours,
+                                    let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
+                                 {
+                                     if cannulaHours >= cannulaAgeOption.maxCannulaAge {
+                                         return 1.0
+                                     } else {
+                                         return CGFloat(min(max(cannulaHours / cannulaAgeOption.maxCannulaAge, 0.0), 1.0))
+                                     }
+                                 } else {
+                                     return 0.0
+                                 }
+                             }()*/
 
                             // Dana Symbol
                             HStack(spacing: 10) {
@@ -1408,7 +1460,7 @@ extension Home {
                                 }
                             }
                         }
-                        .padding(.top, 0)
+                        .padding(.top, 10)
                     }
                     .onReceive(timer) { _ in
                         state.specialDanaKitFunction()
@@ -1458,10 +1510,10 @@ extension Home {
                     thresholdLines: $state.thresholdLines,
                     triggerUpdate: $triggerUpdate,
                     overrideHistory: $state.overrideHistory,
-                    minimumSMB: $state.minimumSMB,
-                    maxBolus: $state.maxBolus,
-                    maxBolusValue: $state.maxBolusValue,
-                    useInsulinBars: $state.useInsulinBars
+                    minimumSMB: $state.minimumSMB
+                    // maxBolus: $state.maxBolus,
+                    // maxBolusValue: $state.maxBolusValue
+                    // useInsulinBars: $state.useInsulinBars
                 )
             }
             .modal(for: .dataTable, from: self)
@@ -1484,13 +1536,12 @@ extension Home {
                     }
                 }
 
-                mainChart.padding(.top, 10)
+                mainChart.padding(.top, 15)
                 legendPanel
                 tempTargetbar
                 infoPanel2
                     .frame(width: UIScreen.main.bounds.width * deviceWidthMultiplier)
             }
-            .background(backgroundColor)
             .frame(minHeight: UIScreen.main.bounds.height / (state.timeSettings ? ratio : ratio2))
         }
 
@@ -1577,7 +1628,6 @@ extension Home {
 
         var infoPanel2: some View {
             ZStack {
-                backgroundColor
                 info2
             }
             .frame(maxWidth: .infinity, maxHeight: 25)
@@ -1594,11 +1644,11 @@ extension Home {
         }
 
         @State var timeButtons: [Buttons] = [
-            Buttons(label: "3", number: "3", active: false, hours: 3, action: nil),
-            Buttons(label: "6", number: "6", active: false, hours: 6, action: nil),
-            Buttons(label: "12", number: "12", active: false, hours: 12, action: nil),
-            Buttons(label: "24", number: "24", active: false, hours: 24, action: nil)
-            //    Buttons(label: "UX", number: "UX", active: false, hours: nil, action: nil)
+            Buttons(label: "3", number: "3", active: false, hours: 3),
+            Buttons(label: "6", number: "6", active: false, hours: 6),
+            Buttons(label: "12", number: "12", active: false, hours: 12),
+            Buttons(label: "24", number: "24", active: false, hours: 24),
+            Buttons(label: "36", number: "36", active: false, hours: 36)
         ]
 
         func highlightButtons() {
@@ -1622,10 +1672,11 @@ extension Home {
                 return AnyView(
                     HStack(spacing: 15) {
                         // Linker Stack
+                        Spacer()
 
                         if let currentISF = state.isf {
-                            HStack(spacing: 4) {
-                                Text("ISF:")
+                            HStack(spacing: 0) {
+                                Text("ISF: ")
                                     .foregroundColor(.white)
                                     .font(.system(size: 15))
 
@@ -1633,12 +1684,12 @@ extension Home {
                                     .foregroundStyle(Color.white)
                                     .font(.system(size: 15))
                             }
-                            .padding(.leading, 20)
-                            .frame(maxWidth: 110, alignment: .leading) // Links ausgerichtet
+                            .padding(.leading, 15)
+                            .frame(maxWidth: 100, alignment: .leading) // Links ausgerichtet
                         } else {
                             HStack(spacing: 4) {
-                                Text("ISF:")
-                                    .foregroundColor(.gray)
+                                Text("ISF: ")
+                                    .foregroundColor(.white)
                                     .font(.system(size: 15))
 
                                 // Platzhalter, wenn kein ISF vorhanden ist
@@ -1646,14 +1697,14 @@ extension Home {
                                     .foregroundStyle(Color.white)
                                     .font(.system(size: 15))
                             }
-                            .padding(.leading, 20)
-                            .frame(maxWidth: 100, alignment: .leading)
+                            .padding(.leading, 20) // Abstand linker Rand
+                            .frame(maxWidth: 110, alignment: .leading)
                         }
                         Spacer()
 
                         // Mittlerer Stack
 
-                        HStack(spacing: 10) {
+                        HStack(spacing: 0) {
                             ForEach(timeButtons) { button in
                                 Text(button.active ? NSLocalizedString(button.label, comment: "") : button.number)
                                     .onTapGesture {
@@ -1665,12 +1716,14 @@ extension Home {
                                         }
                                     }
                                     .font(.system(size: 13))
-                                    .frame(minWidth: 20, maxHeight: 25)
-                                    .padding(.horizontal, 2)
-                                    .foregroundStyle(Color.white)
+                                    .frame(minWidth: 23, maxWidth: .infinity, maxHeight: 25) // Dynamische Breite
+                                    .padding(
+                                        .horizontal,
+                                        5
+                                    ) // Zusätzlicher Innenabstand
                                     .background(button.active ? Color.blue.opacity(0.7) : Color.clear)
-                                    // .cornerRadius(4)
                                     .clipShape(Circle())
+                                    .foregroundStyle(Color.white)
                             }
                             Spacer()
                         }
@@ -1685,12 +1738,15 @@ extension Home {
                         // Rechter Stack - TDD
 
                         HStack {
-                            Text("TDD: " + (numberFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0"))
-                                .font(.system(size: 14))
-                                .foregroundColor(.white)
-                                .padding(.trailing, 20)
-                        }
-                        .frame(maxWidth: 100, alignment: .trailing)
+                            Text(
+                                "TDD: " +
+                                    (numberFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")
+                            )
+                            .font(.system(size: 14))
+                            .foregroundColor(.white)
+                            .padding(.trailing, 20)
+                        }.frame(maxWidth: 110, alignment: .trailing)
+                        Spacer()
                     }
                 )
             } else {
@@ -1702,26 +1758,36 @@ extension Home {
 
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {
-                LinearGradient(
-                    gradient: Gradient(colors: [backgroundColor, backgroundColor]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: 50 + geo.safeAreaInsets.bottom)
+                backgroundColor
+                    /* LinearGradient(
+                         gradient: Gradient(colors: [.clear, .clear]),
+                         startPoint: .top,
+                         endPoint: .bottom
+                     )*/
+                    .frame(height: 50 + geo.safeAreaInsets.bottom)
 
                 let isOverride = fetchedPercent.first?.enabled ?? false
                 let isTarget = (state.tempTarget != nil)
-
                 HStack {
-                    buttonWithCircle(iconName: "carbs3", circleColor: Color.darkGray.opacity(0.5)) {
-                        state.showModal(for: .addCarbs(editMode: false, override: false))
+                    ZStack {
+                        buttonWithCircle(iconName: "carbs3", circleColor: Color.darkGray.opacity(0.5)) {
+                            state.showModal(for: .addCarbs(editMode: false, override: false))
+                        }
+                        if let carbsReq = state.carbsRequired {
+                            Text(numberFormatter.string(from: carbsReq as NSNumber)!)
+                                .font(.caption)
+                                .foregroundColor(.white)
+                                .padding(4)
+                                .background(Capsule().fill(Color.red))
+                                .offset(x: 20, y: 10)
+                        }
                     }
                     Spacer()
 
                     buttonWithCircle(iconName: "iob", circleColor: Color.darkGray.opacity(0.5)) {
                         (state.bolusProgress != nil) ? showBolusActiveAlert = true :
                             state.showModal(for: .bolus(
-                                waitForSuggestion: state.useCalc,
+                                waitForSuggestion: state.useCalc ? true : false,
                                 fetch: false
                             ))
                     }
@@ -1734,7 +1800,10 @@ extension Home {
                         Spacer()
                     }
 
-                    buttonWithCircle(iconName: isOverride ? "profilefill" : "profile", circleColor: Color.darkGray.opacity(0.5)) {
+                    buttonWithCircle(
+                        iconName: isOverride ? "profilefill" : "profile",
+                        circleColor: Color.darkGray.opacity(0.5)
+                    ) {
                         if isOverride {
                             showCancelAlert.toggle()
                         } else {
@@ -1767,7 +1836,8 @@ extension Home {
                     }
                 }
                 .padding(.horizontal, state.allowManualTemp ? 5 : 24)
-                .padding(.bottom, geo.safeAreaInsets.bottom)
+                // .padding(.bottom, geo.safeAreaInsets.bottom)
+                .padding(.bottom, 15)
             }
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .confirmationDialog("Cancel Profile Override", isPresented: $showCancelAlert) {
@@ -1823,6 +1893,25 @@ extension Home {
             }
         }
 
+        var loopView2: some View {
+            LoopView2(
+                suggestion: $state.suggestion,
+                enactedSuggestion: $state.enactedSuggestion,
+                closedLoop: $state.closedLoop,
+                timerDate: $state.timerDate,
+                isLooping: $state.isLooping,
+                lastLoopDate: $state.lastLoopDate,
+                manualTempBasal: $state.manualTempBasal
+            )
+            .onTapGesture {
+                state.isStatusPopupPresented.toggle()
+            }.onLongPressGesture {
+                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                impactHeavy.impactOccurred()
+                state.runLoop()
+            }
+        }
+
         var tempBasalString: String? {
             guard let tempRate = state.tempRate else {
                 return nil
@@ -1844,65 +1933,6 @@ extension Home {
                 return nil
             }
             return tempTarget.displayName
-        }
-
-        var preview: some View {
-            backgroundColor
-                .frame(minHeight: 200)
-                .overlay {
-                    PreviewChart(readings: $state.readings, lowLimit: $state.lowGlucose, highLimit: $state.highGlucose)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .padding(.horizontal, 10)
-                .foregroundStyle(Color.white)
-                .onTapGesture {
-                    state.showModal(for: .statistics)
-                }
-        }
-
-        var activeIOBView: some View {
-            backgroundColor
-                .frame(minHeight: 430)
-                .overlay {
-                    ActiveIOBView(
-                        data: $state.iobData,
-                        neg: $state.neg,
-                        tddChange: $state.tddChange,
-                        tddAverage: $state.tddAverage,
-                        tddYesterday: $state.tddYesterday,
-                        tdd2DaysAgo: $state.tdd2DaysAgo,
-                        tdd3DaysAgo: $state.tdd3DaysAgo,
-                        tddActualAverage: $state.tddActualAverage
-                    )
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .padding(.horizontal, 10)
-                .foregroundStyle(Color.white)
-        }
-
-        var activeCOBView: some View {
-            backgroundColor
-                .frame(minHeight: 230)
-                .overlay {
-                    ActiveCOBView(data: $state.iobData)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .foregroundStyle(Color.white)
-                .padding(.horizontal, 10)
-        }
-
-        var loopPreview: some View {
-            backgroundColor
-                .frame(minHeight: 190)
-                .overlay {
-                    LoopsView(loopStatistics: $state.loopStatistics)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .padding(.horizontal, 10)
-                .foregroundStyle(Color.white)
-                .onTapGesture {
-                    state.showModal(for: .statistics)
-                }
         }
 
         var profileView: some View {
@@ -1941,29 +1971,22 @@ extension Home {
             }
         }
 
+        // TAGESÜBERSICHT
+
         @ViewBuilder private func glucoseHeaderView() -> some View {
             backgroundColor
-                /*  LinearGradient(
-                     gradient: Gradient(colors: [.black, backgroundColor]),
-                     startPoint: .top,
-                     endPoint: .bottom
-                 )*/
-                .frame(maxHeight: 90)
-                .overlay {
-                    VStack {
-                        ZStack {
-                            LinearGradient(
-                                gradient: Gradient(colors: [.clear, .clear]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                            glucosePreview.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                                .dynamicTypeSize(...DynamicTypeSize.medium)
-                        }
-                    }
-                }
-                .clipShape(Rectangle())
-                .foregroundStyle(Color.white)
+                .frame(maxHeight: 200)
+            VStack {
+                Text("Tagesübersicht").font(.system(size: 22, weight: .heavy)).padding(.top, 0).padding(.bottom, 15)
+            }
+            VStack {
+                Text("Glukoseverlauf").font(.previewHeadline).padding(.top, 0).padding(.bottom, 0)
+            }
+            VStack {
+                glucosePreview
+            }
+            .clipShape(Rectangle())
+            .foregroundStyle(Color.white)
         }
 
         var glucosePreview: some View {
@@ -1976,54 +1999,237 @@ extension Home {
             let low = state.lowGlucose
             let veryHigh = 198
 
-            return Chart(data) {
-                PointMark(
-                    x: .value("Time", $0.dateString),
-                    y: .value(
-                        "Glucose",
-                        Double($0.glucose ?? 0) * (state.units == .mmolL ? 0.0555 : 1.0)
-                    )
-                )
-                .foregroundStyle(
-                    (($0.glucose ?? 0) > veryHigh || Decimal($0.glucose ?? 0) < low) ? Color.red :
-                        Decimal($0.glucose ?? 0) > high ? Color.yellow : Color.darkGreen
-                )
-                .symbolSize(7)
-            }
-            .chartXAxis {
-                AxisMarks(values: .stride(by: .hour, count: 2)) { _ in
-                    AxisValueLabel(
-                        format: .dateTime.hour(.defaultDigits(amPM: .omitted))
-                            .locale(Locale(identifier: "sv")) // 24h-Format
-                    )
-                    .foregroundStyle(Color.white)
-                    AxisGridLine()
-                        .foregroundStyle(Color.white)
-                }
-            }
-            .chartYAxis {
-                AxisMarks(values: .automatic(desiredCount: 3)) { _ in
-                    AxisValueLabel()
-                        .foregroundStyle(Color.white)
+            return ZStack {
+                Color.gray.opacity(0.2)
+                    .cornerRadius(20)
+                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
+                    .padding(.horizontal, 15)
+                    .padding(.top, 0)
+                    .padding(.bottom, 20)
 
-                    AxisGridLine()
-                        .foregroundStyle(Color.white)
+                Chart(data) {
+                    PointMark(
+                        x: .value("Time", $0.dateString),
+                        y: .value(
+                            "Glucose",
+                            Double($0.glucose ?? 0) * (state.units == .mmolL ? 0.0555 : 1.0)
+                        )
+                    )
+                    .foregroundStyle(
+                        (($0.glucose ?? 0) > veryHigh || Decimal($0.glucose ?? 0) < low) ? Color.red :
+                            Decimal($0.glucose ?? 0) > high ? Color.yellow : Color.darkGreen
+                    )
+                    .symbolSize(9)
                 }
+                .chartXAxis {
+                    AxisMarks(values: .stride(by: .hour, count: 2)) { _ in
+                        AxisValueLabel(
+                            format: .dateTime.hour(.defaultDigits(amPM: .omitted))
+                                .locale(Locale(identifier: "sv")) // 24h-Format
+                        )
+                        .foregroundStyle(Color.white)
+                        AxisGridLine()
+                            .foregroundStyle(Color.white.opacity(0.5))
+                    }
+                }
+                .chartYAxis {
+                    AxisMarks(values: .automatic(desiredCount: 3)) { _ in
+                        AxisValueLabel()
+                            .foregroundStyle(Color.white)
+                        AxisGridLine()
+                            .foregroundStyle(Color.white.opacity(0.5))
+                    }
+                }
+                .chartYScale(
+                    domain: minimumRange * (state.units == .mmolL ? 0.0555 : 1.0) ... maximum *
+                        (state.units == .mmolL ? 0.0555 : 1.0)
+                )
+                .chartXScale(
+                    domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
+                )
+                .frame(maxHeight: 280)
+                .foregroundStyle(Color.white)
+                .padding(.leading, 25)
+                .padding(.trailing, 25)
+                .padding(.top, 20)
+                .padding(.bottom, 40)
             }
-            .chartYScale(
-                domain: minimumRange * (state.units == .mmolL ? 0.0555 : 1.0) ... maximum *
-                    (state.units == .mmolL ? 0.0555 : 1.0)
-            )
-            .chartXScale(
-                domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
-            )
-            .frame(maxHeight: 70)
-            .padding(.leading, 30)
-            .padding(.trailing, 32)
-            .padding(.top, 0)
-            .padding(.bottom, 0)
-            .foregroundStyle(Color.white)
+            .padding(.horizontal, 10)
+            .onTapGesture {
+                state.showModal(for: .statistics)
+            }
         }
+
+        @ViewBuilder private func TDDOverView() -> some View {
+            VStack(alignment: .center, spacing: 10) {
+                Text("Übersicht TDD")
+                    .font(.previewHeadline)
+                    .padding(.top, 10)
+                    .padding(.bottom, 10)
+                    .foregroundColor(.white)
+                // Tabellenansicht
+                VStack(spacing: 10) {
+                    // Tabellenüberschriften
+
+                    HStack {
+                        Text(" ")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        Text("24h")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        Text("⇢ 2Days")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        Text("⇢ 3Day")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                        Text("10dayØ")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    .font(.system(size: 16))
+                    .foregroundColor(.white)
+
+                    Divider()
+                        .background(Color.white)
+
+                    // Tabellenwerte
+                    HStack {
+                        // Erste Zeile: TDD-Werte
+                        Text("TDD:")
+                            .frame(maxWidth: .infinity, alignment: .leading)
+
+                        Text(
+                            numberFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0"
+                        )
+
+                        .frame(maxWidth: .infinity, alignment: .center)
+
+                        Text(
+                            numberFormatter.string(from: state.tddYesterday as NSNumber) ?? "0"
+                        )
+                        .frame(maxWidth: .infinity, alignment: .center)
+
+                        Text(
+                            numberFormatter.string(from: state.tdd2DaysAgo as NSNumber) ?? "0"
+                        )
+                        .frame(maxWidth: .infinity, alignment: .center)
+
+                        Text(
+                            numberFormatter.string(from: state.tdd3DaysAgo as NSNumber) ?? "0"
+                        )
+                        .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    .font(.system(size: 16))
+                    .foregroundColor(.white)
+                }
+                .padding()
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(10)
+                .shadow(radius: 5)
+            }
+            .padding(20)
+            .background(backgroundColor)
+        }
+
+        var preview: some View {
+            VStack {
+                Text("Time In Range")
+                    .padding(.bottom, 10)
+                    .font(.previewHeadline)
+                    .foregroundColor(.white)
+
+                ZStack {
+                    Color.gray.opacity(0.2)
+                        .cornerRadius(15)
+                        .shadow(radius: 5)
+
+                    VStack {
+                        PreviewChart(readings: $state.readings, lowLimit: $state.lowGlucose, highLimit: $state.highGlucose)
+                            .padding()
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 5)
+            }
+            .onTapGesture {
+                state.showModal(for: .statistics)
+            }
+        }
+
+        var loopPreview: some View {
+            VStack {
+                Text(NSLocalizedString("Loops", comment: "") + " / " + NSLocalizedString("Readings", comment: ""))
+                    .padding(.bottom, 10)
+                    .font(.previewHeadline)
+
+                ZStack {
+                    Color.gray.opacity(0.2)
+                        .cornerRadius(15)
+                        .shadow(radius: 5)
+
+                    VStack {
+                        LoopsView(loopStatistics: $state.loopStatistics)
+                            .padding()
+                    }
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 5)
+            }
+            .onTapGesture {
+                state.showModal(for: .statistics)
+            }
+        }
+
+        var activeCOBView: some View {
+            VStack {
+                Text("Active Carbohydrates")
+                    .padding(.bottom, 10)
+                    .font(.previewHeadline)
+                    .foregroundColor(.white)
+
+                ZStack {
+                    Color.gray.opacity(0.2)
+                        .cornerRadius(15)
+                        .shadow(radius: 5)
+
+                    ActiveCOBView(data: $state.iobData)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 5)
+                .padding(.bottom, 20)
+                .padding(.top, 10)
+            }
+        }
+
+        var activeIOBView: some View {
+            VStack {
+                Text("Active Insulin")
+                    .padding(.bottom, 10)
+                    .font(.previewHeadline)
+                    .foregroundColor(.white)
+
+                ZStack {
+                    Color.gray.opacity(0.2)
+                        .cornerRadius(15)
+                        .shadow(radius: 5)
+
+                    ActiveIOBView(
+                        data: $state.iobData,
+                        neg: $state.neg,
+                        tddChange: $state.tddChange,
+                        tddAverage: $state.tddAverage,
+                        tddYesterday: $state.tddYesterday,
+                        tdd2DaysAgo: $state.tdd2DaysAgo,
+                        tdd3DaysAgo: $state.tdd3DaysAgo,
+                        tddActualAverage: $state.tddActualAverage
+                    )
+                    .padding(.top, 20)
+                }
+                .padding(.horizontal, 20)
+                .padding(.vertical, 5)
+                .padding(.bottom, 20)
+                .padding(.top, 10)
+            }
+        }
+
+        // Tagesübersicht Ende
 
         var backgroundColor: Color {
             BackgroundColorOption(rawValue: state.backgroundColorOptionRawValue)?.color ?? .black
@@ -2038,25 +2244,24 @@ extension Home {
                     VStack(spacing: 0) {
                         headerView(geo)
 
-                        if !state.skipGlucoseChart, scrollOffset > scrollAmount {
-                            glucoseHeaderView()
-                                .transition(.move(edge: .top))
-                        }
-
                         ScrollView {
                             ScrollViewReader { _ in
                                 LazyVStack {
-                                    chart.padding(.top, 0)
+                                    chart.padding(.top, 10)
+                                    if !state.skipGlucoseChart {
+                                        glucoseHeaderView().padding(.top, 10)
+                                    }
+                                    TDDOverView().padding(.top, -30)
                                     preview.padding(.top, 0)
-                                    loopPreview.padding(.top, -10)
-                                    if state.iobData.count > 5 {
+                                    loopPreview.padding(.top, 10).padding(.bottom, 25)
+                                    if state.iobData.count >= 0 {
                                         activeCOBView.padding(.top, 0)
                                         activeIOBView.padding(.top, 0)
                                     }
                                 }
                                 .background(GeometryReader { geo in
                                     let offset = -geo.frame(in: .named(scrollSpace)).minY
-                                    backgroundColor
+                                    backgroundColor // Background für den scrollview Bereich
                                         .preference(
                                             key: ScrollViewOffsetPreferenceKey.self,
                                             value: offset
@@ -2073,7 +2278,7 @@ extension Home {
                         buttonPanel(geo)
                             .frame(height: 60)
                     }
-                    .background(backgroundColor)
+                    .background(backgroundColor) // Das ist der Hintergrund für alles!!!!
                     .ignoresSafeArea(edges: .vertical)
                     .onAppear(perform: startProgress)
                     .navigationTitle("Home")
@@ -2135,7 +2340,7 @@ extension Home {
                 }
             }
             .padding()
-            .background(backgroundColor)
+            .background(backgroundColor) // Für das Popup mit den Loop Informationen
             .cornerRadius(10)
             .shadow(radius: 2)
         }
