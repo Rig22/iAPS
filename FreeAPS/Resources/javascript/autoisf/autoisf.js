@@ -1,10 +1,10 @@
-function generate(profile, autosens, dynamicVariables, glucose, clock, pumpHistory) {
+function generate(iob, profile, autosens, glucose, clock, pumpHistory) {
     clock = new Date();
     const autosens_data = autosens ? autosens : null;
-    
+    const dynamicVariables = profile.dynamicVariables || {} ;
+
     // Auto ISF Overrides
     if (dynamicVariables.useOverride && dynamicVariables.aisfOverridden) {
-
         let overrides = { };
         for (let setting in dynamicVariables.autoISFoverrides) {
           if (dynamicVariables.autoISFoverrides.hasOwnProperty(setting)) {
@@ -17,7 +17,7 @@ function generate(profile, autosens, dynamicVariables, glucose, clock, pumpHisto
 
         if (!profile.iaps.autoisf) {
             console.log("Auto ISF Disabled by Override");
-            profile.autoISFstring = "Auto ISF Disabled by Override"
+            profile.autoISFreasons = "Auto ISF Disabled by Override"
             profile.iaps.autoisf = false;
             return profile
         }
@@ -25,7 +25,7 @@ function generate(profile, autosens, dynamicVariables, glucose, clock, pumpHisto
     
     // Auto ISF
     const glucose_status = getLastGlucose(glucose);
-    aisf(profile, autosens_data, dynamicVariables, glucose_status, clock, pumpHistory);
+    aisf(iob, profile, autosens_data, dynamicVariables, glucose_status, clock, pumpHistory);
     
     return profile
 }
@@ -41,13 +41,14 @@ function addReason(s) {
     autoISFReasons.push(s)
 }
 
-function aisf(profile, autosens_data, dynamicVariables, glucose_status, currentTime, pumpHistory) {
+function aisf(iob, profile, autosens_data, dynamicVariables, glucose_status, currentTime, pumpHistory) {
     autoISFMessages = [];
     autoISFReasons = [];
     profile.microbolusAllowed = true;
 
     // Turn Auto ISF off when exercising and an exercise setting is enabled, like with dynamic ISF.
     if (exercising(profile, dynamicVariables)) {
+        profile.autoISFreasons = "Auto ISF Disabled by Exercise";
         profile.iaps.autoisf = false;
         return
     } else {
@@ -72,7 +73,7 @@ function aisf(profile, autosens_data, dynamicVariables, glucose_status, currentT
     profile.smb_delivery_ratio = round(determine_varSMBratio(profile, glucose_status.glucose, dynamicVariables), 2);
 
     // Change the Max IOB setting, when applicable
-    iob_max(profile);
+    iob_max(iob, dynamicVariables, profile);
 
     profile.autoISFstring = autoISFMessages.join(". ") + ".";
     profile.autoISFreasons = autoISFReasons.join(", ");
@@ -435,9 +436,6 @@ function exercising(profile, dynamicVariables) {
     if (profile.high_temptarget_raises_sensitivity || profile.exercise_mode || dynamicVariables.isEnabled) {
         // Turn dynISF off when using a temp target >= 118 (6.5 mol/l) and if an exercise setting is enabled.
         if (profile.min_bg >= 118 || (dynamicVariables.useOverride && dynamicVariables.overrideTarget >= 118)) {
-            profile.autoISFreasons = "Auto ISF disabled";
-            profile.autoISFstring = "Disabled by exercise";
-            console.log(profile.autoISFreasons);
             return true;
         }
     }
@@ -489,15 +487,81 @@ function aimi(profile, pumpHistory, dynamicVariables, glucose_status) {
 }
 
 // You can set an Auto ISF - specific max IOB setting.
-function iob_max(profile) {
+function iob_max(iob, dynamicVariables, profile) {
     //Your setting
-    const threshold = profile.iaps.iobThresholdPercent;
+    let threshold = profile.iaps.iobThresholdPercent;
+
+    if (dynamicVariables.advancedSettings && dynamicVariables.aisfOverridden) {
+        threshold = dynamicVariables.autoISFoverrides.iobThresholdPercent
+    }
     //Guards
     if (threshold >= 100) {
         return
     }
-    profile.max_iob = round(profile.max_iob * threshold / 100, 1);
-    addReason("Max IOB: " + profile.max_iob);
+    if (!profile.microbolusAllowed) {
+        return
+    }
+
+    const currentBasal = profile.current_basal
+
+    let currentIOB;
+
+    if (!!iob && iob.length > 0) {
+        const latestIOB = iob[0]
+        currentIOB = latestIOB.iob
+    } else {
+        console.log("IOB data missing")
+        return
+    }
+
+    // SMBs are not allowed when above this threshold
+    const smbIOB = round(profile.max_iob * threshold / 100, 1)
+
+    if (currentIOB >= smbIOB) {
+        console.log("SMBs disabled (threshold)");
+        addReason("SMBs disabled (threshold)");
+        profile.microbolusAllowed = false;
+    } else {
+        // when below the threshold, SMBs are allowed
+        // additionally, in this case SMBs are allowed to overshoot the threshold by 30%
+        const smbIOBRemaining = smbIOB*1.30 - currentIOB
+
+        // using max SMB/UAM basal minutes to enforce SMB restrictions
+
+        // no more than this amount of basal minutes can be microbolused in order to stay below threshold+30%
+        const smbIOBRemainingBasalMinutes = round(smbIOBRemaining / (currentBasal / 60.0), 0)
+
+        let effectiveSmbMinutes;
+        if (dynamicVariables.advancedSettings) {
+            effectiveSmbMinutes = dynamicVariables.smbMinutes
+        } else {
+            effectiveSmbMinutes = profile.maxSMBBasalMinutes
+        }
+
+        let effectiveUamMinutes;
+        if (dynamicVariables.advancedSettings) {
+            effectiveUamMinutes = dynamicVariables.uamMinutes
+        } else {
+            effectiveUamMinutes = profile.maxUAMSMBBasalMinutes
+        }
+
+        if (smbIOBRemainingBasalMinutes < effectiveSmbMinutes) {
+            console.log("limiting maxSMBBasalMinutes: " + effectiveSmbMinutes + " -> " + smbIOBRemainingBasalMinutes)
+            addReason("Max SMB: " + effectiveSmbMinutes + " \u2192 " + smbIOBRemainingBasalMinutes);
+            profile.maxSMBBasalMinutes = smbIOBRemainingBasalMinutes;
+            if (dynamicVariables.advancedSettings) {
+                dynamicVariables.smbMinutes = smbIOBRemainingBasalMinutes;
+            }
+        }
+        if (smbIOBRemainingBasalMinutes < effectiveUamMinutes) {
+            console.log("limiting maxUAMSMBBasalMinutes: " + effectiveUamMinutes + " -> " + smbIOBRemainingBasalMinutes)
+            addReason("Max UAM: " + effectiveUamMinutes + " \u2192 " + smbIOBRemainingBasalMinutes);
+            profile.maxUAMSMBBasalMinutes = smbIOBRemainingBasalMinutes;
+            if (dynamicVariables.advancedSettings) {
+                dynamicVariables.uamMinutes = smbIOBRemainingBasalMinutes;
+            }
+        }
+    }
 }
 
 // Reasons for iAPS pop-up
