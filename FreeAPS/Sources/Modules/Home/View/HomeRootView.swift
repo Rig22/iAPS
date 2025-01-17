@@ -230,7 +230,7 @@ extension Home {
                         NSLocalizedString(" U", comment: " ")
 
                     Text(displayText)
-                        .font(.system(size: 14))
+                        .font(.system(size: 16))
                         .foregroundStyle(Color.white)
                         .offset(x: -120, y: 50)
 
@@ -339,7 +339,7 @@ extension Home {
                     }
 
                     Text(displayText)
-                        .font(.system(size: 16))
+                        .font(.system(size: 18))
                         .foregroundColor(.white)
                         .padding(.top, 0)
                 }
@@ -392,7 +392,7 @@ extension Home {
                     }
 
                     Text(displayText)
-                        .font(.system(size: 14))
+                        .font(.system(size: 16))
                         .foregroundColor(.white)
                         .padding(.top, 0)
                 }
@@ -435,7 +435,7 @@ extension Home {
                     }
 
                     Text(displayText)
-                        .font(.system(size: 15))
+                        .font(.system(size: 18))
                         .foregroundColor(.white)
                         .padding(.top, 5)
                 }
@@ -538,7 +538,7 @@ extension Home {
                                     Image(systemName: "chart.xyaxis.line")
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 16, height: 16)
+                                        .frame(width: 18, height: 18)
                                         .foregroundColor(.white)
 
                                     if let tempRate = state.tempRate {
@@ -548,19 +548,19 @@ extension Home {
                                             : ""
 
                                         Text(rateString)
-                                            .font(.system(size: 16))
+                                            .font(.system(size: 18))
                                             .foregroundColor(.white)
                                             +
                                             Text(" U/hr")
-                                            .font(.system(size: 12))
+                                            .font(.system(size: 14))
                                             .foregroundColor(.white)
                                             +
                                             Text(manualBasalString)
-                                            .font(.system(size: 16))
+                                            .font(.system(size: 18))
                                             .foregroundColor(.white)
                                     } else {
                                         Text("---")
-                                            .font(.system(size: 16))
+                                            .font(.system(size: 18))
                                             .foregroundColor(.white)
                                     }
                                 }
@@ -596,12 +596,12 @@ extension Home {
                                         .string(from: eventualBGValue as NSNumber)
                                     {
                                         Text(formattedBG)
-                                            .font(.system(size: 16))
+                                            .font(.system(size: 18))
                                             .foregroundColor(.white)
                                     }
 
                                     Text(state.units.rawValue)
-                                        .font(.system(size: 12))
+                                        .font(.system(size: 14))
                                         .foregroundStyle(.white)
                                         .padding(.leading, -4)
                                 }
@@ -612,7 +612,7 @@ extension Home {
                                         .foregroundStyle(.white)
 
                                     Text("---")
-                                        .font(.system(size: 16))
+                                        .font(.system(size: 18))
                                         .foregroundColor(.white)
                                 }
                             }
@@ -795,7 +795,7 @@ extension Home {
             if state.danaBar {
                 return AnyView(
                     VStack(spacing: 20) {
-                        HStack(spacing: 20) {
+                        HStack(spacing: 30) {
                             // Reservoir Stand
                             HStack(spacing: 10) {
                                 let maxValue = Decimal(300)
@@ -1678,11 +1678,11 @@ extension Home {
                             HStack(spacing: 0) {
                                 Text("ISF: ")
                                     .foregroundColor(.white)
-                                    .font(.system(size: 15))
+                                    .font(.system(size: 17))
 
                                 Text(glucoseFormatter.string(from: currentISF as NSNumber) ?? " ")
                                     .foregroundStyle(Color.white)
-                                    .font(.system(size: 15))
+                                    .font(.system(size: 17))
                             }
                             .padding(.leading, 15)
                             .frame(maxWidth: 100, alignment: .leading) // Links ausgerichtet
@@ -1690,12 +1690,12 @@ extension Home {
                             HStack(spacing: 4) {
                                 Text("ISF: ")
                                     .foregroundColor(.white)
-                                    .font(.system(size: 15))
+                                    .font(.system(size: 17))
 
                                 // Platzhalter, wenn kein ISF vorhanden ist
                                 Text("--")
                                     .foregroundStyle(Color.white)
-                                    .font(.system(size: 15))
+                                    .font(.system(size: 17))
                             }
                             .padding(.leading, 20) // Abstand linker Rand
                             .frame(maxWidth: 110, alignment: .leading)
@@ -1742,7 +1742,7 @@ extension Home {
                                 "TDD: " +
                                     (numberFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")
                             )
-                            .font(.system(size: 14))
+                            .font(.system(size: 17))
                             .foregroundColor(.white)
                             .padding(.trailing, 20)
                         }.frame(maxWidth: 110, alignment: .trailing)
