@@ -1522,9 +1522,9 @@ extension MainChartView {
         if minValue > Config.minGlucose {
             minValue = Config.minGlucose
         }
-        if maxValue < Config.maxGlucose {
-            maxValue = Config.maxGlucose
-        }
+        /*  if maxValue < Config.maxGlucose {
+             maxValue = Config.maxGlucose
+         }*/
         return (min: minValue, max: maxValue)
     }
 
