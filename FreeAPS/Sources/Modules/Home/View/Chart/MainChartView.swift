@@ -269,7 +269,6 @@ struct MainChartView: View {
                         style: StrokeStyle(lineWidth: 1.2, dash: [5, 8]) // dash: [Strichlänge, Abstand]
                     )
                 }
-
                 let yrange = glucoseYRange
                 let bottomstep = (yrange.maxY - yrange.minY) / CGFloat(yrange.maxValue - yrange.minValue) *
                     (CGFloat(yrange.maxValue) - CGFloat(lowGlucose))

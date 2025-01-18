@@ -392,7 +392,7 @@ extension Home {
                     }
 
                     Text(displayText)
-                        .font(.system(size: 16))
+                        .font(.system(size: 15))
                         .foregroundColor(.white)
                         .padding(.top, 0)
                 }
@@ -2243,7 +2243,6 @@ extension Home {
                 } else {
                     VStack(spacing: 0) {
                         headerView(geo)
-
                         ScrollView {
                             ScrollViewReader { _ in
                                 LazyVStack {
