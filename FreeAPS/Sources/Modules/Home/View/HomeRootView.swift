@@ -20,6 +20,7 @@ extension Home {
         @State var scrollOffset = CGFloat.zero
         @State var display = false
         @State var showBolusActiveAlert = false
+        @State var displayAutoHistory = false
 
         @Namespace var scrollSpace
 
@@ -94,7 +95,7 @@ extension Home {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
             formatter.maximumFractionDigits = 0
-            if state.units == .mmolL {
+            if state.data.units == .mmolL {
                 formatter.minimumFractionDigits = 1
                 formatter.maximumFractionDigits = 1
             }
@@ -116,7 +117,7 @@ extension Home {
         private var fetchedTargetFormatter: NumberFormatter {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
-            if state.units == .mmolL {
+            if state.data.units == .mmolL {
                 formatter.maximumFractionDigits = 1
             } else { formatter.maximumFractionDigits = 0 }
             return formatter
@@ -167,12 +168,12 @@ extension Home {
 
             return CurrentGlucoseView(
                 recentGlucose: $state.recentGlucose,
-                timerDate: $state.timerDate,
+                timerDate: $state.data.timerDate,
                 delta: $state.glucoseDelta,
-                units: $state.units,
+                units: $state.data.units,
                 alarm: $state.alarm,
-                lowGlucose: $state.lowGlucose,
-                highGlucose: $state.highGlucose,
+                lowGlucose: $state.data.lowGlucose,
+                highGlucose: $state.data.highGlucose,
                 bolusProgress: doubleBolusProgress
             )
             .onTapGesture {
@@ -590,7 +591,7 @@ extension Home {
                                         .font(.statusFont)
                                         .foregroundStyle(.white)
 
-                                    let eventualBGValue = state.units == .mmolL ? eventualBG.asMmolL : Decimal(eventualBG)
+                                    let eventualBGValue = state.data.units == .mmolL ? eventualBG.asMmolL : Decimal(eventualBG)
 
                                     if let formattedBG = fetchedTargetFormatter
                                         .string(from: eventualBGValue as NSNumber)
@@ -600,7 +601,7 @@ extension Home {
                                             .foregroundColor(.white)
                                     }
 
-                                    Text(state.units.rawValue)
+                                    Text(state.data.units.rawValue)
                                         .font(.system(size: 14))
                                         .foregroundStyle(.white)
                                         .padding(.leading, -4)
@@ -655,7 +656,7 @@ extension Home {
                 if let settings = state.settingsManager {
                     HStack(spacing: 0) {
                         ZStack {
-                            let substance = Double(state.suggestion?.cob ?? 0)
+                            let substance = Double(state.data.suggestion?.cob ?? 0)
                             let maxValue = max(Double(settings.preferences.maxCOB), 1)
                             let fraction = CGFloat(substance / maxValue)
                             let fill = max(min(fraction, 1.0), 0.0)
@@ -666,7 +667,7 @@ extension Home {
                                 fillFraction: fill,
                                 color: .loopYellow,
                                 backgroundColor: .clear,
-                                displayText: "\(numberFormatter.string(from: (state.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
+                                displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
                                 symbolSize: 0,
                                 symbol: "syringe",
                                 animateProgress: true
@@ -690,7 +691,7 @@ extension Home {
                 if let settings = state.settingsManager {
                     HStack(spacing: 0) {
                         ZStack {
-                            let substance = Double(state.suggestion?.iob ?? 0)
+                            let substance = Double(state.data.suggestion?.iob ?? 0)
                             let maxValue = max(Double(settings.preferences.maxIOB), 1)
                             let fraction = CGFloat(substance / maxValue)
                             let fill = max(min(fraction, 1.0), 0.0)
@@ -701,7 +702,7 @@ extension Home {
                                 fillFraction: fill,
                                 color: substance < 0 ? .blue : .insulin,
                                 backgroundColor: .clear,
-                                displayText: "\(insulinnumberFormatter.string(from: (state.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
+                                displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
                                 symbolSize: 0,
                                 symbol: "syringe",
                                 animateProgress: true
@@ -1142,6 +1143,7 @@ extension Home {
                             }
                         }
                         .padding(.top, 10)
+                        .padding(.bottom, 20)
                     }
                     .onReceive(timer) { _ in
                         state.specialDanaKitFunction()
@@ -1461,6 +1463,7 @@ extension Home {
                             }
                         }
                         .padding(.top, 10)
+                        .padding(.bottom, 20)
                     }
                     .onReceive(timer) { _ in
                         state.specialDanaKitFunction()
@@ -1484,40 +1487,10 @@ extension Home {
                         .ignoresSafeArea()
                         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 }
-
-                MainChartView(
-                    glucose: $state.glucose,
-                    isManual: $state.isManual,
-                    suggestion: $state.suggestion,
-                    tempBasals: $state.tempBasals,
-                    boluses: $state.boluses,
-                    suspensions: $state.suspensions,
-                    announcement: $state.announcement,
-                    hours: .constant(state.filteredHours),
-                    maxBasal: $state.maxBasal,
-                    autotunedBasalProfile: $state.autotunedBasalProfile,
-                    basalProfile: $state.basalProfile,
-                    tempTargets: $state.tempTargets,
-                    carbs: $state.carbs,
-                    timerDate: $state.timerDate,
-                    units: $state.units,
-                    smooth: $state.smooth,
-                    highGlucose: $state.highGlucose,
-                    lowGlucose: $state.lowGlucose,
-                    screenHours: $state.hours,
-                    displayXgridLines: $state.displayXgridLines,
-                    displayYgridLines: $state.displayYgridLines,
-                    thresholdLines: $state.thresholdLines,
-                    triggerUpdate: $triggerUpdate,
-                    overrideHistory: $state.overrideHistory,
-                    minimumSMB: $state.minimumSMB
-                    // maxBolus: $state.maxBolus,
-                    // maxBolusValue: $state.maxBolusValue
-                    // useInsulinBars: $state.useInsulinBars
-                )
+                MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
             }
+            .padding(.bottom, 5)
             .modal(for: .dataTable, from: self)
-            .padding()
         }
 
         let deviceWidthMultiplier: CGFloat = 1.07
@@ -1615,7 +1588,7 @@ extension Home {
                         .frame(height: 20)
                 }
 
-                if state.closedLoop, state.settingsManager.preferences.maxIOB == 0 {
+                if state.closedLoop, state.maxIOB == 0 {
                     Text("Check Max IOB Setting")
                         .font(.extraSmall)
                         .foregroundColor(.orange)
@@ -1647,8 +1620,8 @@ extension Home {
             Buttons(label: "3", number: "3", active: false, hours: 3),
             Buttons(label: "6", number: "6", active: false, hours: 6),
             Buttons(label: "12", number: "12", active: false, hours: 12),
-            Buttons(label: "24", number: "24", active: false, hours: 24),
-            Buttons(label: "36", number: "36", active: false, hours: 36)
+            Buttons(label: "24", number: "24", active: false, hours: 24)
+            // Buttons(label: "36", number: "36", active: false, hours: 36)
         ]
 
         func highlightButtons() {
@@ -1674,18 +1647,24 @@ extension Home {
                         // Linker Stack
                         Spacer()
 
-                        if let currentISF = state.isf {
+                        if state.autoisf {
                             HStack(spacing: 0) {
                                 Text("ISF: ")
                                     .foregroundColor(.white)
                                     .font(.system(size: 17))
 
-                                Text(glucoseFormatter.string(from: currentISF as NSNumber) ?? " ")
+                                Text("\(state.data.suggestion?.sensitivityRatio ?? 1)")
                                     .foregroundStyle(Color.white)
                                     .font(.system(size: 17))
                             }
                             .padding(.leading, 15)
                             .frame(maxWidth: 100, alignment: .leading) // Links ausgerichtet
+                            .onTapGesture {
+                                if state.autoisf {
+                                    displayAutoHistory.toggle()
+                                }
+                            }
+
                         } else {
                             HStack(spacing: 4) {
                                 Text("ISF: ")
@@ -1700,6 +1679,13 @@ extension Home {
                             .padding(.leading, 20) // Abstand linker Rand
                             .frame(maxWidth: 110, alignment: .leading)
                         }
+
+                        /*      HStack {
+                             isfView
+                                 .foregroundColor(.white)
+                         }.padding(.leading, 15)
+                             .frame(maxWidth: 100, alignment: .leading)*/ // Links ausgerichtet
+
                         Spacer()
 
                         // Mittlerer Stack
@@ -1752,6 +1738,22 @@ extension Home {
             } else {
                 return AnyView(EmptyView())
             }
+        }
+
+        private var isfView: some View {
+            ZStack {
+                HStack {
+                    Image(systemName: "divide").font(.system(size: 16)).foregroundStyle(.teal)
+                    Text("\(state.data.suggestion?.sensitivityRatio ?? 1)").foregroundStyle(.primary)
+                }
+                .font(.timeSettingFont)
+                .background(TimeEllipse(characters: 10))
+                .onTapGesture {
+                    if state.autoisf {
+                        displayAutoHistory.toggle()
+                    }
+                }
+            }.offset(x: 20)
         }
 
         // buttonPanel
@@ -1876,10 +1878,10 @@ extension Home {
 
         var loopView: some View {
             LoopView(
-                suggestion: $state.suggestion,
+                suggestion: $state.data.suggestion,
                 enactedSuggestion: $state.enactedSuggestion,
                 closedLoop: $state.closedLoop,
-                timerDate: $state.timerDate,
+                timerDate: $state.data.timerDate,
                 isLooping: $state.isLooping,
                 lastLoopDate: $state.lastLoopDate,
                 manualTempBasal: $state.manualTempBasal
@@ -1895,10 +1897,10 @@ extension Home {
 
         var loopView2: some View {
             LoopView2(
-                suggestion: $state.suggestion,
+                suggestion: $state.data.suggestion,
                 enactedSuggestion: $state.enactedSuggestion,
                 closedLoop: $state.closedLoop,
-                timerDate: $state.timerDate,
+                timerDate: $state.data.timerDate,
                 isLooping: $state.isLooping,
                 lastLoopDate: $state.lastLoopDate,
                 manualTempBasal: $state.manualTempBasal
@@ -1971,17 +1973,9 @@ extension Home {
             }
         }
 
-        // TAGESÜBERSICHT
-
         @ViewBuilder private func glucoseHeaderView() -> some View {
             backgroundColor
                 .frame(maxHeight: 200)
-            VStack {
-                Text("Tagesübersicht").font(.system(size: 22, weight: .heavy)).padding(.top, 0).padding(.bottom, 15)
-            }
-            VStack {
-                Text("Glukoseverlauf").font(.previewHeadline).padding(.top, 0).padding(.bottom, 0)
-            }
             VStack {
                 glucosePreview
             }
@@ -1990,143 +1984,57 @@ extension Home {
         }
 
         var glucosePreview: some View {
-            let data = state.glucose
+            let data = state.data.glucose
             let minimum = data.compactMap(\.glucose).min() ?? 0
             let minimumRange = Double(minimum) * 0.8
             let maximum = Double(data.compactMap(\.glucose).max() ?? 0) * 1.1
 
-            let high = state.highGlucose
-            let low = state.lowGlucose
+            let high = state.data.highGlucose
+            let low = state.data.lowGlucose
             let veryHigh = 198
 
-            return ZStack {
-                Color.gray.opacity(0.2)
-                    .cornerRadius(20)
-                    .shadow(color: Color.black.opacity(0.2), radius: 5, x: 0, y: 2)
-                    .padding(.horizontal, 15)
-                    .padding(.top, 0)
-                    .padding(.bottom, 20)
-
-                Chart(data) {
-                    PointMark(
-                        x: .value("Time", $0.dateString),
-                        y: .value(
-                            "Glucose",
-                            Double($0.glucose ?? 0) * (state.units == .mmolL ? 0.0555 : 1.0)
-                        )
-                    )
-                    .foregroundStyle(
-                        (($0.glucose ?? 0) > veryHigh || Decimal($0.glucose ?? 0) < low) ? Color.red :
-                            Decimal($0.glucose ?? 0) > high ? Color.yellow : Color.darkGreen
-                    )
-                    .symbolSize(9)
-                }
-                .chartXAxis {
-                    AxisMarks(values: .stride(by: .hour, count: 2)) { _ in
-                        AxisValueLabel(
-                            format: .dateTime.hour(.defaultDigits(amPM: .omitted))
-                                .locale(Locale(identifier: "sv")) // 24h-Format
-                        )
-                        .foregroundStyle(Color.white)
-                        AxisGridLine()
-                            .foregroundStyle(Color.white.opacity(0.5))
-                    }
-                }
-                .chartYAxis {
-                    AxisMarks(values: .automatic(desiredCount: 3)) { _ in
-                        AxisValueLabel()
-                            .foregroundStyle(Color.white)
-                        AxisGridLine()
-                            .foregroundStyle(Color.white.opacity(0.5))
-                    }
-                }
-                .chartYScale(
-                    domain: minimumRange * (state.units == .mmolL ? 0.0555 : 1.0) ... maximum *
-                        (state.units == .mmolL ? 0.0555 : 1.0)
+            return Chart(data) {
+                PointMark(
+                    x: .value("Time", $0.dateString),
+                    y: .value("Glucose", Double($0.glucose ?? 0) * (state.data.units == .mmolL ? 0.0555 : 1.0))
                 )
-                .chartXScale(
-                    domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
+                .foregroundStyle(
+                    (($0.glucose ?? 0) > veryHigh || Decimal($0.glucose ?? 0) < low) ? Color(.red) : Decimal($0.glucose ?? 0) >
+                        high ? Color(.yellow) : Color(.darkGreen)
                 )
-                .frame(maxHeight: 280)
-                .foregroundStyle(Color.white)
-                .padding(.leading, 25)
-                .padding(.trailing, 25)
-                .padding(.top, 20)
-                .padding(.bottom, 40)
+                .symbolSize(5)
             }
-            .padding(.horizontal, 10)
-            .onTapGesture {
-                state.showModal(for: .statistics)
+            .chartXAxis(.hidden)
+            .chartYAxis {
+                AxisMarks(values: .automatic(desiredCount: 3))
             }
+            .chartYScale(
+                domain: minimumRange * (state.data.units == .mmolL ? 0.0555 : 1.0) ... maximum *
+                    (state.data.units == .mmolL ? 0.0555 : 1.0)
+            )
+            .chartXScale(
+                domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
+            )
+            .frame(height: 60)
+            .padding(.leading, 30)
+            .padding(.trailing, 32)
+            .padding(.top, 15)
+            .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
         }
 
-        @ViewBuilder private func TDDOverView() -> some View {
-            VStack(alignment: .center, spacing: 10) {
-                Text("Übersicht TDD")
-                    .font(.previewHeadline)
-                    .padding(.top, 10)
-                    .padding(.bottom, 10)
-                    .foregroundColor(.white)
-                // Tabellenansicht
-                VStack(spacing: 10) {
-                    // Tabellenüberschriften
-
-                    HStack {
-                        Text(" ")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("24h")
-                            .frame(maxWidth: .infinity, alignment: .center)
-                        Text("⇢ 2Days")
-                            .frame(maxWidth: .infinity, alignment: .center)
-                        Text("⇢ 3Day")
-                            .frame(maxWidth: .infinity, alignment: .center)
-                        Text("10dayØ")
-                            .frame(maxWidth: .infinity, alignment: .center)
-                    }
-                    .font(.system(size: 16))
-                    .foregroundColor(.white)
-
-                    Divider()
-                        .background(Color.white)
-
-                    // Tabellenwerte
-                    HStack {
-                        // Erste Zeile: TDD-Werte
-                        Text("TDD:")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-
-                        Text(
-                            numberFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0"
-                        )
-
-                        .frame(maxWidth: .infinity, alignment: .center)
-
-                        Text(
-                            numberFormatter.string(from: state.tddYesterday as NSNumber) ?? "0"
-                        )
-                        .frame(maxWidth: .infinity, alignment: .center)
-
-                        Text(
-                            numberFormatter.string(from: state.tdd2DaysAgo as NSNumber) ?? "0"
-                        )
-                        .frame(maxWidth: .infinity, alignment: .center)
-
-                        Text(
-                            numberFormatter.string(from: state.tdd3DaysAgo as NSNumber) ?? "0"
-                        )
-                        .frame(maxWidth: .infinity, alignment: .center)
-                    }
-                    .font(.system(size: 16))
-                    .foregroundColor(.white)
-                }
-                .padding()
-                .background(Color.gray.opacity(0.2))
-                .cornerRadius(10)
-                .shadow(radius: 5)
-            }
-            .padding(20)
-            .background(backgroundColor)
-        }
+        /*  var preview: some View {
+             backgroundColor
+                 .frame(minHeight: 150)
+                 .overlay {
+                     PreviewChart(readings: $state.readings, lowLimit: $state.data.lowGlucose, highLimit: $state.data.highGlucose)
+                 }
+                 .clipShape(RoundedRectangle(cornerRadius: 15))
+                 .padding(.horizontal, 10)
+                 .foregroundStyle(Color.white)
+                 .onTapGesture {
+                     state.showModal(for: .statistics)
+                 }
+         }*/
 
         var preview: some View {
             VStack {
@@ -2136,13 +2044,17 @@ extension Home {
                     .foregroundColor(.white)
 
                 ZStack {
-                    Color.gray.opacity(0.2)
-                        .cornerRadius(15)
-                        .shadow(radius: 5)
+                    /* Color.gray.opacity(0.2)
+                     .cornerRadius(15)
+                     .shadow(radius: 5)*/
 
                     VStack {
-                        PreviewChart(readings: $state.readings, lowLimit: $state.lowGlucose, highLimit: $state.highGlucose)
-                            .padding()
+                        PreviewChart(
+                            readings: $state.readings,
+                            lowLimit: $state.data.lowGlucose,
+                            highLimit: $state.data.highGlucose
+                        )
+                        .padding()
                     }
                 }
                 .padding(.horizontal, 20)
@@ -2154,62 +2066,75 @@ extension Home {
         }
 
         var loopPreview: some View {
-            VStack {
-                Text(NSLocalizedString("Loops", comment: "") + " / " + NSLocalizedString("Readings", comment: ""))
-                    .padding(.bottom, 10)
-                    .font(.previewHeadline)
-
-                ZStack {
-                    Color.gray.opacity(0.2)
-                        .cornerRadius(15)
-                        .shadow(radius: 5)
-
-                    VStack {
-                        LoopsView(loopStatistics: $state.loopStatistics)
-                            .padding()
-                    }
+            backgroundColor
+                .frame(minHeight: 190)
+                .overlay {
+                    LoopsView(loopStatistics: $state.loopStatistics)
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 5)
-            }
-            .onTapGesture {
-                state.showModal(for: .statistics)
-            }
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .padding(.horizontal, 10)
+                .foregroundStyle(Color.white)
+                .onTapGesture {
+                    state.showModal(for: .statistics)
+                }
         }
 
-        var activeCOBView: some View {
-            VStack {
-                Text("Active Carbohydrates")
-                    .padding(.bottom, 10)
-                    .font(.previewHeadline)
-                    .foregroundColor(.white)
+        /*      var activeCOBView: some View {
+             VStack {
+                 Text("Active Carbohydrates")
+                     .padding(.bottom, 10)
+                     .font(.previewHeadline)
+                     .foregroundColor(.white)
 
-                ZStack {
-                    Color.gray.opacity(0.2)
-                        .cornerRadius(15)
-                        .shadow(radius: 5)
+                 ZStack {
+                     Color.gray.opacity(0.2)
+                         .cornerRadius(15)
+                         .shadow(radius: 5)
 
-                    ActiveCOBView(data: $state.iobData)
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 5)
-                .padding(.bottom, 20)
-                .padding(.top, 10)
-            }
-        }
+                     ActiveCOBView(data: $state.iobData)
+                 }
+                 .padding(.horizontal, 20)
+                 .padding(.vertical, 5)
+                 .padding(.bottom, 20)
+                 .padding(.top, 10)
+             }
+         }
+
+         var activeIOBView: some View {
+             VStack {
+                 Text("Active Insulin")
+                     .padding(.bottom, 10)
+                     .font(.previewHeadline)
+                     .foregroundColor(.white)
+
+                 ZStack {
+                     Color.gray.opacity(0.2)
+                         .cornerRadius(15)
+                         .shadow(radius: 5)
+
+                     ActiveIOBView(
+                         data: $state.iobData,
+                         neg: $state.neg,
+                         tddChange: $state.tddChange,
+                         tddAverage: $state.tddAverage,
+                         tddYesterday: $state.tddYesterday,
+                         tdd2DaysAgo: $state.tdd2DaysAgo,
+                         tdd3DaysAgo: $state.tdd3DaysAgo,
+                         tddActualAverage: $state.tddActualAverage
+                     )
+                     .padding(.top, 20)
+                 }
+                 .padding(.horizontal, 20)
+                 .padding(.vertical, 5)
+                 .padding(.bottom, 20)
+                 .padding(.top, 10)
+             }
+         }*/
 
         var activeIOBView: some View {
-            VStack {
-                Text("Active Insulin")
-                    .padding(.bottom, 10)
-                    .font(.previewHeadline)
-                    .foregroundColor(.white)
-
-                ZStack {
-                    Color.gray.opacity(0.2)
-                        .cornerRadius(15)
-                        .shadow(radius: 5)
-
+            backgroundColor
+                .frame(minHeight: 430)
+                .overlay {
                     ActiveIOBView(
                         data: $state.iobData,
                         neg: $state.neg,
@@ -2220,16 +2145,22 @@ extension Home {
                         tdd3DaysAgo: $state.tdd3DaysAgo,
                         tddActualAverage: $state.tddActualAverage
                     )
-                    .padding(.top, 20)
                 }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 5)
-                .padding(.bottom, 20)
-                .padding(.top, 10)
-            }
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .padding(.horizontal, 10)
+                .foregroundStyle(Color.white)
         }
 
-        // Tagesübersicht Ende
+        var activeCOBView: some View {
+            backgroundColor
+                .frame(minHeight: 230)
+                .overlay {
+                    ActiveCOBView(data: $state.iobData)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .foregroundStyle(Color.white)
+                .padding(.horizontal, 10)
+        }
 
         var backgroundColor: Color {
             BackgroundColorOption(rawValue: state.backgroundColorOptionRawValue)?.color ?? .black
@@ -2250,8 +2181,7 @@ extension Home {
                                     if !state.skipGlucoseChart {
                                         glucoseHeaderView().padding(.top, 10)
                                     }
-                                    TDDOverView().padding(.top, -30)
-                                    preview.padding(.top, 0)
+                                    preview.padding(.top, 30)
                                     loopPreview.padding(.top, 10).padding(.bottom, 25)
                                     if state.iobData.count >= 0 {
                                         activeCOBView.padding(.top, 0)
@@ -2316,7 +2246,7 @@ extension Home {
             VStack(alignment: .leading, spacing: 4) {
                 Text(state.statusTitle).font(.suggestionHeadline).foregroundStyle(Color.white)
                     .padding(.bottom, 4)
-                if let suggestion = state.suggestion {
+                if let suggestion = state.data.suggestion {
                     TagCloudView(tags: suggestion.reasonParts).animation(.none, value: false)
 
                     Text(suggestion.reasonConclusion.capitalizingFirstLetter()).font(.suggestionSmallParts)
@@ -2331,7 +2261,7 @@ extension Home {
                         .padding(.bottom, 4)
                         .padding(.top, 8)
                     Text(errorMessage).font(.suggestionError).fontWeight(.semibold).foregroundColor(.orange)
-                } else if let suggestion = state.suggestion, (suggestion.bg ?? 100) == 400 {
+                } else if let suggestion = state.data.suggestion, (suggestion.bg ?? 100) == 400 {
                     Text("Invalid CGM reading (HIGH).").font(.suggestionError).bold().foregroundColor(.loopRed)
                         .padding(.top, 8)
                     Text("SMBs and High Temps Disabled.").font(.suggestionParts).foregroundStyle(Color.white)

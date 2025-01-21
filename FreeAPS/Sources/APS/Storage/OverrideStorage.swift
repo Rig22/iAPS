@@ -32,6 +32,30 @@ final class OverrideStorage {
         return overrideArray
     }
 
+    func fetchLatestAutoISFsettings() -> [Auto_ISF] {
+        var array = [Auto_ISF]()
+        coredataContext.performAndWait {
+            let request = Auto_ISF.fetchRequest() as NSFetchRequest<Auto_ISF>
+            let sort = NSSortDescriptor(key: "date", ascending: false)
+            request.sortDescriptors = [sort]
+            request.fetchLimit = 1
+            try? array = self.coredataContext.fetch(request)
+        }
+        return array
+    }
+
+    func fetchAutoISFsetting(id: String) -> Auto_ISF? {
+        var array = [Auto_ISF]()
+        coredataContext.performAndWait {
+            let request = Auto_ISF.fetchRequest() as NSFetchRequest<Auto_ISF>
+            request.predicate = NSPredicate(
+                format: "id == %@", id as String
+            )
+            try? array = self.coredataContext.fetch(request)
+        }
+        return array.first
+    }
+
     func fetchNumberOfOverrides(numbers: Int) -> [Override] {
         var overrideArray = [Override]()
         coredataContext.performAndWait {
@@ -68,9 +92,9 @@ final class OverrideStorage {
                 history.duration = -1 * (latest.date ?? Date()).timeIntervalSinceNow.minutes
                 history.date = latest.date ?? Date()
                 // Looks better in Home View Main Chart when target isn't == 0.
-                if Double(truncating: latest.target ?? 100) < 6 {
+                if Double(latest.target ?? 100) < 6 {
                     history.target = 6
-                } else { history.target = Double(truncating: latest.target ?? 100) }
+                } else { history.target = Double(latest.target ?? 100) }
                 duration = history.duration
             }
             profiles.enabled = false
@@ -106,6 +130,24 @@ final class OverrideStorage {
         }
     }
 
+    func activatePreset(_ id: String) {
+        coredataContext.performAndWait {
+            var presetsArray = [OverridePresets]()
+            coredataContext.performAndWait {
+                let requestPresets = OverridePresets.fetchRequest() as NSFetchRequest<OverridePresets>
+                requestPresets.predicate = NSPredicate(
+                    format: "id == %@", id
+                )
+                try? presetsArray = self.coredataContext.fetch(requestPresets)
+
+                guard let overidePreset = presetsArray.first else {
+                    return
+                }
+                overrideFromPreset(overidePreset)
+            }
+        }
+    }
+
     func fetchProfilePreset(_ name: String) -> OverridePresets? {
         var presetsArray = [OverridePresets]()
         var preset: OverridePresets?
@@ -138,7 +180,7 @@ final class OverrideStorage {
             return nil
         }
 
-        guard (last.date ?? Date.now).addingTimeInterval(Int(truncating: last.duration ?? 0).minutes.timeInterval) > Date(),
+        guard (last.date ?? Date.now).addingTimeInterval(Int(last.duration ?? 0).minutes.timeInterval) > Date(),
               (last.date ?? Date.now) <= Date.now,
               last.duration != 0
         else {
@@ -160,7 +202,6 @@ final class OverrideStorage {
     }
 
     func activateOverride(_ override: Override) {
-        _ = [Override]()
         coredataContext.performAndWait {
             let save = Override(context: coredataContext)
             save.date = Date.now

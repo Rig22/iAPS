@@ -89,6 +89,37 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var hideInsulinBadge: Bool = false
     var allowDilution: Bool = false
     var extended_overrides = false
+    var extendHomeView = true
+    // Auto ISF
+    var autoisf: Bool = false
+    var smbDeliveryRatioBGrange: Decimal = 0
+    var smbDeliveryRatioMin: Decimal = 0.5
+    var smbDeliveryRatioMax: Decimal = 0.5
+    var autoISFhourlyChange: Decimal = 1
+    var higherISFrangeWeight: Decimal = 0
+    var lowerISFrangeWeight: Decimal = 0
+    var postMealISFweight: Decimal = 0.01
+    var enableBGacceleration: Bool = true
+    var bgAccelISFweight: Decimal = 0
+    var bgBrakeISFweight: Decimal = 0.10
+    var iobThresholdPercent: Decimal = 100
+    var autoisf_max: Decimal = 1.2
+    var autoisf_min: Decimal = 0.8
+    // B30
+    var use_B30 = false
+    var iTime_Start_Bolus: Decimal = 1.5
+    var iTime_target: Decimal = 90
+    var b30targetLevel: Decimal = 100
+    var b30upperLimit: Decimal = 130
+    var b30upperdelta: Decimal = 8
+    var b30factor: Decimal = 5
+    var b30_duration: Decimal = 30
+    // Keto protection
+    var ketoProtect: Bool = false
+    var variableKetoProtect: Bool = false
+    var ketoProtectBasalPercent: Decimal = 20
+    var ketoProtectAbsolut: Bool = false
+    var ketoProtectBasalAbsolut: Decimal = 0
 
     // Computed property for background color option
     var backgroundColorOption: BackgroundColorOption {
@@ -208,6 +239,37 @@ struct EncodableFreeAPSSettings: Encodable {
         case disableHypoTreatment
         case allowDilution
         case extendedOverride
+        case extendHomeView
+        // AutoISF
+        case autoisf
+        case smbDeliveryRatioRange
+        case smbDeliveryRatioMin
+        case smbDeliveryRatioMax
+        case autoISFhourlyChange
+        case higherISFrangeWeight
+        case lowerISFrangeWeight
+        case postMealISFweight
+        case enableBGacceleration
+        case bgAccelISFweight
+        case bgBrakeISFweight
+        case iobThresholdPercent
+        case autoisf_max
+        case autoisf_min
+        // B30
+        case use_B30
+        case iTime_Start_Bolus
+        case iTime_target
+        case b30targetLevel
+        case b30upperLimit
+        case b30upperdelta
+        case b30factor
+        case b30_duration
+        // Keto Protect
+        case ketoProtect
+        case variableKetoProtect
+        case ketoProtectBasalPercent
+        case ketoProtectAbsolut
+        case ketoProtectBasalAbsolut
     }
 
     func encode(to encoder: Encoder) throws {
@@ -302,5 +364,35 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.disableHypoTreatment, forKey: .disableHypoTreatment)
         try container.encode(settings.allowDilution, forKey: .allowDilution)
         try container.encode(settings.extended_overrides, forKey: .extendedOverride)
+        // AutoISF
+        try container.encode(settings.autoisf, forKey: .autoisf)
+        try container.encode(settings.smbDeliveryRatioBGrange, forKey: .smbDeliveryRatioRange)
+        try container.encode(settings.smbDeliveryRatioMin, forKey: .smbDeliveryRatioMin)
+        try container.encode(settings.smbDeliveryRatioMax, forKey: .smbDeliveryRatioMax)
+        try container.encode(settings.autoISFhourlyChange, forKey: .autoISFhourlyChange)
+        try container.encode(settings.higherISFrangeWeight, forKey: .higherISFrangeWeight)
+        try container.encode(settings.lowerISFrangeWeight, forKey: .lowerISFrangeWeight)
+        try container.encode(settings.postMealISFweight, forKey: .postMealISFweight)
+        try container.encode(settings.enableBGacceleration, forKey: .enableBGacceleration)
+        try container.encode(settings.bgAccelISFweight, forKey: .bgAccelISFweight)
+        try container.encode(settings.bgBrakeISFweight, forKey: .bgBrakeISFweight)
+        try container.encode(settings.iobThresholdPercent, forKey: .iobThresholdPercent)
+        try container.encode(settings.autoisf_max, forKey: .autoisf_max)
+        try container.encode(settings.autoisf_min, forKey: .autoisf_min)
+        // B30
+        try container.encode(settings.use_B30, forKey: .use_B30)
+        try container.encode(settings.iTime_Start_Bolus, forKey: .iTime_Start_Bolus)
+        try container.encode(settings.iTime_target, forKey: .iTime_target)
+        try container.encode(settings.b30targetLevel, forKey: .b30targetLevel)
+        try container.encode(settings.b30upperLimit, forKey: .b30upperLimit)
+        try container.encode(settings.b30upperdelta, forKey: .b30upperdelta)
+        try container.encode(settings.b30factor, forKey: .b30factor)
+        try container.encode(settings.b30_duration, forKey: .b30_duration)
+        // Keto Protect
+        try container.encode(settings.ketoProtect, forKey: .ketoProtect)
+        try container.encode(settings.variableKetoProtect, forKey: .variableKetoProtect)
+        try container.encode(settings.ketoProtectBasalPercent, forKey: .ketoProtectBasalPercent)
+        try container.encode(settings.ketoProtectAbsolut, forKey: .ketoProtectAbsolut)
+        try container.encode(settings.ketoProtectBasalAbsolut, forKey: .ketoProtectBasalAbsolut)
     }
 }

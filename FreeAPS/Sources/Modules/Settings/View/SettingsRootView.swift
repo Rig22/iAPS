@@ -96,9 +96,10 @@ extension Settings {
                     Text("App Icons").navigationLink(to: .iconConfig, from: self)
                     Text("Bolus Calculator").navigationLink(to: .bolusCalculatorConfig, from: self)
                     Text("Fat And Protein Conversion").navigationLink(to: .fpuConfig, from: self)
-                    Text("Dynamic ISF").navigationLink(to: .dynamicISF, from: self)
                     Text("Sharing").navigationLink(to: .sharing, from: self)
                     Text("Contact Image").navigationLink(to: .contactTrick, from: self)
+                    Text("Dynamic ISF").navigationLink(to: .dynamicISF, from: self)
+                    Text("Auto ISF").navigationLink(to: .autoISF, from: self)
                 } header: { Text("Extra Features") }
 
                 Section {
@@ -141,6 +142,8 @@ extension Settings {
                                 .navigationLink(to: .configEditor(file: OpenAPS.Settings.autosense), from: self)
                             Text("Pump History")
                                 .navigationLink(to: .configEditor(file: OpenAPS.Monitor.pumpHistory), from: self)
+                            Text("Temp Basals")
+                                .navigationLink(to: .configEditor(file: OpenAPS.Monitor.tempBasal), from: self)
                             Text("Basal profile")
                                 .navigationLink(to: .configEditor(file: OpenAPS.Settings.basalProfile), from: self)
                             Text("Targets ranges")
@@ -171,7 +174,10 @@ extension Settings {
                             Text("Glucose")
                                 .navigationLink(to: .configEditor(file: OpenAPS.Monitor.glucose), from: self)
                         }
-
+                        Group {
+                            Text("Dynamic Variables")
+                                .navigationLink(to: .configEditor(file: OpenAPS.Monitor.dynamicVariables), from: self)
+                        }
                         Group {
                             Text("Target presets")
                                 .navigationLink(to: .configEditor(file: OpenAPS.FreeAPS.tempTargetsPresets), from: self)

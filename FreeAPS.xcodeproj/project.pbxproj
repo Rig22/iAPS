@@ -318,6 +318,8 @@
 		792F32F62CD9DCAF009E7F7A /* BackgroundColorOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */; };
 		793F48E22D0203D30029BC95 /* DanaBarViewOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793F48E12D0203BF0029BC95 /* DanaBarViewOption.swift */; };
 		795CBE122D3F60B20044854B /* BGTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE112D3F60A30044854B /* BGTextField.swift */; };
+		795CBE142D3F943A0044854B /* AutoISFsettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE132D3F942B0044854B /* AutoISFsettings.swift */; };
+		795CBE162D3F949D0044854B /* ChartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE152D3F94900044854B /* ChartModel.swift */; };
 		7974B64C2D3817C10077EF9F /* LoopViewOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7974B64B2D3817C10077EF9F /* LoopViewOption.swift */; };
 		7974B64E2D3818030077EF9F /* LoopView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7974B64D2D3818030077EF9F /* LoopView2.swift */; };
 		79D4708E2CE483EE0095B89A /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D4708D2CE483DD0095B89A /* Token.swift */; };
@@ -944,6 +946,8 @@
 		792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundColorOption.swift; sourceTree = "<group>"; };
 		793F48E12D0203BF0029BC95 /* DanaBarViewOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaBarViewOption.swift; sourceTree = "<group>"; };
 		795CBE112D3F60A30044854B /* BGTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGTextField.swift; sourceTree = "<group>"; };
+		795CBE132D3F942B0044854B /* AutoISFsettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoISFsettings.swift; sourceTree = "<group>"; };
+		795CBE152D3F94900044854B /* ChartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartModel.swift; sourceTree = "<group>"; };
 		7974B64B2D3817C10077EF9F /* LoopViewOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopViewOption.swift; sourceTree = "<group>"; };
 		7974B64D2D3818030077EF9F /* LoopView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopView2.swift; sourceTree = "<group>"; };
 		79BDA519C9B890FD9A5DFCF3 /* ISFEditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ISFEditorDataFlow.swift; sourceTree = "<group>"; };
@@ -1080,6 +1084,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7910CDA62CD53A0E001E77AC /* Chart */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Chart; sourceTree = "<group>"; };
+		795CBE172D3F9DD30044854B /* AutoISF */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AutoISF; sourceTree = "<group>"; };
 		79D4708F2CE489CA0095B89A /* Restore */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Restore; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -1434,6 +1439,7 @@
 		3811DE0325C9D31700A708ED /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				795CBE172D3F9DD30044854B /* AutoISF */,
 				F2159A472BA60A0300A0B716 /* ContactTrick */,
 				19F191D92BE4F93400F6297E /* Sharing */,
 				195D80B22AF696EE00D25097 /* Dynamic */,
@@ -1872,6 +1878,8 @@
 		388E5A5925B6F0250019842D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				795CBE152D3F94900044854B /* ChartModel.swift */,
+				795CBE132D3F942B0044854B /* AutoISFsettings.swift */,
 				CE82E02628E869DF00473A9C /* AlertEntry.swift */,
 				385CEAC025F2EA52002D6D5B /* Announcement.swift */,
 				388E5A5F25B6F2310019842D /* Autosens.swift */,
@@ -2681,6 +2689,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				7910CDA62CD53A0E001E77AC /* Chart */,
+				795CBE172D3F9DD30044854B /* AutoISF */,
 				79D4708F2CE489CA0095B89A /* Restore */,
 			);
 			name = FreeAPS;
@@ -3030,6 +3039,7 @@
 				E00EEC0827368630002FF094 /* NetworkAssembly.swift in Sources */,
 				1920BF5D2B9DF53200E861FE /* BolusShortcut.swift in Sources */,
 				38A13D3225E28B4B00EAA382 /* PumpHistoryEvent.swift in Sources */,
+				795CBE162D3F949D0044854B /* ChartModel.swift in Sources */,
 				E00EEC0627368630002FF094 /* UIAssembly.swift in Sources */,
 				3811DE1825C9D40400A708ED /* Router.swift in Sources */,
 				CE7950262998056D00FA576E /* CGMSetupView.swift in Sources */,
@@ -3117,6 +3127,7 @@
 				F2159A572BA6239F00A0B716 /* ContactTrickManager.swift in Sources */,
 				38DF179027733EAD00B3528F /* SnowScene.swift in Sources */,
 				195F00482B5C267D00DAC71A /* DescriptionView.swift in Sources */,
+				795CBE142D3F943A0044854B /* AutoISFsettings.swift in Sources */,
 				19DC677F29CA675700FD9EC4 /* OverrideProfilesDataFlow.swift in Sources */,
 				1935364028496F7D001E0B16 /* Dynamic structs.swift in Sources */,
 				F2159A522BA60F7A00A0B716 /* FontWeight.swift in Sources */,
@@ -3611,7 +3622,7 @@
 					"$(PROJECT_DIR)/Dependencies/ios-armv7_arm64",
 				);
 				INFOPLIST_FILE = FreeAPS/Resources/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -3654,7 +3665,7 @@
 					"$(PROJECT_DIR)/Dependencies/ios-armv7_arm64",
 				);
 				INFOPLIST_FILE = FreeAPS/Resources/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

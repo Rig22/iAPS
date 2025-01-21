@@ -13,6 +13,7 @@ extension Dynamic {
         @Published var threshold_setting: Decimal = 65
         @Published var unit: GlucoseUnits = .mmolL
         @Published var averages: (isf: Double, cr: Double, days: Double)?
+        @Published var aisf = false
 
         var preferences: Preferences {
             settingsManager.preferences
@@ -25,7 +26,8 @@ extension Dynamic {
             sigmoid = settings.preferences.sigmoid
             adjustmentFactor = settings.preferences.adjustmentFactor
             weightPercentage = settings.preferences.weightPercentage
-            //  averages = thirtyDaysAverages()
+            averages = thirtyDaysAverages()
+            aisf = settingsManager.settings.autoisf
 
             if unit == .mmolL {
                 threshold_setting = settings.preferences.threshold_setting.asMmolL
@@ -72,24 +74,24 @@ extension Dynamic {
             unit == .mmolL
         }
 
-        /*   private func thirtyDaysAverages() -> (isf: Double, cr: Double, days: Double)? {
-             let history = reasons.filter({ $0.mmol == sameUnit }).sorted(by: { $0.date ?? Date() > $1.date ?? Date() })
-             let days = -1 * (history.last?.date ?? .now).timeIntervalSince(history.first?.date ?? .now) / 8.64E4
-             // Avoid displaying "0 days"
-             guard !history.isEmpty, days >= 0.06 else { return nil }
+        private func thirtyDaysAverages() -> (isf: Double, cr: Double, days: Double)? {
+            let history = reasons.filter({ $0.mmol == sameUnit }).sorted(by: { $0.date ?? Date() > $1.date ?? Date() })
+            let days = -1 * (history.last?.date ?? .now).timeIntervalSince(history.first?.date ?? .now) / 8.64E4
+            // Avoid displaying "0 days"
+            guard !history.isEmpty, days >= 0.06 else { return nil }
 
-             let isf = history.compactMap(\.isf)
-             let cr = history.compactMap(\.cr)
-             let totalISF = isf.reduce(0, { x, y in
-                 x + (y as Decimal)
-             })
-             let totalCR = cr.reduce(0, { x, y in
-                 x + (y as Decimal)
-             })
-             let averageCR = Double(totalCR) / Double(cr.count)
-             let averageISF = Double(totalISF) / Double(isf.count)
+            let isf = history.compactMap(\.isf)
+            let cr = history.compactMap(\.cr)
+            let totalISF = isf.reduce(0, { x, y in
+                x + (y as Decimal)
+            })
+            let totalCR = cr.reduce(0, { x, y in
+                x + (y as Decimal)
+            })
+            let averageCR = Double(totalCR) / Double(cr.count)
+            let averageISF = Double(totalISF) / Double(isf.count)
 
-             return (averageISF, averageCR, days)
-         }*/
+            return (averageISF, averageCR, days)
+        }
     }
 }

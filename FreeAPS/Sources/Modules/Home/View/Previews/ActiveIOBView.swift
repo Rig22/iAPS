@@ -29,7 +29,7 @@ struct ActiveIOBView: View {
 
     var body: some View {
         VStack {
-            // Text("Active Insulin").font(.previewHeadline).padding(.top, 20).padding(.bottom, 15)
+            Text("Active Insulin").font(.previewHeadline).padding(.top, 20).padding(.bottom, 15)
             iobView().frame(maxHeight: 130).padding(.horizontal, 20).padding(.top, 10)
             sumView().frame(maxHeight: 250).padding(.top, 20).padding(.bottom, 10)
         }.dynamicTypeSize(...DynamicTypeSize.xLarge)
@@ -148,37 +148,37 @@ struct ActiveIOBView: View {
                 formula: "",
                 insulin: .zero,
                 color: Color(.clear)
+            ),
+            BolusSummary(
+                variable: NSLocalizedString("Average Insulin 10 days", comment: ""),
+                formula: NSLocalizedString(" U", comment: ""),
+                insulin: tddActualAverage,
+                color: .white
+            ),
+            BolusSummary(
+                variable: "",
+                formula: "",
+                insulin: .zero,
+                color: Color(.clear)
+            ),
+            BolusSummary(
+                variable: NSLocalizedString("TDD yesterday", comment: ""),
+                formula: NSLocalizedString(" U", comment: ""),
+                insulin: tddYesterday,
+                color: .white
+            ),
+            BolusSummary(
+                variable: NSLocalizedString("TDD 2 days ago", comment: ""),
+                formula: NSLocalizedString(" U", comment: ""),
+                insulin: tdd2DaysAgo,
+                color: .white
+            ),
+            BolusSummary(
+                variable: NSLocalizedString("TDD 3 days ago", comment: ""),
+                formula: NSLocalizedString(" U", comment: ""),
+                insulin: tdd3DaysAgo,
+                color: .white
             )
-            /*     BolusSummary(
-                 variable: NSLocalizedString("Average Insulin 10 days", comment: ""),
-                 formula: NSLocalizedString(" U", comment: ""),
-                 insulin: tddActualAverage,
-                 color: .white
-             ),
-             BolusSummary(
-                 variable: "",
-                 formula: "",
-                 insulin: .zero,
-                 color: Color(.clear)
-             ),
-             BolusSummary(
-                 variable: NSLocalizedString("TDD yesterday", comment: ""),
-                 formula: NSLocalizedString(" U", comment: ""),
-                 insulin: tddYesterday,
-                 color: .white
-             ),
-             BolusSummary(
-                 variable: NSLocalizedString("TDD 2 days ago", comment: ""),
-                 formula: NSLocalizedString(" U", comment: ""),
-                 insulin: tdd2DaysAgo,
-                 color: .white
-             ),
-             BolusSummary(
-                 variable: NSLocalizedString("TDD 3 days ago", comment: ""),
-                 formula: NSLocalizedString(" U", comment: ""),
-                 insulin: tdd3DaysAgo,
-                 color: .white
-             )*/
         ]
 
         let insulinData = useData(entries)
