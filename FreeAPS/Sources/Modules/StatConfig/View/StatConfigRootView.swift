@@ -194,11 +194,11 @@ extension StatConfig {
                         Toggle("Display and allow Fat and Protein entries", isOn: $state.useFPUconversion)
                     } header: { Text("Add Meal View settings ") }
 
-                    Section {
-                        Toggle(isOn: $state.extendHomeView) {
-                            Text("Display Ratio and a History View button")
-                        }
-                    } header: { Text("Auto ISF Home View") }
+                    /*   Section {
+                         Toggle(isOn: $state.extendHomeView) {
+                             Text("Display Ratio and a History View button")
+                         }
+                     } header: { Text("Auto ISF Home View") }*/
                 }
                 .dynamicTypeSize(...DynamicTypeSize.xxLarge)
                 .onAppear(perform: configureView)

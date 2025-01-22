@@ -179,37 +179,37 @@ struct MainChartView: View {
         }
     }
 
-    var legendPanel: some View {
-        ZStack {
-            HStack {
-                Group {
-                    Circle().fill(Color.insulin).frame(width: 8, height: 8)
-                        .padding(.leading, 8)
-                    Text("IOB")
-                        .font(.system(size: 12, weight: .bold)).foregroundColor(.insulin)
-                }
-                Group {
-                    Circle().fill(Color.zt).frame(width: 8, height: 8)
-                        .padding(.leading, 8)
-                    Text("ZT")
-                        .font(.system(size: 12, weight: .bold)).foregroundColor(.zt)
-                }
-                Group {
-                    Circle().fill(Color.loopYellow).frame(width: 8, height: 8)
-                        .padding(.leading, 8)
-                    Text("COB")
-                        .font(.system(size: 12, weight: .bold)).foregroundColor(.loopYellow)
-                }
-                Group {
-                    Circle().fill(Color.uam).frame(width: 8, height: 8)
-                        .padding(.leading, 8)
-                    Text("UAM")
-                        .font(.system(size: 12, weight: .bold)).foregroundColor(.uam)
-                }
-            }
-            .padding(.bottom, 8)
-        }
-    }
+    /*  var legendPanel: some View {
+         ZStack {
+             HStack {
+                 Group {
+                     Circle().fill(Color.insulin).frame(width: 8, height: 8)
+                         .padding(.leading, 8)
+                     Text("IOB")
+                         .font(.system(size: 12, weight: .bold)).foregroundColor(.insulin)
+                 }
+                 Group {
+                     Circle().fill(Color.zt).frame(width: 8, height: 8)
+                         .padding(.leading, 8)
+                     Text("ZT")
+                         .font(.system(size: 12, weight: .bold)).foregroundColor(.zt)
+                 }
+                 Group {
+                     Circle().fill(Color.loopYellow).frame(width: 8, height: 8)
+                         .padding(.leading, 8)
+                     Text("COB")
+                         .font(.system(size: 12, weight: .bold)).foregroundColor(.loopYellow)
+                 }
+                 Group {
+                     Circle().fill(Color.uam).frame(width: 8, height: 8)
+                         .padding(.leading, 8)
+                     Text("UAM")
+                         .font(.system(size: 12, weight: .bold)).foregroundColor(.uam)
+                 }
+             }
+             .padding(.bottom, 8)
+         }
+     }*/
 
     private func mainScrollView(fullSize: CGSize) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
@@ -218,8 +218,8 @@ struct MainChartView: View {
                     tempTargetsView(fullSize: fullSize).drawingGroup()
                     overridesView(fullSize: fullSize).drawingGroup()
                     basalView(fullSize: fullSize).drawingGroup()
-                    legendPanel.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-                        .padding(.trailing, 20).padding(.bottom, 20)
+                    /*  legendPanel.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
+                     .padding(.trailing, 20).padding(.bottom, 20)*/
                     mainView(fullSize: fullSize).id(Config.endID)
                         .drawingGroup()
                         /* .onChange(of: data.glucose) { _ in
@@ -247,7 +247,7 @@ struct MainChartView: View {
     }
 
     private func yGridView(fullSize: CGSize) -> some View {
-        let useColour = data.displayYgridLines ? Color.secondary : Color.clear
+        let useColour = data.displayYgridLines ? Color.white : Color.clear
         return ZStack {
             Path { path in
                 let range = glucoseYRange
@@ -300,6 +300,7 @@ struct MainChartView: View {
             return Text(glucoseFormatter.string(from: value as NSNumber)!)
                 .position(CGPoint(x: fullSize.width - 12, y: range.minY + CGFloat(line) * yStep))
                 .font(.bolusDotFont)
+                .foregroundStyle(Color.white)
                 .asAny()
         }
     }
@@ -358,7 +359,7 @@ struct MainChartView: View {
     @Environment(\.colorScheme) var colorScheme
 
     private func xGridView(fullSize: CGSize) -> some View {
-        let useColour = data.displayXgridLines ? Color.secondary : Color.clear
+        let useColour = data.displayXgridLines ? Color.white : Color.clear
         return ZStack {
             Path { path in
                 for hour in 0 ..< data.hours + data.hours {
@@ -402,7 +403,7 @@ struct MainChartView: View {
                                 CGFloat(hour) * CGFloat(1.hours.timeInterval),
                             y: 10.0
                         )
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white)
                 }
             }
         }.frame(maxHeight: 20)

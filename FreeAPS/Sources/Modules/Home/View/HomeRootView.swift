@@ -1647,49 +1647,11 @@ extension Home {
                         // Linker Stack
                         Spacer()
 
-                        if state.autoisf {
-                            HStack(spacing: 0) {
-                                Text("ISF: ")
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 17))
-
-                                Text("\(state.data.suggestion?.sensitivityRatio ?? 1)")
-                                    .foregroundStyle(Color.white)
-                                    .font(.system(size: 17))
-                            }
-                            .padding(.leading, 15)
-                            .frame(maxWidth: 100, alignment: .leading) // Links ausgerichtet
-                            .onTapGesture {
-                                if state.autoisf {
-                                    displayAutoHistory.toggle()
-                                }
-                            }
-
-                        } else {
-                            HStack(spacing: 4) {
-                                Text("ISF: ")
-                                    .foregroundColor(.white)
-                                    .font(.system(size: 17))
-
-                                // Platzhalter, wenn kein ISF vorhanden ist
-                                Text("--")
-                                    .foregroundStyle(Color.white)
-                                    .font(.system(size: 17))
-                            }
-                            .padding(.leading, 20) // Abstand linker Rand
-                            .frame(maxWidth: 110, alignment: .leading)
-                            .onTapGesture {
-                                if state.autoisf {
-                                    displayAutoHistory.toggle()
-                                }
-                            }
-                        }
-
-                        /*   HStack {
-                             isfView
-                                 .foregroundColor(.white)
-                         }.padding(.leading, 15)
-                             .frame(maxWidth: 100, alignment: .leading)*/
+                        HStack {
+                            isfView
+                                .foregroundColor(.white)
+                        }.padding(.leading, 0)
+                            .frame(maxWidth: 100, alignment: .leading)
 
                         Spacer()
 
@@ -1729,14 +1691,11 @@ extension Home {
                         // Rechter Stack - TDD
 
                         HStack {
-                            Text(
-                                "TDD: " +
-                                    (numberFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")
-                            )
-                            .font(.system(size: 17))
-                            .foregroundColor(.white)
-                            .padding(.trailing, 20)
-                        }.frame(maxWidth: 110, alignment: .trailing)
+                            tddView
+                                .foregroundColor(.white)
+                        }.padding(.trailing, 25)
+                            .frame(maxWidth: 100, alignment: .trailing)
+
                         Spacer()
                     }
                 )
@@ -1758,7 +1717,18 @@ extension Home {
                         displayAutoHistory.toggle()
                     }
                 }
-            }.offset(x: 20)
+            }.offset(x: 30)
+        }
+
+        private var tddView: some View {
+            ZStack {
+                HStack {
+                    Image(systemName: "timer").font(.system(size: 14)).foregroundStyle(.teal)
+                    Text("\(numberFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")").foregroundStyle(.primary)
+                }
+                .font(.timeSettingFont)
+                .background(TimeEllipse(characters: 10))
+            }.offset(x: 0)
         }
 
         // buttonPanel
@@ -1981,6 +1951,10 @@ extension Home {
         @ViewBuilder private func glucoseHeaderView() -> some View {
             backgroundColor
                 .frame(maxHeight: 200)
+            HStack { Text("Glucose Tagesverlauf") }
+                .font(.headline)
+                .foregroundStyle(Color.white)
+
             VStack {
                 glucosePreview
             }
@@ -2004,14 +1978,24 @@ extension Home {
                     y: .value("Glucose", Double($0.glucose ?? 0) * (state.data.units == .mmolL ? 0.0555 : 1.0))
                 )
                 .foregroundStyle(
-                    (($0.glucose ?? 0) > veryHigh || Decimal($0.glucose ?? 0) < low) ? Color(.red) : Decimal($0.glucose ?? 0) >
-                        high ? Color(.yellow) : Color(.darkGreen)
+                    (($0.glucose ?? 0) > veryHigh || Decimal($0.glucose ?? 0) < low) ? Color.red : Decimal($0.glucose ?? 0) >
+                        high ? Color.yellow : Color.green
                 )
                 .symbolSize(5)
             }
-            .chartXAxis(.hidden)
             .chartYAxis {
-                AxisMarks(values: .automatic(desiredCount: 3))
+                AxisMarks(values: .automatic(desiredCount: 3)) { _ in
+                    AxisGridLine().foregroundStyle(Color.white)
+                    AxisTick().foregroundStyle(Color.white)
+                    AxisValueLabel().foregroundStyle(Color.white)
+                }
+            }
+            .chartXAxis {
+                AxisMarks(values: .automatic(desiredCount: 5)) { _ in
+                    AxisGridLine().foregroundStyle(Color.white)
+                    AxisTick().foregroundStyle(Color.white)
+                    AxisValueLabel().foregroundStyle(Color.clear)
+                }
             }
             .chartYScale(
                 domain: minimumRange * (state.data.units == .mmolL ? 0.0555 : 1.0) ... maximum *
@@ -2020,39 +2004,20 @@ extension Home {
             .chartXScale(
                 domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
             )
-            .frame(height: 60)
+            .frame(height: 100)
             .padding(.leading, 30)
             .padding(.trailing, 32)
             .padding(.top, 15)
             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
         }
 
-        /*  var preview: some View {
-             backgroundColor
-                 .frame(minHeight: 150)
-                 .overlay {
-                     PreviewChart(readings: $state.readings, lowLimit: $state.data.lowGlucose, highLimit: $state.data.highGlucose)
-                 }
-                 .clipShape(RoundedRectangle(cornerRadius: 15))
-                 .padding(.horizontal, 10)
-                 .foregroundStyle(Color.white)
-                 .onTapGesture {
-                     state.showModal(for: .statistics)
-                 }
-         }*/
-
         var preview: some View {
             VStack {
                 Text("Time In Range")
-                    .padding(.bottom, 10)
                     .font(.previewHeadline)
                     .foregroundColor(.white)
 
                 ZStack {
-                    /* Color.gray.opacity(0.2)
-                     .cornerRadius(15)
-                     .shadow(radius: 5)*/
-
                     VStack {
                         PreviewChart(
                             readings: $state.readings,
@@ -2218,6 +2183,9 @@ extension Home {
                     .navigationTitle("Home")
                     .navigationBarHidden(true)
                     .ignoresSafeArea(.keyboard) // Ignoriert die Tastatur bei Safe Area
+                    .sheet(isPresented: $displayAutoHistory) {
+                        AutoISFHistoryView(units: state.data.units)
+                    }
 
                     // Popup für Statusanzeige
                     .popup(isPresented: state.isStatusPopupPresented, alignment: .center, direction: .bottom) {
