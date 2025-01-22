@@ -94,8 +94,8 @@ extension NotificationsConfig {
                                 Toggle("Show Live Activity", isOn: $state.useLiveActivity)
                                 if state.useLiveActivity {
                                     Toggle("Display Chart", isOn: $state.liveActivityChart)
-                                    if !state.liveActivityChart {
-                                        Toggle("Arrow for Eventual Glucose", isOn: $state.liveActivityEventualArrow)
+                                    if state.liveActivityChart {
+                                        Toggle("Show Predictions", isOn: $state.liveActivityChartShowPredictions)
                                     }
                                 }
                             }
@@ -104,18 +104,6 @@ extension NotificationsConfig {
                     .onReceive(resolver.resolve(LiveActivityBridge.self)!.$systemEnabled, perform: {
                         self.systemLiveActivitySetting = $0
                     })
-                }
-                if #available(iOS 16.2, *) {
-                    if state.useLiveActivity, state.liveActivityChart {
-                        Section(
-                            header: Text("Activity Chart"),
-                            content: {
-                                Toggle("Show Predictions", isOn: $state.liveActivityChartShowPredictions)
-                                Toggle("Threshold Lines", isOn: $state.liveActivityChartThresholdLines)
-                                Toggle("Dynamic range", isOn: $state.liveActivityChartDynamicRange)
-                            }
-                        )
-                    }
                 }
             }
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)

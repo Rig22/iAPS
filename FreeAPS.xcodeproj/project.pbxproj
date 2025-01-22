@@ -1085,6 +1085,7 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7910CDA62CD53A0E001E77AC /* Chart */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Chart; sourceTree = "<group>"; };
 		795CBE172D3F9DD30044854B /* AutoISF */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AutoISF; sourceTree = "<group>"; };
+		795CBE6E2D4166240044854B /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
 		79D4708F2CE489CA0095B89A /* Restore */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Restore; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -2272,6 +2273,7 @@
 		6B1A8D1C2B14D91600E76752 /* LiveActivity */ = {
 			isa = PBXGroup;
 			children = (
+				795CBE6E2D4166240044854B /* Views */,
 				6B1A8D1D2B14D91600E76752 /* LiveActivityBundle.swift */,
 				6B1A8D1F2B14D91600E76752 /* LiveActivity.swift */,
 				6B1A8D232B14D91700E76752 /* Assets.xcassets */,
@@ -2772,6 +2774,9 @@
 			buildRules = (
 			);
 			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				795CBE6E2D4166240044854B /* Views */,
 			);
 			name = LiveActivityExtension;
 			productName = LiveActivityExtension;

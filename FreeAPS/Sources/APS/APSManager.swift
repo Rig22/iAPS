@@ -1007,8 +1007,8 @@ final class BaseAPSManager: APSManager, Injectable {
         let output = Loops(
             loops: Int(loopNr),
             errors: errorNR,
-            // mostFrequentErrorType: errorArray.mostFrequent()?.description ?? "",
-            // mostFrequentErrorAmount: errorArray.filter({ $0 == mostFrequentString }).count,
+            //   mostFrequentErrorType: errorArray.mostFrequent()?.description ?? "",
+            //   mostFrequentErrorAmount: errorArray.filter({ $0 == mostFrequentString }).count,
             success_rate: roundDecimal(Decimal(successRate ?? 0), 1),
             avg_interval: roundDecimal(Decimal(intervalAverage), 1),
             median_interval: roundDecimal(Decimal(median_interval), 1),
@@ -1053,7 +1053,9 @@ final class BaseAPSManager: APSManager, Injectable {
 
             var algo_ = "Oref0"
 
-            if preferences.sigmoid, preferences.enableDynamicCR {
+            if settings.autoisf {
+                algo_ = "Auto ISF"
+            } else if preferences.sigmoid, preferences.enableDynamicCR {
                 algo_ = "Dynamic ISF + CR: Sigmoid"
             } else if preferences.sigmoid, !preferences.enableDynamicCR {
                 algo_ = "Dynamic ISF: Sigmoid"
@@ -1061,9 +1063,8 @@ final class BaseAPSManager: APSManager, Injectable {
                 algo_ = "Dynamic ISF + CR: Logarithmic"
             } else if preferences.useNewFormula, !preferences.sigmoid,!preferences.enableDynamicCR {
                 algo_ = "Dynamic ISF: Logarithmic"
-            } else if settings.autoisf {
-                algo_ = "Auto ISF"
             }
+
             let af = preferences.adjustmentFactor
             let insulin_type = preferences.curve
             let buildDate = Bundle.main.buildDate
@@ -1208,7 +1209,7 @@ final class BaseAPSManager: APSManager, Injectable {
             let loopstat = LoopCycles(
                 loops: oneDayLoops.loops,
                 errors: oneDayLoops.errors,
-                // mostFrequentErrorType: oneDayLoops.mostFrequentErrorType,
+                //  mostFrequentErrorType: oneDayLoops.mostFrequentErrorType,
                 // mostFrequentErrorAmount: oneDayLoops.mostFrequentErrorAmount,
                 readings: Int(oneDayGlucose.readings),
                 success_rate: oneDayLoops.success_rate,

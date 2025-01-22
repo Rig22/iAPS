@@ -54,7 +54,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var displayPredictions: Bool = true
     var useLiveActivity: Bool = true
     var liveActivityEventualArrow: Bool = false
-    var liveActivityChart = true
+    var liveActivityChart = false
     var liveActivityChartShowPredictions = true
     var liveActivityChartThresholdLines = true
     var liveActivityChartDynamicRange = true

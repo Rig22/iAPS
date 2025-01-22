@@ -134,7 +134,7 @@ enum OverrideIntentError: Error {
         let presets = overrideStorage.fetchProfiles().flatMap { preset -> [OverrideEntity] in
             let percentage = preset.percentage != 100 ? preset.percentage.formatted() : ""
             let targetRaw = settingsManager.settings
-                .units == .mgdL ? Decimal(Double(truncating: preset.target ?? 0)) : Double(truncating: preset.target ?? 0)
+                .units == .mgdL ? Decimal(Double(preset.target ?? 0)) : Double(preset.target ?? 0)
                 .asMmolL
             let target = (preset.target != 0 || preset.target != 6) ?
                 (glucoseFormatter.string(from: targetRaw as NSNumber) ?? "") : ""
@@ -168,11 +168,11 @@ enum OverrideIntentError: Error {
     }
 
     func fetchIDs(_ id: [OverrideEntity.ID]) -> [OverrideEntity] {
-        let presets = overrideStorage.fetchProfiles().filter { id.contains(UUID(uuidString: $0.id ?? "")!) }
+        let presets = overrideStorage.fetchProfiles().filter { id.contains(UUID(uuidString: $0.id ?? "") ?? UUID()) }
             .map { preset -> OverrideEntity in
                 let percentage = preset.percentage != 100 ? preset.percentage.formatted() : ""
                 let targetRaw = settingsManager.settings
-                    .units == .mgdL ? Decimal(Double(truncating: preset.target ?? 0)) : Double(truncating: preset.target ?? 0)
+                    .units == .mgdL ? Decimal(Double(preset.target ?? 0)) : Double(preset.target ?? 0)
                     .asMmolL
                 let target = (preset.target != 0 || preset.target != 6) ?
                     (glucoseFormatter.string(from: targetRaw as NSNumber) ?? "") : ""
@@ -205,11 +205,7 @@ enum OverrideIntentError: Error {
         }
         overrideStorage.overrideFromPreset(overridePreset)
         let currentActiveOveride = overrideStorage.fetchLatestOverride().first
-        nightscoutManager.uploadOverride(
-            preset.name ?? "",
-            Double(truncating: preset.duration ?? 0),
-            currentActiveOveride?.date ?? Date.now
-        )
+        nightscoutManager.uploadOverride(preset.name ?? "", Double(preset.duration ?? 0), currentActiveOveride?.date ?? Date.now)
         return currentActiveOveride
     }
 
@@ -222,6 +218,10 @@ enum OverrideIntentError: Error {
                 if let duration = overrideStorage.cancelProfile() {
                     // Update in Nightscout
                     nightscoutManager.editOverride(preset, duration, activeOveride.date ?? Date.now)
+                }
+            } else if activeOveride.isPreset {
+                if let duration = overrideStorage.cancelProfile() {
+                    nightscoutManager.editOverride("📉", duration, activeOveride.date ?? Date.now)
                 }
             } else {
                 let nsString = activeOveride.percentage.formatted() != "100" ? activeOveride.percentage

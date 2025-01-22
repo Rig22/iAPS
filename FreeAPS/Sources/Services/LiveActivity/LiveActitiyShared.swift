@@ -15,10 +15,8 @@ struct LiveActivityAttributes: ActivityAttributes {
         let readings: ValueSeries?
         let predictions: ActivityPredictions?
         let showChart: Bool
-        let chartLowThreshold: Int16?
-        let chartHighThreshold: Int16?
-        let chartMaxValue: Int16?
-        let eventualText: Bool
+        let chartLowThreshold: Int16
+        let chartHighThreshold: Int16
 
         func withoutPredictions() -> ContentState {
             ContentState(
@@ -35,9 +33,7 @@ struct LiveActivityAttributes: ActivityAttributes {
                 predictions: nil,
                 showChart: showChart,
                 chartLowThreshold: chartLowThreshold,
-                chartHighThreshold: chartHighThreshold,
-                chartMaxValue: chartMaxValue,
-                eventualText: eventualText
+                chartHighThreshold: chartHighThreshold
             )
         }
     }
@@ -45,11 +41,6 @@ struct LiveActivityAttributes: ActivityAttributes {
     struct ValueSeries: Codable, Hashable {
         let dates: [Date]
         let values: [Int16]
-    }
-
-    struct ContentStateReading: Codable, Hashable {
-        let date: Date
-        let glucose: Int16
     }
 
     struct ActivityPredictions: Codable, Hashable {

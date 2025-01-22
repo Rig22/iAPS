@@ -1,3 +1,4 @@
+
 {
   "units" : "mmol/L",
   "closedLoop" : false,
@@ -50,6 +51,8 @@
   "fattyMealFactor" : 0.7,
   "displayPredictions" : true,
   "useLiveActivity" : false,
+  "liveActivityChart": false,
+  "liveActivityChartShowPredictions": true,
   "useTargetButton" : false,
   "alwaysUseColors" : true,
   "timeSettings" : true,
