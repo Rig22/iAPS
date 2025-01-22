@@ -1493,7 +1493,7 @@ extension Home {
             .modal(for: .dataTable, from: self)
         }
 
-        let deviceWidthMultiplier: CGFloat = 1.07
+        let deviceWidthMultiplier: CGFloat = 1.0
 
         var chart: some View {
             let ratio = state.timeSettings ? 1.76 : 1.66 // TimeSetting ein
@@ -1678,13 +1678,18 @@ extension Home {
                             }
                             .padding(.leading, 20) // Abstand linker Rand
                             .frame(maxWidth: 110, alignment: .leading)
+                            .onTapGesture {
+                                if state.autoisf {
+                                    displayAutoHistory.toggle()
+                                }
+                            }
                         }
 
-                        /*      HStack {
+                        /*   HStack {
                              isfView
                                  .foregroundColor(.white)
                          }.padding(.leading, 15)
-                             .frame(maxWidth: 100, alignment: .leading)*/ // Links ausgerichtet
+                             .frame(maxWidth: 100, alignment: .leading)*/
 
                         Spacer()
 

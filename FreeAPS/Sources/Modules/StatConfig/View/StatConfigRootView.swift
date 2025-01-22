@@ -158,6 +158,7 @@ extension StatConfig {
                             Text("hours").foregroundColor(.white)
                         }
                         Toggle("Standing / Laying TIR Chart", isOn: $state.oneDimensionalGraph)
+                        Toggle("Use insulin bars", isOn: $state.useInsulinBars)
                         HStack {
                             Text("Hide the bolus amount strings when amount is under")
                             Spacer()
@@ -189,7 +190,7 @@ extension StatConfig {
                     } header: { Text("Statistics settings ") }
 
                     Section {
-                        // Toggle("Skip Bolus screen after carbs", isOn: $state.skipBolusScreenAfterCarbs)
+                        Toggle("Skip Bolus screen after carbs", isOn: $state.skipBolusScreenAfterCarbs)
                         Toggle("Display and allow Fat and Protein entries", isOn: $state.useFPUconversion)
                     } header: { Text("Add Meal View settings ") }
 
