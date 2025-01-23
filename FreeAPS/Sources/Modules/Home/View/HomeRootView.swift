@@ -518,6 +518,94 @@ extension Home {
             }
         }
 
+        private var tempRateView: some View {
+            ZStack {
+                VStack {
+                    HStack {
+                        Image(systemName: "chart.xyaxis.line")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.teal)
+
+                        if let tempRate = state.tempRate {
+                            let rateString = tempRatenumberFormatter.string(from: tempRate as NSNumber) ?? "0"
+                            let manualBasalString = state.apsManager.isManualTempBasal
+                                ? NSLocalizedString(" Manual", comment: "Manual Temp basal")
+                                : ""
+
+                            HStack(spacing: 2) {
+                                Text(rateString)
+                                    .font(.system(size: 18))
+                                    .foregroundColor(.white)
+                                    +
+                                    Text(" U/hr")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.white)
+                                    +
+                                    Text(manualBasalString)
+                                    .font(.system(size: 18))
+                                    .foregroundColor(.white)
+                            }
+                        } else {
+                            Text("---")
+                                .font(.system(size: 18))
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .font(.timeSettingFont)
+                    .background(TimeEllipseBig(characters: 10))
+                }
+            }
+            .offset(x: 20, y: 0)
+        }
+
+        private var eventualBGView: some View {
+            ZStack {
+                VStack {
+                    HStack {
+                        /* Image(systemName: "timer")
+                         .font(.system(size: 14))
+                         .foregroundStyle(.teal)*/
+
+                        if let eventualBG = state.eventualBG {
+                            HStack(spacing: 4) {
+                                Text("⇢")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(.teal)
+
+                                let eventualBGValue = state.data.units == .mmolL ? eventualBG.asMmolL : Decimal(eventualBG)
+
+                                if let formattedBG = fetchedTargetFormatter
+                                    .string(from: eventualBGValue as NSNumber)
+                                {
+                                    Text(formattedBG)
+                                        .font(.system(size: 18))
+                                        .foregroundColor(.white)
+                                }
+
+                                Text(state.data.units.rawValue)
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(.white)
+                                    .padding(.leading, -4)
+                            }
+                        } else {
+                            HStack(spacing: 4) {
+                                Text("⇢")
+                                    .font(.statusFont)
+                                    .foregroundStyle(.white)
+
+                                Text("---")
+                                    .font(.system(size: 18))
+                                    .foregroundColor(.white)
+                            }
+                        }
+                    }
+                    .font(.timeSettingFont)
+                    .background(TimeEllipseBig(characters: 10))
+                }
+            }
+            .offset(x: -20, y: 0)
+        }
+
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             LinearGradient(
                 gradient: Gradient(colors: [.black, .clear]),
@@ -536,36 +624,8 @@ extension Home {
                             VStack(alignment: .leading, spacing: 8) {
                                 // TempRate anzeigen
                                 HStack(spacing: 5) {
-                                    Image(systemName: "chart.xyaxis.line")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 18, height: 18)
-                                        .foregroundColor(.white)
-
-                                    if let tempRate = state.tempRate {
-                                        let rateString = tempRatenumberFormatter.string(from: tempRate as NSNumber) ?? "0"
-                                        let manualBasalString = state.apsManager.isManualTempBasal
-                                            ? NSLocalizedString(" Manual", comment: "Manual Temp basal")
-                                            : ""
-
-                                        Text(rateString)
-                                            .font(.system(size: 18))
-                                            .foregroundColor(.white)
-                                            +
-                                            Text(" U/hr")
-                                            .font(.system(size: 14))
-                                            .foregroundColor(.white)
-                                            +
-                                            Text(manualBasalString)
-                                            .font(.system(size: 18))
-                                            .foregroundColor(.white)
-                                    } else {
-                                        Text("---")
-                                            .font(.system(size: 18))
-                                            .foregroundColor(.white)
-                                    }
+                                    tempRateView
                                 }
-                                .padding(.leading, 6)
                             }
 
                             Spacer()
@@ -584,42 +644,8 @@ extension Home {
                             }
 
                             // Rechter Block (eventualBG)
-
-                            if let eventualBG = state.eventualBG {
-                                HStack(spacing: 4) {
-                                    Text("⇢")
-                                        .font(.statusFont)
-                                        .foregroundStyle(.white)
-
-                                    let eventualBGValue = state.data.units == .mmolL ? eventualBG.asMmolL : Decimal(eventualBG)
-
-                                    if let formattedBG = fetchedTargetFormatter
-                                        .string(from: eventualBGValue as NSNumber)
-                                    {
-                                        Text(formattedBG)
-                                            .font(.system(size: 18))
-                                            .foregroundColor(.white)
-                                    }
-
-                                    Text(state.data.units.rawValue)
-                                        .font(.system(size: 14))
-                                        .foregroundStyle(.white)
-                                        .padding(.leading, -4)
-                                }
-                            } else {
-                                HStack(spacing: 4) {
-                                    Text("⇢")
-                                        .font(.statusFont)
-                                        .foregroundStyle(.white)
-
-                                    Text("---")
-                                        .font(.system(size: 18))
-                                        .foregroundColor(.white)
-                                }
-                            }
+                            eventualBGView
                         }
-                        .padding(.horizontal, 22) // Seitenabstand für den HStack
-                        .padding(.top, -15) // Oberer Rand
                     }
                     .offset(y: 90)
 
@@ -632,11 +658,11 @@ extension Home {
                             Spacer()
                             carbsView
                                 .frame(maxHeight: .infinity, alignment: .bottom)
-                                .padding(.bottom, 20)
+                                .padding(.bottom, 30)
                             Spacer(minLength: 200)
                             insulinView
                                 .frame(maxHeight: .infinity, alignment: .bottom)
-                                .padding(.bottom, 20)
+                                .padding(.bottom, 30)
                             Spacer()
                         }
                         .dynamicTypeSize(...DynamicTypeSize.xLarge)
@@ -1607,37 +1633,20 @@ extension Home {
             .padding(.top, 20)
         }
 
-        struct Buttons: Identifiable {
-            let label: String
-            let number: String
-            var active: Bool
-            let hours: Int?
-            var action: (() -> Void)?
-            var id: String { label }
-        }
-
-        @State var timeButtons: [Buttons] = [
-            Buttons(label: "3", number: "3", active: false, hours: 3),
-            Buttons(label: "6", number: "6", active: false, hours: 6),
-            Buttons(label: "12", number: "12", active: false, hours: 12),
-            Buttons(label: "24", number: "24", active: false, hours: 24)
-            // Buttons(label: "36", number: "36", active: false, hours: 36)
-        ]
-
-        func highlightButtons() {
-            for i in 0 ..< timeButtons.count {
-                timeButtons[i].active = timeButtons[i].hours == state.hours
+        var timeSetting: some View {
+            let string = "\(state.hours) " + NSLocalizedString("hours", comment: "") + "   "
+            return Menu(string) {
+                Button("3 " + NSLocalizedString("hours", comment: ""), action: { state.hours = 3 })
+                Button("6 " + NSLocalizedString("hours", comment: ""), action: { state.hours = 6 })
+                Button("9 " + NSLocalizedString("hours", comment: ""), action: { state.hours = 9 })
+                Button("12 " + NSLocalizedString("hours", comment: ""), action: { state.hours = 12 })
+                Button("24 " + NSLocalizedString("hours", comment: ""), action: { state.hours = 24 })
+                Button("UI/UX Settings", action: { state.showModal(for: .statisticsConfig) })
             }
-        }
-
-        func updateButtonActions() {
-            for i in 0 ..< timeButtons.count {
-                if timeButtons[i].label == "UX" {
-                    timeButtons[i].action = {
-                        state.showModal(for: .statisticsConfig)
-                    }
-                }
-            }
+            .foregroundStyle(Color.white)
+            .font(.timeSettingFont)
+            .padding(.vertical, 15)
+            .background(TimeEllipse(characters: string.count))
         }
 
         var info2: some View {
@@ -1658,33 +1667,7 @@ extension Home {
                         // Mittlerer Stack
 
                         HStack(spacing: 0) {
-                            ForEach(timeButtons) { button in
-                                Text(button.active ? NSLocalizedString(button.label, comment: "") : button.number)
-                                    .onTapGesture {
-                                        if let action = button.action {
-                                            action()
-                                        } else if let hours = button.hours {
-                                            state.hours = hours
-                                            highlightButtons()
-                                        }
-                                    }
-                                    .font(.system(size: 13))
-                                    .frame(minWidth: 23, maxWidth: .infinity, maxHeight: 25) // Dynamische Breite
-                                    .padding(
-                                        .horizontal,
-                                        5
-                                    ) // Zusätzlicher Innenabstand
-                                    .background(button.active ? Color.blue.opacity(0.7) : Color.clear)
-                                    .clipShape(Circle())
-                                    .foregroundStyle(Color.white)
-                            }
-                            Spacer()
-                        }
-                        .font(buttonFont)
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .onAppear {
-                            highlightButtons()
-                            updateButtonActions()
+                            timeSetting
                         }
                         Spacer()
 
@@ -1724,7 +1707,7 @@ extension Home {
             ZStack {
                 HStack {
                     Image(systemName: "timer").font(.system(size: 14)).foregroundStyle(.teal)
-                    Text("\(numberFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")").foregroundStyle(.primary)
+                    Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")").foregroundStyle(.primary)
                 }
                 .font(.timeSettingFont)
                 .background(TimeEllipse(characters: 10))
@@ -1828,7 +1811,7 @@ extension Home {
                     state.cancelTempTarget()
                 }
             }
-            .padding(.bottom, 10)
+            .padding(.bottom, 20)
         }
 
         @ViewBuilder private func buttonWithCircle(
@@ -2049,58 +2032,6 @@ extension Home {
                 }
         }
 
-        /*      var activeCOBView: some View {
-             VStack {
-                 Text("Active Carbohydrates")
-                     .padding(.bottom, 10)
-                     .font(.previewHeadline)
-                     .foregroundColor(.white)
-
-                 ZStack {
-                     Color.gray.opacity(0.2)
-                         .cornerRadius(15)
-                         .shadow(radius: 5)
-
-                     ActiveCOBView(data: $state.iobData)
-                 }
-                 .padding(.horizontal, 20)
-                 .padding(.vertical, 5)
-                 .padding(.bottom, 20)
-                 .padding(.top, 10)
-             }
-         }
-
-         var activeIOBView: some View {
-             VStack {
-                 Text("Active Insulin")
-                     .padding(.bottom, 10)
-                     .font(.previewHeadline)
-                     .foregroundColor(.white)
-
-                 ZStack {
-                     Color.gray.opacity(0.2)
-                         .cornerRadius(15)
-                         .shadow(radius: 5)
-
-                     ActiveIOBView(
-                         data: $state.iobData,
-                         neg: $state.neg,
-                         tddChange: $state.tddChange,
-                         tddAverage: $state.tddAverage,
-                         tddYesterday: $state.tddYesterday,
-                         tdd2DaysAgo: $state.tdd2DaysAgo,
-                         tdd3DaysAgo: $state.tdd3DaysAgo,
-                         tddActualAverage: $state.tddActualAverage
-                     )
-                     .padding(.top, 20)
-                 }
-                 .padding(.horizontal, 20)
-                 .padding(.vertical, 5)
-                 .padding(.bottom, 20)
-                 .padding(.top, 10)
-             }
-         }*/
-
         var activeIOBView: some View {
             backgroundColor
                 .frame(minHeight: 430)
@@ -2154,8 +2085,8 @@ extension Home {
                                     preview.padding(.top, 30)
                                     loopPreview.padding(.top, 10).padding(.bottom, 25)
                                     if state.iobData.count >= 0 {
-                                        activeCOBView.padding(.top, 0)
-                                        activeIOBView.padding(.top, 0)
+                                        activeCOBView.padding(.bottom, 25)
+                                        activeIOBView.padding(.top, 0).padding(.bottom, 25)
                                     }
                                 }
                                 .background(GeometryReader { geo in

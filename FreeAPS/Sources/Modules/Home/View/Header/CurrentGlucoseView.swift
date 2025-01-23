@@ -20,7 +20,7 @@ struct CurrentGlucoseView: View {
         if let progress = bolusProgress, progress < 1.0 {
             return Color.clear
         } else {
-            return colourGlucoseText
+            return Color.white
         }
     }
 
@@ -99,8 +99,8 @@ struct CurrentGlucoseView: View {
                             } ?? "--"
                     )
                     .font(.system(size: 30, weight: .bold))
-                    // .foregroundColor(alarm == nil ? colourGlucoseText : .yellow)
-                    .foregroundStyle(Color.white)
+                    .foregroundColor(alarm == nil ? colourGlucoseText : .yellow)
+                    // .foregroundStyle(Color.white)
                 }
                 HStack {
                     let elapsedSeconds = -1 * (recentGlucose?.dateString.timeIntervalSinceNow ?? 0)
@@ -157,7 +157,7 @@ struct CurrentGlucoseView: View {
 
     var colourGlucoseText: Color {
         let whichGlucose = recentGlucose?.glucose ?? 0
-        let defaultColor = Color.white
+        let defaultColor = Color.green
 
         guard lowGlucose < highGlucose else { return .primary }
 

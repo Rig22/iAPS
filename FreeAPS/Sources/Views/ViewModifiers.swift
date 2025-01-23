@@ -221,6 +221,16 @@ struct TimeEllipse: View {
     }
 }
 
+struct TimeEllipseBig: View {
+    @Environment(\.colorScheme) var colorScheme
+    let characters: Int
+    var body: some View {
+        RoundedRectangle(cornerRadius: 15)
+            .fill(Color.gray).opacity(0.2)
+            .frame(width: CGFloat(characters * 10), height: 30)
+    }
+}
+
 struct HeaderBackground: View {
     var body: some View {
         Rectangle()
@@ -416,7 +426,11 @@ extension UIImage {
         draw(in: rect)
         let context = UIGraphicsGetCurrentContext()!
         context.setBlendMode(CGBlendMode.sourceIn)
-        context.setFillColor(color.cgColor ?? UIColor(.insulin.opacity(portion <= 3 ? 0.8 : 1)).cgColor)
+        context
+            .setFillColor(
+                color.cgColor ?? UIColor(portion > 0.75 ? .red.opacity(0.8) : .insulin.opacity(portion <= 3 ? 0.8 : 1))
+                    .cgColor
+            )
         let height: CGFloat = 1 - portion
         let rectToFill = CGRect(x: 0, y: size.height * portion, width: size.width, height: size.height * height)
         context.fill(rectToFill)
