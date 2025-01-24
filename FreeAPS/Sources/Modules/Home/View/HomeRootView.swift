@@ -1512,8 +1512,7 @@ extension Home {
             return Group {
                 if isChartBackgroundColored {
                     ZStack {
-                        addColouredBackground().shadow(radius: 3, x: 3, y: 3)
-
+                        addColouredBackground().shadow(color: Color.black.opacity(0.4), radius: 5, x: 4, y: 4)
                         if state.animatedBackground {
                             SpriteView(scene: spriteScene, options: [.allowsTransparency])
                                 .ignoresSafeArea()
@@ -1537,6 +1536,7 @@ extension Home {
             .padding(.bottom, 5)
             .padding(.leading, 15)
             .padding(.trailing, 15)
+            .modal(for: .dataTable, from: self)
         }
 
         var chart: some View {
