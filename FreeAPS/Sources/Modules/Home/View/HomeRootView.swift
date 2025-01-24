@@ -1507,17 +1507,36 @@ extension Home {
         var timer = Timer.publish(every: 2, on: .main, in: .common).autoconnect() // Aktualisiert alle 2 Sekunden
 
         var mainChart: some View {
-            ZStack {
-                addColouredBackground().shadow(radius: 3, y: 3)
-                if state.animatedBackground {
-                    SpriteView(scene: spriteScene, options: [.allowsTransparency])
-                        .ignoresSafeArea()
-                        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+            let isChartBackgroundColored: Bool = state.settingsManager?.settings.chartBackgroundColored ?? false
+
+            return Group {
+                if isChartBackgroundColored {
+                    ZStack {
+                        addColouredBackground().shadow(radius: 3, x: 3, y: 3)
+
+                        if state.animatedBackground {
+                            SpriteView(scene: spriteScene, options: [.allowsTransparency])
+                                .ignoresSafeArea()
+                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                        }
+                        MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
+                    }
+                } else {
+                    ZStack {
+                        ColouredBackground2()
+
+                        if state.animatedBackground {
+                            SpriteView(scene: spriteScene, options: [.allowsTransparency])
+                                .ignoresSafeArea()
+                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                        }
+                        MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
+                    }
                 }
-                MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
             }
             .padding(.bottom, 5)
-            .modal(for: .dataTable, from: self)
+            .padding(.leading, 15)
+            .padding(.trailing, 15)
         }
 
         var chart: some View {

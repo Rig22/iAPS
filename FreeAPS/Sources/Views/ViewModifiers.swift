@@ -191,10 +191,16 @@ struct ColouredRoundedBackground: View {
 }
 
 struct ColouredBackground: View {
-    // @Environment(\.colorScheme) var colorScheme
     var body: some View {
-        Rectangle()
+        RoundedRectangle(cornerRadius: 15)
             .fill(Color.rig22Background)
+    }
+}
+
+struct ColouredBackground2: View {
+    var body: some View {
+        RoundedRectangle(cornerRadius: 15)
+            .fill(Color.clear)
     }
 }
 

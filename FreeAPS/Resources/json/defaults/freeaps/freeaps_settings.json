@@ -95,5 +95,10 @@
   "ketoProtectAbsolut": false,
   "ketoProtectBasalAbsolut": 0,
   "extendHomeView": true,
-  "extended_overrides": false
+  "extended_overrides": false,
+  "timeSettings": false,
+  "danaBar": false,
+  "legendsSwitch": false,
+  "tempTargetbar": false,
+  "danaBar": false
 }

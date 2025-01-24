@@ -148,6 +148,7 @@ extension StatConfig {
                     } header: { Text("UI | UX Settings ") }
 
                     Section {
+                        Toggle("Mainchart ⇢ Dark", isOn: $state.chartBackgroundColored)
                         Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
                         Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
                         Toggle("Display Chart Threshold lines for Low and High", isOn: $state.rulerMarks)
