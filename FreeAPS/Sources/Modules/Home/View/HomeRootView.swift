@@ -1168,7 +1168,7 @@ extension Home {
                                 }
                             }
                         }
-                        .padding(.top, 10)
+                        .padding(.top, 0)
                         .padding(.bottom, 20)
                     }
                     .onReceive(timer) { _ in
@@ -1488,7 +1488,7 @@ extension Home {
                                 }
                             }
                         }
-                        .padding(.top, 10)
+                        .padding(.top, 0)
                         .padding(.bottom, 20)
                     }
                     .onReceive(timer) { _ in
@@ -1504,10 +1504,11 @@ extension Home {
             }
         }
 
-        var timer = Timer.publish(every: 5, on: .main, in: .common).autoconnect() // Aktualisiert alle 5 Sekunden
+        var timer = Timer.publish(every: 2, on: .main, in: .common).autoconnect() // Aktualisiert alle 2 Sekunden
 
         var mainChart: some View {
             ZStack {
+                addColouredBackground().shadow(radius: 3, y: 3)
                 if state.animatedBackground {
                     SpriteView(scene: spriteScene, options: [.allowsTransparency])
                         .ignoresSafeArea()
@@ -1519,11 +1520,9 @@ extension Home {
             .modal(for: .dataTable, from: self)
         }
 
-        let deviceWidthMultiplier: CGFloat = 1.0
-
         var chart: some View {
-            let ratio = state.timeSettings ? 1.76 : 1.66 // TimeSetting ein
-            let ratio2 = state.timeSettings ? 1.71 : 1.61 // TimeSetting aus
+            let ratio = 1.76
+            let ratio2 = 1.71
 
             return VStack(spacing: 0) {
                 // infoPanel
@@ -1533,13 +1532,12 @@ extension Home {
                     } else {
                         info3
                     }
+                    mainChart.padding(.top, 15)
+                    legendPanel.padding(.top, 10)
+                    tempTargetbar.padding(.top, 15)
+                    infoPanel2.padding(.top, 15)
+                        .frame(width: UIScreen.main.bounds.width)
                 }
-
-                mainChart.padding(.top, 15)
-                legendPanel
-                tempTargetbar
-                infoPanel2
-                    .frame(width: UIScreen.main.bounds.width * deviceWidthMultiplier)
             }
             .frame(minHeight: UIScreen.main.bounds.height / (state.timeSettings ? ratio : ratio2))
         }
@@ -1574,7 +1572,6 @@ extension Home {
                                     .font(.system(size: 12, weight: .bold)).foregroundColor(.uam)
                             }
                         }
-                        .padding(.bottom, 8)
                     }
                 )
             } else {
@@ -1589,7 +1586,6 @@ extension Home {
                 } else {}
             }
             .frame(maxWidth: .infinity, maxHeight: state.tempTargetbar ? 25 : 0)
-            .padding(.top, 12)
         }
 
         var Targetbar: some View {
@@ -1630,7 +1626,6 @@ extension Home {
                 info2
             }
             .frame(maxWidth: .infinity, maxHeight: 25)
-            .padding(.top, 20)
         }
 
         var timeSetting: some View {
