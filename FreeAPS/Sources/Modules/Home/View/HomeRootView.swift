@@ -2001,9 +2001,8 @@ extension Home {
             .chartXScale(
                 domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
             )
-            .frame(height: 150)
-            .padding(.leading, 30)
-            .padding(.trailing, 32)
+            .frame(height: 100)
+            .padding(.horizontal, 20)
             .padding(.top, 15)
             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
         }
