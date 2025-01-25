@@ -143,8 +143,6 @@ struct CurrentGlucoseView: View {
                  .notComputable,
                  .rateOutOfRange:
                 rotationDegrees = 0
-            case nil:
-                ()
             @unknown default:
                 rotationDegrees = 0
             }
@@ -156,45 +154,19 @@ struct CurrentGlucoseView: View {
         }
     }
 
-    /*    var colourGlucoseText: Color {
-             let whichGlucose = recentGlucose?.glucose ?? 0
-             let defaultColor = Color.green
-             print("whichGlucose: \(whichGlucose), lowGlucose: \(lowGlucose), highGlucose: \(highGlucose)")
-             guard lowGlucose < highGlucose else { return .primary }
-
-             switch whichGlucose {
-             case 0 ..< Int(lowGlucose):
-                 return .red
-             case Int(lowGlucose) ..< Int(highGlucose):
-                 return defaultColor
-             case Int(highGlucose)...:
-                 return .yellow
-             default:
-                 return defaultColor
-             }
-         }
-     }*/
-
     var colourGlucoseText: Color {
-        let whichGlucose = Decimal(recentGlucose?.glucose ?? -1)
+        let whichGlucose = recentGlucose?.glucose ?? 0
         let defaultColor = Color.green
-
         guard lowGlucose < highGlucose else { return .primary }
 
-        print("whichGlucose:", whichGlucose, "lowGlucose:", lowGlucose, "highGlucose:", highGlucose)
-
         switch whichGlucose {
-        case ..<lowGlucose:
-            print("Returning RED")
+        case 0 ..< Int(lowGlucose):
             return .red
-        case lowGlucose ..< highGlucose:
-            print("Returning GREEN")
+        case Int(lowGlucose) ..< Int(highGlucose):
             return defaultColor
-        case highGlucose...:
-            print("Returning YELLOW")
+        case Int(highGlucose)...:
             return .yellow
         default:
-            print("Returning DEFAULT")
             return defaultColor
         }
     }
