@@ -51,7 +51,7 @@ struct CurrentGlucoseView: View {
     var body: some View {
         // let triangleColor = Color(red: 0.18, green: 0.35, blue: 0.58)
         // let triangleColor = Color.white.opacity(0.7)
-        let triangleColor = colourGlucoseText.opacity(0.7)
+        // let triangleColor = colourGlucoseText.opacity(0.7)
 
         let angularGradient = AngularGradient(
             gradient: Gradient(colors: [
@@ -99,8 +99,7 @@ struct CurrentGlucoseView: View {
                             } ?? "--"
                     )
                     .font(.system(size: 30, weight: .bold))
-                    .foregroundColor(alarm == nil ? colourGlucoseText : .yellow)
-                    // .foregroundStyle(Color.white)
+                    .foregroundColor(alarm == nil || colourGlucoseText == .red ? colourGlucoseText : .yellow)
                 }
                 HStack {
                     let elapsedSeconds = -1 * (recentGlucose?.dateString.timeIntervalSinceNow ?? 0)
@@ -144,6 +143,8 @@ struct CurrentGlucoseView: View {
                  .notComputable,
                  .rateOutOfRange:
                 rotationDegrees = 0
+            case nil:
+                ()
             @unknown default:
                 rotationDegrees = 0
             }
@@ -155,20 +156,45 @@ struct CurrentGlucoseView: View {
         }
     }
 
+    /*    var colourGlucoseText: Color {
+             let whichGlucose = recentGlucose?.glucose ?? 0
+             let defaultColor = Color.green
+             print("whichGlucose: \(whichGlucose), lowGlucose: \(lowGlucose), highGlucose: \(highGlucose)")
+             guard lowGlucose < highGlucose else { return .primary }
+
+             switch whichGlucose {
+             case 0 ..< Int(lowGlucose):
+                 return .red
+             case Int(lowGlucose) ..< Int(highGlucose):
+                 return defaultColor
+             case Int(highGlucose)...:
+                 return .yellow
+             default:
+                 return defaultColor
+             }
+         }
+     }*/
+
     var colourGlucoseText: Color {
-        let whichGlucose = recentGlucose?.glucose ?? 0
+        let whichGlucose = Decimal(recentGlucose?.glucose ?? -1)
         let defaultColor = Color.green
 
         guard lowGlucose < highGlucose else { return .primary }
 
+        print("whichGlucose:", whichGlucose, "lowGlucose:", lowGlucose, "highGlucose:", highGlucose)
+
         switch whichGlucose {
-        case 0 ..< Int(lowGlucose):
+        case ..<lowGlucose:
+            print("Returning RED")
             return .red
-        case Int(lowGlucose) ..< Int(highGlucose):
+        case lowGlucose ..< highGlucose:
+            print("Returning GREEN")
             return defaultColor
-        case Int(highGlucose)...:
+        case highGlucose...:
+            print("Returning YELLOW")
             return .yellow
         default:
+            print("Returning DEFAULT")
             return defaultColor
         }
     }

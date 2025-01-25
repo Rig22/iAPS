@@ -207,7 +207,7 @@ struct addColouredBackground: View {
 
 struct ColouredBackground: View {
     var body: some View {
-        RoundedRectangle(cornerRadius: 15)
+        RoundedRectangle(cornerRadius: 10)
             .fill(Color.rig22Background)
             .shadow(color: Color.black.opacity(0.5), radius: 10, x: 5, y: 5) // Kräftigerer Schatten
     }

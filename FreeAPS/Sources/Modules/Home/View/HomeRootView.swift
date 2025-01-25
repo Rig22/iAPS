@@ -524,7 +524,7 @@ extension Home {
                     HStack {
                         Image(systemName: "chart.xyaxis.line")
                             .font(.system(size: 14))
-                            .foregroundStyle(.teal)
+                            .foregroundStyle(.white)
 
                         if let tempRate = state.tempRate {
                             let rateString = tempRatenumberFormatter.string(from: tempRate as NSNumber) ?? "0"
@@ -570,7 +570,7 @@ extension Home {
                             HStack(spacing: 4) {
                                 Text("⇢")
                                     .font(.system(size: 14))
-                                    .foregroundStyle(.teal)
+                                    .foregroundStyle(.white)
 
                                 let eventualBGValue = state.data.units == .mmolL ? eventualBG.asMmolL : Decimal(eventualBG)
 
@@ -1704,8 +1704,8 @@ extension Home {
         private var isfView: some View {
             ZStack {
                 HStack {
-                    Image(systemName: "divide").font(.system(size: 16)).foregroundStyle(.teal)
-                    Text("\(state.data.suggestion?.sensitivityRatio ?? 1)").foregroundStyle(.primary)
+                    Image(systemName: "divide").font(.system(size: 16)).foregroundStyle(.white)
+                    Text("\(state.data.suggestion?.sensitivityRatio ?? 1)").foregroundStyle(.white)
                 }
                 .font(.timeSettingFont)
                 .background(TimeEllipse(characters: 10))
@@ -1720,8 +1720,8 @@ extension Home {
         private var tddView: some View {
             ZStack {
                 HStack {
-                    Image(systemName: "timer").font(.system(size: 14)).foregroundStyle(.teal)
-                    Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")").foregroundStyle(.primary)
+                    Image(systemName: "timer").font(.system(size: 14)).foregroundStyle(.white)
+                    Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")").foregroundStyle(.white)
                 }
                 .font(.timeSettingFont)
                 .background(TimeEllipse(characters: 10))
@@ -1949,7 +1949,7 @@ extension Home {
             backgroundColor
                 .frame(maxHeight: 200)
             HStack { Text("Glucose Tagesverlauf") }
-                .font(.headline)
+                .font(.previewHeadline)
                 .foregroundStyle(Color.white)
 
             VStack {
@@ -1991,7 +1991,7 @@ extension Home {
                 AxisMarks(values: .automatic(desiredCount: 5)) { _ in
                     AxisGridLine().foregroundStyle(Color.white)
                     AxisTick().foregroundStyle(Color.white)
-                    AxisValueLabel().foregroundStyle(Color.clear)
+                    AxisValueLabel().foregroundStyle(Color.white)
                 }
             }
             .chartYScale(
@@ -2001,7 +2001,7 @@ extension Home {
             .chartXScale(
                 domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
             )
-            .frame(height: 100)
+            .frame(height: 150)
             .padding(.leading, 30)
             .padding(.trailing, 32)
             .padding(.top, 15)
