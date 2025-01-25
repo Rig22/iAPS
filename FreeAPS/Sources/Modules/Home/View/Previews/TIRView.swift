@@ -121,8 +121,8 @@ struct PreviewChart: View {
         data = prepareData(data_: data)
 
         return VStack {
-            // Text("Time In Range").padding(.bottom, 10).font(.previewHeadline)
-            //     .foregroundColor(.white) // Textfarbe auf weiß setzen
+            //  Text("Time In Range").padding(.bottom, 10).font(.previewHeadline)
+            //      .foregroundColor(.white) // Textfarbe auf weiß setzen
 
             Chart(data) { item in
                 BarMark(

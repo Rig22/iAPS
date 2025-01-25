@@ -89,6 +89,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var insulinBadge: Bool = false
     var hideInsulinBadge: Bool = false
     var allowDilution: Bool = false
+    var profileID: String = "Hypo Treatment"
     var extended_overrides = false
     var extendHomeView = true
     // Auto ISF
@@ -240,6 +241,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case sexSetting
         case disableHypoTreatment
         case allowDilution
+        case profileID
         case extendedOverride
         case extendHomeView
         // AutoISF
@@ -367,6 +369,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.disableHypoTreatment, forKey: .disableHypoTreatment)
         try container.encode(settings.allowDilution, forKey: .allowDilution)
         try container.encode(settings.extended_overrides, forKey: .extendedOverride)
+        try container.encode(settings.profileID, forKey: .profileID)
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)
         try container.encode(settings.smbDeliveryRatioBGrange, forKey: .smbDeliveryRatioRange)

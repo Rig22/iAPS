@@ -144,11 +144,11 @@ extension StatConfig {
                         Toggle("Legend Bar", isOn: $state.legendsSwitch)
                         Toggle("TempTarget Bar", isOn: $state.tempTargetBar)
                         Toggle("Bottom Bar", isOn: $state.timeSettings)
+                        Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
                         Toggle("Never display the small glucose chart when scrolling", isOn: $state.skipGlucoseChart)
                     } header: { Text("UI | UX Settings ") }
 
                     Section {
-                        Toggle("Mainchart ⇢ Dark", isOn: $state.chartBackgroundColored)
                         Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
                         Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
                         Toggle("Display Chart Threshold lines for Low and High", isOn: $state.rulerMarks)

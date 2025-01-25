@@ -523,7 +523,7 @@ extension Home {
                 VStack {
                     HStack {
                         Image(systemName: "chart.xyaxis.line")
-                            .font(.system(size: 14))
+                            .font(.system(size: 12))
                             .foregroundStyle(.white)
 
                         if let tempRate = state.tempRate {
@@ -532,22 +532,23 @@ extension Home {
                                 ? NSLocalizedString(" Manual", comment: "Manual Temp basal")
                                 : ""
 
-                            HStack(spacing: 2) {
+                            HStack(spacing: 0) {
                                 Text(rateString)
-                                    .font(.system(size: 18))
+                                    .font(.system(size: 16))
                                     .foregroundColor(.white)
-                                    +
-                                    Text(" U/hr")
+
+                                // Text(" U/hr")
+                                Text("\u{00A0}U/hr") // Zwei geschützte Leerzeichen
                                     .font(.system(size: 14))
                                     .foregroundColor(.white)
                                     +
                                     Text(manualBasalString)
-                                    .font(.system(size: 18))
+                                    .font(.system(size: 16))
                                     .foregroundColor(.white)
                             }
                         } else {
                             Text("---")
-                                .font(.system(size: 18))
+                                .font(.system(size: 16))
                                 .foregroundColor(.white)
                         }
                     }
@@ -578,14 +579,14 @@ extension Home {
                                     .string(from: eventualBGValue as NSNumber)
                                 {
                                     Text(formattedBG)
-                                        .font(.system(size: 18))
+                                        .font(.system(size: 16))
                                         .foregroundColor(.white)
                                 }
 
                                 Text(state.data.units.rawValue)
                                     .font(.system(size: 14))
                                     .foregroundStyle(.white)
-                                    .padding(.leading, -4)
+                                    .padding(.leading, -1)
                             }
                         } else {
                             HStack(spacing: 4) {
@@ -594,7 +595,7 @@ extension Home {
                                     .foregroundStyle(.white)
 
                                 Text("---")
-                                    .font(.system(size: 18))
+                                    .font(.system(size: 16))
                                     .foregroundColor(.white)
                             }
                         }
@@ -604,6 +605,44 @@ extension Home {
                 }
             }
             .offset(x: -20, y: 0)
+        }
+
+        var loopView: some View {
+            LoopView(
+                suggestion: $state.data.suggestion,
+                enactedSuggestion: $state.enactedSuggestion,
+                closedLoop: $state.closedLoop,
+                timerDate: $state.data.timerDate,
+                isLooping: $state.isLooping,
+                lastLoopDate: $state.lastLoopDate,
+                manualTempBasal: $state.manualTempBasal
+            )
+            .onTapGesture {
+                state.isStatusPopupPresented.toggle()
+            }.onLongPressGesture {
+                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                impactHeavy.impactOccurred()
+                state.runLoop()
+            }
+        }
+
+        var loopView2: some View {
+            LoopView2(
+                suggestion: $state.data.suggestion,
+                enactedSuggestion: $state.enactedSuggestion,
+                closedLoop: $state.closedLoop,
+                timerDate: $state.data.timerDate,
+                isLooping: $state.isLooping,
+                lastLoopDate: $state.lastLoopDate,
+                manualTempBasal: $state.manualTempBasal
+            )
+            .onTapGesture {
+                state.isStatusPopupPresented.toggle()
+            }.onLongPressGesture {
+                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                impactHeavy.impactOccurred()
+                state.runLoop()
+            }
         }
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
@@ -749,27 +788,6 @@ extension Home {
         }
 
         // DanaBars
-
-        var infoPanel: some View {
-            if state.danaBar {
-                return AnyView(
-                    ZStack {
-                        // backgroundColor
-                        LinearGradient(
-                            gradient: Gradient(colors: [.clear, .clear]),
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-
-                        .frame(maxWidth: .infinity, maxHeight: 0)
-
-                        // info
-                    }
-                )
-            } else {
-                return AnyView(EmptyView())
-            }
-        }
 
         func reservoirLevelColor(for reservoirLevel: Double?) -> Color {
             guard let level = reservoirLevel else { return Color.gray.opacity(0.0) }
@@ -1512,7 +1530,8 @@ extension Home {
             return Group {
                 if isChartBackgroundColored {
                     ZStack {
-                        addColouredBackground().shadow(color: Color.black.opacity(0.4), radius: 5, x: 4, y: 4)
+                        ColouredBackground()
+
                         if state.animatedBackground {
                             SpriteView(scene: spriteScene, options: [.allowsTransparency])
                                 .ignoresSafeArea()
@@ -1540,11 +1559,7 @@ extension Home {
         }
 
         var chart: some View {
-            let ratio = 1.76
-            let ratio2 = 1.71
-
-            return VStack(spacing: 0) {
-                // infoPanel
+            VStack(spacing: 0) {
                 Group {
                     if state.danaBarViewOption == "view1" {
                         info
@@ -1552,13 +1567,13 @@ extension Home {
                         info3
                     }
                     mainChart.padding(.top, 15)
-                    legendPanel.padding(.top, 10)
-                    tempTargetbar.padding(.top, 15)
-                    infoPanel2.padding(.top, 15)
+                    legendPanel.padding(.top, 15)
+                    tempTargetbar.padding(.top, 20)
+                    infoPanel.padding(.top, 20).padding(.bottom, 10)
                         .frame(width: UIScreen.main.bounds.width)
                 }
             }
-            .frame(minHeight: UIScreen.main.bounds.height / (state.timeSettings ? ratio : ratio2))
+            .frame(minHeight: UIScreen.main.bounds.height / 1.7) // Je größer der Wert, je kleiner der Chart
         }
 
         var legendPanel: some View {
@@ -1640,11 +1655,11 @@ extension Home {
 
         // BottomInfoBar mit TimeButtons
 
-        var infoPanel2: some View {
+        var infoPanel: some View {
             ZStack {
                 info2
             }
-            .frame(maxWidth: .infinity, maxHeight: 25)
+            .frame(maxWidth: .infinity)
         }
 
         var timeSetting: some View {
@@ -1848,44 +1863,6 @@ extension Home {
             .foregroundStyle(Color.white)
         }
 
-        var loopView: some View {
-            LoopView(
-                suggestion: $state.data.suggestion,
-                enactedSuggestion: $state.enactedSuggestion,
-                closedLoop: $state.closedLoop,
-                timerDate: $state.data.timerDate,
-                isLooping: $state.isLooping,
-                lastLoopDate: $state.lastLoopDate,
-                manualTempBasal: $state.manualTempBasal
-            )
-            .onTapGesture {
-                state.isStatusPopupPresented.toggle()
-            }.onLongPressGesture {
-                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                impactHeavy.impactOccurred()
-                state.runLoop()
-            }
-        }
-
-        var loopView2: some View {
-            LoopView2(
-                suggestion: $state.data.suggestion,
-                enactedSuggestion: $state.enactedSuggestion,
-                closedLoop: $state.closedLoop,
-                timerDate: $state.data.timerDate,
-                isLooping: $state.isLooping,
-                lastLoopDate: $state.lastLoopDate,
-                manualTempBasal: $state.manualTempBasal
-            )
-            .onTapGesture {
-                state.isStatusPopupPresented.toggle()
-            }.onLongPressGesture {
-                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                impactHeavy.impactOccurred()
-                state.runLoop()
-            }
-        }
-
         var tempBasalString: String? {
             guard let tempRate = state.tempRate else {
                 return nil
@@ -1945,12 +1922,48 @@ extension Home {
             }
         }
 
+        var DayView: some View {
+            let isChartBackgroundColored: Bool = state.settingsManager?.settings.chartBackgroundColored ?? false
+            let backgroundView = isChartBackgroundColored ? AnyView(ColouredBackground()) : AnyView(ColouredBackground2())
+
+            return Group {
+                ZStack {
+                    if !state.skipGlucoseChart {
+                        backgroundView
+                        glucoseHeaderView().padding(.top, 8).padding(.bottom, 10)
+                    } else {
+                        EmptyView()
+                    }
+                }
+
+                ZStack {
+                    backgroundView
+                    preview.padding(.top, 15)
+                }
+
+                ZStack {
+                    backgroundView
+                    loopPreview
+                }
+
+                if state.iobData.count >= 0 {
+                    ZStack {
+                        backgroundView
+                        activeCOBView.padding(.bottom, 20)
+                    }
+
+                    ZStack {
+                        backgroundView
+                        activeIOBView.padding(.bottom, 20)
+                    }
+                }
+            }
+            .padding(.horizontal, 15)
+        }
+
         @ViewBuilder private func glucoseHeaderView() -> some View {
-            backgroundColor
+            ColouredBackground2()
                 .frame(maxHeight: 200)
-            HStack { Text("Glucose Tagesverlauf") }
-                .font(.previewHeadline)
-                .foregroundStyle(Color.white)
 
             VStack {
                 glucosePreview
@@ -2023,7 +2036,6 @@ extension Home {
                         .padding()
                     }
                 }
-                .padding(.horizontal, 20)
                 .padding(.vertical, 5)
             }
             .onTapGesture {
@@ -2032,7 +2044,7 @@ extension Home {
         }
 
         var loopPreview: some View {
-            backgroundColor
+            ColouredBackground2()
                 .frame(minHeight: 190)
                 .overlay {
                     LoopsView(loopStatistics: $state.loopStatistics)
@@ -2046,7 +2058,7 @@ extension Home {
         }
 
         var activeIOBView: some View {
-            backgroundColor
+            ColouredBackground2()
                 .frame(minHeight: 430)
                 .overlay {
                     ActiveIOBView(
@@ -2066,7 +2078,7 @@ extension Home {
         }
 
         var activeCOBView: some View {
-            backgroundColor
+            ColouredBackground2()
                 .frame(minHeight: 230)
                 .overlay {
                     ActiveCOBView(data: $state.iobData)
@@ -2083,7 +2095,6 @@ extension Home {
         var body: some View {
             GeometryReader { geo in
                 if onboarded.first?.firstRun ?? true, let openAPSSettings = state.openAPSSettings {
-                    // Anzeige der Importansicht für alte iAPS-Benutzer Einstellungen
                     importResetSettingsView(settings: openAPSSettings)
                 } else {
                     VStack(spacing: 0) {
@@ -2092,15 +2103,16 @@ extension Home {
                             ScrollViewReader { _ in
                                 LazyVStack {
                                     chart.padding(.top, 10)
-                                    if !state.skipGlucoseChart {
-                                        glucoseHeaderView().padding(.top, 10)
-                                    }
-                                    preview.padding(.top, 30)
-                                    loopPreview.padding(.top, 10).padding(.bottom, 25)
-                                    if state.iobData.count >= 0 {
-                                        activeCOBView.padding(.bottom, 25)
-                                        activeIOBView.padding(.top, 0).padding(.bottom, 25)
-                                    }
+                                    /* if !state.skipGlucoseChart {
+                                         glucoseHeaderView().padding(.top, 10)
+                                     }
+                                       preview.padding(.top, 30)
+                                      loopPreview.padding(.top, 10).padding(.bottom, 25)
+                                      if state.iobData.count >= 0 {
+                                          activeCOBView.padding(.bottom, 25)
+                                          activeIOBView.padding(.bottom, 25)
+                                      }*/
+                                    DayView.padding(.bottom, 30)
                                 }
                                 .background(GeometryReader { geo in
                                     let offset = -geo.frame(in: .named(scrollSpace)).minY

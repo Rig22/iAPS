@@ -103,6 +103,18 @@ extension Settings {
                 } header: { Text("Extra Features") }
 
                 Section {
+                    HStack {
+                        Picker("Treatment", selection: $state.profileID) {
+                            Text("Default  📉").tag("Hypo Treatment")
+                            ForEach(fetchedProfiles) { item in
+                                Text(item.name ?? "").tag(item.id?.string ?? "")
+                            }
+                            Text("None").tag("None")
+                        }
+                    }
+                } header: { Text("Hypo Treatment") }
+
+                Section {
                     Toggle("Debug options", isOn: $state.debugOptions)
                     if state.debugOptions {
                         Group {
