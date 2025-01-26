@@ -41,11 +41,8 @@ struct CapsulaBackground: ViewModifier {
 
 struct CompactSectionSpacing: ViewModifier {
     func body(content: Content) -> some View {
-        if #available(iOS 17, *) {
-            return content
-                .listSectionSpacing(.compact)
-        } else {
-            return content }
+        content
+            .listSectionSpacing(.compact)
     }
 }
 
@@ -145,6 +142,48 @@ struct FrostedGlass: View {
     var body: some View {
         UnevenRoundedRectangle.testTube
             .fill(.ultraThinMaterial.opacity(opacity))
+    }
+}
+
+struct NonStandardInsulin: View {
+    let concentration: Double
+    let pod: Bool
+
+    private var formatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        return formatter
+    }
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 15)
+                .fill(.red)
+                .frame(width: 33, height: 15)
+                .overlay {
+                    Text("U" + (formatter.string(from: concentration * 100 as NSNumber) ?? ""))
+                        .font(.system(size: 9))
+                        .foregroundStyle(.white)
+                }
+        }
+        .offset(x: pod ? -15 : -5, y: pod ? -24 : 7)
+    }
+}
+
+struct TooOldValue: View {
+    var body: some View {
+        ZStack {
+            Image(systemName: "circle.fill")
+                .resizable()
+                .frame(maxHeight: 20)
+                .symbolRenderingMode(.palette)
+                .foregroundStyle(Color(.warning).opacity(0.5))
+                .offset(x: 5, y: -13)
+                .overlay {
+                    Text("Old").font(.caption)
+                }
+        }
     }
 }
 

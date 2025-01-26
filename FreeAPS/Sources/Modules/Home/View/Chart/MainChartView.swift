@@ -161,13 +161,13 @@ struct MainChartView: View {
                 mainScrollView(fullSize: geo.size)
                 glucoseLabelsView(fullSize: geo.size)
             }
-            .onChange(of: hSizeClass) { _ in
+            .onChange(of: hSizeClass) {
                 update(fullSize: geo.size)
             }
-            .onChange(of: vSizeClass) { _ in
+            .onChange(of: vSizeClass) {
                 update(fullSize: geo.size)
             }
-            .onChange(of: data.screenHours) { _ in
+            .onChange(of: data.screenHours) {
                 update(fullSize: geo.size)
             }
             .onReceive(
@@ -231,7 +231,7 @@ struct MainChartView: View {
                          .onChange(of: data.tempBasals) { _ in
                              scroll.scrollTo(Config.endID, anchor: .trailing)
                          } */
-                        .onChange(of: data.screenHours) { _ in
+                        .onChange(of: data.screenHours) {
                             scroll.scrollTo(Config.endID, anchor: .trailing)
                         }
                         .onAppear {
@@ -317,19 +317,19 @@ struct MainChartView: View {
         .frame(width: fullGlucoseWidth(viewWidth: fullSize.width) + additionalWidth(viewWidth: fullSize.width))
         .frame(maxHeight: Config.basalHeight)
         .background(Color.clear)
-        .onChange(of: data.tempBasals) { _ in
+        .onChange(of: data.tempBasals) {
             calculateBasalPoints(fullSize: fullSize)
         }
-        .onChange(of: data.suspensions) { _ in
+        .onChange(of: data.suspensions) {
             calculateSuspensions(fullSize: fullSize)
         }
-        .onChange(of: data.maxBasal) { _ in
+        .onChange(of: data.maxBasal) {
             calculateBasalPoints(fullSize: fullSize)
         }
-        .onChange(of: data.autotunedBasalProfile) { _ in
+        .onChange(of: data.autotunedBasalProfile) {
             calculateBasalPoints(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             calculateBasalPoints(fullSize: fullSize)
         }
     }
@@ -416,10 +416,10 @@ struct MainChartView: View {
             }
         }
         .fill(Color.darkGreen)
-        .onChange(of: data.glucose) { _ in
+        .onChange(of: data.glucose) {
             update(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             update(fullSize: fullSize)
         }
         .onReceive(Foundation.NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
@@ -436,10 +436,10 @@ struct MainChartView: View {
             path.addLines(lines)
         }
         .stroke(Color.loopGreen, lineWidth: 0.5)
-        .onChange(of: data.glucose) { _ in
+        .onChange(of: data.glucose) {
             update(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             update(fullSize: fullSize)
         }
         .onReceive(Foundation.NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
@@ -454,10 +454,10 @@ struct MainChartView: View {
             }
         }
         .fill(Color.gray)
-        .onChange(of: data.isManual) { _ in
+        .onChange(of: data.isManual) {
             update(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             update(fullSize: fullSize)
         }
         .onReceive(Foundation.NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
@@ -498,10 +498,10 @@ struct MainChartView: View {
                 }.position(position).asAny()
             }
         }
-        .onChange(of: data.announcement) { _ in
+        .onChange(of: data.announcement) {
             calculateAnnouncementDots(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             calculateAnnouncementDots(fullSize: fullSize)
         }
     }
@@ -514,10 +514,10 @@ struct MainChartView: View {
         }
         .fill(Color.red)
 
-        .onChange(of: data.isManual) { _ in
+        .onChange(of: data.isManual) {
             update(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             update(fullSize: fullSize)
         }
         .onReceive(
@@ -538,10 +538,10 @@ struct MainChartView: View {
             path.addLines(lines)
         }
         .stroke(Color.loopGray, lineWidth: 0.5)
-        .onChange(of: data.glucose) { _ in
+        .onChange(of: data.glucose) {
             update(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             update(fullSize: fullSize)
         }
         .onReceive(Foundation.NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
@@ -576,13 +576,13 @@ struct MainChartView: View {
                 }
             }
         }
-        .onChange(of: data.boluses) { _ in
+        .onChange(of: data.boluses) {
             calculateBolusDots(fullSize: fullSize)
         }
-        .onChange(of: data.useInsulinBars) { _ in
+        .onChange(of: data.useInsulinBars) {
             calculateBolusDots(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             calculateBolusDots(fullSize: fullSize)
         }
     }
@@ -601,10 +601,10 @@ struct MainChartView: View {
                     .asAny()
             }
         }
-        .onChange(of: data.carbs) { _ in
+        .onChange(of: data.carbs) {
             calculateCarbsDots(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             calculateCarbsDots(fullSize: fullSize)
         }
     }
@@ -616,10 +616,10 @@ struct MainChartView: View {
             fpuPath
                 .stroke(Color.primary, lineWidth: 0.2)
         }
-        .onChange(of: data.carbs) { _ in
+        .onChange(of: data.carbs) {
             calculateFPUsDots(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             calculateFPUsDots(fullSize: fullSize)
         }
     }
@@ -631,13 +631,13 @@ struct MainChartView: View {
             tempTargetsPath
                 .stroke(Color.basal.opacity(0.5), lineWidth: 1)
         }
-        .onChange(of: data.glucose) { _ in
+        .onChange(of: data.glucose) {
             calculateTempTargetsRects(fullSize: fullSize)
         }
-        .onChange(of: data.tempTargets) { _ in
+        .onChange(of: data.tempTargets) {
             calculateTempTargetsRects(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             calculateTempTargetsRects(fullSize: fullSize)
         }
     }
@@ -649,19 +649,19 @@ struct MainChartView: View {
             overridesPath
                 .stroke(Color.violet.opacity(0.7), lineWidth: 1)
         }
-        .onChange(of: data.glucose) { _ in
+        .onChange(of: data.glucose) {
             calculateOverridesRects(fullSize: fullSize)
         }
-        .onChange(of: data.suggestion) { _ in
+        .onChange(of: data.suggestion) {
             calculateOverridesRects(fullSize: fullSize)
         }
-        .onChange(of: data.overrideHistory) { _ in
+        .onChange(of: data.overrideHistory) {
             calculateOverridesRects(fullSize: fullSize)
         }
-        .onChange(of: triggerUpdate) { _ in
+        .onChange(of: triggerUpdate) {
             calculateOverridesRects(fullSize: fullSize)
         }
-        .onChange(of: didAppearTrigger) { _ in
+        .onChange(of: didAppearTrigger) {
             calculateOverridesRects(fullSize: fullSize)
         }
     }
@@ -692,7 +692,7 @@ struct MainChartView: View {
                 }
             }.fill(Color.uam)
         }
-        .onChange(of: data.suggestion) { _ in
+        .onChange(of: data.suggestion) {
             update(fullSize: fullSize)
         }
     }
