@@ -36,7 +36,7 @@ extension AddCarbs {
 
         override func subscribe() {
             carbsRequired = provider.suggestion?.carbsReq
-            // id = settings.settings.profileID
+            id = settings.settings.profileID
             maxCarbs = settings.settings.maxCarbs
             skipBolus = settingsManager.settings.skipBolusScreenAfterCarbs
             useFPUconversion = settingsManager.settings.useFPUconversion
@@ -264,7 +264,7 @@ extension AddCarbs {
                     override.date ?? Date.now
                 )
             } else {
-                // os.activatePreset(profileID)
+                os.activatePreset(profileID)
             }
         }
     }
