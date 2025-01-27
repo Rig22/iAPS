@@ -315,8 +315,6 @@ extension Home {
                 VStack {
                     ZStack {
                         Circle()
-                            // .fill(backgroundColor)
-                            // .opacity(0.3)
                             .fill(Color.darkGray.opacity(0.5))
                             .frame(width: 60, height: 60)
                             .overlay(
@@ -324,19 +322,24 @@ extension Home {
                                     .stroke(Color.white, lineWidth: 0)
                             )
 
-                        PieSliceView(
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                        )
-                        .fill(color)
-                        .frame(width: 60, height: 60)
-                        .opacity(0.6)
-
-                        /*   Image(systemName: symbol)
-                         .resizable()
-                         .scaledToFit()
-                         .frame(width: symbolSize, height: symbolSize)
-                         .foregroundColor(.white)*/
+                        if fillFraction >= 0 {
+                            // Normale Füllung für positive Werte
+                            PieSliceView(
+                                startAngle: .degrees(-90),
+                                endAngle: .degrees(-90 + Double(fillFraction * 360))
+                            )
+                            .fill(color)
+                            .frame(width: 60, height: 60)
+                            .opacity(0.6)
+                        } else {
+                            PieSliceView(
+                                startAngle: .degrees(-90 + Double(fillFraction * 360)),
+                                endAngle: .degrees(270)
+                            )
+                            .fill(.red)
+                            .frame(width: 60, height: 60)
+                            .opacity(0.6)
+                        }
                     }
 
                     Text(displayText)
@@ -348,7 +351,7 @@ extension Home {
                 .onAppear {
                     pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
                 }
-                .onChange(of: fillFraction) { newValue in
+                .onChange(of: fillFraction) { _, newValue in
                     pieSegmentViewModel.updateProgress(to: newValue, animate: true)
                 }
             }
@@ -401,7 +404,7 @@ extension Home {
                 .onAppear {
                     pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
                 }
-                .onChange(of: fillFraction) { newValue in
+                .onChange(of: fillFraction) { _, newValue in
                     pieSegmentViewModel.updateProgress(to: newValue, animate: true)
                 }
             }
@@ -444,7 +447,7 @@ extension Home {
                 .onAppear {
                     pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
                 }
-                .onChange(of: fillFraction) { newValue in
+                .onChange(of: fillFraction) { _, newValue in
                     pieSegmentViewModel.updateProgress(to: newValue, animate: true)
                 }
             }
@@ -537,8 +540,7 @@ extension Home {
                                     .font(.system(size: 16))
                                     .foregroundColor(.white)
 
-                                // Text(" U/hr")
-                                Text("\u{00A0}U/hr") // Zwei geschützte Leerzeichen
+                                Text("\u{00A0}U/hr") //Ein geschütztes Leerzeichen
                                     .font(.system(size: 14))
                                     .foregroundColor(.white)
                                     +
@@ -758,20 +760,24 @@ extension Home {
                         ZStack {
                             let substance = Double(state.data.suggestion?.iob ?? 0)
                             let maxValue = max(Double(settings.preferences.maxIOB), 1)
-                            let fraction = CGFloat(substance / maxValue)
-                            let fill = max(min(fraction, 1.0), 0.0)
-                            //  let insulinSymbol = "syringe"
+
+                            // Füllstand als Anteil von maxIOB berechnen
+                            let fraction = substance / maxValue
+
+                            // Normalisieren: Positiv max 1.0, Negativ max -1.0
+                            let fill = max(min(fraction, 1.0), -1.0)
 
                             FillablePieSegment(
                                 pieSegmentViewModel: insulinPieSegmentViewModel,
                                 fillFraction: fill,
-                                color: substance < 0 ? .blue : .insulin,
+                                color: fill < 0 ? .red : .insulin, // Negative Werte rot färben
                                 backgroundColor: .clear,
                                 displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
                                 symbolSize: 0,
                                 symbol: "syringe",
                                 animateProgress: true
                             )
+
                             Image("iob")
                                 .resizable()
                                 .scaledToFit()
@@ -1192,10 +1198,13 @@ extension Home {
                     .onReceive(timer) { _ in
                         state.specialDanaKitFunction()
                     }
-                    .onChange(of: state.insulinConcentration) { newValue in
-                        if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {}
-                    }
-                    .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                    /*  .onChange(of: state.insulinConcentration) { newValue in
+                     if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {}*/
+                    .onChange(of: state.insulinConcentration) { _, newValue in
+                        if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {
+                            // Deine Logik hier
+                        }
+                    }.dynamicTypeSize(...DynamicTypeSize.xxLarge)
                 )
             } else {
                 return AnyView(EmptyView())
@@ -1512,7 +1521,7 @@ extension Home {
                     .onReceive(timer) { _ in
                         state.specialDanaKitFunction()
                     }
-                    .onChange(of: state.insulinConcentration) { newValue in
+                    .onChange(of: state.insulinConcentration) { _, newValue in
                         if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {}
                     }
                     .dynamicTypeSize(...DynamicTypeSize.xxLarge)
@@ -1735,7 +1744,7 @@ extension Home {
         private var tddView: some View {
             ZStack {
                 HStack {
-                    Image(systemName: "timer").font(.system(size: 14)).foregroundStyle(.white)
+                    Image(systemName: "circle.slash").font(.system(size: 14)).foregroundStyle(.white)
                     Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")").foregroundStyle(.white)
                 }
                 .font(.timeSettingFont)
@@ -1743,7 +1752,7 @@ extension Home {
             }.offset(x: 0)
         }
 
-        // buttonPanel
+        // buttonPanel line.diagonal circle.slash circle.and.line.horizontal
 
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {

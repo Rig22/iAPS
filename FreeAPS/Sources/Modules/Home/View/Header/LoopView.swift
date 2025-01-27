@@ -85,7 +85,7 @@ struct FillablePieSegment: View {
         .onAppear {
             pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
         }
-        .onChange(of: fillFraction) { newValue in
+        .onChange(of: fillFraction) { _, newValue in
             pieSegmentViewModel.updateProgress(to: newValue, animate: true)
         }
     }
@@ -148,7 +148,7 @@ struct LoopView: View {
         .onAppear {
             pieSegmentViewModel.updateProgress(to: min(CGFloat(minutesAgo) / 5.0, 1.0), animate: true)
         }
-        .onChange(of: minutesAgo) { _ in
+        .onChange(of: minutesAgo) {
             pieSegmentViewModel.updateProgress(to: min(CGFloat(minutesAgo) / 5.0, 1.0), animate: true)
         }
     }
