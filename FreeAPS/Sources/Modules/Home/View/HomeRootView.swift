@@ -317,29 +317,17 @@ extension Home {
                         Circle()
                             .fill(Color.darkGray.opacity(0.5))
                             .frame(width: 60, height: 60)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
 
-                        if fillFraction >= 0 {
-                            // Normale Füllung für positive Werte
-                            PieSliceView(
-                                startAngle: .degrees(-90),
-                                endAngle: .degrees(-90 + Double(fillFraction * 360))
-                            )
-                            .fill(color)
-                            .frame(width: 60, height: 60)
-                            .opacity(0.6)
-                        } else {
-                            PieSliceView(
-                                startAngle: .degrees(-90 + Double(fillFraction * 360)),
-                                endAngle: .degrees(270)
-                            )
-                            .fill(.red)
-                            .frame(width: 60, height: 60)
-                            .opacity(0.6)
-                        }
+                        Circle()
+                            .stroke(Color.white, lineWidth: 0)
+
+                        PieSliceView(
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                        )
+                        .fill(color)
+                        .frame(width: 60, height: 60)
+                        .opacity(0.6)
                     }
 
                     Text(displayText)
@@ -540,7 +528,7 @@ extension Home {
                                     .font(.system(size: 16))
                                     .foregroundColor(.white)
 
-                                Text("\u{00A0}U/hr") //Ein geschütztes Leerzeichen
+                                Text("\u{00A0}U/hr") // Ein geschütztes Leerzeichen
                                     .font(.system(size: 14))
                                     .foregroundColor(.white)
                                     +
@@ -749,8 +737,6 @@ extension Home {
             }
         }
 
-        // InsulinView
-
         @StateObject private var insulinPieSegmentViewModel = PieSegmentViewModel()
 
         var insulinView: some View {
@@ -761,16 +747,19 @@ extension Home {
                             let substance = Double(state.data.suggestion?.iob ?? 0)
                             let maxValue = max(Double(settings.preferences.maxIOB), 1)
 
-                            // Füllstand als Anteil von maxIOB berechnen
-                            let fraction = substance / maxValue
+                            // Berechnung für positive & negative Werte
+                            let fraction = CGFloat(abs(substance) / maxValue)
+                            let fill = min(fraction, 1.0) // Begrenzung auf max 1
 
-                            // Normalisieren: Positiv max 1.0, Negativ max -1.0
-                            let fill = max(min(fraction, 1.0), -1.0)
+                            // Farbe & Startpunkt für negative Werte
+                            let isNegative = substance < 0
+                            let pieColor: Color = isNegative ? .red : .insulin
+                            let _: Double = isNegative ? 90 : -90 // Negative Werte starten bei 3 Uhr
 
                             FillablePieSegment(
                                 pieSegmentViewModel: insulinPieSegmentViewModel,
                                 fillFraction: fill,
-                                color: fill < 0 ? .red : .insulin, // Negative Werte rot färben
+                                color: pieColor,
                                 backgroundColor: .clear,
                                 displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
                                 symbolSize: 0,

@@ -227,7 +227,7 @@ extension OverrideProfilesConfig {
             coredataContext.perform { try? self.coredataContext.save() }
 
             // Uploads new Override to NS
-            ns.uploadOverride(profile.name ?? "", Double(saveOverride.duration ?? 0), saveOverride.date ?? Date())
+            ns.uploadOverride(profile.name ?? "", Double(truncating: saveOverride.duration ?? 0), saveOverride.date ?? Date())
         }
 
         func savedSettings() {
