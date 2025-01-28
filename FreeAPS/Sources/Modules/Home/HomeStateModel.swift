@@ -45,7 +45,6 @@ extension Home {
         @Published var alarm: GlucoseAlarm?
         @Published var animatedBackground = false
         @Published var manualTempBasal = false
-        @Published var smooth = false
         @Published var maxValue: Decimal = 1.2
         @Published var timeZone: TimeZone?
         @Published var totalBolus: Decimal = 0
@@ -182,7 +181,7 @@ extension Home {
             manualTempBasal = apsManager.isManualTempBasal
             setStatusTitle()
             setupCurrentTempTarget()
-            smooth = settingsManager.settings.smoothGlucose
+            data.smooth = settingsManager.settings.smoothGlucose
             maxValue = settingsManager.preferences.autosensMax
             data.lowGlucose = settingsManager.settings.low
             data.highGlucose = settingsManager.settings.high
