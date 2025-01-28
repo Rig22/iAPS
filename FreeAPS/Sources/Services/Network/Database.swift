@@ -1,3 +1,4 @@
+
 import Combine
 import Foundation
 
@@ -396,7 +397,7 @@ extension Database {
                 id: item.id ?? "",
                 indefininite: item.indefinite,
                 isf: item.isf,
-                isndAndCr: item.isfAndCr,
+                isndAndCr: item.isfAndCr, basal: item.basal,
                 maxIOB: (item.maxIOB ?? 0) as Decimal,
                 name: item.name ?? "",
                 overrideMaxIOB: item.overrideMaxIOB,

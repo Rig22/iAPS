@@ -92,9 +92,9 @@ final class OverrideStorage {
                 history.duration = -1 * (latest.date ?? Date()).timeIntervalSinceNow.minutes
                 history.date = latest.date ?? Date()
                 // Looks better in Home View Main Chart when target isn't == 0.
-                if Double(truncating: latest.target ?? 100) < 6 {
+                if Double(latest.target ?? 100) < 6 {
                     history.target = 6
-                } else { history.target = Double(truncating: latest.target ?? 100) }
+                } else { history.target = Double(latest.target ?? 100) }
                 duration = history.duration
             }
             profiles.enabled = false
@@ -118,6 +118,7 @@ final class OverrideStorage {
             save.indefinite = preset.indefinite
             save.isPreset = true
             save.isf = preset.isf
+            save.basal = preset.basal
             save.isfAndCr = preset.isfAndCr
             save.percentage = preset.percentage
             save.smbIsAlwaysOff = preset.smbIsAlwaysOff
@@ -182,7 +183,7 @@ final class OverrideStorage {
             return nil
         }
 
-        guard (last.date ?? Date.now).addingTimeInterval(Int(truncating: last.duration ?? 0).minutes.timeInterval) > Date(),
+        guard (last.date ?? Date.now).addingTimeInterval(Int(last.duration ?? 0).minutes.timeInterval) > Date(),
               (last.date ?? Date.now) <= Date.now,
               last.duration != 0
         else {
@@ -217,6 +218,7 @@ final class OverrideStorage {
             save.indefinite = override.indefinite
             save.isPreset = override.isPreset
             save.isf = override.isf
+            save.basal = override.basal
             save.isfAndCr = override.isfAndCr
             save.percentage = override.percentage
             save.smbIsAlwaysOff = override.smbIsAlwaysOff
@@ -310,6 +312,7 @@ final class OverrideStorage {
                 save.indefinite = preset.indefinite
                 save.isPreset = true
                 save.isf = preset.isf
+                save.basal = preset.basal
                 save.isfAndCr = preset.isfAndCr
                 save.percentage = preset.percentage
                 save.smbIsAlwaysOff = preset.smbIsAlwaysOff
