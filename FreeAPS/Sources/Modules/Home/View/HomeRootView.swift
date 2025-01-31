@@ -150,6 +150,13 @@ extension Home {
             return formatter
         }
 
+        let percentageFormatter: NumberFormatter = {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.maximumFractionDigits = 0 // Keine Nachkommastellen
+            return formatter
+        }()
+
         private var spriteScene: SKScene {
             let scene = SnowScene()
             scene.scaleMode = .resizeFill
@@ -233,7 +240,7 @@ extension Home {
                     Text(displayText)
                         .font(.system(size: 16))
                         .foregroundStyle(Color.white)
-                        .offset(x: -120, y: 50)
+                        .offset(x: -120, y: 60)
 
                     ProgressView(value: Double(truncating: progress as NSNumber))
                         .progressViewStyle(CircularProgressViewStyle(backgroundColor: backgroundColor))
@@ -476,7 +483,7 @@ extension Home {
                         )
                     }
 
-                    loopViewSelector()
+                    //  loopViewSelector()
                 }
             }
         }
@@ -485,7 +492,7 @@ extension Home {
             VStack {
                 glucoseView
                     .frame(width: 110, height: 110)
-                loopViewSelector()
+                // loopViewSelector()
             }
         }
 
@@ -496,11 +503,13 @@ extension Home {
                     loopView
                         .frame(maxHeight: .infinity)
                         .offset(y: 25)
+                        .padding(.bottom, 10)
+
                 case .view2:
                     loopView2
                         .frame(maxHeight: .infinity)
                         .offset(y: 25)
-                        .padding(.top, 10)
+                        .padding(.bottom, 10)
                 }
             } else {
                 // Fallback-Ansicht, falls der String-Wert ungültig ist
@@ -642,64 +651,35 @@ extension Home {
                 endPoint: .bottom
             )
             .frame(
-                maxHeight: fontSize < .extraExtraLarge ? 250 + geo.safeAreaInsets.top : 145 + geo.safeAreaInsets.top
+                maxHeight: fontSize < .extraExtraLarge ? 160 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
             )
+
             .overlay {
                 VStack {
-                    // Oberer Bereich
-                    VStack {
+                    VStack(alignment: .leading, spacing: 8) {
                         HStack {
-                            // Linker Block
                             VStack(alignment: .leading, spacing: 8) {
-                                // TempRate anzeigen
                                 HStack(spacing: 5) {
                                     tempRateView
                                 }
                             }
-
                             Spacer()
-
-                            // Mittlerer Stack
                             HStack {
                                 Spacer()
-
-                                if state.bolusProgress != nil && state.bolusAmount != nil {
+                                if state.bolusProgress != nil, state.bolusAmount != nil {
                                     bolusProgressView()
                                 } else {
                                     glucoseAndLoopView()
                                 }
-
                                 Spacer()
                             }
-
-                            // Rechter Block (eventualBG)
                             eventualBGView
                         }
                     }
-                    .offset(y: 90)
-
-                    Spacer() // Rechts
-
-                    // Unterer Bereich
-                    VStack(spacing: 20) {
-                        Spacer()
-                        HStack {
-                            Spacer()
-                            carbsView
-                                .frame(maxHeight: .infinity, alignment: .bottom)
-                                .padding(.bottom, 30)
-                            Spacer(minLength: 200)
-                            insulinView
-                                .frame(maxHeight: .infinity, alignment: .bottom)
-                                .padding(.bottom, 30)
-                            Spacer()
-                        }
-                        .dynamicTypeSize(...DynamicTypeSize.xLarge)
-                        .padding(.horizontal, 10)
-                    }
+                    .offset(y: 80) // Hier die gesamte View nach unten verschieben
+                    Spacer()
                 }
             }
-            .clipShape(Rectangle())
         }
 
         // CarbView
@@ -754,7 +734,7 @@ extension Home {
                             // Farbe & Startpunkt für negative Werte
                             let isNegative = substance < 0
                             let pieColor: Color = isNegative ? .red : .insulin
-                            let _: Double = isNegative ? 90 : -90 // Negative Werte starten bei 3 Uhr
+                            let _: Double = isNegative ? 90 : -90
 
                             FillablePieSegment(
                                 pieSegmentViewModel: insulinPieSegmentViewModel,
@@ -1181,18 +1161,15 @@ extension Home {
                                 }
                             }
                         }
-                        .padding(.top, 0)
+                        .padding(.top, 20)
                         .padding(.bottom, 20)
                     }
                     .onReceive(timer) { _ in
                         state.specialDanaKitFunction()
                     }
-                    /*  .onChange(of: state.insulinConcentration) { newValue in
-                     if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {}*/
+
                     .onChange(of: state.insulinConcentration) { _, newValue in
-                        if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {
-                            // Deine Logik hier
-                        }
+                        if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {}
                     }.dynamicTypeSize(...DynamicTypeSize.xxLarge)
                 )
             } else {
@@ -1304,7 +1281,7 @@ extension Home {
                                         let remainingHours = cannulaAgeOption
                                             .maxCannulaAge - cannulaHours
                                         if remainingHours <= 0 {
-                                            return 1.0 // Vollständig gefüllt bei Überschreitung
+                                            return 1.0
                                         } else {
                                             return CGFloat(min(max(
                                                 remainingHours / cannulaAgeOption.maxCannulaAge,
@@ -1312,7 +1289,7 @@ extension Home {
                                             ), 1.0))
                                         }
                                     } else {
-                                        return 0.0 // Voll gefüllt, wenn keine Stunden bekannt sind
+                                        return 0.0
                                     }
                                 }()
 
@@ -1504,7 +1481,7 @@ extension Home {
                                 }
                             }
                         }
-                        .padding(.top, 0)
+                        .padding(.top, 20)
                         .padding(.bottom, 20)
                     }
                     .onReceive(timer) { _ in
@@ -1558,6 +1535,31 @@ extension Home {
 
         var chart: some View {
             VStack(spacing: 0) {
+                if state.carbInsulinLoopViewOption {
+                    HStack {
+                        Spacer()
+                        carbsView
+                            .frame(height: 50)
+                            .padding(.top, 0)
+
+                        Spacer()
+
+                        loopViewSelector()
+                            .frame(height: 50)
+                            .padding(.bottom, 0)
+
+                        Spacer()
+
+                        insulinView
+                            .frame(height: 50)
+                            .padding(.top, 0)
+                        Spacer()
+                    }
+                    .dynamicTypeSize(...DynamicTypeSize.xLarge)
+                    .padding(.horizontal, 10)
+                    .padding(.bottom, 50)
+                }
+
                 Group {
                     if state.danaBarViewOption == "view1" {
                         info
@@ -1571,7 +1573,7 @@ extension Home {
                         .frame(width: UIScreen.main.bounds.width)
                 }
             }
-            .frame(minHeight: UIScreen.main.bounds.height / 1.7) // Je größer der Wert, je kleiner der Chart
+            .frame(minHeight: UIScreen.main.bounds.height / 1.47) // Je größer der Wert, je kleiner der Chart
         }
 
         var legendPanel: some View {
@@ -1714,30 +1716,73 @@ extension Home {
             }
         }
 
+        /*   private var isfView: some View {
+             ZStack {
+                 HStack {
+                     Image(systemName: "divide").font(.system(size: 16)).foregroundStyle(.white)
+                     Text("\(state.data.suggestion?.sensitivityRatio ?? 1)").foregroundStyle(.white)
+                 }
+                 .font(.timeSettingFont)
+                 .background(TimeEllipse(characters: 10))
+                 .onTapGesture {
+                     if state.autoisf {
+                         displayAutoHistory.toggle()
+                     }
+                 }
+             }.offset(x: 30)
+         }
+
+         private var tddView: some View {
+             ZStack {
+                 HStack {
+                     Image(systemName: "circle.slash").font(.system(size: 14)).foregroundStyle(.white)
+                     Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")").foregroundStyle(.white)
+                 }
+                 .font(.timeSettingFont)
+                 .background(TimeEllipse(characters: 10))
+             }.offset(x: 0)
+         }*/
+
+        private var sensitivityPercentage: String {
+            let sensitivityValue = (state.data.suggestion?.sensitivityRatio ?? 1) as NSDecimalNumber
+            return percentageFormatter.string(from: NSNumber(value: sensitivityValue.doubleValue * 100)) ?? "0"
+        }
+
         private var isfView: some View {
             ZStack {
                 HStack {
-                    Image(systemName: "divide").font(.system(size: 16)).foregroundStyle(.white)
-                    Text("\(state.data.suggestion?.sensitivityRatio ?? 1)").foregroundStyle(.white)
-                }
-                .font(.timeSettingFont)
-                .background(TimeEllipse(characters: 10))
-                .onTapGesture {
-                    if state.autoisf {
-                        displayAutoHistory.toggle()
+                    HStack {
+                        // Image(systemName: "divide")
+                        Text("ISF")
+                            .font(.system(size: 14))
+                            .foregroundStyle(.white)
+
+                        Text("\(sensitivityPercentage)%")
+                            .foregroundStyle(.white)
+                            .font(.timeSettingFont)
+                    }
+                    .background(TimeEllipse(characters: 12))
+                    .onTapGesture {
+                        if state.autoisf {
+                            displayAutoHistory.toggle()
+                        }
                     }
                 }
-            }.offset(x: 30)
+                .offset(x: 30)
+            }
         }
 
         private var tddView: some View {
             ZStack {
                 HStack {
-                    Image(systemName: "circle.slash").font(.system(size: 14)).foregroundStyle(.white)
-                    Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")").foregroundStyle(.white)
+                    Image(systemName: "circle.slash").font(.system(size: 13)).foregroundStyle(.white)
+                    /* Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")").foregroundStyle(.white)*/
+
+                    Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0") U")
+                        .foregroundStyle(.white)
                 }
                 .font(.timeSettingFont)
-                .background(TimeEllipse(characters: 10))
+                .background(TimeEllipse(characters: 12))
             }.offset(x: 0)
         }
 
@@ -2110,7 +2155,7 @@ extension Home {
                                           activeCOBView.padding(.bottom, 25)
                                           activeIOBView.padding(.bottom, 25)
                                       }*/
-                                    DayView.padding(.bottom, 30)
+                                    DayView.padding(.bottom, 30).padding(.top, 30)
                                 }
                                 .background(GeometryReader { geo in
                                     let offset = -geo.frame(in: .named(scrollSpace)).minY

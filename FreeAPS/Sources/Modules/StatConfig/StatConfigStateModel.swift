@@ -29,6 +29,8 @@ extension StatConfig {
         @Published var cannulaAgeOption: String = "Drei_Tage"
         @Published var loopViewOption: String = LoopViewOption.view1.rawValue
         @Published var chartBackgroundColored: Bool = false
+        @Published var carbInsulinLoopViewOption: Bool = true
+
         // Dana UI Toggels
         @Published var minimumSMB: Decimal = 0.3
         @Published var useInsulinBars: Bool = true
@@ -66,6 +68,7 @@ extension StatConfig {
             subscribeSetting(\.backgroundColorOptionRawValue, on: $backgroundColorOptionRawValue) {
                 self.backgroundColorOptionRawValue = $0 }
             subscribeSetting(\.chartBackgroundColored, on: $chartBackgroundColored) { chartBackgroundColored = $0 }
+            subscribeSetting(\.carbInsulinLoopViewOption, on: $carbInsulinLoopViewOption) { carbInsulinLoopViewOption = $0 }
             // Dana Toggels
             subscribeSetting(\.alwaysUseColors, on: $alwaysUseColors) { alwaysUseColors = $0 }
             subscribeSetting(\.useFPUconversion, on: $useFPUconversion) { useFPUconversion = $0 }

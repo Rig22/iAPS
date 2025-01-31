@@ -1006,7 +1006,7 @@ final class BaseAPSManager: APSManager, Injectable {
 
         // Loop errors
         let errorArray = loops.compactMap(\.error)
-        let mostFrequentString = errorArray.mostFrequent()?.description ?? ""
+        // let mostFrequentString = errorArray.mostFrequent()?.description ?? ""
 
         let output = Loops(
             loops: Int(loopNr),
@@ -1213,8 +1213,8 @@ final class BaseAPSManager: APSManager, Injectable {
             let loopstat = LoopCycles(
                 loops: oneDayLoops.loops,
                 errors: oneDayLoops.errors,
-                mostFrequentErrorType: oneDayLoops.mostFrequentErrorType as! String,
-                mostFrequentErrorAmount: oneDayLoops.mostFrequentErrorAmount as! Int,
+                // mostFrequentErrorType: oneDayLoops.mostFrequentErrorType as! String,
+                // mostFrequentErrorAmount: oneDayLoops.mostFrequentErrorAmount as! Int,
                 readings: Int(oneDayGlucose.readings),
                 success_rate: oneDayLoops.success_rate,
                 avg_interval: oneDayLoops.avg_interval,

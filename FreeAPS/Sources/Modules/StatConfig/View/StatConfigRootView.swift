@@ -36,76 +36,104 @@ extension StatConfig {
                 Image(state.danaIconRawValue)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 150, height: 100)
+                    .frame(width: 100, height: 67)
                     .padding(.top, 20)
 
                 Form {
                     Section {
-                        Toggle("Dana Bar", isOn: $state.danaBar)
+                        Text("Overview Bars")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity, alignment: .center)
 
-                        if state.danaBar {
-                            Picker("Wähle eine Ansicht", selection: $state.danaBarViewOption) {
-                                Text("DanaBar 1").tag("view1")
-                                Text("DanaBar 2").tag("view2")
-                            }
-                            .pickerStyle(SegmentedPickerStyle())
+                        Image("Sphere_Overview")
+                            .resizable()
+                            .frame(width: 250, height: 250)
+                            .offset(x: 50, y: 0)
+                    }
 
-                            if state.danaBarViewOption == "view2" {
-                                if #available(iOS 18.0, *) {
-                                    Picker("Pump Icon", selection: $state.danaIconRawValue) {
-                                        ForEach(DanaIconOption.allCases, id: \.rawValue) { option in
-                                            HStack {
-                                                Image(option.rawValue)
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 60, height: 40)
-
-                                                Text(option.displayName)
-                                                    .foregroundColor(.white)
-                                            }
-                                            .tag(option.rawValue)
-                                        }
+                    Section {
+                        Toggle("Top Bar", isOn: $state.carbInsulinLoopViewOption)
+                        if state.carbInsulinLoopViewOption {
+                            Picker("Select Loop View", selection: $state.loopViewOption) {
+                                ForEach(LoopViewOption.allCases) { option in
+                                    HStack {
+                                        Image(option == .view1 ? "LoopView1" : "LoopView2")
+                                            .resizable()
+                                            .scaledToFit()
+                                            .frame(width: 30, height: 30)
+                                        Text(option.rawValue)
+                                            .font(.caption)
                                     }
-                                    .pickerStyle(NavigationLinkPickerStyle())
-                                } else {
-                                    // Fallback für frühere iOS-Versionen
+                                    .tag(option)
                                 }
                             }
+                            .pickerStyle(NavigationLinkPickerStyle())
+                        }
 
-                            if state.danaBarViewOption == "view1" {
-                                Picker("Max Reservoir Insulin Age", selection: $state.insulinAgeOption) {
+                        Section {
+                            Toggle("Dana Bar", isOn: $state.danaBar)
+
+                            if state.danaBar {
+                                Picker("Wähle eine Ansicht", selection: $state.danaBarViewOption) {
+                                    Text("DanaBar 1").tag("view1")
+                                    Text("DanaBar 2").tag("view2")
+                                }
+                                .pickerStyle(SegmentedPickerStyle())
+
+                                if state.danaBarViewOption == "view2" {
+                                    if #available(iOS 18.0, *) {
+                                        Picker("Pump Icon", selection: $state.danaIconRawValue) {
+                                            ForEach(DanaIconOption.allCases, id: \.rawValue) { option in
+                                                HStack {
+                                                    Image(option.rawValue)
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 60, height: 40)
+
+                                                    Text(option.displayName)
+                                                        .foregroundColor(.white)
+                                                }
+                                                .tag(option.rawValue)
+                                            }
+                                        }
+                                        .pickerStyle(NavigationLinkPickerStyle())
+                                    } else {
+                                        // Fallback für frühere iOS-Versionen
+                                    }
+                                }
+
+                                if state.danaBarViewOption == "view1" {
+                                    Picker("Max Reservoir Insulin Age", selection: $state.insulinAgeOption) {
+                                        Text("1 Day").tag("Ein_Tag")
+                                        Text("2 Days").tag("Zwei_Tage")
+                                        Text("3 Days").tag("Drei_Tage")
+                                        Text("4 Days").tag("Vier_Tage")
+                                        Text("5 Days").tag("Fuenf_Tage")
+                                        Text("6 Days").tag("Sechs_Tage")
+                                        Text("7 Days").tag("Sieben_Tage")
+                                        Text("8 Days").tag("Acht_Tage")
+                                        Text("9 Days").tag("Neun_Tage")
+                                        Text("10 Days").tag("Zehn_Tage")
+                                    }
+                                    .pickerStyle(NavigationLinkPickerStyle())
+                                }
+
+                                Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
                                     Text("1 Day").tag("Ein_Tag")
                                     Text("2 Days").tag("Zwei_Tage")
                                     Text("3 Days").tag("Drei_Tage")
                                     Text("4 Days").tag("Vier_Tage")
                                     Text("5 Days").tag("Fuenf_Tage")
-                                    Text("6 Days").tag("Sechs_Tage")
-                                    Text("7 Days").tag("Sieben_Tage")
-                                    Text("8 Days").tag("Acht_Tage")
-                                    Text("9 Days").tag("Neun_Tage")
-                                    Text("10 Days").tag("Zehn_Tage")
                                 }
                                 .pickerStyle(NavigationLinkPickerStyle())
-                            }
 
-                            Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
-                                Text("1 Day").tag("Ein_Tag")
-                                Text("2 Days").tag("Zwei_Tage")
-                                Text("3 Days").tag("Drei_Tage")
-                                Text("4 Days").tag("Vier_Tage")
-                                Text("5 Days").tag("Fuenf_Tage")
+                                Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
                             }
-                            .pickerStyle(NavigationLinkPickerStyle())
-
-                            Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
                         }
-                    } header: {
-                        Text("Dana Bar settings")
-                    } footer: {
-                        Text("Personalize your Dana Bar")
-                    }
+                        Toggle("Legend Bar", isOn: $state.legendsSwitch)
+                        Toggle("TT Bar", isOn: $state.tempTargetBar)
+                        Toggle("Bottom Bar", isOn: $state.timeSettings)
 
-                    Section {
                         if #available(iOS 18.0, *) {
                             Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
                                 ForEach(BackgroundColorOption.allCases) { option in
@@ -126,24 +154,6 @@ extension StatConfig {
                             // Fallback für frühere iOS-Versionen
                         }
 
-                        Picker("Select Loop View", selection: $state.loopViewOption) {
-                            ForEach(LoopViewOption.allCases) { option in
-                                HStack {
-                                    Image(option == .view1 ? "LoopView1" : "LoopView2")
-                                        .resizable()
-                                        .scaledToFit()
-                                        .frame(width: 30, height: 30)
-                                    Text(option.rawValue)
-                                        .font(.caption)
-                                }
-                                .tag(option)
-                            }
-                        }
-                        .pickerStyle(NavigationLinkPickerStyle())
-
-                        Toggle("Legend Bar", isOn: $state.legendsSwitch)
-                        Toggle("TempTarget Bar", isOn: $state.tempTargetBar)
-                        Toggle("Bottom Bar", isOn: $state.timeSettings)
                         Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
                         Toggle("Never display the small glucose chart when scrolling", isOn: $state.skipGlucoseChart)
                     } header: { Text("UI | UX Settings ") }

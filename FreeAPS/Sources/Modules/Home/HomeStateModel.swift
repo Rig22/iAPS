@@ -71,6 +71,7 @@ extension Home {
         @Published var danaBarViewOption: String = "view1"
         @Published var loopViewOption: String = LoopViewOption.view1.rawValue
         @Published var chartBackgroundColored: Bool = false
+        @Published var carbInsulinLoopViewOption: Bool = true
         // Dana UI Toggels
         @Published var useCalc: Bool = true
         @Published var hours: Int = 6
@@ -205,6 +206,7 @@ extension Home {
             cannulaAgeOption = settingsManager.settings.cannulaAgeOption
             loopViewOption = settingsManager.settings.loopViewOption
             chartBackgroundColored = settingsManager.settings.chartBackgroundColored
+            carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
             // Dana UI Toggels
             useCalc = settingsManager.settings.useCalc
             data.minimumSMB = settingsManager.settings.minimumSMB
@@ -747,6 +749,7 @@ extension Home.StateModel:
         danaBarViewOption = settingsManager.settings.danaBarViewOption
         loopViewOption = settingsManager.settings.loopViewOption
         chartBackgroundColored = settingsManager.settings.chartBackgroundColored
+        carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
         // Dana UI Toggels
         useCalc = settingsManager.settings.useCalc
         data.minimumSMB = settingsManager.settings.minimumSMB
