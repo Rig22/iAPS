@@ -521,6 +521,7 @@ extension Home {
                 }
             }
         }
+
         // IOB Ende
 
         @ViewBuilder private func glucoseAndLoopView() -> some View {
