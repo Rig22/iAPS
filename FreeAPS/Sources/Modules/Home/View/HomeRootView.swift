@@ -201,54 +201,6 @@ extension Home {
             }
         }
 
-        // Bolus Progressbar
-
-        public struct CircularProgressViewStyle: ProgressViewStyle {
-            var backgroundColor: Color
-
-            public func makeBody(configuration: Configuration) -> some View {
-                let progress = CGFloat(configuration.fractionCompleted ?? 0)
-
-                ZStack {
-                    Circle()
-                        // .trim(from: 1.0 - progress, to: 1.0) // Progress läuft gegen den Uhrzeigersinn
-                        .trim(from: 0.0, to: progress)
-                        .stroke(
-                            LinearGradient(
-                                gradient: Gradient(colors: [backgroundColor, backgroundColor]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            style: StrokeStyle(lineWidth: 2, lineCap: .round)
-                        )
-                        .rotationEffect(Angle(degrees: 270))
-                        .animation(.linear(duration: 0.5), value: progress)
-                }
-                .frame(width: 123, height: 123)
-            }
-        }
-
-        func bolusProgressView(progress: Decimal, amount: Decimal, backgroundColor: Color) -> some View {
-            ZStack {
-                VStack(alignment: .leading, spacing: 5) {
-                    let bolusAmount = amount * progress
-                    let bolused = bolusProgressFormatter.string(from: bolusAmount as NSNumber) ?? ""
-                    let totalAmount = amount.formatted(.number.precision(.fractionLength(2)))
-                    let displayText = bolused + " " + NSLocalizedString("of", comment: "") + " " + totalAmount +
-                        NSLocalizedString(" U", comment: " ")
-
-                    Text(displayText)
-                        .font(.system(size: 16))
-                        .foregroundStyle(Color.white)
-                        .offset(x: -120, y: 60)
-
-                    ProgressView(value: Double(truncating: progress as NSNumber))
-                        .progressViewStyle(CircularProgressViewStyle(backgroundColor: backgroundColor))
-                        .padding(.top, 15)
-                }
-            }
-        }
-
         // headerView
 
         private func startProgress() {
@@ -405,6 +357,90 @@ extension Home {
             }
         }
 
+        // GlucoseWheel Anfang
+        struct BigFillablePieSegment2: View {
+            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
+
+            var fillFraction: CGFloat
+            var color: Color
+            var displayText: String
+            var animateProgress: Bool
+
+            var body: some View {
+                ZStack {
+                    Circle()
+                        .fill(Color.black.opacity(1.0))
+                        .frame(width: 110, height: 110)
+                        .overlay(
+                            Circle()
+                                .stroke(Color.white, lineWidth: 0)
+                        )
+
+                    PieSliceView(
+                        startAngle: .degrees(-90),
+                        endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                    )
+                    .fill(color)
+                    .frame(width: 110, height: 110)
+                    .opacity(1.0)
+
+                    Text(displayText)
+                        .font(.system(size: 14))
+                        .foregroundColor(.white)
+                        .multilineTextAlignment(.center)
+                        .frame(width: 100)
+                        .offset(y: 27)
+                }
+                .onAppear {
+                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+                }
+                .onChange(of: fillFraction) { _, newValue in
+                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+                }
+            }
+        }
+
+        @StateObject private var bolusPieSegmentViewModel2 = PieSegmentViewModel()
+
+        @ViewBuilder private func bolusProgressView2() -> some View {
+            if let progress = state.bolusProgress, let amount = state.bolusAmount {
+                let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
+                let bolusedValue = amount * progress
+                let bolused = bolusProgressFormatter.string(from: bolusedValue as NSNumber) ?? ""
+                let formattedAmount = amount.formatted(.number.precision(.fractionLength(2)))
+                let displayText = "\(bolused) / \(formattedAmount) U"
+
+                VStack {
+                    ZStack {
+                        BigFillablePieSegment2(
+                            pieSegmentViewModel: bolusPieSegmentViewModel2,
+                            fillFraction: fillFraction,
+                            color: backgroundColor,
+                            displayText: displayText,
+                            animateProgress: true
+                        )
+                        .frame(width: 110, height: 110)
+
+                        // X-Button Overlay
+                        Circle()
+                            .fill(Color.red)
+                            .frame(width: 25, height: 25)
+                            .overlay(
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.white)
+                            )
+                            .onTapGesture {
+                                state.cancelBolus()
+                            }
+                    }
+                }
+            }
+        }
+
+        // GlucoseWheel Ende
+
+        // IOB Pie Anfang
         struct BigFillablePieSegment: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
@@ -482,17 +518,15 @@ extension Home {
                                 }
                         )
                     }
-
-                    //  loopViewSelector()
                 }
             }
         }
+        // IOB Ende
 
         @ViewBuilder private func glucoseAndLoopView() -> some View {
             VStack {
                 glucoseView
                     .frame(width: 110, height: 110)
-                // loopViewSelector()
             }
         }
 
@@ -651,7 +685,7 @@ extension Home {
                 endPoint: .bottom
             )
             .frame(
-                maxHeight: fontSize < .extraExtraLarge ? 160 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
+                maxHeight: fontSize < .extraExtraLarge ? 140 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
             )
 
             .overlay {
@@ -667,7 +701,7 @@ extension Home {
                             HStack {
                                 Spacer()
                                 if state.bolusProgress != nil, state.bolusAmount != nil {
-                                    bolusProgressView()
+                                    bolusProgressView2()
                                 } else {
                                     glucoseAndLoopView()
                                 }
@@ -1540,24 +1574,22 @@ extension Home {
                         Spacer()
                         carbsView
                             .frame(height: 50)
-                            .padding(.top, 0)
 
                         Spacer()
 
                         loopViewSelector()
                             .frame(height: 50)
-                            .padding(.bottom, 0)
 
                         Spacer()
 
                         insulinView
                             .frame(height: 50)
-                            .padding(.top, 0)
+
                         Spacer()
                     }
                     .dynamicTypeSize(...DynamicTypeSize.xLarge)
                     .padding(.horizontal, 10)
-                    .padding(.bottom, 50)
+                    .padding(.bottom, 40)
                 }
 
                 Group {
@@ -1573,7 +1605,7 @@ extension Home {
                         .frame(width: UIScreen.main.bounds.width)
                 }
             }
-            .frame(minHeight: UIScreen.main.bounds.height / 1.47) // Je größer der Wert, je kleiner der Chart
+            .frame(minHeight: UIScreen.main.bounds.height / 1.4) // Je größer der Wert, je kleiner der Chart
         }
 
         var legendPanel: some View {
