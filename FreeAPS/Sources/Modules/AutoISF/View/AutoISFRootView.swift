@@ -1,24 +1,29 @@
 import LoopKit
 import SwiftUI
 import Swinject
+
 extension AutoISF {
     struct RootView: BaseView {
         let resolver: Resolver
         @StateObject var state = StateModel()
+
         @State var isPresented = false
         @State var description = Text("")
         @State var descriptionHeader = Text("")
         @State var scrollView = false
         @State var graphics: (any View)?
         @State var presentHistory = false
+
         @Environment(\.colorScheme) var colorScheme
         @Environment(\.sizeCategory) private var fontSize
         @Environment(\.dismiss) private var dismiss
+
         @FetchRequest(
             entity: Reasons.entity(),
             sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)],
             predicate: NSPredicate(format: "date > %@", DateFilter().day)
         ) var reasons: FetchedResults<Reasons>
+
         private var formatter: NumberFormatter {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
@@ -61,6 +66,7 @@ extension AutoISF {
                         }.disabled(isPresented)
                     }
                 } header: { Text("Experimental").foregroundStyle(.red) }
+
                 if state.autoisf {
                     Section {
                         HStack {
@@ -76,6 +82,7 @@ extension AutoISF {
                             }.disabled(isPresented)
                         }
                     } header: { Text("Toggles") }
+
                     Section {
                         HStack {
                             Text("Auto ISF Max")
@@ -90,6 +97,7 @@ extension AutoISF {
                             DecimalTextField("0", value: $state.autoisf_max, formatter: formatter)
                                 .disabled(isPresented)
                         }
+
                         HStack {
                             Text("Auto ISF Min")
                                 .onTapGesture {
@@ -103,6 +111,7 @@ extension AutoISF {
                             DecimalTextField("0", value: $state.autoisf_min, formatter: formatter)
                                 .disabled(isPresented)
                         }
+
                         HStack {
                             Text("SMB Delivery Ratio Minimum")
                                 .onTapGesture {
@@ -116,8 +125,9 @@ extension AutoISF {
                             DecimalTextField("0", value: $state.smbDeliveryRatioMin, formatter: formatter)
                                 .disabled(isPresented)
                         }
+
                         HStack {
-                            Text("SMB DeliveryRatio Maximum")
+                            Text("SMB Delivery Ratio Maximum")
                                 .onTapGesture {
                                     info(
                                         header: "SMB Delivery Ratio Maximum",
@@ -129,6 +139,7 @@ extension AutoISF {
                             DecimalTextField("0", value: $state.smbDeliveryRatioMax, formatter: formatter)
                                 .disabled(isPresented)
                         }
+
                         HStack {
                             Text("SMB Delivery Ratio BG Range")
                                 .onTapGesture {
@@ -146,6 +157,7 @@ extension AutoISF {
                                 isDisabled: isPresented
                             )
                         }
+
                         HStack {
                             Text("Dura ISF Hourly Max Change")
                                 .onTapGesture {
@@ -159,6 +171,7 @@ extension AutoISF {
                             DecimalTextField("0", value: $state.autoISFhourlyChange, formatter: formatter)
                                 .disabled(isPresented)
                         }
+
                         HStack {
                             Text("ISF weight for higher BG's")
                                 .onTapGesture {
@@ -172,6 +185,7 @@ extension AutoISF {
                             DecimalTextField("0", value: $state.higherISFrangeWeight, formatter: formatter)
                                 .disabled(isPresented)
                         }
+
                         HStack {
                             Text("ISF weight for lower BG's")
                                 .onTapGesture {
@@ -185,6 +199,7 @@ extension AutoISF {
                             DecimalTextField("0", value: $state.lowerISFrangeWeight, formatter: formatter)
                                 .disabled(isPresented)
                         }
+
                         HStack {
                             Text("ISF weight for postprandial BG rise")
                                 .onTapGesture {
@@ -198,6 +213,7 @@ extension AutoISF {
                             DecimalTextField("0", value: $state.postMealISFweight, formatter: formatter)
                                 .disabled(isPresented)
                         }
+
                         HStack {
                             Text("ISF weight while BG accelerates")
                                 .onTapGesture {
@@ -211,6 +227,7 @@ extension AutoISF {
                             DecimalTextField("0", value: $state.bgAccelISFweight, formatter: formatter)
                                 .disabled(isPresented)
                         }
+
                         HStack {
                             Text("ISF weight while BG decelerates")
                                 .onTapGesture {
@@ -224,6 +241,7 @@ extension AutoISF {
                             DecimalTextField("0", value: $state.bgBrakeISFweight, formatter: formatter)
                                 .disabled(isPresented)
                         }
+
                         HStack {
                             Text("Max IOB Threshold Percent")
                                 .onTapGesture {
@@ -238,6 +256,7 @@ extension AutoISF {
                                 .disabled(isPresented)
                         }
                     } header: { Text("Settings") }
+
                     Section {
                         HStack {
                             Toggle(isOn: $state.use_B30) {
@@ -253,6 +272,7 @@ extension AutoISF {
                                     }
                             }.disabled(isPresented)
                         }
+
                         if state.use_B30 {
                             HStack {
                                 Text("Minimum Start Bolus size")
@@ -267,12 +287,13 @@ extension AutoISF {
                                 DecimalTextField("0", value: $state.iTime_Start_Bolus, formatter: formatter)
                                     .disabled(isPresented)
                             }
+
                             HStack {
                                 Text("Target Level for B30 to be enacted")
                                     .onTapGesture {
                                         info(
                                             header: "Target Level for B30 to be enacted",
-                                            body: "An EatingSoon Override Target (or a Temporary Target) needs to be activated to start the B30 adaption. Target needs to be below or equal this  setting for B30 to start. Default is 90 mg/dl. If you cancel this EatingSoon Target, the B30 basal rate will stop.",
+                                            body: "An EatingSoon Override Target (or a Temporary Target) needs to be activated to start the B30 adaption. Target needs to be below this setting for B30 to start. Default is 90 mg/dl. If you cancel this EatingSoon Target, the B30 basal rate will stop.",
                                             useGraphics: nil
                                         )
                                     }
@@ -284,6 +305,7 @@ extension AutoISF {
                                     isDisabled: isPresented
                                 )
                             }
+
                             HStack {
                                 Text("Upper BG limit")
                                     .onTapGesture {
@@ -301,6 +323,7 @@ extension AutoISF {
                                     isDisabled: isPresented
                                 )
                             }
+
                             HStack {
                                 Text("Upper Delta limit")
                                     .onTapGesture {
@@ -318,6 +341,7 @@ extension AutoISF {
                                     isDisabled: isPresented
                                 )
                             }
+
                             HStack {
                                 Text("B30 Basal rate increase factor")
                                     .onTapGesture {
@@ -331,6 +355,7 @@ extension AutoISF {
                                 DecimalTextField("0", value: $state.b30factor, formatter: formatter)
                                     .disabled(isPresented)
                             }
+
                             HStack {
                                 Text("Duration of increased B30 basal rate")
                                     .onTapGesture {
@@ -346,6 +371,7 @@ extension AutoISF {
                             }
                         }
                     } header: { Text("B30 Settings") }
+
                     Section {
                         HStack {
                             Toggle(isOn: $state.ketoProtect) {
@@ -359,6 +385,7 @@ extension AutoISF {
                                     }
                             }.disabled(isPresented)
                         }
+
                         if state.ketoProtect {
                             HStack {
                                 Toggle(isOn: $state.variableKetoProtect) {
@@ -387,6 +414,7 @@ extension AutoISF {
                                         .disabled(isPresented)
                                 }
                             }
+
                             HStack {
                                 Toggle(isOn: $state.ketoProtectAbsolut) {
                                     Text("Enable Keto protection with pre-defined TBR")
@@ -399,6 +427,7 @@ extension AutoISF {
                                         }
                                 }.disabled(isPresented)
                             }
+
                             if state.ketoProtectAbsolut {
                                 HStack {
                                     Text("Absolute Safety TBR ")
@@ -416,6 +445,7 @@ extension AutoISF {
                             }
                         }
                     } header: { Text("Keto Protection") }
+
                     Section {
                         HStack {
                             Text("History")
@@ -492,6 +522,7 @@ extension AutoISF {
                     localizedString: "You can specify how long B30 run and how high it is"
                 )
             ]
+
             return Grid {
                 ForEach(entries) { entry in
                     GridRow {
@@ -500,6 +531,7 @@ extension AutoISF {
                     }.listRowSpacing(10)
                 }
             }
+
             .padding(.all, 20)
             .foregroundStyle(colorScheme == .dark ? Color.white : Color.black)
             .background(

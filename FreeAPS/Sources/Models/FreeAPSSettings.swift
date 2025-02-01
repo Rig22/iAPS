@@ -70,7 +70,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var danaBarViewOption: String = "view1"
     var insulinAgeOption: String = "Drei_Tage"
     var cannulaAgeOption: String = "Drei_Tage"
-    var loopViewOption: String = LoopViewOption.view1.rawValue
+    var loopViewOption: String = LoopViewOption.view2.rawValue
     var chartBackgroundColored: Bool = false
     var carbInsulinLoopViewOption: Bool = true
     // Dana-Toggles

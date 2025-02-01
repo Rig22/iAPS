@@ -69,7 +69,7 @@ extension Home {
         @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
         @Published var danaBarViewOption: String = "view1"
-        @Published var loopViewOption: String = LoopViewOption.view1.rawValue
+        @Published var loopViewOption: String = LoopViewOption.view2.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = true
         // Dana UI Toggels

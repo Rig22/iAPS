@@ -686,7 +686,7 @@ extension Home {
                 endPoint: .bottom
             )
             .frame(
-                maxHeight: fontSize < .extraExtraLarge ? 140 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
+                maxHeight: fontSize < .extraExtraLarge ? 145 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
             )
 
             .overlay {
@@ -1606,7 +1606,7 @@ extension Home {
                         .frame(width: UIScreen.main.bounds.width)
                 }
             }
-            .frame(minHeight: UIScreen.main.bounds.height / 1.4) // Je größer der Wert, je kleiner der Chart
+            .frame(minHeight: UIScreen.main.bounds.height / 1.44) // Je größer der Wert, je kleiner der Chart
         }
 
         var legendPanel: some View {

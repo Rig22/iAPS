@@ -27,7 +27,7 @@ extension StatConfig {
         @Published var danaBarViewOption: String = "view1"
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
-        @Published var loopViewOption: String = LoopViewOption.view1.rawValue
+        @Published var loopViewOption: String = LoopViewOption.view2.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = true
 

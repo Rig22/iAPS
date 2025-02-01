@@ -1087,6 +1087,9 @@
 		795CBE172D3F9DD30044854B /* AutoISF */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = AutoISF; sourceTree = "<group>"; };
 		795CBE6E2D4166240044854B /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
 		79D4708F2CE489CA0095B89A /* Restore */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Restore; sourceTree = "<group>"; };
+		79D9D59C2D4E590D00FA92D7 /* OpenClosed */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = OpenClosed; sourceTree = "<group>"; };
+		79D9D5A02D4E598700FA92D7 /* SuspendResume */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = SuspendResume; sourceTree = "<group>"; };
+		79D9D5A42D4E5A0A00FA92D7 /* TempBasal */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = TempBasal; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2444,6 +2447,9 @@
 		CE7CA3422A064973004BE681 /* Shortcuts */ = {
 			isa = PBXGroup;
 			children = (
+				79D9D5A42D4E5A0A00FA92D7 /* TempBasal */,
+				79D9D5A02D4E598700FA92D7 /* SuspendResume */,
+				79D9D59C2D4E590D00FA92D7 /* OpenClosed */,
 				CE7CA3432A064973004BE681 /* AppShortcuts.swift */,
 				CE7CA3442A064973004BE681 /* BaseIntentsRequest.swift */,
 				CE1856F32ADC4835007E39C7 /* Carbs */,
@@ -2693,6 +2699,9 @@
 				7910CDA62CD53A0E001E77AC /* Chart */,
 				795CBE172D3F9DD30044854B /* AutoISF */,
 				79D4708F2CE489CA0095B89A /* Restore */,
+				79D9D59C2D4E590D00FA92D7 /* OpenClosed */,
+				79D9D5A02D4E598700FA92D7 /* SuspendResume */,
+				79D9D5A42D4E5A0A00FA92D7 /* TempBasal */,
 			);
 			name = FreeAPS;
 			packageProductDependencies = (
@@ -3636,7 +3645,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = 6.1.0;
+				MARKETING_VERSION = 6.2.1;
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					CoreNFC,
@@ -3679,7 +3688,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = 6.1.0;
+				MARKETING_VERSION = 6.2.1;
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					CoreNFC,
@@ -3716,7 +3725,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = iAPS;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(BUNDLE_IDENTIFIER)";
-				MARKETING_VERSION = 6.1.0;
+				MARKETING_VERSION = 6.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_IDENTIFIER).watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -3752,7 +3761,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = iAPS;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = "$(BUNDLE_IDENTIFIER)";
-				MARKETING_VERSION = 6.1.0;
+				MARKETING_VERSION = 6.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_IDENTIFIER).watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -3792,7 +3801,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 6.1.0;
+				MARKETING_VERSION = 6.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_IDENTIFIER).watchkitapp.watchkitextension";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
@@ -3833,7 +3842,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 6.1.0;
+				MARKETING_VERSION = 6.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_IDENTIFIER).watchkitapp.watchkitextension";
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
