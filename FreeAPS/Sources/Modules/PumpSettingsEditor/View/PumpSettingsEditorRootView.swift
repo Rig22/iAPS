@@ -1,3 +1,4 @@
+
 import SwiftUI
 import Swinject
 
@@ -21,18 +22,18 @@ extension PumpSettingsEditor {
                 Section(header: Text("Delivery limits")) {
                     HStack {
                         Text("Max Basal")
-                        DecimalTextField("U/hr", value: $state.maxBasal, formatter: formatter)
+                        DecimalTextField("U/hr", value: $state.maxBasal, formatter: formatter, liveEditing: true)
                     }
                     HStack {
                         Text("Max Bolus")
-                        DecimalTextField("U", value: $state.maxBolus, formatter: formatter)
+                        DecimalTextField("U", value: $state.maxBolus, formatter: formatter, liveEditing: true)
                     }
                 }
 
                 Section(header: Text("Duration of Insulin Action")) {
                     HStack {
                         Text("DIA")
-                        DecimalTextField("hours", value: $state.dia, formatter: formatter)
+                        DecimalTextField("hours", value: $state.dia, formatter: formatter, liveEditing: true)
                     }
                 }
 
@@ -49,24 +50,23 @@ extension PumpSettingsEditor {
                         .navigationLink(to: .basalProfileEditor(saveNewConcentration: true), from: self)
                 } header: { Text("Concentration") }
 
-                    /* Section {
-                         HStack {
-                                 if state.syncInProgress {
-                              ProgressView().padding(.trailing, 10)
-                              }
-                              Button { state.save() }
-                              label: {
-                              Text(state.syncInProgress ? "Saving..." : "Save on Pump")
-                              }
-                              .disabled(state.syncInProgress)
-                              }
+                /*  Section {
+                     HStack {
+                         if state.syncInProgress {
+                             ProgressView().padding(.trailing, 10)
                          }
-                     } */
-                    .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                    .onAppear(perform: configureView)
-                    .navigationTitle("Pump Settings")
-                    .navigationBarTitleDisplayMode(.inline)
+                         Button { state.save() }
+                         label: {
+                             Text(state.syncInProgress ? "Saving..." : "Save on Pump")
+                         }
+                         .disabled(state.syncInProgress)
+                     }
+                 }*/
             }
+            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            .onAppear(perform: configureView)
+            .navigationTitle("Pump Settings")
+            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }

@@ -1819,6 +1819,7 @@ extension Home {
             }.offset(x: 0)
         }
 
+        @State private var didLongPress = false
         // buttonPanel line.diagonal circle.slash circle.and.line.horizontal
 
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
@@ -1896,9 +1897,24 @@ extension Home {
                     }
                     Spacer()
 
+                    /* buttonWithCircle(iconName: "settings2", circleColor: Color.darkGray.opacity(0.5)) {
+                         state.showModal(for: .settings)
+                     }*/
+
                     buttonWithCircle(iconName: "settings2", circleColor: Color.darkGray.opacity(0.5)) {
-                        state.showModal(for: .settings)
+                        if !didLongPress {
+                            state.showModal(for: .settings)
+                        }
+                        didLongPress = false
                     }
+                    .simultaneousGesture(
+                        LongPressGesture().onEnded { _ in
+                            let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                            impactHeavy.impactOccurred()
+                            state.isStatusPopupPresented.toggle()
+                            didLongPress = true
+                        }
+                    )
                 }
                 .padding(.horizontal, state.allowManualTemp ? 5 : 24)
                 // .padding(.bottom, geo.safeAreaInsets.bottom)
