@@ -68,13 +68,12 @@ extension StatConfig {
                             .resizable()
                             .scaledToFit()
 
-                        if state.danaBarViewOption == "view2" {
-                            Image(state.danaIconRawValue)
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 90, height: 55)
-                                .offset(x: -45, y: 8)
-                        }
+                        if state.danaBar && state.danaBarViewOption == "view2" { Image(state.danaIconRawValue)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 90, height: 55)
+                            .offset(x: -45, y: 8)
+                        } else {}
                     }
                     .frame(width: 360, height: 245)
                 }

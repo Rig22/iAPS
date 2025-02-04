@@ -53,18 +53,27 @@ struct CurrentGlucoseView: View {
         // let triangleColor = Color.white.opacity(0.7)
         // let triangleColor = colourGlucoseText.opacity(0.7)
 
+        /* let angularGradient = AngularGradient(
+             gradient: Gradient(colors: [
+                 /* Color.blue.opacity(0.7),
+                   Color.blue.opacity(0.6),
+                   Color.blue.opacity(0.6),
+                   Color.blue.opacity(0.5),
+                   Color.blue.opacity(0.5),
+                   Color.blue.opacity(0.5),
+                   Color.blue.opacity(0.6),
+                   Color.blue.opacity(0.6),
+                   Color.blue.opacity(0.7)
+                  Color.darkGray.opacity(0.4)*/
+                 Color2
+             ]),
+             center: .center,
+             startAngle: .degrees(0),
+             endAngle: .degrees(360)
+         ) */
         let angularGradient = AngularGradient(
             gradient: Gradient(colors: [
-                /* Color.blue.opacity(0.7),
-                 Color.blue.opacity(0.6),
-                 Color.blue.opacity(0.6),
-                 Color.blue.opacity(0.5),
-                 Color.blue.opacity(0.5),
-                 Color.blue.opacity(0.5),
-                 Color.blue.opacity(0.6),
-                 Color.blue.opacity(0.6),
-                 Color.blue.opacity(0.7)*/
-                Color.darkGray.opacity(0.4)
+                Color.rig22Background
             ]),
             center: .center,
             startAngle: .degrees(0),
@@ -156,7 +165,9 @@ struct CurrentGlucoseView: View {
 
     var colourGlucoseText: Color {
         let whichGlucose = recentGlucose?.glucose ?? 0
-        let defaultColor = Color.green
+        let defaultColor = Color.white.opacity(0.7)
+        // let defaultColor = Color.green.opacity(0.7)
+
         guard lowGlucose < highGlucose else { return .primary }
 
         switch whichGlucose {

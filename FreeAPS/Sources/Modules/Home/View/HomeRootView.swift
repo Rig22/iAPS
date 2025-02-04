@@ -681,10 +681,18 @@ extension Home {
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             LinearGradient(
-                gradient: Gradient(colors: [.black, .clear]),
+                gradient: Gradient(colors: [
+                    .black.opacity(0.7),
+                    .black.opacity(0.5),
+                    .black.opacity(0.3),
+                    .clear,
+                    .clear,
+                    .clear
+                ]),
                 startPoint: .top,
                 endPoint: .bottom
             )
+            // backgroundColor
             .frame(
                 maxHeight: fontSize < .extraExtraLarge ? 145 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
             )
