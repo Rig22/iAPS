@@ -312,6 +312,7 @@
 		6FFAE524D1D9C262F2407CAE /* SnoozeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CAE81192B118804DCD23034 /* SnoozeProvider.swift */; };
 		711C0CB42CAABE788916BC9D /* ManualTempBasalDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96653287EDB276A111288305 /* ManualTempBasalDataFlow.swift */; };
 		72F1BD388F42FCA6C52E4500 /* ConfigEditorProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44080E4709E3AE4B73054563 /* ConfigEditorProvider.swift */; };
+		7909A4AA2D5101E500975822 /* BarViewOptionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7909A4A92D5101D800975822 /* BarViewOptionConfiguration.swift */; };
 		791D86DC2D071A04001D2763 /* InsulinAgeOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */; };
 		7927D7162D082E8400385439 /* CannulaAgeOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7927D7152D082E7300385439 /* CannulaAgeOption.swift */; };
 		792E4EC32CF8C95800ADE3DC /* DanaIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */; };
@@ -940,6 +941,7 @@
 		6BCF84DC2B16843A003AD46E /* LiveActitiyShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActitiyShared.swift; sourceTree = "<group>"; };
 		6F8BA8533F56BC55748CA877 /* PreferencesEditorProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PreferencesEditorProvider.swift; sourceTree = "<group>"; };
 		72778B68C3004F71F6E79BDC /* PumpSettingsEditorStateModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PumpSettingsEditorStateModel.swift; sourceTree = "<group>"; };
+		7909A4A92D5101D800975822 /* BarViewOptionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarViewOptionConfiguration.swift; sourceTree = "<group>"; };
 		791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinAgeOption.swift; sourceTree = "<group>"; };
 		7927D7152D082E7300385439 /* CannulaAgeOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CannulaAgeOption.swift; sourceTree = "<group>"; };
 		792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaIconOption.swift; sourceTree = "<group>"; };
@@ -1557,6 +1559,7 @@
 		3811DE2C25C9D49500A708ED /* View */ = {
 			isa = PBXGroup;
 			children = (
+				7909A4A92D5101D800975822 /* BarViewOptionConfiguration.swift */,
 				7974B64B2D3817C10077EF9F /* LoopViewOption.swift */,
 				7927D7152D082E7300385439 /* CannulaAgeOption.swift */,
 				791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */,
@@ -3277,6 +3280,7 @@
 				3862CC1F273FDC9200BF832C /* CalibrationsChart.swift in Sources */,
 				19E1F7EC29D082FE005C8D20 /* IconConfigStateModel.swift in Sources */,
 				194C32772B93A9BF0016FB2A /* OverrideShortcuts.swift in Sources */,
+				7909A4AA2D5101E500975822 /* BarViewOptionConfiguration.swift in Sources */,
 				711C0CB42CAABE788916BC9D /* ManualTempBasalDataFlow.swift in Sources */,
 				BF1667ADE69E4B5B111CECAE /* ManualTempBasalProvider.swift in Sources */,
 				F90692D6274B9A450037068D /* HealthKitStateModel.swift in Sources */,

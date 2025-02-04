@@ -73,6 +73,12 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var loopViewOption: String = LoopViewOption.view2.rawValue
     var chartBackgroundColored: Bool = false
     var carbInsulinLoopViewOption: Bool = true
+    var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.none.rawValue
+    var topBarActive: Bool = false
+    var danaBarActive: Bool = false
+    var legendBarActive: Bool = false
+    var ttBarActive: Bool = false
+    var bottomBarActive: Bool = false
     // Dana-Toggles
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
@@ -228,6 +234,12 @@ struct EncodableFreeAPSSettings: Encodable {
         case loopViewOption
         case chartBackgroundColored
         case carbInsulinLoopViewOption
+        case topBarActive
+        case danaBarActive
+        case legendBarActive
+        case ttBarActive
+        case bottomBarActive
+        case barViewOptionConfigurationRawValue
         // Dana Toggles
         case profilesOrTempTargets
         case allowBolusShortcut
@@ -356,6 +368,12 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.loopViewOption, forKey: .loopViewOption)
         try container.encode(settings.chartBackgroundColored, forKey: .chartBackgroundColored)
         try container.encode(settings.carbInsulinLoopViewOption, forKey: .carbInsulinLoopViewOption)
+        try container.encode(settings.topBarActive, forKey: .topBarActive)
+        try container.encode(settings.danaBarActive, forKey: .danaBarActive)
+        try container.encode(settings.legendBarActive, forKey: .legendBarActive)
+        try container.encode(settings.ttBarActive, forKey: .ttBarActive)
+        try container.encode(settings.bottomBarActive, forKey: .bottomBarActive)
+        try container.encode(settings.barViewOptionConfigurationRawValue, forKey: .barViewOptionConfigurationRawValue)
         // Dana Toggels
         try container.encode(settings.profilesOrTempTargets, forKey: .profilesOrTempTargets)
         try container.encode(settings.allowBolusShortcut, forKey: .allowBolusShortcut)

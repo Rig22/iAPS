@@ -30,7 +30,12 @@ extension StatConfig {
         @Published var loopViewOption: String = LoopViewOption.view2.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = true
-
+        @Published var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.all.rawValue
+        @Published var topBarActive: Bool = true
+        @Published var danaBarActive: Bool = true
+        @Published var legendBarActive: Bool = true
+        @Published var ttBarActive: Bool = true
+        @Published var bottomBarActive: Bool = true
         // Dana UI Toggels
         @Published var minimumSMB: Decimal = 0.3
         @Published var useInsulinBars: Bool = true
@@ -40,6 +45,50 @@ extension StatConfig {
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
         var selectedBackgroundColor: Color {
             BackgroundColorOption(rawValue: backgroundColorOptionRawValue)?.color ?? .clear
+        }
+
+        func BarViewOptionConfigurationRawValue(
+            topBar: Bool,
+            danaBar: Bool,
+            legendBar: Bool,
+            ttBar: Bool,
+            bottomBar: Bool
+        ) -> BarViewOptionConfiguration {
+            switch (topBar, danaBar, legendBar, ttBar, bottomBar) {
+            case (false, false, false, false, false): return .none
+            case (true, false, false, false, false): return .top
+            case (false, true, false, false, false): return .dana
+            case (false, false, true, false, false): return .legend
+            case (false, false, false, true, false): return .tt
+            case (false, false, false, false, true): return .bottom
+            case (true, true, false, false, false): return .topDana
+            case (true, false, true, false, false): return .topLegend
+            case (true, false, false, true, false): return .topTT
+            case (true, false, false, false, true): return .topBottom
+            case (false, true, true, false, false): return .danaLegend
+            case (false, true, false, true, false): return .danaTT
+            case (false, true, false, false, true): return .danaBottom
+            case (false, false, true, true, false): return .legendTT
+            case (false, false, true, false, true): return .legendBottom
+            case (false, false, false, true, true): return .ttBottom
+            case (true, true, true, false, false): return .topDanaLegend
+            case (true, true, false, true, false): return .topDanaTT
+            case (true, true, false, false, true): return .topDanaBottom
+            case (true, false, true, true, false): return .topLegendTT
+            case (true, false, true, false, true): return .topLegendBottom
+            case (true, false, false, true, true): return .topTTBottom
+            case (false, true, true, true, false): return .danaLegendTT
+            case (false, true, true, false, true): return .danaLegendBottom
+            case (false, true, false, true, true): return .danaTTBottom
+            case (false, false, true, true, true): return .legendTTBottom
+            case (true, true, true, true, false): return .topDanaLegendTT
+            case (true, true, true, false, true): return .topDanaLegendBottom
+            case (true, true, false, true, true): return .topDanaTTBottom
+            case (true, false, true, true, true): return .topLegendTTBottom
+            case (false, true, true, true, true): return .danaLegendTTBottom
+            case (true, true, true, true, true): return .all
+            default: return .none
+            }
         }
 
         var units: GlucoseUnits = .mmolL
@@ -69,6 +118,13 @@ extension StatConfig {
                 self.backgroundColorOptionRawValue = $0 }
             subscribeSetting(\.chartBackgroundColored, on: $chartBackgroundColored) { chartBackgroundColored = $0 }
             subscribeSetting(\.carbInsulinLoopViewOption, on: $carbInsulinLoopViewOption) { carbInsulinLoopViewOption = $0 }
+            subscribeSetting(\.barViewOptionConfigurationRawValue, on: $barViewOptionConfigurationRawValue) {
+                barViewOptionConfigurationRawValue = $0 }
+            subscribeSetting(\.topBarActive, on: $topBarActive) { topBarActive = $0 }
+            subscribeSetting(\.danaBarActive, on: $danaBarActive) { danaBarActive = $0 }
+            subscribeSetting(\.legendBarActive, on: $legendBarActive) { legendBarActive = $0 }
+            subscribeSetting(\.ttBarActive, on: $ttBarActive) { ttBarActive = $0 }
+            subscribeSetting(\.bottomBarActive, on: $bottomBarActive) { bottomBarActive = $0 }
             // Dana Toggels
             subscribeSetting(\.alwaysUseColors, on: $alwaysUseColors) { alwaysUseColors = $0 }
             subscribeSetting(\.useFPUconversion, on: $useFPUconversion) { useFPUconversion = $0 }
