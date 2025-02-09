@@ -1,4 +1,3 @@
-
 import CoreData
 import SwiftUI
 import Swinject
@@ -62,6 +61,13 @@ extension OverrideProfilesConfig {
             return formatter
         }
 
+        private var dateFormatter: DateComponentsFormatter {
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.hour, .minute]
+            formatter.unitsStyle = .brief
+            return formatter
+        }
+
         var body: some View {
             overridesView
                 .navigationBarTitle("Profiles")
@@ -85,7 +91,7 @@ extension OverrideProfilesConfig {
             Form {
                 if state.presets.isNotEmpty, !isEditingPreset {
                     Section {
-                        ForEach(fetchedProfiles) { preset in
+                        ForEach(fetchedProfiles.uniqued(on: \.id)) { preset in
                             profilesView(for: preset)
                                 .swipeActions(edge: .leading) {
                                     Button {
@@ -175,21 +181,23 @@ extension OverrideProfilesConfig {
                                 Text("Disable SMBs")
                             }
                         }
-                        HStack {
-                            Toggle(isOn: $state.smbIsAlwaysOff) {
-                                Text("Schedule when SMBs are Off")
-                            }.disabled(!state.smbIsOff)
-                        }
-                        if state.smbIsAlwaysOff {
+                        if state.smbIsOff {
                             HStack {
-                                Text("First Hour SMBs are Off (24 hours)")
-                                DecimalTextField("0", value: $state.start, formatter: formatter, liveEditing: true)
-                                Text("hour").foregroundColor(.secondary)
+                                Toggle(isOn: $state.smbIsAlwaysOff) {
+                                    Text("Schedule when SMBs are Off")
+                                }.disabled(!state.smbIsOff)
                             }
-                            HStack {
-                                Text("Last Hour SMBs are Off (24 hours)")
-                                DecimalTextField("0", value: $state.end, formatter: formatter, liveEditing: true)
-                                Text("hour").foregroundColor(.secondary)
+                            if state.smbIsAlwaysOff {
+                                HStack {
+                                    Text("First Hour SMBs are Off (24 hours)")
+                                    DecimalTextField("0", value: $state.start, formatter: formatter, liveEditing: true)
+                                    Text("hour").foregroundColor(.secondary)
+                                }
+                                HStack {
+                                    Text("Last Hour SMBs are Off (24 hours)")
+                                    DecimalTextField("0", value: $state.end, formatter: formatter, liveEditing: true)
+                                    Text("hour").foregroundColor(.secondary)
+                                }
                             }
                         }
                         HStack {
@@ -518,16 +526,13 @@ extension OverrideProfilesConfig {
                         if !isEditingPreset {
                             Button("Start") {
                                 showAlert.toggle()
+                                let duration = TimeInterval(state.duration * 60)
                                 alertSring = "\(state.percentage.formatted(.number)) %, " +
                                     (
-                                        state.duration > 0 && !state
-                                            ._indefinite ?
-                                            (
-                                                state
-                                                    .duration
-                                                    .formatted(.number.grouping(.never).rounded().precision(.fractionLength(0))) +
-                                                    " min."
-                                            ) :
+                                        state.duration > 0 && !state._indefinite ? (
+                                            dateFormatter
+                                                .string(from: duration) ?? ""
+                                        ) :
                                             NSLocalizedString(" infinite duration.", comment: "")
                                     ) +
                                     (
@@ -561,10 +566,7 @@ extension OverrideProfilesConfig {
                             if !isEditingPreset {
                                 isSheetPresented = true
                             } else if let editThis = presetToEdit {
-                                if !editThis.hasChanges {
-                                    moc.delete(editThis)
-                                }
-                                state.savePreset()
+                                save(editThis)
                                 isEditingPreset.toggle()
                             }
                         }
@@ -630,142 +632,142 @@ extension OverrideProfilesConfig {
             // Values as String
             let targetRaw = ((preset.target ?? 0) as NSDecimalNumber) as Decimal
             let target = state.units == .mmolL ? targetRaw.asMmolL : targetRaw
-            let duration = (preset.duration ?? 0) as Decimal
             let name = ((preset.name ?? "") == "") || (preset.name?.isEmpty ?? true) ? "" : preset.name!
             let percent = preset.percentage / 100
             let perpetual = preset.indefinite
-            let durationString = perpetual ? "" : "\(formatter.string(from: duration as NSNumber)!)"
-            let scheduledSMBstring = (preset.smbIsOff && preset.smbIsAlwaysOff) ? "Scheduled SMBs" : ""
-            let smbString = (preset.smbIsOff && scheduledSMBstring == "") ? "SMBs are off" : ""
-            let targetString = targetRaw > 10 ? "\(glucoseFormatter.string(from: target as NSNumber)!)" : ""
-            let maxMinutesSMB = (preset.smbMinutes as Decimal?) != nil ? (preset.smbMinutes ?? 0) as Decimal : 0
-            let maxMinutesUAM = (preset.uamMinutes as Decimal?) != nil ? (preset.uamMinutes ?? 0) as Decimal : 0
-            let maxIOB = preset.overrideMaxIOB ? (preset.maxIOB ?? 999) as Decimal : 999
+            let durationString = perpetual ? "" : dateFormatter
+                .string(from: TimeInterval(truncating: (preset.duration ?? 0) as NSNumber) * 60) ?? ""
+            let scheduledSMBstring = (preset.smbIsOff && preset.smbIsAlwaysOff) ? LocalizedStringKey("🕝 SMBs") : ""
+            let smbString = (preset.smbIsOff && scheduledSMBstring == "") ? "SMBs" : ""
+            let targetString = targetRaw > 10 ? "\(glucoseFormatter.string(from: target as NSNumber) ?? "")" : ""
             let isfString = preset.isf ? "ISF" : ""
             let crString = preset.cr ? "CR" : ""
             let basalString = preset.basal ? "Basal" : ""
             let dash = (crString != "" && isfString != "") ? ", " : ""
             let dash2 = (basalString != "" && isfString + dash + crString != "") ? ", " : ""
-            let isfAndCRstring = "[" + isfString + dash + crString + dash2 + basalString + "]"
+            let isfAndCRstring = isfString + dash + crString + dash2 + basalString != "" ? "[" + isfString + dash + crString +
+                dash2 + basalString + "]" : "[None]"
             let autoisfSettings = fetchedSettings.first(where: { $0.id == preset.id })
 
             if name != "" {
-                HStack {
-                    VStack(alignment: .leading) {
-                        Text(name)
-                        HStack(spacing: 7) {
-                            if percent != 1 {
-                                Text(percent.formatted(.percent.grouping(.never).rounded().precision(.fractionLength(0))))
-                            }
-                            if targetString != "" {
-                                Text(targetString)
-                                Text(targetString != "" ? state.units.rawValue : "")
-                            }
-                            if durationString != "" { Text(durationString + (perpetual ? "" : "min")) }
-                            if smbString != "" { Text(smbString).foregroundColor(.secondary).font(.caption) }
-                            if scheduledSMBstring != "" { Text(scheduledSMBstring) }
-                            if let settings = autoisfSettings, settings.autoisf != state.currentSettings.autoisf {
-                                Text("Auto ISF \(settings.autoisf)")
-                            }
-                            Spacer()
+                VStack(alignment: .leading, spacing: 1) {
+                    HStack {
+                        Text(name).padding(.vertical, 4)
+                        Spacer()
+                    }
+                    HStack {
+                        percent != 1 ?
+                            Text(percent.formatted(.percent.grouping(.never).rounded().precision(.fractionLength(0))))
+                            .foregroundStyle(.secondary) : nil
+                        targetString != "" ? Text(targetString + " " + state.units.rawValue).foregroundStyle(.secondary) : nil
+                        durationString != "" ? Text(durationString).foregroundStyle(.secondary) : nil
+                        if let aisf = autoisfSettings, preset.overrideAutoISF {
+                            bool(bool: aisf.autoisf, setting: state.currentSettings.autoisf, label: "Auto ISF")
                         }
-                        .padding(.top, 2)
-                        .foregroundColor(.secondary)
-                        .font(.caption)
+                    }
+                    .font(.caption)
 
-                        if preset.advancedSettings {
+                    if preset.advancedSettings {
+                        HStack {
+                            percent != 1 && !(preset.isf && preset.cr && preset.basal) ?
+                                Text(
+                                    NSLocalizedString("Adjust ", comment: "Override adjustment of ISF, CR and Basal") +
+                                        isfAndCRstring
+                                ) : nil
+                            if !preset.smbIsOff {
+                                decimal(decimal: preset.smbMinutes ?? 0, setting: state.defaultSmbMinutes, label: "SMB ")
+                                decimal(decimal: preset.uamMinutes ?? 0, setting: state.defaultUamMinutes, label: "UAM ")
+                            }
+                            if preset.overrideMaxIOB {
+                                decimal(decimal: preset.maxIOB, setting: state.defaultmaxIOB, label: "Max IOB: ")
+                            }
+                            smbString != "" ? bool(bool: false, setting: true, label: smbString) : nil
+                            scheduledSMBstring != "" ? Text(scheduledSMBstring) : nil
+                        }.foregroundStyle(.secondary).font(.caption)
+                    }
+
+                    // All of the Auto ISF Settings (Bool and Decimal optionals)
+                    if preset.overrideAutoISF, let aisf = autoisfSettings, aisf.autoisf {
+                        let standard = state.currentSettings
+
+                        HStack {
+                            bool(
+                                bool: aisf.enableBGacceleration,
+                                setting: standard.enableBGacceleration,
+                                label: "Accel"
+                            )
+                            bool(bool: aisf.ketoProtect, setting: standard.ketoProtect, label: "Keto")
+                            bool(bool: aisf.use_B30, setting: standard.use_B30, label: "B30")
+
                             HStack {
-                                if percent != 1, !(preset.isf && preset.cr && preset.basal) { Text("Adjust " + isfAndCRstring) }
-                                if !preset.smbIsOff {
-                                    Text(maxMinutesSMB == 0 ? "" : maxMinutesSMB.formatted() + " SMB")
-                                    Text(maxMinutesUAM == 0 ? "" : maxMinutesUAM.formatted() + " UAM")
-                                }
-                                Text(maxIOB == 999 ? "" : " Max IOB: " + maxIOB.formatted())
-                            }.foregroundStyle(.secondary).font(.caption)
+                                decimal(decimal: aisf.autoisf_min, setting: standard.autoisf_min, label: "Min: ")
+                                decimal(decimal: aisf.autoisf_max, setting: standard.autoisf_max, label: "Max: ")
+                            }
                         }
+                        .foregroundStyle(.secondary).font(.caption)
 
-                        // All of the Auto ISF Settings (Bool and Decimal optionals)
-                        if let settings = autoisfSettings, settings.autoisf {
-                            let standard = state.currentSettings
+                        HStack {
+                            percentage(
+                                decimal: aisf.iobThresholdPercent,
+                                setting: standard
+                                    .iobThresholdPercent,
+                                label: "SMB IOB: "
+                            )
 
-                            HStack(spacing: 5) {
-                                bool(
-                                    bool: settings.enableBGacceleration,
-                                    setting: standard.enableBGacceleration,
-                                    label: "Accel: "
+                            if ((aisf.smbDeliveryRatioMin ?? 0.5) as Decimal) != standard
+                                .smbDeliveryRatioMin || ((aisf.smbDeliveryRatioMax ?? 0.5) as Decimal) != standard
+                                .smbDeliveryRatioMax
+                            {
+                                Text(
+                                    "SMB ratio: \(aisf.smbDeliveryRatioMin ?? 0.5)-\(aisf.smbDeliveryRatioMax ?? 0.5)"
                                 )
-                                bool(bool: settings.ketoProtect, setting: standard.ketoProtect, label: "Keto: ")
-                                bool(bool: settings.use_B30, setting: standard.use_B30, label: "B30: ")
+                            }
+                            glucose(
+                                decimal: aisf.smbDeliveryRatioBGrange,
+                                setting: standard.smbDeliveryRatioBGrange,
+                                label: "SMB Range: "
+                            )
+                        }.foregroundStyle(.secondary).font(.caption)
 
-                                HStack(spacing: 5) {
-                                    decimal(decimal: settings.autoisf_min, setting: standard.autoisf_min, label: "Min: ")
-                                    decimal(decimal: settings.autoisf_max, setting: standard.autoisf_max, label: "Max: ")
-                                }.foregroundColor(.secondary)
-                                    .font(.caption)
-                            }.foregroundStyle(.secondary).font(.caption)
+                        HStack {
+                            decimal(
+                                decimal: aisf.lowerISFrangeWeight,
+                                setting: standard.lowerISFrangeWeight,
+                                label: "low: "
+                            )
+                            decimal(
+                                decimal: aisf.higherISFrangeWeight,
+                                setting: standard.higherISFrangeWeight,
+                                label: "high: "
+                            )
 
-                            HStack(spacing: 5) {
-                                percentage(
-                                    decimal: settings.iobThresholdPercent,
-                                    setting: standard
-                                        .iobThresholdPercent,
-                                    label: "SMB IOB: "
-                                )
-
-                                if ((settings.smbDeliveryRatioMin ?? 0.5) as Decimal) != standard
-                                    .smbDeliveryRatioMin || ((settings.smbDeliveryRatioMax ?? 0.5) as Decimal) != standard
-                                    .smbDeliveryRatioMax
-                                {
-                                    Text(
-                                        "SMB ratio: \(settings.smbDeliveryRatioMin ?? 0.5)-\(settings.smbDeliveryRatioMax ?? 0.5)"
-                                    )
-                                }
-                                glucose(
-                                    decimal: settings.smbDeliveryRatioBGrange,
-                                    setting: standard.smbDeliveryRatioBGrange,
-                                    label: "SMB Range: "
-                                )
-                            }.foregroundStyle(.secondary).font(.caption)
-
-                            HStack(spacing: 6) {
+                            if aisf.enableBGacceleration {
                                 decimal(
-                                    decimal: settings.lowerISFrangeWeight,
-                                    setting: standard.lowerISFrangeWeight,
-                                    label: "lowBG: "
+                                    decimal: aisf.bgAccelISFweight,
+                                    setting: standard.bgAccelISFweight,
+                                    label: "accel: "
                                 )
                                 decimal(
-                                    decimal: settings.higherISFrangeWeight,
-                                    setting: standard.lowerISFrangeWeight,
-                                    label: "highBG: "
+                                    decimal: aisf.bgBrakeISFweight,
+                                    setting: standard.bgBrakeISFweight,
+                                    label: "brake: "
                                 )
-
-                                if settings.enableBGacceleration {
-                                    decimal(
-                                        decimal: settings.bgAccelISFweight,
-                                        setting: standard.bgAccelISFweight,
-                                        label: "accel: "
-                                    )
-                                    decimal(
-                                        decimal: settings.bgBrakeISFweight,
-                                        setting: standard.bgBrakeISFweight,
-                                        label: "brake: "
-                                    )
-                                }
-                                decimal(
-                                    decimal: settings.autoISFhourlyChange,
-                                    setting: standard.autoISFhourlyChange,
-                                    label: "Dura: "
-                                )
-                                decimal(decimal: settings.postMealISFweight, setting: standard.postMealISFweight, label: "PP: ")
-                            }.foregroundStyle(.secondary).font(.caption)
-                        }
+                            }
+                            decimal(
+                                decimal: aisf.autoISFhourlyChange,
+                                setting: standard.autoISFhourlyChange,
+                                label: "dura: "
+                            )
+                            decimal(decimal: aisf.postMealISFweight, setting: standard.postMealISFweight, label: "pp: ")
+                        }.foregroundStyle(.secondary).font(.caption)
                     }
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        state.selectProfile(id_: preset.id ?? "")
-                        state.hideModal()
-                    }
-                }.dynamicTypeSize(...DynamicTypeSize.large)
+                }
+                .contentShape(Rectangle())
+                .onTapGesture {
+                    state.selectProfile(id_: preset.id ?? "")
+                    state.hideModal()
+                }
+                .dynamicTypeSize(...DynamicTypeSize.large)
             }
         }
 
@@ -787,32 +789,42 @@ extension OverrideProfilesConfig {
         }
 
         private func decimal(decimal: NSDecimalNumber?, setting: Decimal, label: String) -> Text? {
-            if let dec = decimal, dec as Decimal != setting {
+            if let dec = decimal as? Decimal, round(dec) != round(setting) {
                 return Text(label + "\(dec)")
             }
             return nil
         }
 
-        private func bool(bool: Bool, setting: Bool, label: String) -> Text? {
+        private func bool(bool: Bool, setting: Bool, label: String) -> AnyView? {
+            let onOff = bool ? NSLocalizedString(" on", comment: "Is true") :
+                NSLocalizedString(" off", comment: "Is false")
             if bool != setting {
-                return Text(label + "\(bool)")
+                return Text(label + onOff).foregroundStyle(.white).boolTag(bool).asAny()
             }
             return nil
         }
 
         private func percentage(decimal: NSDecimalNumber?, setting: Decimal, label: String) -> Text? {
-            if let dec = decimal, dec as Decimal != setting {
+            if let dec = decimal as? Decimal, dec != setting {
                 return Text(label + "\(dec)%")
             }
             return nil
         }
 
         private func glucose(decimal: NSDecimalNumber?, setting: Decimal, label: String) -> Text? {
-            if let dec = decimal, dec as Decimal != setting {
-                let target: Decimal = state.units == .mmolL ? (dec as Decimal).asMmolL : setting
-                return Text(label + (glucoseFormatter.string(from: target as NSNumber) ?? "") + " " + state.units.rawValue)
+            if let nsDecimal = decimal {
+                let dec = nsDecimal as Decimal
+                if round(dec) != round(setting) {
+                    let target: Decimal = state.units == .mmolL ? dec.asMmolL : dec
+                    return Text(label + (glucoseFormatter.string(from: target as NSNumber) ?? "") + " " + state.units.rawValue)
+                }
             }
             return nil
+        }
+
+        /// Round to two fraction digits
+        private func round(_ decimal: Decimal) -> Decimal {
+            decimal.rounded(to: 2)
         }
 
         private func removeProfile(at offsets: IndexSet) {
@@ -820,6 +832,59 @@ extension OverrideProfilesConfig {
                 let preset = fetchedProfiles[index]
                 moc.delete(preset)
             }
+            do {
+                try moc.save()
+            } catch {
+                // To do: add error
+            }
+        }
+
+        private func save(_ preset: OverridePresets) {
+            let saveOverride = preset
+
+            saveOverride.duration = state.duration as NSDecimalNumber
+            saveOverride.indefinite = state._indefinite
+            saveOverride.percentage = state.percentage
+            saveOverride.smbIsOff = state.smbIsOff
+            saveOverride.name = state.profileName
+            saveOverride.emoji = state.emoji
+            saveOverride.overrideAutoISF = state.overrideAutoISF
+            if state.override_target {
+                saveOverride.target = (
+                    state.units == .mmolL
+                        ? state.target.asMgdL
+                        : state.target
+                ) as NSDecimalNumber
+            } else { saveOverride.target = 6 }
+
+            saveOverride.advancedSettings = state.advancedSettings
+            saveOverride.isfAndCr = state.isfAndCr
+            if !state.isfAndCr {
+                saveOverride.isf = state.isf
+                saveOverride.cr = state.cr
+                saveOverride.basal = state.basal
+            }
+
+            if state.smbIsAlwaysOff {
+                saveOverride.smbIsAlwaysOff = true
+                saveOverride.start = state.start as NSDecimalNumber
+                saveOverride.end = state.end as NSDecimalNumber
+            } else { saveOverride.smbIsAlwaysOff = false }
+
+            if !state.smbIsAlwaysOff {
+                saveOverride.smbMinutes = state.smbMinutes as NSDecimalNumber
+                saveOverride.uamMinutes = state.uamMinutes as NSDecimalNumber
+            }
+            saveOverride.overrideMaxIOB = state.overrideMaxIOB
+            if state.overrideMaxIOB {
+                saveOverride.maxIOB = state.maxIOB as NSDecimalNumber
+            }
+            saveOverride.date = Date.now
+
+            if state.overrideAutoISF {
+                state.updateAutoISF(preset.id)
+            }
+
             do {
                 try moc.save()
             } catch {

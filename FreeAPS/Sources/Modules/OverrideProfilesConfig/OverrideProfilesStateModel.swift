@@ -145,26 +145,23 @@ extension OverrideProfilesConfig {
                     ) as NSDecimalNumber
                 } else { saveOverride.target = 6 }
 
-                if advancedSettings {
-                    saveOverride.advancedSettings = true
-                    saveOverride.isfAndCr = self.isfAndCr
-                    if !isfAndCr {
-                        saveOverride.isf = self.isf
-                        saveOverride.cr = self.cr
-                        saveOverride.basal = self.basal
-                    }
-                    if smbIsAlwaysOff {
-                        saveOverride.smbIsAlwaysOff = true
-                        saveOverride.start = start as NSDecimalNumber
-                        saveOverride.end = end as NSDecimalNumber
-                    } else { smbIsAlwaysOff = false }
+                saveOverride.advancedSettings = advancedSettings
+                saveOverride.isfAndCr = self.isfAndCr
+                saveOverride.isf = self.isf
+                saveOverride.cr = self.cr
+                saveOverride.basal = self.basal
 
-                    saveOverride.smbMinutes = self.smbMinutes as NSDecimalNumber
-                    saveOverride.uamMinutes = self.uamMinutes as NSDecimalNumber
-                    saveOverride.maxIOB = maxIOB as NSDecimalNumber
-                    saveOverride.overrideMaxIOB = self.overrideMaxIOB
-                    saveOverride.date = Date.now
-                }
+                if smbIsAlwaysOff {
+                    saveOverride.smbIsAlwaysOff = true
+                    saveOverride.start = start as NSDecimalNumber
+                    saveOverride.end = end as NSDecimalNumber
+                } else { smbIsAlwaysOff = false }
+
+                saveOverride.smbMinutes = self.smbMinutes as NSDecimalNumber
+                saveOverride.uamMinutes = self.uamMinutes as NSDecimalNumber
+                saveOverride.maxIOB = maxIOB as NSDecimalNumber
+                saveOverride.overrideMaxIOB = self.overrideMaxIOB
+                saveOverride.date = Date.now
 
                 if overrideAutoISF {
                     updateAutoISF(useId)
@@ -250,8 +247,10 @@ extension OverrideProfilesConfig {
                 return
             }
             var presetArray: OverridePresets?
-            if edit { presetArray = OverrideStorage().fetchPreset(id: identifier ?? "No, I'm sorry.") }
-            if edit { profileName = presetArray?.name ?? "" }
+            if edit {
+                presetArray = OverrideStorage().fetchPreset(id: identifier ?? "No, I'm sorry.")
+                profileName = presetArray?.name ?? ""
+            }
 
             percentage = !edit ? overrideArray!.percentage : presetArray?.percentage ?? 100
             _indefinite = !edit ? overrideArray!.indefinite : presetArray?.indefinite ?? true
@@ -263,34 +262,31 @@ extension OverrideProfilesConfig {
             overrideMaxIOB = !edit ? overrideArray!.overrideMaxIOB : presetArray?.overrideMaxIOB ?? false
             overrideAutoISF = !edit ? overrideArray!.overrideAutoISF : presetArray?.overrideAutoISF ?? false
 
-            if advancedSettings {
-                if !isfAndCr {
-                    isf = !edit ? overrideArray!.isf : presetArray?.isf ?? true
-                    cr = !edit ? overrideArray!.cr : presetArray?.cr ?? true
-                    basal = !edit ? overrideArray!.basal : presetArray?.basal ?? true
-                }
-                if smbIsAlwaysOff {
-                    start = !edit ? (overrideArray!.start ?? 0) as Decimal : (presetArray?.start ?? 0) as Decimal
-                    end = !edit ? (overrideArray!.end ?? 0) as Decimal : (presetArray?.end ?? 0) as Decimal
-                }
+            isf = !edit ? overrideArray!.isf : presetArray?.isf ?? true
+            cr = !edit ? overrideArray!.cr : presetArray?.cr ?? true
+            basal = !edit ? overrideArray!.basal : presetArray?.basal ?? true
 
-                if !edit, (overrideArray!.smbMinutes as Decimal?) != nil {
-                    smbMinutes = (overrideArray!.smbMinutes ?? 30) as Decimal
-                } else if edit, (presetArray?.smbMinutes as Decimal?) != nil {
-                    smbMinutes = (presetArray?.smbMinutes ?? 30) as Decimal
-                }
+            if smbIsAlwaysOff {
+                start = !edit ? (overrideArray!.start ?? 0) as Decimal : (presetArray?.start ?? 0) as Decimal
+                end = !edit ? (overrideArray!.end ?? 0) as Decimal : (presetArray?.end ?? 0) as Decimal
+            }
 
-                if !edit, (overrideArray!.uamMinutes as Decimal?) != nil {
-                    uamMinutes = (overrideArray!.uamMinutes ?? 30) as Decimal
-                } else if edit, (presetArray?.uamMinutes as Decimal?) != nil {
-                    uamMinutes = (overrideArray?.uamMinutes ?? 30) as Decimal
-                }
+            if !edit, (overrideArray!.smbMinutes as Decimal?) != nil {
+                smbMinutes = (overrideArray!.smbMinutes ?? defaultSmbMinutes as NSDecimalNumber) as Decimal
+            } else if edit {
+                smbMinutes = (presetArray?.smbMinutes ?? defaultSmbMinutes as NSDecimalNumber) as Decimal
+            }
 
-                if !edit, let maxIOB_ = overrideArray!.maxIOB as Decimal? {
-                    maxIOB = maxIOB_ as Decimal
-                } else if edit, let maxIOB_ = presetArray?.maxIOB as Decimal? {
-                    maxIOB = maxIOB_ as Decimal
-                }
+            if !edit, (overrideArray!.uamMinutes as Decimal?) != nil {
+                uamMinutes = (overrideArray!.uamMinutes ?? defaultUamMinutes as NSDecimalNumber) as Decimal
+            } else if edit {
+                uamMinutes = (presetArray?.uamMinutes ?? defaultUamMinutes as NSDecimalNumber) as Decimal
+            }
+
+            if !edit, let maxIOB_ = overrideArray!.maxIOB as Decimal? {
+                maxIOB = maxIOB_ as Decimal
+            } else if edit, let maxIOB_ = presetArray?.maxIOB as Decimal? {
+                maxIOB = maxIOB_ as Decimal
             }
 
             let aisf = !edit && (overrideArray?.enabled ?? false) ? OverrideStorage()
@@ -356,9 +352,13 @@ extension OverrideProfilesConfig {
         }
 
         // Save Auto ISF Override settings
-        private func updateAutoISF(_ id_: String?) {
+        func updateAutoISF(_ id_: String?) {
+            guard let identifier = id_ else { return }
+
+            let oldObject = OverrideStorage().fetchAutoISFsetting(id: identifier)
+            let saveAutoISF = oldObject != nil ? oldObject! : Auto_ISF(context: coredataContext)
+
             coredataContext.perform { [self] in
-                let saveAutoISF = Auto_ISF(context: coredataContext)
                 saveAutoISF.autoISFhourlyChange = autoISFsettings.autoISFhourlyChange as NSDecimalNumber
                 saveAutoISF.autoisf = autoISFsettings.autoisf
                 saveAutoISF.autoisf_min = autoISFsettings.autoisf_min as NSDecimalNumber
@@ -387,7 +387,7 @@ extension OverrideProfilesConfig {
                 saveAutoISF.smbDeliveryRatioBGrange = autoISFsettings.smbDeliveryRatioBGrange as NSDecimalNumber
                 saveAutoISF.postMealISFweight = autoISFsettings.postMealISFweight as NSDecimalNumber
                 saveAutoISF.date = Date.now
-                saveAutoISF.id = id_
+                if oldObject == nil { saveAutoISF.id = identifier }
                 try? self.coredataContext.save()
             }
         }

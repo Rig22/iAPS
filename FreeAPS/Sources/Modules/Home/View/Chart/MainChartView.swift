@@ -269,7 +269,7 @@ struct MainChartView: View {
                         path.addLine(to: CGPoint(x: fullSize.width, y: range.minY + topstep))
                     }.stroke(
                         Color.yellow,
-                        style: StrokeStyle(lineWidth: 1.2, dash: [5, 8])
+                        style: StrokeStyle(lineWidth: 0.8, dash: [5, 8])
                     ) // .stroke(Color.loopYellow, lineWidth: 0.5) // .StrokeStyle(lineWidth: 0.5, dash: [5])
                 }
                 let yrange = glucoseYRange
@@ -281,7 +281,7 @@ struct MainChartView: View {
                         path.addLine(to: CGPoint(x: fullSize.width, y: yrange.minY + bottomstep))
                     }.stroke(
                         Color.red,
-                        style: StrokeStyle(lineWidth: 1.2, dash: [5, 8])
+                        style: StrokeStyle(lineWidth: 0.8, dash: [5, 8])
                     )
                     // .stroke(Color.loopRed, lineWidth: 0.5)
                 }
@@ -381,7 +381,7 @@ struct MainChartView: View {
                 path.addLine(to: CGPoint(x: x, y: fullSize.height - 20))
             }
             .stroke(
-                colorScheme == .dark ? Color.white : Color.black,
+                colorScheme == .dark ? Color.white : Color.white,
                 style: StrokeStyle(lineWidth: 0.5, dash: [5])
             )
         }
@@ -548,7 +548,7 @@ struct MainChartView: View {
         ZStack {
             let bolusPath = data.useInsulinBars ? insulinBar() : bolusPath
             bolusPath.fill(Color.insulin)
-            bolusPath.stroke(Color.primary, lineWidth: 0.3)
+            bolusPath.stroke(Color.white, lineWidth: 0.3)
 
             if data.useInsulinBars {
                 ForEach(bolusDots, id: \.rect.minX) { info -> AnyView in
@@ -558,6 +558,7 @@ struct MainChartView: View {
                     Text(info.value >= data.minimumSMB ? (bolusFormatter.string(from: info.value as NSNumber) ?? "") : "")
                         .rotationEffect(Angle(degrees: -90))
                         .font(bolusFont())
+                        .foregroundColor(.white)
                         .position(position)
                         .asAny()
                 }
@@ -566,6 +567,7 @@ struct MainChartView: View {
                     let position = CGPoint(x: info.rect.midX, y: info.rect.minY - 8)
                     return Text(info.value >= data.minimumSMB ? (bolusFormatter.string(from: info.value as NSNumber) ?? "") : "")
                         .font(.bolusDotFont)
+                        .foregroundColor(.white)
                         .position(position)
                         .asAny()
                 }
@@ -587,11 +589,11 @@ struct MainChartView: View {
             carbsPath
                 .fill(Color.loopYellow)
             carbsPath
-                .stroke(Color.primary, lineWidth: 0.5)
+                .stroke(Color.white, lineWidth: 0.5)
 
             ForEach(carbsDots, id: \.rect.minX) { info -> AnyView in
                 let position = CGPoint(x: info.rect.midX, y: info.rect.maxY + 8)
-                return Text(carbsFormatter.string(from: info.value as NSNumber)!).font(.carbsDotFont)
+                return Text(carbsFormatter.string(from: info.value as NSNumber)!).font(.carbsDotFont).colorScheme(.dark)
                     .position(position)
                     .asAny()
             }
@@ -609,7 +611,7 @@ struct MainChartView: View {
             fpuPath
                 .fill(.orange.opacity(0.5))
             fpuPath
-                .stroke(Color.primary, lineWidth: 0.2)
+                .stroke(Color.white, lineWidth: 0.2)
         }
         .onChange(of: data.carbs) {
             calculateFPUsDots(fullSize: fullSize)
@@ -713,7 +715,6 @@ extension MainChartView {
         calculateOverridesRects(fullSize: fullSize)
         calculateBasalPoints(fullSize: fullSize)
         calculateSuspensions(fullSize: fullSize)
-        print("Updating Main Chart")
     }
 
     private func calculateGlucoseDots(fullSize: CGSize) {
