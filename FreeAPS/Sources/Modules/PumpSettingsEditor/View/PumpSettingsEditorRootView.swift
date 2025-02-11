@@ -1,4 +1,3 @@
-
 import SwiftUI
 import Swinject
 
@@ -19,14 +18,27 @@ extension PumpSettingsEditor {
 
         var body: some View {
             Form {
-                Section(header: Text("Delivery limits")) {
+                Section(
+                    header: Text("Delivery limits"),
+                    footer: Text(
+                        state
+                            .isDanaPump ?
+                            NSLocalizedString(
+                                "Dana pump does not allow editing of max basal and max bolus. Configure these in the doctor's settings of the pump. Saving the settings will fetch the lastest values from the pump",
+                                comment: "Dana footer"
+                            ) :
+                            ""
+                    )
+                ) {
                     HStack {
                         Text("Max Basal")
                         DecimalTextField("U/hr", value: $state.maxBasal, formatter: formatter, liveEditing: true)
+                            .disabled(state.isDanaPump)
                     }
                     HStack {
                         Text("Max Bolus")
                         DecimalTextField("U", value: $state.maxBolus, formatter: formatter, liveEditing: true)
+                            .disabled(state.isDanaPump)
                     }
                 }
 
@@ -50,18 +62,18 @@ extension PumpSettingsEditor {
                         .navigationLink(to: .basalProfileEditor(saveNewConcentration: true), from: self)
                 } header: { Text("Concentration") }
 
-                /*  Section {
-                     HStack {
-                         if state.syncInProgress {
-                             ProgressView().padding(.trailing, 10)
-                         }
-                         Button { state.save() }
-                         label: {
-                             Text(state.syncInProgress ? "Saving..." : "Save on Pump")
-                         }
-                         .disabled(state.syncInProgress)
-                     }
-                 }*/
+                Section {
+                    HStack {
+                        if state.syncInProgress {
+                            ProgressView().padding(.trailing, 10)
+                        }
+                        Button { state.save() }
+                        label: {
+                            Text(state.syncInProgress ? "Saving..." : !state.isDanaPump ? "Save on Pump" : "Save")
+                        }
+                        .disabled(state.syncInProgress)
+                    }
+                }
             }
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .onAppear(perform: configureView)
