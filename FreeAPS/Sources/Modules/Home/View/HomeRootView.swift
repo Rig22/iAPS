@@ -150,6 +150,13 @@ extension Home {
             return formatter
         }
 
+        private var daysFormatter: DateComponentsFormatter {
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.day, .hour]
+            formatter.unitsStyle = .abbreviated
+            return formatter
+        }
+
         let percentageFormatter: NumberFormatter = {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
@@ -181,7 +188,9 @@ extension Home {
                 alarm: $state.alarm,
                 lowGlucose: $state.data.lowGlucose,
                 highGlucose: $state.data.highGlucose,
-                bolusProgress: doubleBolusProgress
+                bolusProgress: doubleBolusProgress,
+                displayDelta: $state.displayDelta,
+                displayExpiration: $state.displayExpiration
             )
             .onTapGesture {
                 if state.alarm == nil {
@@ -201,8 +210,6 @@ extension Home {
             }
         }
 
-        // headerView
-
         private func startProgress() {
             Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { timer in
                 withAnimation(Animation.linear(duration: 0.02)) {
@@ -214,7 +221,7 @@ extension Home {
             }
         }
 
-        // Pie Animation
+        // Pie Animation Anfang
 
         struct PieSliceView: Shape {
             var startAngle: Angle
@@ -357,6 +364,158 @@ extension Home {
             }
         }
 
+        struct BigFillablePieSegment: View {
+            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
+
+            var fillFraction: CGFloat
+            var color: Color
+            var displayText: String
+            var animateProgress: Bool
+
+            var body: some View {
+                VStack {
+                    ZStack {
+                        Circle()
+                            .fill(Color.black.opacity(1.0))
+                            .frame(width: 110, height: 110)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 0)
+                            )
+
+                        PieSliceView(
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                        )
+                        .fill(color)
+                        .frame(width: 110, height: 110)
+                        .opacity(1.0)
+                    }
+
+                    Text(displayText)
+                        .font(.system(size: 18))
+                        .foregroundColor(.white)
+                        .padding(.top, 5)
+                }
+                .offset(y: 14)
+                .onAppear {
+                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+                }
+                .onChange(of: fillFraction) { _, newValue in
+                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+                }
+            }
+        }
+
+        @StateObject private var bolusPieSegmentViewModel = PieSegmentViewModel()
+
+        @ViewBuilder private func bolusProgressView() -> some View {
+            if let progress = state.bolusProgress, let amount = state.bolusAmount {
+                let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
+                let bolusedValue = amount * progress
+                let bolused = bolusProgressFormatter.string(from: bolusedValue as NSNumber) ?? ""
+                let formattedAmount = amount.formatted(.number.precision(.fractionLength(2)))
+                let displayText = "\(bolused) / \(formattedAmount) U"
+
+                VStack {
+                    ZStack {
+                        BigFillablePieSegment(
+                            pieSegmentViewModel: bolusPieSegmentViewModel,
+                            fillFraction: fillFraction,
+                            color: backgroundColor,
+                            displayText: displayText,
+                            animateProgress: true
+                        )
+                        .frame(width: 110, height: 110)
+                        .overlay(
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 25, height: 25)
+                                .overlay(
+                                    Image(systemName: "xmark")
+                                        .font(.system(size: 14))
+                                        .foregroundColor(.white)
+                                )
+                                .onTapGesture {
+                                    state.cancelBolus()
+                                }
+                        )
+                    }
+                }
+            }
+        }
+
+        private var sageView: some View {
+            ZStack {
+                if let date = state.recentGlucose?.sessionStartDate {
+                    let timeAgo: TimeInterval = -1 * date.timeIntervalSinceNow
+
+                    HStack {
+                        Image(systemName: "clock") // Oder ein passenderes Symbol
+                            .font(.system(size: 12))
+                            .foregroundStyle(.white)
+
+                        Text(
+                            (daysFormatter.string(from: timeAgo) ?? "").trimmingCharacters(in: .whitespaces)
+                                .replacingOccurrences(of: ",", with: " ")
+                        )
+                        .font(.system(size: 16))
+                        .foregroundColor(.white)
+                    }
+                    .background(TimeEllipse(characters: 8))
+                } else {
+                    EmptyView() // Stellt sicher, dass immer ein View existiert
+                }
+            }
+            .font(.timeSettingFont)
+            .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+            .frame(maxHeight: .infinity, alignment: .center)
+            .offset(x: 0, y: 3)
+        }
+
+        // Header Anfang
+        // Temp Basal Anfang
+        private var tempRateView: some View {
+            ZStack {
+                VStack {
+                    HStack {
+                        Image(systemName: "chart.xyaxis.line")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.white)
+
+                        if let tempRate = state.tempRate {
+                            let rateString = tempRatenumberFormatter.string(from: tempRate as NSNumber) ?? "0"
+                            let manualBasalString = state.apsManager.isManualTempBasal
+                                ? NSLocalizedString(" Manual", comment: "Manual Temp basal")
+                                : ""
+
+                            HStack(spacing: 0) {
+                                Text(rateString)
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.white)
+
+                                Text("\u{00A0}U/hr") // Ein geschütztes Leerzeichen
+                                    .font(.system(size: 14))
+                                    .foregroundColor(.white)
+                                    +
+                                    Text(manualBasalString)
+                                    .font(.system(size: 16))
+                                    .foregroundColor(.white)
+                            }
+                        } else {
+                            Text("---")
+                                .font(.system(size: 16))
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .font(.timeSettingFont)
+                    .background(TimeEllipseBig(characters: 10))
+                }
+            }
+            .offset(x: 20, y: 0)
+        }
+
+        // Temp Basal Ende
         // GlucoseWheel Anfang
         struct BigFillablePieSegment2: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
@@ -440,158 +599,7 @@ extension Home {
 
         // GlucoseWheel Ende
 
-        // IOB Pie Anfang
-        struct BigFillablePieSegment: View {
-            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
-
-            var fillFraction: CGFloat
-            var color: Color
-            var displayText: String
-            var animateProgress: Bool
-
-            var body: some View {
-                VStack {
-                    ZStack {
-                        Circle()
-                            .fill(Color.black.opacity(1.0))
-                            .frame(width: 110, height: 110)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
-
-                        PieSliceView(
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                        )
-                        .fill(color)
-                        .frame(width: 110, height: 110)
-                        .opacity(1.0)
-                    }
-
-                    Text(displayText)
-                        .font(.system(size: 18))
-                        .foregroundColor(.white)
-                        .padding(.top, 5)
-                }
-                .offset(y: 14)
-                .onAppear {
-                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-                }
-                .onChange(of: fillFraction) { _, newValue in
-                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-                }
-            }
-        }
-
-        @StateObject private var bolusPieSegmentViewModel = PieSegmentViewModel()
-
-        @ViewBuilder private func bolusProgressView() -> some View {
-            if let progress = state.bolusProgress, let amount = state.bolusAmount {
-                let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
-                let bolusedValue = amount * progress
-                let bolused = bolusProgressFormatter.string(from: bolusedValue as NSNumber) ?? ""
-                let formattedAmount = amount.formatted(.number.precision(.fractionLength(2)))
-                let displayText = "\(bolused) / \(formattedAmount) U"
-
-                VStack {
-                    ZStack {
-                        BigFillablePieSegment(
-                            pieSegmentViewModel: bolusPieSegmentViewModel,
-                            fillFraction: fillFraction,
-                            color: backgroundColor,
-                            displayText: displayText,
-                            animateProgress: true
-                        )
-                        .frame(width: 110, height: 110)
-                        .overlay(
-                            Circle()
-                                .fill(Color.red)
-                                .frame(width: 25, height: 25)
-                                .overlay(
-                                    Image(systemName: "xmark")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.white)
-                                )
-                                .onTapGesture {
-                                    state.cancelBolus()
-                                }
-                        )
-                    }
-                }
-            }
-        }
-
-        // IOB Ende
-
-        @ViewBuilder private func glucoseAndLoopView() -> some View {
-            VStack {
-                glucoseView
-                    .frame(width: 110, height: 110)
-            }
-        }
-
-        @ViewBuilder private func loopViewSelector() -> some View {
-            if let loopOption = LoopViewOption(rawValue: state.loopViewOption) {
-                switch loopOption {
-                case .view1:
-                    loopView
-                        .frame(maxHeight: .infinity)
-                        .offset(y: 25)
-                        .padding(.bottom, 10)
-
-                case .view2:
-                    loopView2
-                        .frame(maxHeight: .infinity)
-                        .offset(y: 25)
-                        .padding(.bottom, 10)
-                }
-            } else {
-                // Fallback-Ansicht, falls der String-Wert ungültig ist
-                Text("Ungültige Ansichtsauswahl")
-                    .foregroundColor(.red)
-            }
-        }
-
-        private var tempRateView: some View {
-            ZStack {
-                VStack {
-                    HStack {
-                        Image(systemName: "chart.xyaxis.line")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.white)
-
-                        if let tempRate = state.tempRate {
-                            let rateString = tempRatenumberFormatter.string(from: tempRate as NSNumber) ?? "0"
-                            let manualBasalString = state.apsManager.isManualTempBasal
-                                ? NSLocalizedString(" Manual", comment: "Manual Temp basal")
-                                : ""
-
-                            HStack(spacing: 0) {
-                                Text(rateString)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white)
-
-                                Text("\u{00A0}U/hr") // Ein geschütztes Leerzeichen
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.white)
-                                    +
-                                    Text(manualBasalString)
-                                    .font(.system(size: 16))
-                                    .foregroundColor(.white)
-                            }
-                        } else {
-                            Text("---")
-                                .font(.system(size: 16))
-                                .foregroundColor(.white)
-                        }
-                    }
-                    .font(.timeSettingFont)
-                    .background(TimeEllipseBig(characters: 10))
-                }
-            }
-            .offset(x: 20, y: 0)
-        }
+        // eventualBG Anfang
 
         private var eventualBGView: some View {
             ZStack {
@@ -641,6 +649,155 @@ extension Home {
             .offset(x: -20, y: 0)
         }
 
+        // eventualBG Ende
+
+        @ViewBuilder private func glucoseAndLoopView() -> some View {
+            VStack {
+                glucoseView
+                    .frame(width: 110, height: 110)
+            }
+        }
+
+        @ViewBuilder private func loopViewSelector() -> some View {
+            if let loopOption = LoopViewOption(rawValue: state.loopViewOption) {
+                switch loopOption {
+                case .view1:
+                    loopView
+                        .frame(maxHeight: .infinity)
+                        .offset(y: 25)
+                        .padding(.bottom, 10)
+
+                case .view2:
+                    loopView2
+                        .frame(maxHeight: .infinity)
+                        .offset(y: 25)
+                        .padding(.bottom, 10)
+                }
+            } else {
+                // Fallback-Ansicht, falls der String-Wert ungültig ist
+                Text("Ungültige Ansichtsauswahl")
+                    .foregroundColor(.red)
+            }
+        }
+
+        @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
+            /* LinearGradient(
+                 gradient: Gradient(colors: [
+                     .black.opacity(0.7),
+                     .black.opacity(0.5),
+                     .black.opacity(0.3),
+                     .clear,
+                     .clear,
+                     .clear
+                 ]),
+                 startPoint: .top,
+                 endPoint: .bottom
+             )*/
+            LinearGradient(
+                gradient: Gradient(colors: [
+                    .clear,
+                    .clear,
+                    .clear
+                ]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .frame(
+                maxHeight: fontSize < .extraExtraLarge ? 165 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
+            )
+            .overlay {
+                VStack {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack(spacing: 5) {
+                                    tempRateView
+                                }
+                            }
+                            Spacer()
+                            HStack {
+                                Spacer()
+                                if state.bolusProgress != nil, state.bolusAmount != nil {
+                                    bolusProgressView2()
+                                } else {
+                                    glucoseAndLoopView()
+                                }
+                                Spacer()
+                            }
+                            if state.displayExpiration {
+                                ZStack {
+                                    sageView
+                                        .offset(y: -50)
+                                    eventualBGView
+                                }
+                            } else {
+                                eventualBGView
+                            }
+                        }
+                    }
+                    .offset(y: state.displayExpiration ? 25 : 80)
+                    Spacer()
+                }
+            }
+            .overlay(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        Color.black.opacity(0.5),
+                        Color.black.opacity(0.4),
+                        Color.black.opacity(0.3),
+                        Color.black.opacity(0.2),
+                        Color.black.opacity(0.1),
+                        Color.black.opacity(0)
+                    ]),
+                    startPoint: .bottom,
+                    endPoint: .top
+                )
+                .frame(height: 20) // Höhe des Schattenverlaufs
+                .offset(y: 0), // Schatten genau unten platzieren
+                alignment: .bottom
+            )
+        }
+
+        // Head Ende
+
+        // TopBar Anfang
+
+        // CarbView Anfang
+        @StateObject private var carbsPieSegmentViewModel = PieSegmentViewModel()
+
+        var carbsView: some View {
+            HStack {
+                if let settings = state.settingsManager {
+                    HStack(spacing: 0) {
+                        ZStack {
+                            let substance = Double(state.data.suggestion?.cob ?? 0)
+                            let maxValue = max(Double(settings.preferences.maxCOB), 1)
+                            let fraction = CGFloat(substance / maxValue)
+                            let fill = max(min(fraction, 1.0), 0.0)
+                            //  let carbSymbol = "fork.knife"
+
+                            FillablePieSegment(
+                                pieSegmentViewModel: carbsPieSegmentViewModel,
+                                fillFraction: fill,
+                                color: .loopYellow,
+                                backgroundColor: .clear,
+                                displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
+                                symbolSize: 0,
+                                symbol: "syringe",
+                                animateProgress: true
+                            )
+                            Image("carbs3")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 45, height: 45)
+                        }
+                    }
+                }
+            }
+        }
+
+        // CarbView Ende
+
         var loopView: some View {
             LoopView(
                 suggestion: $state.data.suggestion,
@@ -679,87 +836,6 @@ extension Home {
             }
         }
 
-        @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-            LinearGradient(
-                gradient: Gradient(colors: [
-                    .black.opacity(0.7),
-                    .black.opacity(0.5),
-                    .black.opacity(0.3),
-                    .clear,
-                    .clear,
-                    .clear
-                ]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            // backgroundColor
-            .frame(
-                maxHeight: fontSize < .extraExtraLarge ? 145 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
-            )
-
-            .overlay {
-                VStack {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 8) {
-                                HStack(spacing: 5) {
-                                    tempRateView
-                                }
-                            }
-                            Spacer()
-                            HStack {
-                                Spacer()
-                                if state.bolusProgress != nil, state.bolusAmount != nil {
-                                    bolusProgressView2()
-                                } else {
-                                    glucoseAndLoopView()
-                                }
-                                Spacer()
-                            }
-                            eventualBGView
-                        }
-                    }
-                    .offset(y: 80) // Hier die gesamte View nach unten verschieben
-                    Spacer()
-                }
-            }
-        }
-
-        // CarbView
-
-        @StateObject private var carbsPieSegmentViewModel = PieSegmentViewModel()
-
-        var carbsView: some View {
-            HStack {
-                if let settings = state.settingsManager {
-                    HStack(spacing: 0) {
-                        ZStack {
-                            let substance = Double(state.data.suggestion?.cob ?? 0)
-                            let maxValue = max(Double(settings.preferences.maxCOB), 1)
-                            let fraction = CGFloat(substance / maxValue)
-                            let fill = max(min(fraction, 1.0), 0.0)
-                            //  let carbSymbol = "fork.knife"
-
-                            FillablePieSegment(
-                                pieSegmentViewModel: carbsPieSegmentViewModel,
-                                fillFraction: fill,
-                                color: .loopYellow,
-                                backgroundColor: .clear,
-                                displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
-                                symbolSize: 0,
-                                symbol: "syringe",
-                                animateProgress: true
-                            )
-                            Image("carbs3")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 45, height: 45)
-                        }
-                    }
-                }
-            }
-        }
-
         @StateObject private var insulinPieSegmentViewModel = PieSegmentViewModel()
 
         var insulinView: some View {
@@ -770,11 +846,9 @@ extension Home {
                             let substance = Double(state.data.suggestion?.iob ?? 0)
                             let maxValue = max(Double(settings.preferences.maxIOB), 1)
 
-                            // Berechnung für positive & negative Werte
                             let fraction = CGFloat(abs(substance) / maxValue)
                             let fill = min(fraction, 1.0) // Begrenzung auf max 1
 
-                            // Farbe & Startpunkt für negative Werte
                             let isNegative = substance < 0
                             let pieColor: Color = isNegative ? .red : .insulin
                             let _: Double = isNegative ? 90 : -90
@@ -804,6 +878,9 @@ extension Home {
                 }
             }
         }
+
+        // InsulinView Ende
+        // TopBar Ende
 
         // DanaBars
 
@@ -1178,6 +1255,10 @@ extension Home {
                                     .padding(.bottom, 1)
                                 }
                             }
+
+                            /* HStack(spacing: 10) {
+                                 sageView
+                             }*/
 
                             // Bluetooth Connection
                             HStack(spacing: 10) {
@@ -1583,6 +1664,7 @@ extension Home {
                         Spacer()
                         carbsView
                             .frame(height: 50)
+                            .padding(.top, 10)
 
                         Spacer()
 
@@ -1593,12 +1675,14 @@ extension Home {
 
                         insulinView
                             .frame(height: 50)
+                            .padding(.top, 10)
 
                         Spacer()
                     }
                     .dynamicTypeSize(...DynamicTypeSize.xLarge)
                     .padding(.horizontal, 10)
-                    .padding(.bottom, 40)
+                    .padding(.top, 10)
+                    .padding(.bottom, 30)
                 }
 
                 Group {
@@ -1614,7 +1698,8 @@ extension Home {
                         .frame(width: UIScreen.main.bounds.width)
                 }
             }
-            .frame(minHeight: UIScreen.main.bounds.height / 1.44) // Je größer der Wert, je kleiner der Chart
+            // .frame(minHeight: UIScreen.main.bounds.height / 1.44) // Je größer der Wert, je kleiner der Chart // ORIGINAL
+            .frame(minHeight: UIScreen.main.bounds.height / 1.5) // Je größer der Wert, je kleiner der Chart
         }
 
         var legendPanel: some View {

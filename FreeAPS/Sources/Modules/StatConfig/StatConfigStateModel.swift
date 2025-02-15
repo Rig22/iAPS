@@ -41,6 +41,8 @@ extension StatConfig {
         @Published var useInsulinBars: Bool = true
         @Published var skipGlucoseChart: Bool = false
         @Published var extendHomeView: Bool = true
+        @Published var displayDelta: Bool = false
+        @Published var displayExpiration: Bool = false
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
         var selectedBackgroundColor: Color {
@@ -133,6 +135,8 @@ extension StatConfig {
             subscribeSetting(\.oneDimensionalGraph, on: $oneDimensionalGraph) { oneDimensionalGraph = $0 }
             subscribeSetting(\.useInsulinBars, on: $useInsulinBars) { useInsulinBars = $0 }
             subscribeSetting(\.extendHomeView, on: $extendHomeView) { extendHomeView = $0 }
+            subscribeSetting(\.displayExpiration, on: $displayExpiration) { displayExpiration = $0 }
+            subscribeSetting(\.displayDelta, on: $displayDelta) { displayDelta = $0 }
             subscribeSetting(\.low, on: $low, initial: {
                 let value = max(min($0, 90), 40)
                 low = units == .mmolL ? value.asMmolL : value

@@ -56,7 +56,7 @@ extension Home {
         @Published var useTargetButton: Bool = false
         @Published var overrideHistory: [OverrideHistory] = []
         @Published var overrides: [Override] = []
-        @Published var alwaysUseColors: Bool = true
+        @Published var alwaysUseColors: Bool = false
         @Published var openAPSSettings: Preferences?
         // Dana UI Toggels
         @Published var danaIconRawValue: String = "ic_dana_rs"
@@ -73,17 +73,6 @@ extension Home {
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = true
         // Dana UI Toggels
-        @Published var useCalc: Bool = true
-        @Published var hours: Int = 6
-        @Published var iobData: [IOBData] = []
-        @Published var neg: Int = 0
-        @Published var tddChange: Decimal = 0
-        @Published var tddAverage: Decimal = 0
-        @Published var tddYesterday: Decimal = 0
-        @Published var tdd2DaysAgo: Decimal = 0
-        @Published var tdd3DaysAgo: Decimal = 0
-        @Published var tddActualAverage: Decimal = 0
-        @Published var skipGlucoseChart: Bool = false
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
         @Published var isConnected: Bool = false
@@ -96,11 +85,25 @@ extension Home {
         @Published var reservoirAge: String?
         @Published var insulinType: String?
         @Published var insulinConcentration: Double = 1.0 // Initialer Wert
-        // @Published var displayDelta: Bool = false
+        // specialDanaKitFuction
+        @Published var useCalc: Bool = true
+        @Published var hours: Int = 6
+        @Published var iobData: [IOBData] = []
+        @Published var neg: Int = 0
+        @Published var tddChange: Decimal = 0
+        @Published var tddAverage: Decimal = 0
+        @Published var tddYesterday: Decimal = 0
+        @Published var tdd2DaysAgo: Decimal = 0
+        @Published var tdd3DaysAgo: Decimal = 0
+        @Published var tddActualAverage: Decimal = 0
+        @Published var skipGlucoseChart: Bool = false
+        @Published var displayDelta: Bool = false
         @Published var extended = true
         @Published var maxIOB: Decimal = 0
         @Published var maxCOB: Decimal = 0
         @Published var autoisf = false
+        @Published var displayExpiration = false
+
         // Chart data
         var data = ChartModel(
             suggestion: nil,
@@ -212,8 +215,9 @@ extension Home {
             data.minimumSMB = settingsManager.settings.minimumSMB
             data.maxBolus = settingsManager.pumpSettings.maxBolus
             data.useInsulinBars = settingsManager.settings.useInsulinBars
+            displayDelta = settingsManager.settings.displayDelta
             skipGlucoseChart = settingsManager.settings.skipGlucoseChart
-            // displayDelta = settingsManager.settings.displayDelta
+            displayExpiration = settingsManager.settings.displayExpiration
             extended = settingsManager.settings.extendHomeView
             maxIOB = settingsManager.preferences.maxIOB
             maxCOB = settingsManager.preferences.maxCOB
@@ -756,12 +760,13 @@ extension Home.StateModel:
         data.maxBolus = settingsManager.pumpSettings.maxBolus
         data.useInsulinBars = settingsManager.settings.useInsulinBars
         skipGlucoseChart = settingsManager.settings.skipGlucoseChart
-        // displayDelta = settingsManager.settings.displayDelta
+        displayDelta = settingsManager.settings.displayDelta
         extended = settingsManager.settings.extendHomeView
         maxIOB = settingsManager.preferences.maxIOB
         maxCOB = settingsManager.preferences.maxCOB
         autoisf = settingsManager.settings.autoisf
         hours = settingsManager.settings.hours
+        displayExpiration = settingsManager.settings.displayExpiration
         setupGlucose()
         setupOverrideHistory()
         setupData()

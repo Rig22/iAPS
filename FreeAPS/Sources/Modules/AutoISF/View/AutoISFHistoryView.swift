@@ -1,14 +1,18 @@
 import SwiftUI
+
 struct AutoISFHistoryView: View {
     let units: GlucoseUnits
     let device = UIDevice.current.getDeviceId
+
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.dismiss) private var dismiss
+
     @FetchRequest(
         entity: Reasons.entity(),
         sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)],
         predicate: NSPredicate(format: "date > %@", DateFilter().day)
     ) var reasons: FetchedResults<Reasons>
+
     private var formatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -76,30 +80,34 @@ struct AutoISFHistoryView: View {
             .font(.system(size: 18))
             .padding(.bottom, 5)
             .padding(.horizontal, 20)
+
             Divider()
-            let proMaxOffset_1: CGFloat = (device == "iPhone17,2" || device == "iPhone 15 Pro Max") ? -20 : -7
+
+            let proMaxOffset_1: CGFloat = (device == "iPhone17,2" || device == "iPhone 15 Pro Max") ? -21 : -9
             let proMaxOffset_2: CGFloat = (device == "iPhone17,2" || device == "iPhone 15 Pro Max") ? -10 : 0
-            // SubTitle
-            // Non-localized variable acronyms
+
+            // Subtitle with non-localized variable acronyms
             HStack(spacing: 10) {
-                Text("Time").foregroundStyle(.primary)
+                Text(verbatim: "Time").foregroundStyle(.primary)
                 Spacer(minLength: 1)
-                Text("BG  ").foregroundStyle(Color(.loopGreen)).offset(x: proMaxOffset_1)
-                Text("Final").foregroundStyle(.red).offset(x: proMaxOffset_1)
-                Text("acce").foregroundStyle(.orange).offset(x: 2 + proMaxOffset_2)
-                Text("bg  ").foregroundStyle(.orange).offset(x: 6 + proMaxOffset_2)
-                Text("dura  ").foregroundStyle(.orange).offset(x: 6)
-                Text("pp  ").foregroundStyle(.orange).offset(x: 4)
+                Text(verbatim: "BG  ").foregroundStyle(Color(.loopGreen)).offset(x: proMaxOffset_1)
+                Text(verbatim: "Final").foregroundStyle(.red).offset(x: proMaxOffset_1)
+                Text(verbatim: "acce").foregroundStyle(.orange).offset(x: 2 + proMaxOffset_2)
+                Text(verbatim: "bg  ").foregroundStyle(.orange).offset(x: 6 + proMaxOffset_2)
+                Text(verbatim: "dura  ").foregroundStyle(.orange).offset(x: 6)
+                Text(verbatim: "pp  ").foregroundStyle(.orange).offset(x: 4)
                 Spacer(minLength: 3)
-                Text("Req. ").foregroundColor(.secondary).offset(x: proMaxOffset_2 / 2)
-                Text("TBR ").foregroundColor(.blue).offset(x: proMaxOffset_2 / 2)
-                Text("SMB ").foregroundColor(.blue).offset(x: proMaxOffset_2 / 2)
+                Text(verbatim: "Req. ").foregroundColor(.secondary).offset(x: proMaxOffset_2 / 2)
+                Text(verbatim: "TBR ").foregroundColor(.blue).offset(x: proMaxOffset_2 / 2)
+                Text(verbatim: "SMB ").foregroundColor(.blue).offset(x: proMaxOffset_2 / 2)
             }
             .padding(.horizontal, 5)
             .font(.system(size: 12))
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.vertical, 4)
+
             Divider()
+
             // Non-localized data table
             List {
                 ForEach(reasons) { item in

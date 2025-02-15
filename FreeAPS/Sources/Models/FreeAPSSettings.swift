@@ -59,7 +59,28 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var liveActivityChartThresholdLines = true
     var liveActivityChartDynamicRange = true
     var useTargetButton: Bool = false
-    var alwaysUseColors: Bool = true
+    var alwaysUseColors: Bool = false
+    var profilesOrTempTargets: Bool = false
+    var allowBolusShortcut: Bool = false
+    var allowedRemoteBolusAmount: Decimal = 0.0
+    var eventualBG: Bool = false
+    var minumimPrediction: Bool = false
+    var minimumSMB: Decimal = 0.3
+    var useInsulinBars: Bool = true
+    var disableCGMError: Bool = true
+    var uploadVersion: Bool = true
+    var skipGlucoseChart: Bool = false
+    var birthDate = Date.distantPast
+    var sexSetting: Int = 3
+    var disableHypoTreatment: Bool = false
+    var insulinBadge: Bool = false
+    var hideInsulinBadge: Bool = false
+    var allowDilution: Bool = false
+    var displayDelta: Bool = false
+    var profileID: String = "Hypo Treatment"
+    var extended_overrides = false
+    var extendHomeView = true
+    var displayExpiration = false
     // Dana-Toggles
     var timeSettings: Bool = false
     var danaIconRawValue: String = "ic_dana_rs"
@@ -80,25 +101,6 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var ttBarActive: Bool = false
     var bottomBarActive: Bool = false
     // Dana-Toggles
-    var profilesOrTempTargets: Bool = false
-    var allowBolusShortcut: Bool = false
-    var allowedRemoteBolusAmount: Decimal = 0.0
-    var eventualBG: Bool = false
-    var minumimPrediction: Bool = false
-    var minimumSMB: Decimal = 0.3
-    var useInsulinBars: Bool = true
-    var disableCGMError: Bool = true
-    var uploadVersion: Bool = true
-    var skipGlucoseChart: Bool = false
-    var birthDate = Date.distantPast
-    var sexSetting: Int = 3
-    var disableHypoTreatment: Bool = false
-    var insulinBadge: Bool = false
-    var hideInsulinBadge: Bool = false
-    var allowDilution: Bool = false
-    var profileID: String = "Hypo Treatment"
-    var extended_overrides = false
-    var extendHomeView = true
     // Auto ISF
     var autoisf: Bool = false
     var smbDeliveryRatioBGrange: Decimal = 0
@@ -219,6 +221,25 @@ struct EncodableFreeAPSSettings: Encodable {
         case liveActivityThresholdLines
         case useTargetButton
         case alwaysUseColors
+        case profilesOrTempTargets
+        case allowBolusShortcut
+        case allowedRemoteBolusAmount
+        case eventualBG
+        case minumimPrediction
+        case minimumSMB
+        case useInsulinBars
+        case disableCGMError
+        case uploadVersion
+        case skipGlucoseChart
+        case birthDate
+        case sexSetting
+        case displayDelta
+        case disableHypoTreatment
+        case allowDilution
+        case profileID
+        case extendedOverride
+        case extendHomeView
+        case displayExpiration
         // Dana Toggles
         case danaIconRawValue
         case danaBar
@@ -241,23 +262,6 @@ struct EncodableFreeAPSSettings: Encodable {
         case bottomBarActive
         case barViewOptionConfigurationRawValue
         // Dana Toggles
-        case profilesOrTempTargets
-        case allowBolusShortcut
-        case allowedRemoteBolusAmount
-        case eventualBG
-        case minumimPrediction
-        case minimumSMB
-        case useInsulinBars
-        case disableCGMError
-        case uploadVersion
-        case skipGlucoseChart
-        case birthDate
-        case sexSetting
-        case disableHypoTreatment
-        case allowDilution
-        case profileID
-        case extendedOverride
-        case extendHomeView
         // AutoISF
         case autoisf
         case smbDeliveryRatioRange
@@ -354,6 +358,24 @@ struct EncodableFreeAPSSettings: Encodable {
         // ----
         try container.encode(settings.useTargetButton, forKey: .useTargetButton)
         try container.encode(settings.alwaysUseColors, forKey: .alwaysUseColors)
+        try container.encode(settings.profilesOrTempTargets, forKey: .profilesOrTempTargets)
+        try container.encode(settings.allowBolusShortcut, forKey: .allowBolusShortcut)
+        try container.encode(settings.allowedRemoteBolusAmount, forKey: .allowedRemoteBolusAmount)
+        try container.encode(settings.eventualBG, forKey: .eventualBG)
+        try container.encode(settings.minumimPrediction, forKey: .minumimPrediction)
+        try container.encode(settings.minimumSMB, forKey: .minimumSMB)
+        try container.encode(settings.useInsulinBars, forKey: .useInsulinBars)
+        try container.encode(settings.disableCGMError, forKey: .disableCGMError)
+        try container.encode(settings.uploadVersion, forKey: .uploadVersion)
+        try container.encode(settings.skipGlucoseChart, forKey: .skipGlucoseChart)
+        try container.encode(settings.birthDate, forKey: .birthDate)
+        try container.encode(settings.sexSetting, forKey: .sexSetting)
+        try container.encode(settings.disableHypoTreatment, forKey: .disableHypoTreatment)
+        try container.encode(settings.allowDilution, forKey: .allowDilution)
+        try container.encode(settings.extended_overrides, forKey: .extendedOverride)
+        try container.encode(settings.displayDelta, forKey: .displayDelta)
+        try container.encode(settings.profileID, forKey: .profileID)
+        try container.encode(settings.displayExpiration, forKey: .displayExpiration)
         // Dana Toogels
         try container.encode(settings.danaBar, forKey: .danaBar)
         try container.encode(settings.insulinBadge, forKey: .insulinBadge)
@@ -375,22 +397,6 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.bottomBarActive, forKey: .bottomBarActive)
         try container.encode(settings.barViewOptionConfigurationRawValue, forKey: .barViewOptionConfigurationRawValue)
         // Dana Toggels
-        try container.encode(settings.profilesOrTempTargets, forKey: .profilesOrTempTargets)
-        try container.encode(settings.allowBolusShortcut, forKey: .allowBolusShortcut)
-        try container.encode(settings.allowedRemoteBolusAmount, forKey: .allowedRemoteBolusAmount)
-        try container.encode(settings.eventualBG, forKey: .eventualBG)
-        try container.encode(settings.minumimPrediction, forKey: .minumimPrediction)
-        try container.encode(settings.minimumSMB, forKey: .minimumSMB)
-        try container.encode(settings.useInsulinBars, forKey: .useInsulinBars)
-        try container.encode(settings.disableCGMError, forKey: .disableCGMError)
-        try container.encode(settings.uploadVersion, forKey: .uploadVersion)
-        try container.encode(settings.skipGlucoseChart, forKey: .skipGlucoseChart)
-        try container.encode(settings.birthDate, forKey: .birthDate)
-        try container.encode(settings.sexSetting, forKey: .sexSetting)
-        try container.encode(settings.disableHypoTreatment, forKey: .disableHypoTreatment)
-        try container.encode(settings.allowDilution, forKey: .allowDilution)
-        try container.encode(settings.extended_overrides, forKey: .extendedOverride)
-        try container.encode(settings.profileID, forKey: .profileID)
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)
         try container.encode(settings.smbDeliveryRatioBGrange, forKey: .smbDeliveryRatioRange)

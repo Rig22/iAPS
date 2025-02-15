@@ -51,7 +51,7 @@ extension PumpSettingsEditor {
 
                 Section {
                     HStack {
-                        Text("To change the values above, go to Settings ⇢ Debug Options ⇢ Pump Settings")
+                        Text("To change the DIA, go to Settings ⇢ Debug Options ⇢ Pump Settings")
                             .font(.system(size: 14))
                             .foregroundStyle(Color.orange)
                     }

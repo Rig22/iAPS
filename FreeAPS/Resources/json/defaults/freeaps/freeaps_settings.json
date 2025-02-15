@@ -101,4 +101,5 @@
   "legendsSwitch": false,
   "tempTargetbar": false,
   "danaBar": false
+  "displayExpiration": false
 }

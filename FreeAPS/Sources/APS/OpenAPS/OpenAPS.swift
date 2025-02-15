@@ -91,7 +91,7 @@ final class OpenAPS {
                         autosens: autosens.isEmpty ? .null : autosens,
                         pumpHistory: pumpHistory
                     )
-                }
+                } else { profile = alteredProfile }
 
                 now = Date.now
                 // The OpenAPS layer
@@ -792,8 +792,8 @@ final class OpenAPS {
                 smbIsOff: disableSMBs,
                 advancedSettings: overrideArray.first?.advancedSettings ?? false,
                 isfAndCr: overrideArray.first?.isfAndCr ?? false,
-                isf: overrideArray.first?.isf ?? false,
-                cr: overrideArray.first?.cr ?? false,
+                isf: overrideArray.first?.isf ?? true,
+                cr: overrideArray.first?.cr ?? true,
                 basal: overrideArray.first?.basal ?? true,
                 smbIsAlwaysOff: overrideArray.first?.smbIsAlwaysOff ?? false,
                 start: (overrideArray.first?.start ?? 0) as Decimal,

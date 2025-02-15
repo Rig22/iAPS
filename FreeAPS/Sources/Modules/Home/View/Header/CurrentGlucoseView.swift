@@ -9,6 +9,12 @@ struct CurrentGlucoseView: View {
     @Binding var lowGlucose: Decimal
     @Binding var highGlucose: Decimal
     @Binding var bolusProgress: Double?
+    @Binding var displayDelta: Bool
+    // @Binding var scrolling: Bool
+    @Binding var displayExpiration: Bool
+
+    // @Environment(\.colorScheme) var colorScheme
+    @Environment(\.sizeCategory) private var fontSize
 
     @State private var rotationDegrees: Double = 0
     @State private var bumpEffect: Double = 0
@@ -46,6 +52,47 @@ struct CurrentGlucoseView: View {
         formatter.numberStyle = .decimal
         formatter.maximumFractionDigits = 0
         return formatter
+    }
+
+    private var daysFormatter: DateComponentsFormatter {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.day, .hour]
+        formatter.unitsStyle = .abbreviated
+        return formatter
+    }
+
+    private var sageView: some View {
+        ZStack {
+            if let date = recentGlucose?.sessionStartDate {
+                let timeAgo: TimeInterval = -1 * date.timeIntervalSinceNow
+                background(TimeEllipseBig(characters: 10))
+                    .overlay {
+                        HStack {
+                            Text(
+                                (daysFormatter.string(from: timeAgo) ?? "").trimmingCharacters(in: .whitespaces)
+                                    .replacingOccurrences(of: ",", with: " ")
+                            )
+                        }
+                    }
+            }
+        }
+        .font(.footnote)
+        .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+        .frame(maxHeight: .infinity, alignment: .center).offset(x: 128, y: 3)
+    }
+
+    private func deltaView(_ deltaInt: Int) -> some View {
+        ZStack {
+            let deltaConverted = units == .mmolL ? deltaInt.asMmolL : Decimal(deltaInt)
+            let string = deltaFormatter.string(from: deltaConverted as NSNumber) ?? ""
+            let offset: CGFloat = -7
+
+            Text(string)
+                .font(.callout).foregroundStyle(.secondary)
+                .offset(x: offset, y: 10)
+        }
+        .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+        .frame(maxHeight: .infinity, alignment: .center).offset(x: 140.5, y: displayExpiration ? -34 : -7)
     }
 
     var body: some View {
@@ -160,6 +207,50 @@ struct CurrentGlucoseView: View {
                 bumpEffect = 5
                 bumpEffect = 0
             }
+        }
+    }
+
+    private var adjustments: (degree: Double, x: CGFloat, y: CGFloat) {
+        let yOffset: CGFloat = 17
+        guard let direction = recentGlucose?.direction else {
+            return (90, 0, yOffset)
+        }
+        switch direction {
+        case .doubleUp,
+             .singleUp,
+             .tripleUp:
+            return (0, 0, yOffset)
+        case .fortyFiveUp:
+            return (45, 0, yOffset)
+        case .flat:
+            return (90, 0, yOffset)
+        case .fortyFiveDown:
+            return (135, 0, yOffset)
+        case .doubleDown,
+             .singleDown,
+             .tripleDown:
+            return (180, 0, yOffset)
+        case .none,
+             .notComputable,
+             .rateOutOfRange:
+            return (90, 0, yOffset)
+        }
+    }
+
+    private func direction(degree: Double) -> (x: CGFloat, y: CGFloat) {
+        switch degree {
+        case 0:
+            return (0, -2)
+        case 45:
+            return (1, -2)
+        case 90:
+            return (2, 0)
+        case 135:
+            return (1, 2)
+        case 180:
+            return (0, 2)
+        default:
+            return (2, 0)
         }
     }
 

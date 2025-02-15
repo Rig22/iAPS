@@ -184,6 +184,8 @@ extension StatConfig {
                                 Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
                             }
 
+                            Toggle("Display Sensor Age", isOn: $state.displayExpiration)
+
                             Section(header: Text("Chart settings")) {
                                 Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
                                 Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
@@ -197,6 +199,7 @@ extension StatConfig {
                                 Toggle("Standing / Laying TIR Chart", isOn: $state.oneDimensionalGraph)
                                 Toggle("Use insulin bars", isOn: $state.useInsulinBars)
                             }
+                            // Toggle("Display Glucose Delta", isOn: $state.displayDelta)
 
                             Section(header: Text("Button Panel")) {
                                 Toggle("Display Temp Targets Button", isOn: $state.useTargetButton)
