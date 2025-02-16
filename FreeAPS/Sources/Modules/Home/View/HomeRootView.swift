@@ -520,6 +520,8 @@ extension Home {
         struct BigFillablePieSegment2: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
+            private let backgroundColorCircle = Color(red: 0.31, green: 0.42, blue: 0.66)
+
             var fillFraction: CGFloat
             var color: Color
             var displayText: String
@@ -528,7 +530,7 @@ extension Home {
             var body: some View {
                 ZStack {
                     Circle()
-                        .fill(Color.black.opacity(1.0))
+                        .fill(backgroundColorCircle.opacity(1.0))
                         .frame(width: 110, height: 110)
                         .overlay(
                             Circle()
@@ -703,8 +705,9 @@ extension Home {
                 endPoint: .bottom
             )
             .frame(
-                maxHeight: fontSize < .extraExtraLarge ? 165 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
+                maxHeight: fontSize < .extraExtraLarge ? 105 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
             )
+            .padding(.top, geo.safeAreaInsets.top)
             .overlay {
                 VStack {
                     VStack(alignment: .leading, spacing: 8) {
@@ -712,6 +715,7 @@ extension Home {
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack(spacing: 5) {
                                     tempRateView
+                                        .offset(y: 8)
                                 }
                             }
                             Spacer()
@@ -719,19 +723,24 @@ extension Home {
                                 Spacer()
                                 if state.bolusProgress != nil, state.bolusAmount != nil {
                                     bolusProgressView2()
+                                        .offset(y: 8)
+
                                 } else {
                                     glucoseAndLoopView()
+                                        .offset(y: 8)
                                 }
                                 Spacer()
                             }
                             if state.displayExpiration {
                                 ZStack {
                                     sageView
-                                        .offset(y: -50)
+                                        .offset(y: -45)
                                     eventualBGView
+                                        .offset(y: 8)
                                 }
                             } else {
                                 eventualBGView
+                                    .offset(y: 8)
                             }
                         }
                     }
@@ -739,6 +748,45 @@ extension Home {
                     Spacer()
                 }
             }
+            /*   // Schatten oben
+             .overlay(
+                 LinearGradient(
+                     gradient: Gradient(colors: [
+                         backgroundColor.opacity(1),
+                         backgroundColor.opacity(1),
+                         // Color.black.opacity(0.5),
+                         Color.black.opacity(0.4),
+                         Color.black.opacity(0.3),
+                         Color.black.opacity(0.2),
+                         Color.black.opacity(0.1),
+                         Color.black.opacity(0.0)
+                     ]),
+                     startPoint: .top,
+                     endPoint: .bottom
+                 )
+                 .frame(height: 25),
+                 alignment: .top
+
+             )*/
+            .overlay(
+                LinearGradient(
+                    gradient: Gradient(colors: [
+                        backgroundColor.opacity(1),
+                        backgroundColor.opacity(1),
+                        Color.black.opacity(0.4),
+                        Color.black.opacity(0.3),
+                        Color.black.opacity(0.2),
+                        Color.black.opacity(0.1),
+                        Color.black.opacity(0.0)
+                    ]),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: 25)
+                .offset(y: 50),
+                alignment: .top
+            )
+            // Schatten unten
             .overlay(
                 LinearGradient(
                     gradient: Gradient(colors: [
@@ -752,8 +800,7 @@ extension Home {
                     startPoint: .bottom,
                     endPoint: .top
                 )
-                .frame(height: 20) // Höhe des Schattenverlaufs
-                .offset(y: 0), // Schatten genau unten platzieren
+                .frame(height: 20),
                 alignment: .bottom
             )
         }
