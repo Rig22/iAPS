@@ -705,7 +705,7 @@ extension Home {
                 endPoint: .bottom
             )
             .frame(
-                maxHeight: fontSize < .extraExtraLarge ? 105 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
+                maxHeight: fontSize < .extraExtraLarge ? 115 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
             )
             .padding(.top, geo.safeAreaInsets.top)
             .overlay {
@@ -715,7 +715,7 @@ extension Home {
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack(spacing: 5) {
                                     tempRateView
-                                        .offset(y: 8)
+                                        .offset(y: 18)
                                 }
                             }
                             Spacer()
@@ -723,28 +723,28 @@ extension Home {
                                 Spacer()
                                 if state.bolusProgress != nil, state.bolusAmount != nil {
                                     bolusProgressView2()
-                                        .offset(y: 8)
+                                        .offset(y: 18)
 
                                 } else {
                                     glucoseAndLoopView()
-                                        .offset(y: 8)
+                                        .offset(y: 18)
                                 }
                                 Spacer()
                             }
                             if state.displayExpiration {
                                 ZStack {
                                     sageView
-                                        .offset(y: -45)
+                                        .offset(y: -35)
                                     eventualBGView
-                                        .offset(y: 8)
+                                        .offset(y: 18)
                                 }
                             } else {
                                 eventualBGView
-                                    .offset(y: 8)
+                                    .offset(y: 18)
                             }
                         }
                     }
-                    .offset(y: state.displayExpiration ? 25 : 80)
+                    .offset(y: state.displayExpiration ? 20 : 80)
                     Spacer()
                 }
             }
@@ -783,7 +783,7 @@ extension Home {
                     endPoint: .bottom
                 )
                 .frame(height: 25)
-                .offset(y: 50),
+                .offset(y: 60),
                 alignment: .top
             )
             // Schatten unten
