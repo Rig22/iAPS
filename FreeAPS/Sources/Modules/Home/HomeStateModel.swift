@@ -72,6 +72,8 @@ extension Home {
         @Published var loopViewOption: String = LoopViewOption.view2.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = true
+        @Published var button3D: Bool = true
+
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -210,6 +212,7 @@ extension Home {
             loopViewOption = settingsManager.settings.loopViewOption
             chartBackgroundColored = settingsManager.settings.chartBackgroundColored
             carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
+            button3D = settingsManager.settings.button3D
             // Dana UI Toggels
             useCalc = settingsManager.settings.useCalc
             data.minimumSMB = settingsManager.settings.minimumSMB
@@ -754,6 +757,7 @@ extension Home.StateModel:
         loopViewOption = settingsManager.settings.loopViewOption
         chartBackgroundColored = settingsManager.settings.chartBackgroundColored
         carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
+        button3D = settingsManager.settings.button3D
         // Dana UI Toggels
         useCalc = settingsManager.settings.useCalc
         data.minimumSMB = settingsManager.settings.minimumSMB

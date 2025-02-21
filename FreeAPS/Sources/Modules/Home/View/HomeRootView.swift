@@ -171,6 +171,45 @@ extension Home {
             return scene
         }
 
+        /*  var glucoseView: some View {
+             let doubleBolusProgress = Binding<Double?> {
+                 state.bolusProgress.map { Double(truncating: $0 as NSNumber) }
+             } set: { newValue in
+                 if let newDecimalValue = newValue.map({ Decimal($0) }) {
+                     state.bolusProgress = newDecimalValue
+                 }
+             }
+
+             return CurrentGlucoseView(
+                 recentGlucose: $state.recentGlucose,
+                 timerDate: $state.data.timerDate,
+                 delta: $state.glucoseDelta,
+                 units: $state.data.units,
+                 alarm: $state.alarm,
+                 lowGlucose: $state.data.lowGlucose,
+                 highGlucose: $state.data.highGlucose,
+                 bolusProgress: doubleBolusProgress,
+                 displayDelta: $state.displayDelta,
+                 displayExpiration: $state.displayExpiration
+             )
+             .onTapGesture {
+                 if state.alarm == nil {
+                     state.openCGM()
+                 } else {
+                     state.showModal(for: .snooze)
+                 }
+             }
+             .onLongPressGesture {
+                 let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                 impactHeavy.impactOccurred()
+                 if state.alarm == nil {
+                     state.showModal(for: .snooze)
+                 } else {
+                     state.openCGM()
+                 }
+             }
+         }*/
+
         var glucoseView: some View {
             let doubleBolusProgress = Binding<Double?> {
                 state.bolusProgress.map { Double(truncating: $0 as NSNumber) }
@@ -179,33 +218,74 @@ extension Home {
                     state.bolusProgress = newDecimalValue
                 }
             }
-
-            return CurrentGlucoseView(
-                recentGlucose: $state.recentGlucose,
-                timerDate: $state.data.timerDate,
-                delta: $state.glucoseDelta,
-                units: $state.data.units,
-                alarm: $state.alarm,
-                lowGlucose: $state.data.lowGlucose,
-                highGlucose: $state.data.highGlucose,
-                bolusProgress: doubleBolusProgress,
-                displayDelta: $state.displayDelta,
-                displayExpiration: $state.displayExpiration
+            let angularGradient = AngularGradient(
+                gradient: Gradient(colors: [
+                    Color.gray.opacity(0.3)
+                ]),
+                center: .center,
+                startAngle: .degrees(0),
+                endAngle: .degrees(360)
             )
-            .onTapGesture {
-                if state.alarm == nil {
-                    state.openCGM()
+            return ZStack {
+                if state.button3D {
+                    Circle()
+                        .fill(Color.darkGray.opacity(0.5))
+                        .frame(width: 110, height: 110)
+                        .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color.white.opacity(0.9), // Lichtreflexion oben links
+                                    Color.white.opacity(0.4),
+                                    Color.clear,
+                                    Color.black.opacity(0.3), // Schatten unten rechts
+                                    Color.black.opacity(0.6)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 2
+                        )
+                        .frame(width: 110, height: 110)
                 } else {
-                    state.showModal(for: .snooze)
+                    Circle()
+                        .fill(angularGradient)
+                        .frame(width: 110, height: 110)
+                        .overlay(
+                            Circle()
+                                .stroke(Color.white, lineWidth: 0)
+                        )
                 }
-            }
-            .onLongPressGesture {
-                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                impactHeavy.impactOccurred()
-                if state.alarm == nil {
-                    state.showModal(for: .snooze)
-                } else {
-                    state.openCGM()
+
+                CurrentGlucoseView(
+                    recentGlucose: $state.recentGlucose,
+                    timerDate: $state.data.timerDate,
+                    delta: $state.glucoseDelta,
+                    units: $state.data.units,
+                    alarm: $state.alarm,
+                    lowGlucose: $state.data.lowGlucose,
+                    highGlucose: $state.data.highGlucose,
+                    bolusProgress: doubleBolusProgress,
+                    displayDelta: $state.displayDelta,
+                    displayExpiration: $state.displayExpiration
+                )
+                .onTapGesture {
+                    if state.alarm == nil {
+                        state.openCGM()
+                    } else {
+                        state.showModal(for: .snooze)
+                    }
+                }
+                .onLongPressGesture {
+                    let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                    impactHeavy.impactOccurred()
+                    if state.alarm == nil {
+                        state.showModal(for: .snooze)
+                    } else {
+                        state.openCGM()
+                    }
                 }
             }
         }
@@ -276,16 +356,51 @@ extension Home {
             var symbolSize: CGFloat
             var symbol: String
             var animateProgress: Bool
+            var button3D: Bool // Umschalter für den 3D-Effekt
+
+            let angularGradient = AngularGradient(
+                gradient: Gradient(colors: [
+                    Color.gray.opacity(0.3)
+                ]),
+                center: .center,
+                startAngle: .degrees(0),
+                endAngle: .degrees(360)
+            )
 
             var body: some View {
                 VStack {
                     ZStack {
-                        Circle()
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: 60, height: 60)
+                        if button3D {
+                            Circle()
+                                .fill(Color.darkGray.opacity(0.5))
+                                .frame(width: 60, height: 60)
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
 
-                        Circle()
-                            .stroke(Color.white, lineWidth: 0)
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color.white.opacity(0.9), // Lichtreflexion oben links
+                                            Color.white.opacity(0.4),
+                                            Color.clear,
+                                            Color.black.opacity(0.3), // Schatten unten rechts
+                                            Color.black.opacity(0.6)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 2
+                                )
+                                .frame(width: 60, height: 60)
+                        } else {
+                            Circle()
+                                .fill(angularGradient)
+                                .frame(width: 60, height: 60)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.white, lineWidth: 0)
+                                )
+                        }
 
                         PieSliceView(
                             startAngle: .degrees(-90),
@@ -321,18 +436,51 @@ extension Home {
             var symbolSize: CGFloat
             var symbol: String
             var animateProgress: Bool
+            var button3D: Bool // Umschalter für den 3D-Effekt
+
+            let angularGradient = AngularGradient(
+                gradient: Gradient(colors: [
+                    Color.gray.opacity(0.3)
+                ]),
+                center: .center,
+                startAngle: .degrees(0),
+                endAngle: .degrees(360)
+            )
 
             var body: some View {
                 VStack {
                     ZStack {
-                        Circle()
-                            // .fill(backgroundColor)
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: 40, height: 40)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
+                        if button3D {
+                            Circle()
+                                .fill(Color.darkGray.opacity(0.5))
+                                .frame(width: 40, height: 40)
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color.white.opacity(0.9), // Lichtreflexion oben links
+                                            Color.white.opacity(0.4),
+                                            Color.clear,
+                                            Color.black.opacity(0.3), // Schatten unten rechts
+                                            Color.black.opacity(0.6)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 2
+                                )
+                                .frame(width: 40, height: 40)
+                        } else {
+                            Circle()
+                                .fill(angularGradient)
+                                .frame(width: 40, height: 40)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.white, lineWidth: 0)
+                                )
+                        }
 
                         PieSliceView(
                             startAngle: .degrees(-90),
@@ -375,13 +523,34 @@ extension Home {
             var body: some View {
                 VStack {
                     ZStack {
+                        /* Circle()
+                         .fill(Color.black.opacity(1.0))
+                         .frame(width: 110, height: 110)
+                         .overlay(
+                             Circle()
+                                 .stroke(Color.white, lineWidth: 0)
+                         )*/
                         Circle()
-                            .fill(Color.black.opacity(1.0))
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: 110, height: 110)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 0)
+                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+
+                        Circle()
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.white.opacity(0.9), // Lichtreflexion oben links
+                                        Color.white.opacity(0.4),
+                                        Color.clear,
+                                        Color.black.opacity(0.3), // Schatten unten rechts
+                                        Color.black.opacity(0.6)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 2
                             )
+                            .frame(width: 110, height: 110)
 
                         PieSliceView(
                             startAngle: .degrees(-90),
@@ -831,7 +1000,8 @@ extension Home {
                                 displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
                                 symbolSize: 0,
                                 symbol: "syringe",
-                                animateProgress: true
+                                animateProgress: true,
+                                button3D: state.button3D
                             )
                             Image("carbs3")
                                 .resizable()
@@ -908,7 +1078,8 @@ extension Home {
                                 displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
                                 symbolSize: 0,
                                 symbol: "syringe",
-                                animateProgress: true
+                                animateProgress: true,
+                                button3D: state.button3D
                             )
 
                             Image("iob")
@@ -1014,7 +1185,8 @@ extension Home {
                                             displayText: displayText,
                                             symbolSize: 0,
                                             symbol: "cross.vial",
-                                            animateProgress: true
+                                            animateProgress: true,
+                                            button3D: state.button3D
                                         )
                                         .frame(width: 45, height: 45)
 
@@ -1137,7 +1309,8 @@ extension Home {
                                         displayText: reservoirAge,
                                         symbolSize: 0,
                                         symbol: "timer",
-                                        animateProgress: true
+                                        animateProgress: true,
+                                        button3D: state.button3D
                                     )
                                     .frame(width: 45, height: 45)
 
@@ -1219,7 +1392,8 @@ extension Home {
                                         displayText: cannulaDisplayText,
                                         symbolSize: 0,
                                         symbol: "cross.vial",
-                                        animateProgress: true
+                                        animateProgress: true,
+                                        button3D: state.button3D
                                     )
                                     .frame(width: 45, height: 45)
 
@@ -1273,7 +1447,8 @@ extension Home {
                                             displayText: batteryText,
                                             symbolSize: 0,
                                             symbol: "cross.vial",
-                                            animateProgress: true
+                                            animateProgress: true,
+                                            button3D: state.button3D
                                         )
                                         .frame(width: 45, height: 45)
 
@@ -1282,30 +1457,8 @@ extension Home {
                                             .scaledToFit()
                                             .frame(width: 40, height: 40)
                                     }
-                                } else {
-                                    ZStack {
-                                        Circle()
-                                            // .fill(Color.clear)
-                                            // .opacity(0.3)
-                                            .fill(Color.darkGray.opacity(0.5))
-                                            .frame(width: 40, height: 40)
-                                            .overlay(
-                                                Circle()
-                                                    .stroke(Color.white, lineWidth: 0)
-                                            )
-
-                                        Image("battery")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 40, height: 40)
-                                    }
-                                    .padding(.bottom, 1)
                                 }
                             }
-
-                            /* HStack(spacing: 10) {
-                                 sageView
-                             }*/
 
                             // Bluetooth Connection
                             HStack(spacing: 10) {
@@ -1321,7 +1474,8 @@ extension Home {
                                         displayText: state.isConnected ? "On" : "--",
                                         symbolSize: 0,
                                         symbol: "cross.vial",
-                                        animateProgress: true
+                                        animateProgress: true,
+                                        button3D: state.button3D
                                     )
                                     .frame(width: 45, height: 45)
 
@@ -1405,7 +1559,8 @@ extension Home {
                                             displayText: displayText,
                                             symbolSize: 0,
                                             symbol: "cross.vial",
-                                            animateProgress: true
+                                            animateProgress: true,
+                                            button3D: state.button3D
                                         )
                                         .frame(width: 40, height: 40)
 
@@ -1501,7 +1656,8 @@ extension Home {
                                         displayText: cannulaDisplayText,
                                         symbolSize: 0,
                                         symbol: "cross.vial",
-                                        animateProgress: true
+                                        animateProgress: true,
+                                        button3D: state.button3D
                                     )
                                     .frame(width: 45, height: 45)
 
@@ -1597,7 +1753,8 @@ extension Home {
                                             displayText: batteryText,
                                             symbolSize: 0,
                                             symbol: "cross.vial",
-                                            animateProgress: true
+                                            animateProgress: true,
+                                            button3D: state.button3D
                                         )
                                         .frame(width: 45, height: 45)
 
@@ -1606,27 +1763,8 @@ extension Home {
                                             .scaledToFit()
                                             .frame(width: 40, height: 40)
                                     }
-                                } else {
-                                    ZStack {
-                                        Circle()
-                                            // .fill(Color.clear)
-                                            // .opacity(0.3)
-                                            .fill(Color.darkGray.opacity(0.5))
-                                            .frame(width: 40, height: 40)
-                                            .overlay(
-                                                Circle()
-                                                    .stroke(Color.white, lineWidth: 0)
-                                            )
-
-                                        Image("battery")
-                                            .resizable()
-                                            .scaledToFit()
-                                            .frame(width: 40, height: 40)
-                                    }
-                                    .padding(.bottom, 1)
                                 }
                             }
-
                             // Bluetooth Connection
                             HStack(spacing: 10) {
                                 let connectionFraction: CGFloat = state.isConnected ? 1.0 : 0.0
@@ -1641,7 +1779,8 @@ extension Home {
                                         displayText: state.isConnected ? "On" : "--",
                                         symbolSize: 0,
                                         symbol: "cross.vial",
-                                        animateProgress: true
+                                        animateProgress: true,
+                                        button3D: state.button3D
                                     )
                                     .frame(width: 40, height: 40)
 
@@ -2077,18 +2216,47 @@ extension Home {
 
         @ViewBuilder private func buttonWithCircle(
             iconName: String,
-            circleColor: Color,
+            circleColor _: Color,
             action: @escaping () -> Void
         ) -> some View {
             Button(action: action) {
                 ZStack {
-                    Circle()
-                        .fill(circleColor)
-                        .frame(width: 50, height: 50)
+                    if state.button3D {
+                        Circle()
+                            .fill(Color.darkGray.opacity(0.5))
+                            .frame(width: 55, height: 55)
+                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+
+                        Circle()
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.white.opacity(0.9), // Lichtreflexion oben links
+                                        Color.white.opacity(0.4),
+                                        Color.clear,
+                                        Color.black.opacity(0.3), // Schatten unten rechts
+                                        Color.black.opacity(0.6)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 2
+                            )
+                            .frame(width: 55, height: 55)
+                    } else {
+                        Circle()
+                            .fill(Color.gray.opacity(0.3))
+                            .frame(width: 55, height: 55)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 0)
+                            )
+                    }
+
                     Image(iconName)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 40, height: 40)
+                        .frame(width: 50, height: 50)
                 }
             }
             .buttonStyle(.borderless)

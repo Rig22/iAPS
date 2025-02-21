@@ -128,13 +128,34 @@ struct CurrentGlucoseView: View {
         )
 
         ZStack {
-            Circle()
-                .fill(angularGradient)
-                .frame(width: 110, height: 110)
-                .overlay(
-                    Circle()
-                        .stroke(Color.white, lineWidth: 0)
-                )
+            /* Circle()
+             .fill(angularGradient)
+             .frame(width: 110, height: 110)
+             .overlay(
+                 Circle()
+                     .stroke(Color.white, lineWidth: 0)
+             )*/
+            /*   Circle()
+                 .fill(Color.darkGray.opacity(0.5))
+                 .frame(width: 110, height: 110)
+                 .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+
+             Circle()
+                 .stroke(
+                     LinearGradient(
+                         gradient: Gradient(colors: [
+                             Color.white.opacity(0.9), // Lichtreflexion oben links
+                             Color.white.opacity(0.4),
+                             Color.clear,
+                             Color.black.opacity(0.3), // Schatten unten rechts
+                             Color.black.opacity(0.6)
+                         ]),
+                         startPoint: .topLeading,
+                         endPoint: .bottomTrailing
+                     ),
+                     lineWidth: 2
+                 )
+                 .frame(width: 110, height: 110)*/
 
             // TriangleShape(color: triangleColor)
             TriangleShape(color: currentTriangleColor)

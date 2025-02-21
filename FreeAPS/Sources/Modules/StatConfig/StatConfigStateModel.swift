@@ -32,10 +32,11 @@ extension StatConfig {
         @Published var carbInsulinLoopViewOption: Bool = true
         @Published var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.all.rawValue
         @Published var topBarActive: Bool = true
-        @Published var danaBarActive: Bool = true
-        @Published var legendBarActive: Bool = true
-        @Published var ttBarActive: Bool = true
-        @Published var bottomBarActive: Bool = true
+        @Published var danaBarActive: Bool = false
+        @Published var legendBarActive: Bool = false
+        @Published var ttBarActive: Bool = false
+        @Published var bottomBarActive: Bool = false
+        @Published var button3D: Bool = false
         // Dana UI Toggels
         @Published var minimumSMB: Decimal = 0.3
         @Published var useInsulinBars: Bool = true
@@ -89,7 +90,6 @@ extension StatConfig {
             case (true, false, true, true, true): return .topLegendTTBottom
             case (false, true, true, true, true): return .danaLegendTTBottom
             case (true, true, true, true, true): return .all
-            default: return .none
             }
         }
 
@@ -127,6 +127,7 @@ extension StatConfig {
             subscribeSetting(\.legendBarActive, on: $legendBarActive) { legendBarActive = $0 }
             subscribeSetting(\.ttBarActive, on: $ttBarActive) { ttBarActive = $0 }
             subscribeSetting(\.bottomBarActive, on: $bottomBarActive) { bottomBarActive = $0 }
+            subscribeSetting(\.button3D, on: $button3D) { button3D = $0 }
             // Dana Toggels
             subscribeSetting(\.alwaysUseColors, on: $alwaysUseColors) { alwaysUseColors = $0 }
             subscribeSetting(\.useFPUconversion, on: $useFPUconversion) { useFPUconversion = $0 }

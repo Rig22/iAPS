@@ -182,6 +182,7 @@ extension StatConfig {
                                 }
 
                                 Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
+                                Toggle("3D Button", isOn: $state.button3D)
                             }
 
                             Toggle("Display Sensor Age", isOn: $state.displayExpiration)

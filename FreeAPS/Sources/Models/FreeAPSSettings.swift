@@ -100,6 +100,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var legendBarActive: Bool = false
     var ttBarActive: Bool = false
     var bottomBarActive: Bool = false
+    var button3D: Bool = false
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false
@@ -261,6 +262,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case ttBarActive
         case bottomBarActive
         case barViewOptionConfigurationRawValue
+        case button3D
         // Dana Toggles
         // AutoISF
         case autoisf
@@ -396,6 +398,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.ttBarActive, forKey: .ttBarActive)
         try container.encode(settings.bottomBarActive, forKey: .bottomBarActive)
         try container.encode(settings.barViewOptionConfigurationRawValue, forKey: .barViewOptionConfigurationRawValue)
+        try container.encode(settings.button3D, forKey: .button3D)
         // Dana Toggels
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)
