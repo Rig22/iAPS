@@ -185,7 +185,7 @@ extension StatConfig {
                                 Toggle("3D Button", isOn: $state.button3D)
                             }
 
-                            Toggle("Display Sensor Age", isOn: $state.displayExpiration)
+                            Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)
 
                             Section(header: Text("Chart settings")) {
                                 Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)

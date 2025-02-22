@@ -20,6 +20,35 @@ struct RoundedBackground: ViewModifier {
     }
 }
 
+struct Sage: View {
+    @Environment(\.colorScheme) var colorScheme
+    let amount: Double
+    let expiration: Double
+    var body: some View {
+        let fill = max(amount / expiration, 0.07)
+        let colour: Color = amount <= 8.64E4 ? .red.opacity(0.9) : colorScheme == .light ? .white.opacity(0.7) : .clear
+            .opacity(0.8)
+        RoundedRectangle(cornerRadius: 15)
+            .stroke(colorScheme == .dark ? Color(.clear) : Color(.clear), lineWidth: 2)
+            .background(
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                Gradient.Stop(
+                                    color: colour,
+                                    location: fill
+                                ),
+                                Gradient.Stop(color: Color.clear, location: fill)
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+            )
+    }
+}
+
 struct BoolTag: ViewModifier {
     let bool: Bool
     @Environment(\.colorScheme) var colorScheme

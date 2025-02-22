@@ -12,6 +12,8 @@ struct CurrentGlucoseView: View {
     @Binding var displayDelta: Bool
     // @Binding var scrolling: Bool
     @Binding var displayExpiration: Bool
+    @Binding var cgm: CGMType
+    @Binding var sensordays: Double
 
     // @Environment(\.colorScheme) var colorScheme
     @Environment(\.sizeCategory) private var fontSize
@@ -61,25 +63,65 @@ struct CurrentGlucoseView: View {
         return formatter
     }
 
-    private var sageView: some View {
-        ZStack {
-            if let date = recentGlucose?.sessionStartDate {
-                let timeAgo: TimeInterval = -1 * date.timeIntervalSinceNow
-                background(TimeEllipseBig(characters: 10))
-                    .overlay {
-                        HStack {
-                            Text(
-                                (daysFormatter.string(from: timeAgo) ?? "").trimmingCharacters(in: .whitespaces)
-                                    .replacingOccurrences(of: ",", with: " ")
-                            )
-                        }
-                    }
-            }
-        }
-        .font(.footnote)
-        .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-        .frame(maxHeight: .infinity, alignment: .center).offset(x: 128, y: 3)
+    private var remainingTimeFormatter: DateComponentsFormatter {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.day, .hour]
+        formatter.unitsStyle = .abbreviated
+        return formatter
     }
+
+    private var remainingTimeFormatterDays: DateComponentsFormatter {
+        let formatter = DateComponentsFormatter()
+        formatter.allowedUnits = [.day]
+        formatter.unitsStyle = .short
+        return formatter
+    }
+
+    // Sage Time Past
+    /* private var sageView: some View {
+         ZStack {
+             if let date = recentGlucose?.sessionStartDate {
+                 let timeAgo: TimeInterval = -1 * date.timeIntervalSinceNow
+                 background(TimeEllipseBig(characters: 10))
+                     .overlay {
+                         HStack {
+                             Text(
+                                 (daysFormatter.string(from: timeAgo) ?? "").trimmingCharacters(in: .whitespaces)
+                                     .replacingOccurrences(of: ",", with: " ")
+                             )
+                         }
+                     }
+             }
+         }
+         .font(.footnote)
+         .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+         .frame(maxHeight: .infinity, alignment: .center).offset(x: 128, y: 3)
+     } */
+
+    // Not needed now
+    /* private var sageView: some View {
+         ZStack {
+             if let date = recentGlucose?.sessionStartDate {
+                 let expiration = (cgm == .xdrip || cgm == .glucoseDirect) ? sensordays * 8.64E4 : cgm.expiration
+                 let remainingTime: TimeInterval = expiration - (-1 * date.timeIntervalSinceNow)
+                 Sage(amount: remainingTime, expiration: expiration).frame(width: 59, height: 26)
+                     .overlay {
+                         HStack {
+                             Text(
+                                 remainingTime >= 2 * 8.64E4 ?
+                                     (remainingTimeFormatterDays.string(from: remainingTime) ?? "")
+                                     .replacingOccurrences(of: ",", with: " ") :
+                                     (remainingTimeFormatter.string(from: remainingTime) ?? "")
+                                     .replacingOccurrences(of: ",", with: " ")
+                             )
+                         }
+                     }
+             }
+         }
+         .font(.footnote)
+         .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+         .frame(maxHeight: .infinity, alignment: .center).offset(x: 140.5, y: 3)
+     } */
 
     private func deltaView(_ deltaInt: Int) -> some View {
         ZStack {
@@ -96,28 +138,6 @@ struct CurrentGlucoseView: View {
     }
 
     var body: some View {
-        // let triangleColor = Color(red: 0.18, green: 0.35, blue: 0.58)
-        // let triangleColor = Color.white.opacity(0.7)
-        // let triangleColor = colourGlucoseText.opacity(0.7)
-
-        /* let angularGradient = AngularGradient(
-             gradient: Gradient(colors: [
-                 /* Color.blue.opacity(0.7),
-                   Color.blue.opacity(0.6),
-                   Color.blue.opacity(0.6),
-                   Color.blue.opacity(0.5),
-                   Color.blue.opacity(0.5),
-                   Color.blue.opacity(0.5),
-                   Color.blue.opacity(0.6),
-                   Color.blue.opacity(0.6),
-                   Color.blue.opacity(0.7)
-                  Color.darkGray.opacity(0.4)*/
-                 Color2
-             ]),
-             center: .center,
-             startAngle: .degrees(0),
-             endAngle: .degrees(360)
-         ) */
         let angularGradient = AngularGradient(
             gradient: Gradient(colors: [
                 Color.rig22Background
@@ -128,43 +148,10 @@ struct CurrentGlucoseView: View {
         )
 
         ZStack {
-            /* Circle()
-             .fill(angularGradient)
-             .frame(width: 110, height: 110)
-             .overlay(
-                 Circle()
-                     .stroke(Color.white, lineWidth: 0)
-             )*/
-            /*   Circle()
-                 .fill(Color.darkGray.opacity(0.5))
-                 .frame(width: 110, height: 110)
-                 .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
-
-             Circle()
-                 .stroke(
-                     LinearGradient(
-                         gradient: Gradient(colors: [
-                             Color.white.opacity(0.9), // Lichtreflexion oben links
-                             Color.white.opacity(0.4),
-                             Color.clear,
-                             Color.black.opacity(0.3), // Schatten unten rechts
-                             Color.black.opacity(0.6)
-                         ]),
-                         startPoint: .topLeading,
-                         endPoint: .bottomTrailing
-                     ),
-                     lineWidth: 2
-                 )
-                 .frame(width: 110, height: 110)*/
-
             // TriangleShape(color: triangleColor)
             TriangleShape(color: currentTriangleColor)
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))
                 .animation(.easeInOut(duration: 3.0), value: rotationDegrees)
-
-            /* Circle()
-             .fill(Color.clear.opacity(1.0))
-             .frame(width: 110, height: 110)*/
 
             VStack(alignment: .center) {
                 HStack {

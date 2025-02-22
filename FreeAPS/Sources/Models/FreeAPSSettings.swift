@@ -81,6 +81,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var extended_overrides = false
     var extendHomeView = true
     var displayExpiration = false
+    var sensorDays: Double = 10
     // Dana-Toggles
     var timeSettings: Bool = false
     var danaIconRawValue: String = "ic_dana_rs"
@@ -241,6 +242,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case extendedOverride
         case extendHomeView
         case displayExpiration
+        case sensorDays
         // Dana Toggles
         case danaIconRawValue
         case danaBar
@@ -378,6 +380,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.displayDelta, forKey: .displayDelta)
         try container.encode(settings.profileID, forKey: .profileID)
         try container.encode(settings.displayExpiration, forKey: .displayExpiration)
+        try container.encode(settings.sensorDays, forKey: .sensorDays)
         // Dana Toogels
         try container.encode(settings.danaBar, forKey: .danaBar)
         try container.encode(settings.insulinBadge, forKey: .insulinBadge)

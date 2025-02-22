@@ -1,4 +1,3 @@
-
 {
   "units" : "mmol/L",
   "closedLoop" : false,
@@ -96,10 +95,7 @@
   "ketoProtectBasalAbsolut": 0,
   "extendHomeView": true,
   "extended_overrides": false,
-  "timeSettings": false,
-  "danaBar": false,
-  "legendsSwitch": false,
-  "tempTargetbar": false,
-  "danaBar": false
-  "displayExpiration": false
+  "displayExpiration": false,
+  "sensorDays": 10.0,
+  "anubis": false
 }

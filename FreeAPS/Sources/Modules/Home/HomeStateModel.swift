@@ -58,36 +58,6 @@ extension Home {
         @Published var overrides: [Override] = []
         @Published var alwaysUseColors: Bool = false
         @Published var openAPSSettings: Preferences?
-        // Dana UI Toggels
-        @Published var danaIconRawValue: String = "ic_dana_rs"
-        @Published var danaBar: Bool = false
-        @Published var insulinBadge: Bool = false
-        @Published var insulinAgeOption: String = "Drei_Tage"
-        @Published var cannulaAgeOption: String = "Drei_Tage"
-        @Published var legendsSwitch: Bool = false
-        @Published var tempTargetbar: Bool = false
-        @Published var timeSettings: Bool = false
-        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
-        @Published var danaBarViewOption: String = "view1"
-        @Published var loopViewOption: String = LoopViewOption.view2.rawValue
-        @Published var chartBackgroundColored: Bool = false
-        @Published var carbInsulinLoopViewOption: Bool = true
-        @Published var button3D: Bool = true
-
-        // Dana UI Toggels
-        // specialDanaKitFunction
-        @Published var pumpBatteryChargeRemaining: String?
-        @Published var isConnected: Bool = false
-        @Published var bluetooth: Bool = true
-        @Published var cannulaDate: Date?
-        @Published var cannulaAge: String?
-        @Published var cannulaHours: Double?
-        @Published var reservoirDate: Date?
-        @Published var reservoirLevel: Double? = 0
-        @Published var reservoirAge: String?
-        @Published var insulinType: String?
-        @Published var insulinConcentration: Double = 1.0 // Initialer Wert
-        // specialDanaKitFuction
         @Published var useCalc: Bool = true
         @Published var hours: Int = 6
         @Published var iobData: [IOBData] = []
@@ -105,6 +75,37 @@ extension Home {
         @Published var maxCOB: Decimal = 0
         @Published var autoisf = false
         @Published var displayExpiration = false
+        @Published var cgm: CGMType = .nightscout
+        @Published var sensorDays: Double = 10
+        // Dana UI Toggels
+        @Published var danaIconRawValue: String = "ic_dana_rs"
+        @Published var danaBar: Bool = false
+        @Published var insulinBadge: Bool = false
+        @Published var insulinAgeOption: String = "Drei_Tage"
+        @Published var cannulaAgeOption: String = "Drei_Tage"
+        @Published var legendsSwitch: Bool = false
+        @Published var tempTargetbar: Bool = false
+        @Published var timeSettings: Bool = false
+        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
+        @Published var danaBarViewOption: String = "view1"
+        @Published var loopViewOption: String = LoopViewOption.view2.rawValue
+        @Published var chartBackgroundColored: Bool = false
+        @Published var carbInsulinLoopViewOption: Bool = true
+        @Published var button3D: Bool = true
+        // Dana UI Toggels
+        // specialDanaKitFunction
+        @Published var pumpBatteryChargeRemaining: String?
+        @Published var isConnected: Bool = false
+        @Published var bluetooth: Bool = true
+        @Published var cannulaDate: Date?
+        @Published var cannulaAge: String?
+        @Published var cannulaHours: Double?
+        @Published var reservoirDate: Date?
+        @Published var reservoirLevel: Double? = 0
+        @Published var reservoirAge: String?
+        @Published var insulinType: String?
+        @Published var insulinConcentration: Double = 1.0 // Initialer Wert
+        // specialDanaKitFuction
 
         // Chart data
         var data = ChartModel(
@@ -198,6 +199,19 @@ extension Home {
             useTargetButton = settingsManager.settings.useTargetButton
             data.screenHours = settingsManager.settings.hours
             alwaysUseColors = settingsManager.settings.alwaysUseColors
+            data.minimumSMB = settingsManager.settings.minimumSMB
+            data.maxBolus = settingsManager.pumpSettings.maxBolus
+            data.useInsulinBars = settingsManager.settings.useInsulinBars
+            displayDelta = settingsManager.settings.displayDelta
+            skipGlucoseChart = settingsManager.settings.skipGlucoseChart
+            extended = settingsManager.settings.extendHomeView
+            maxIOB = settingsManager.preferences.maxIOB
+            maxCOB = settingsManager.preferences.maxCOB
+            autoisf = settingsManager.settings.autoisf
+            hours = settingsManager.settings.hours
+            displayExpiration = settingsManager.settings.displayExpiration
+            cgm = settingsManager.settings.cgm
+            sensorDays = settingsManager.settings.sensorDays
             // Dana UI Toggels
             danaIconRawValue = settingsManager.settings.danaIconRawValue
             danaBar = settingsManager.settings.danaBar
@@ -215,17 +229,6 @@ extension Home {
             button3D = settingsManager.settings.button3D
             // Dana UI Toggels
             useCalc = settingsManager.settings.useCalc
-            data.minimumSMB = settingsManager.settings.minimumSMB
-            data.maxBolus = settingsManager.pumpSettings.maxBolus
-            data.useInsulinBars = settingsManager.settings.useInsulinBars
-            displayDelta = settingsManager.settings.displayDelta
-            skipGlucoseChart = settingsManager.settings.skipGlucoseChart
-            displayExpiration = settingsManager.settings.displayExpiration
-            extended = settingsManager.settings.extendHomeView
-            maxIOB = settingsManager.preferences.maxIOB
-            maxCOB = settingsManager.preferences.maxCOB
-            autoisf = settingsManager.settings.autoisf
-            hours = settingsManager.settings.hours
 
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -744,6 +747,23 @@ extension Home.StateModel:
         useTargetButton = settingsManager.settings.useTargetButton
         data.screenHours = settingsManager.settings.hours
         alwaysUseColors = settingsManager.settings.alwaysUseColors
+        useCalc = settingsManager.settings.useCalc
+        data.minimumSMB = settingsManager.settings.minimumSMB
+        data.maxBolus = settingsManager.pumpSettings.maxBolus
+        data.useInsulinBars = settingsManager.settings.useInsulinBars
+        skipGlucoseChart = settingsManager.settings.skipGlucoseChart
+        displayDelta = settingsManager.settings.displayDelta
+        extended = settingsManager.settings.extendHomeView
+        maxIOB = settingsManager.preferences.maxIOB
+        maxCOB = settingsManager.preferences.maxCOB
+        autoisf = settingsManager.settings.autoisf
+        hours = settingsManager.settings.hours
+        displayExpiration = settingsManager.settings.displayExpiration
+        cgm = settingsManager.settings.cgm
+        sensorDays = settingsManager.settings.sensorDays
+        setupGlucose()
+        setupOverrideHistory()
+        setupData()
         // Dana UI Toggels
         danaIconRawValue = settingsManager.settings.danaIconRawValue
         danaBar = settingsManager.settings.danaBar
@@ -759,21 +779,6 @@ extension Home.StateModel:
         carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
         button3D = settingsManager.settings.button3D
         // Dana UI Toggels
-        useCalc = settingsManager.settings.useCalc
-        data.minimumSMB = settingsManager.settings.minimumSMB
-        data.maxBolus = settingsManager.pumpSettings.maxBolus
-        data.useInsulinBars = settingsManager.settings.useInsulinBars
-        skipGlucoseChart = settingsManager.settings.skipGlucoseChart
-        displayDelta = settingsManager.settings.displayDelta
-        extended = settingsManager.settings.extendHomeView
-        maxIOB = settingsManager.preferences.maxIOB
-        maxCOB = settingsManager.preferences.maxCOB
-        autoisf = settingsManager.settings.autoisf
-        hours = settingsManager.settings.hours
-        displayExpiration = settingsManager.settings.displayExpiration
-        setupGlucose()
-        setupOverrideHistory()
-        setupData()
     }
 
     func pumpHistoryDidUpdate(_: [PumpHistoryEvent]) {

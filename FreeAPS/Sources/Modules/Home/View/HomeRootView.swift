@@ -157,6 +157,20 @@ extension Home {
             return formatter
         }
 
+        private var remainingTimeFormatter: DateComponentsFormatter {
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.day, .hour]
+            formatter.unitsStyle = .abbreviated
+            return formatter
+        }
+
+        private var remainingTimeFormatterDays: DateComponentsFormatter {
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.day]
+            formatter.unitsStyle = .short
+            return formatter
+        }
+
         let percentageFormatter: NumberFormatter = {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
@@ -171,44 +185,40 @@ extension Home {
             return scene
         }
 
-        /*  var glucoseView: some View {
-             let doubleBolusProgress = Binding<Double?> {
-                 state.bolusProgress.map { Double(truncating: $0 as NSNumber) }
-             } set: { newValue in
-                 if let newDecimalValue = newValue.map({ Decimal($0) }) {
-                     state.bolusProgress = newDecimalValue
-                 }
-             }
+        private var sageView: some View {
+            ZStack {
+                if let date = state.recentGlucose?.sessionStartDate {
+                    let expiration = (state.cgm == .xdrip || state.cgm == .glucoseDirect) ? state.sensorDays * 8.64E4 : state.cgm
+                        .expiration
+                    let remainingTime: TimeInterval = expiration - (-1 * date.timeIntervalSinceNow)
 
-             return CurrentGlucoseView(
-                 recentGlucose: $state.recentGlucose,
-                 timerDate: $state.data.timerDate,
-                 delta: $state.glucoseDelta,
-                 units: $state.data.units,
-                 alarm: $state.alarm,
-                 lowGlucose: $state.data.lowGlucose,
-                 highGlucose: $state.data.highGlucose,
-                 bolusProgress: doubleBolusProgress,
-                 displayDelta: $state.displayDelta,
-                 displayExpiration: $state.displayExpiration
-             )
-             .onTapGesture {
-                 if state.alarm == nil {
-                     state.openCGM()
-                 } else {
-                     state.showModal(for: .snooze)
-                 }
-             }
-             .onLongPressGesture {
-                 let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                 impactHeavy.impactOccurred()
-                 if state.alarm == nil {
-                     state.showModal(for: .snooze)
-                 } else {
-                     state.openCGM()
-                 }
-             }
-         }*/
+                    Sage(amount: remainingTime, expiration: expiration).frame(width: 70, height: 26)
+
+                    HStack {
+                        Image(systemName: "clock")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.white)
+
+                        Text(
+                            remainingTime >= 2 * 8.64E4 ?
+                                (remainingTimeFormatterDays.string(from: remainingTime) ?? "")
+                                .replacingOccurrences(of: ",", with: " ") :
+                                (remainingTimeFormatter.string(from: remainingTime) ?? "")
+                                .replacingOccurrences(of: ",", with: " ")
+                        )
+                        .font(.system(size: 16))
+                        .foregroundColor(.white)
+                    }
+                    .background(TimeEllipse(characters: 10))
+                } /* else {
+                     EmptyView() // Stellt sicher, dass immer ein View existiert
+                 } */
+            }
+            .font(.timeSettingFont)
+            .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+            .frame(maxHeight: .infinity, alignment: .center)
+            .offset(x: -8, y: 3)
+        }
 
         var glucoseView: some View {
             let doubleBolusProgress = Binding<Double?> {
@@ -269,7 +279,7 @@ extension Home {
                     highGlucose: $state.data.highGlucose,
                     bolusProgress: doubleBolusProgress,
                     displayDelta: $state.displayDelta,
-                    displayExpiration: $state.displayExpiration
+                    displayExpiration: $state.displayExpiration, cgm: $state.cgm, sensordays: $state.sensorDays
                 )
                 .onTapGesture {
                     if state.alarm == nil {
@@ -614,34 +624,6 @@ extension Home {
             }
         }
 
-        private var sageView: some View {
-            ZStack {
-                if let date = state.recentGlucose?.sessionStartDate {
-                    let timeAgo: TimeInterval = -1 * date.timeIntervalSinceNow
-
-                    HStack {
-                        Image(systemName: "clock") // Oder ein passenderes Symbol
-                            .font(.system(size: 12))
-                            .foregroundStyle(.white)
-
-                        Text(
-                            (daysFormatter.string(from: timeAgo) ?? "").trimmingCharacters(in: .whitespaces)
-                                .replacingOccurrences(of: ",", with: " ")
-                        )
-                        .font(.system(size: 16))
-                        .foregroundColor(.white)
-                    }
-                    .background(TimeEllipse(characters: 8))
-                } else {
-                    EmptyView() // Stellt sicher, dass immer ein View existiert
-                }
-            }
-            .font(.timeSettingFont)
-            .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-            .frame(maxHeight: .infinity, alignment: .center)
-            .offset(x: 0, y: 3)
-        }
-
         // Header Anfang
         // Temp Basal Anfang
         private var tempRateView: some View {
@@ -917,26 +899,6 @@ extension Home {
                     Spacer()
                 }
             }
-            /*   // Schatten oben
-             .overlay(
-                 LinearGradient(
-                     gradient: Gradient(colors: [
-                         backgroundColor.opacity(1),
-                         backgroundColor.opacity(1),
-                         // Color.black.opacity(0.5),
-                         Color.black.opacity(0.4),
-                         Color.black.opacity(0.3),
-                         Color.black.opacity(0.2),
-                         Color.black.opacity(0.1),
-                         Color.black.opacity(0.0)
-                     ]),
-                     startPoint: .top,
-                     endPoint: .bottom
-                 )
-                 .frame(height: 25),
-                 alignment: .top
-
-             )*/
             .overlay(
                 LinearGradient(
                     gradient: Gradient(colors: [
@@ -1710,6 +1672,7 @@ extension Home {
                                     state.setupPump = true
                                 }
                             }
+
                             // PumpenBatterie
                             HStack(spacing: 10) {
                                 var batteryColor: Color {
@@ -2028,33 +1991,6 @@ extension Home {
             }
         }
 
-        /*   private var isfView: some View {
-             ZStack {
-                 HStack {
-                     Image(systemName: "divide").font(.system(size: 16)).foregroundStyle(.white)
-                     Text("\(state.data.suggestion?.sensitivityRatio ?? 1)").foregroundStyle(.white)
-                 }
-                 .font(.timeSettingFont)
-                 .background(TimeEllipse(characters: 10))
-                 .onTapGesture {
-                     if state.autoisf {
-                         displayAutoHistory.toggle()
-                     }
-                 }
-             }.offset(x: 30)
-         }
-
-         private var tddView: some View {
-             ZStack {
-                 HStack {
-                     Image(systemName: "circle.slash").font(.system(size: 14)).foregroundStyle(.white)
-                     Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")").foregroundStyle(.white)
-                 }
-                 .font(.timeSettingFont)
-                 .background(TimeEllipse(characters: 10))
-             }.offset(x: 0)
-         }*/
-
         private var sensitivityPercentage: String {
             let sensitivityValue = (state.data.suggestion?.sensitivityRatio ?? 1) as NSDecimalNumber
             return percentageFormatter.string(from: NSNumber(value: sensitivityValue.doubleValue * 100)) ?? "0"
@@ -2224,7 +2160,7 @@ extension Home {
                     if state.button3D {
                         Circle()
                             .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: 55, height: 55)
+                            .frame(width: 50, height: 50)
                             .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
 
                         Circle()
@@ -2242,11 +2178,11 @@ extension Home {
                                 ),
                                 lineWidth: 2
                             )
-                            .frame(width: 55, height: 55)
+                            .frame(width: 50, height: 50)
                     } else {
                         Circle()
                             .fill(Color.gray.opacity(0.3))
-                            .frame(width: 55, height: 55)
+                            .frame(width: 50, height: 50)
                             .overlay(
                                 Circle()
                                     .stroke(Color.white, lineWidth: 0)
@@ -2256,7 +2192,7 @@ extension Home {
                     Image(iconName)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 50, height: 50)
+                        .frame(width: 40, height: 40)
                 }
             }
             .buttonStyle(.borderless)
@@ -2562,6 +2498,9 @@ extension Home {
                             )
                     }
                     .onAppear {
+                        print("Display Expiration:", state.displayExpiration)
+                        print("Sensor Days:", state.sensorDays)
+                        print("CGM Type:", state.cgm)
                         if onboarded.first?.firstRun ?? true {
                             state.fetchPreferences()
                         }
