@@ -14,6 +14,12 @@ extension StatConfig {
         @Published var useTargetButton: Bool = false
         @Published var hours: Decimal = 6
         @Published var alwaysUseColors: Bool = true
+        @Published var minimumSMB: Decimal = 0.3
+        @Published var useInsulinBars: Bool = true
+        @Published var skipGlucoseChart: Bool = false
+        @Published var extendHomeView: Bool = true
+        @Published var displayDelta: Bool = false
+        @Published var displayExpiration: Bool = false
         // Dana UI Toggels
         @Published var danaIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
@@ -37,13 +43,9 @@ extension StatConfig {
         @Published var ttBarActive: Bool = false
         @Published var bottomBarActive: Bool = false
         @Published var button3D: Bool = false
+        @Published var sensorAgeDays: String = "Drei_Tage"
+        @Published var sensorStartTime: Date?
         // Dana UI Toggels
-        @Published var minimumSMB: Decimal = 0.3
-        @Published var useInsulinBars: Bool = true
-        @Published var skipGlucoseChart: Bool = false
-        @Published var extendHomeView: Bool = true
-        @Published var displayDelta: Bool = false
-        @Published var displayExpiration: Bool = false
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
         var selectedBackgroundColor: Color {
@@ -104,6 +106,15 @@ extension StatConfig {
             subscribeSetting(\.yGridLines, on: $yGridLines) { yGridLines = $0 }
             subscribeSetting(\.rulerMarks, on: $rulerMarks) { rulerMarks = $0 }
             subscribeSetting(\.skipGlucoseChart, on: $skipGlucoseChart) { skipGlucoseChart = $0 }
+            subscribeSetting(\.alwaysUseColors, on: $alwaysUseColors) { alwaysUseColors = $0 }
+            subscribeSetting(\.useFPUconversion, on: $useFPUconversion) { useFPUconversion = $0 }
+            subscribeSetting(\.useTargetButton, on: $useTargetButton) { useTargetButton = $0 }
+            subscribeSetting(\.skipBolusScreenAfterCarbs, on: $skipBolusScreenAfterCarbs) { skipBolusScreenAfterCarbs = $0 }
+            subscribeSetting(\.oneDimensionalGraph, on: $oneDimensionalGraph) { oneDimensionalGraph = $0 }
+            subscribeSetting(\.useInsulinBars, on: $useInsulinBars) { useInsulinBars = $0 }
+            subscribeSetting(\.extendHomeView, on: $extendHomeView) { extendHomeView = $0 }
+            subscribeSetting(\.displayExpiration, on: $displayExpiration) { displayExpiration = $0 }
+            subscribeSetting(\.displayDelta, on: $displayDelta) { displayDelta = $0 }
             // Dana Toggels
             subscribeSetting(\.danaIconRawValue, on: $danaIconRawValue) { danaIconRawValue = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
@@ -128,16 +139,10 @@ extension StatConfig {
             subscribeSetting(\.ttBarActive, on: $ttBarActive) { ttBarActive = $0 }
             subscribeSetting(\.bottomBarActive, on: $bottomBarActive) { bottomBarActive = $0 }
             subscribeSetting(\.button3D, on: $button3D) { button3D = $0 }
+            subscribeSetting(\.sensorAgeDays, on: $sensorAgeDays) { sensorAgeDays = $0 }
+            subscribeSetting(\.sensorStartTime, on: $sensorStartTime) { sensorStartTime = $0 }
             // Dana Toggels
-            subscribeSetting(\.alwaysUseColors, on: $alwaysUseColors) { alwaysUseColors = $0 }
-            subscribeSetting(\.useFPUconversion, on: $useFPUconversion) { useFPUconversion = $0 }
-            subscribeSetting(\.useTargetButton, on: $useTargetButton) { useTargetButton = $0 }
-            subscribeSetting(\.skipBolusScreenAfterCarbs, on: $skipBolusScreenAfterCarbs) { skipBolusScreenAfterCarbs = $0 }
-            subscribeSetting(\.oneDimensionalGraph, on: $oneDimensionalGraph) { oneDimensionalGraph = $0 }
-            subscribeSetting(\.useInsulinBars, on: $useInsulinBars) { useInsulinBars = $0 }
-            subscribeSetting(\.extendHomeView, on: $extendHomeView) { extendHomeView = $0 }
-            subscribeSetting(\.displayExpiration, on: $displayExpiration) { displayExpiration = $0 }
-            subscribeSetting(\.displayDelta, on: $displayDelta) { displayDelta = $0 }
+
             subscribeSetting(\.low, on: $low, initial: {
                 let value = max(min($0, 90), 40)
                 low = units == .mmolL ? value.asMmolL : value

@@ -102,6 +102,8 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var ttBarActive: Bool = false
     var bottomBarActive: Bool = false
     var button3D: Bool = false
+    var sensorAgeDays: String = "Fuenfzehn_Tage"
+    var sensorStartTime: Date?
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false
@@ -265,6 +267,8 @@ struct EncodableFreeAPSSettings: Encodable {
         case bottomBarActive
         case barViewOptionConfigurationRawValue
         case button3D
+        case sensorAgeDays
+        case sensorStartTime
         // Dana Toggles
         // AutoISF
         case autoisf
@@ -381,6 +385,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.profileID, forKey: .profileID)
         try container.encode(settings.displayExpiration, forKey: .displayExpiration)
         try container.encode(settings.sensorDays, forKey: .sensorDays)
+        try container.encodeIfPresent(settings.sensorStartTime, forKey: .sensorStartTime)
         // Dana Toogels
         try container.encode(settings.danaBar, forKey: .danaBar)
         try container.encode(settings.insulinBadge, forKey: .insulinBadge)
@@ -402,6 +407,8 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.bottomBarActive, forKey: .bottomBarActive)
         try container.encode(settings.barViewOptionConfigurationRawValue, forKey: .barViewOptionConfigurationRawValue)
         try container.encode(settings.button3D, forKey: .button3D)
+        try container.encode(settings.sensorAgeDays, forKey: .sensorAgeDays)
+        try container.encodeIfPresent(settings.sensorStartTime, forKey: .sensorStartTime)
         // Dana Toggels
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)

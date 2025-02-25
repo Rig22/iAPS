@@ -47,6 +47,28 @@ extension StatConfig {
             return BarViewOptionConfiguration(rawValue: imageName) ?? .none
         }
 
+        @State private var displayedStartTime: String?
+
+        // **Funktionen müssen außerhalb der View stehen!**
+        func formatDate(_ date: Date) -> String {
+            let formatter = DateFormatter()
+            formatter.dateStyle = .short
+            formatter.timeStyle = .medium
+            return formatter.string(from: date)
+        }
+
+        func saveSensorStartTime(_ date: Date) {
+            UserDefaults.standard.set(date.timeIntervalSince1970, forKey: "sensorStartTime")
+        }
+
+        func loadSensorStartTime() -> String? {
+            if let savedTime = UserDefaults.standard.value(forKey: "sensorStartTime") as? TimeInterval {
+                let savedDate = Date(timeIntervalSince1970: savedTime)
+                return formatDate(savedDate)
+            }
+            return nil
+        }
+
         var body: some View {
             VStack(spacing: 0) {
                 ZStack {
@@ -185,7 +207,81 @@ extension StatConfig {
                                 Toggle("3D Button", isOn: $state.button3D)
                             }
 
-                            Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)
+                            // Section(header: Text("Sensor Settings"))
+                            Section(
+                                header: Text("Sensor Settings"),
+                                footer: Text("Long press for setting new Sensor Start Time")
+                            ) {
+                                Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)
+                                if state.displayExpiration {
+                                    Picker("Select Sensor Span", selection: $state.sensorAgeDays) {
+                                        Text("1 Tag").tag("Ein_Tag")
+                                        Text("2 Tage").tag("Zwei_Tage")
+                                        Text("3 Tage").tag("Drei_Tage")
+                                        Text("4 Tage").tag("Vier_Tage")
+                                        Text("5 Tage").tag("Fuenf_Tage")
+                                        Text("6 Tage").tag("Sechs_Tage")
+                                        Text("7 Tage").tag("Sieben_Tage")
+                                        Text("8 Tage").tag("Acht_Tage")
+                                        Text("9 Tage").tag("Neun_Tage")
+                                        Text("10 Tage").tag("Zehn_Tage")
+                                        Text("11 Tage").tag("Elf_Tage")
+                                        Text("12 Tage").tag("Zwoelf_Tage")
+                                        Text("13 Tage").tag("Dreizehn_Tage")
+                                        Text("14 Tage").tag("Vierzehn_Tage")
+                                        Text("15 Tage").tag("Fuenfzehn_Tage")
+                                    }
+                                    .pickerStyle(NavigationLinkPickerStyle())
+
+                                    VStack(alignment: .leading, spacing: 8) {
+                                        Button(action: {}, label: {
+                                            Text("Start New Sensor")
+                                                .frame(maxWidth: .infinity)
+                                                .frame(height: 38)
+                                                .foregroundColor(.orange)
+                                        })
+                                            .buttonStyle(.bordered)
+                                            .padding(.top)
+                                            .simultaneousGesture(
+                                                LongPressGesture(minimumDuration: 1.0) // 1 Sekunde halten
+                                                    .onEnded { _ in
+                                                        let newStartTime = Date()
+                                                        state.sensorStartTime = newStartTime
+                                                        state.settingsManager.settings.sensorStartTime = newStartTime
+
+                                                        // Formatieren und Speichern der Startzeit
+                                                        displayedStartTime = formatDate(newStartTime)
+                                                        saveSensorStartTime(newStartTime)
+
+                                                        // Haptisches Feedback
+                                                        let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                                                        impactHeavy.impactOccurred()
+
+                                                        print("New sensor started at: \(newStartTime)")
+                                                    }
+                                            )
+
+                                        // Anzeige der letzten Startzeit
+                                        HStack {
+                                            Text("Last sensor start time:")
+                                                .font(.subheadline)
+                                                .foregroundColor(.white)
+                                            Spacer()
+                                            if let startTime = displayedStartTime {
+                                                Text(startTime)
+                                                    .font(.subheadline)
+                                                    .foregroundColor(.white)
+                                            }
+                                        }
+                                        .padding(.top)
+                                        .padding(.horizontal)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .onAppear {
+                                        displayedStartTime = loadSensorStartTime()
+                                    }
+                                }
+                            }
 
                             Section(header: Text("Chart settings")) {
                                 Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
@@ -230,7 +326,7 @@ extension StatConfig {
                         .frame(minHeight: geometry.size.height) // Fix für ScrollView
                     }
                 }
-                .frame(maxHeight: .infinity) // Sorgt dafür, dass ScrollView den verfügbaren Platz bekommt
+                .frame(maxHeight: .infinity)
             }
             .onAppear(perform: configureView)
             .navigationBarItems(trailing: Button("Close", action: state.hideModal))

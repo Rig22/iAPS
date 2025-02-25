@@ -97,5 +97,6 @@
   "extended_overrides": false,
   "displayExpiration": false,
   "sensorDays": 10.0,
-  "anubis": false
+  "anubis": false,
+  "sensorStartTime": null
 }

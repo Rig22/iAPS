@@ -92,6 +92,9 @@ extension Home {
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = true
         @Published var button3D: Bool = true
+        @Published var sensorAgeDays: String = "Fuenfzehn_Tage"
+        @Published var sensorStartTime: Date?
+        @Published var remainingSensorDays: Int = 0
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -104,7 +107,7 @@ extension Home {
         @Published var reservoirLevel: Double? = 0
         @Published var reservoirAge: String?
         @Published var insulinType: String?
-        @Published var insulinConcentration: Double = 1.0 // Initialer Wert
+        @Published var insulinConcentration: Double = 1.0
         // specialDanaKitFuction
 
         // Chart data
@@ -207,6 +210,7 @@ extension Home {
             extended = settingsManager.settings.extendHomeView
             maxIOB = settingsManager.preferences.maxIOB
             maxCOB = settingsManager.preferences.maxCOB
+            useCalc = settingsManager.settings.useCalc
             autoisf = settingsManager.settings.autoisf
             hours = settingsManager.settings.hours
             displayExpiration = settingsManager.settings.displayExpiration
@@ -227,8 +231,10 @@ extension Home {
             chartBackgroundColored = settingsManager.settings.chartBackgroundColored
             carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
             button3D = settingsManager.settings.button3D
+            sensorAgeDays = settingsManager.settings.sensorAgeDays
+            sensorStartTime = settingsManager.settings.sensorStartTime
+
             // Dana UI Toggels
-            useCalc = settingsManager.settings.useCalc
 
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -778,7 +784,33 @@ extension Home.StateModel:
         chartBackgroundColored = settingsManager.settings.chartBackgroundColored
         carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
         button3D = settingsManager.settings.button3D
-        // Dana UI Toggels
+        sensorAgeDays = settingsManager.settings.sensorAgeDays
+        sensorStartTime = settingsManager.settings.sensorStartTime
+
+        // Falls keine Startzeit gesetzt ist, verwende das aktuelle Datum
+        if sensorStartTime == nil {
+            sensorStartTime = Date()
+            settingsManager.settings.sensorStartTime = sensorStartTime
+        }
+
+        // Berechne die verbleibenden Sensor-Tage
+        if let startTime = sensorStartTime {
+            let elapsedDays = Calendar.current.dateComponents([.day], from: startTime, to: Date()).day ?? 0
+
+            if let sensorAge = SensorAgeDays(rawValue: sensorAgeDays) {
+                let totalDays = sensorAge.asInt() // Sensorlaufzeit in Tagen
+                remainingSensorDays = max(0, totalDays - elapsedDays)
+            } else {
+                remainingSensorDays = 0 // Fallback, falls kein gültiger Wert gefunden wird
+            }
+        } else {
+            // Falls keine Startzeit vorhanden ist, nutze die Standard-Sensorlaufzeit
+            if let sensorAge = SensorAgeDays(rawValue: sensorAgeDays) {
+                remainingSensorDays = sensorAge.asInt()
+            } else {
+                remainingSensorDays = 0
+            }
+        }
     }
 
     func pumpHistoryDidUpdate(_: [PumpHistoryEvent]) {

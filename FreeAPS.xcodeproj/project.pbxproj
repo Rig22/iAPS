@@ -323,6 +323,7 @@
 		795CBE162D3F949D0044854B /* ChartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE152D3F94900044854B /* ChartModel.swift */; };
 		7974B64C2D3817C10077EF9F /* LoopViewOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7974B64B2D3817C10077EF9F /* LoopViewOption.swift */; };
 		7974B64E2D3818030077EF9F /* LoopView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7974B64D2D3818030077EF9F /* LoopView2.swift */; };
+		7987CE052D6A10D80045F6EA /* SensorAgeDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */; };
 		79D4708E2CE483EE0095B89A /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D4708D2CE483DD0095B89A /* Token.swift */; };
 		7BCFACB97C821041BA43A114 /* ManualTempBasalRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C377490C77661D75E8C50649 /* ManualTempBasalRootView.swift */; };
 		7F7B756BE8543965D9FDF1A2 /* DataTableDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A401509D21F7F35D4E109EDA /* DataTableDataFlow.swift */; };
@@ -952,6 +953,7 @@
 		795CBE152D3F94900044854B /* ChartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartModel.swift; sourceTree = "<group>"; };
 		7974B64B2D3817C10077EF9F /* LoopViewOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopViewOption.swift; sourceTree = "<group>"; };
 		7974B64D2D3818030077EF9F /* LoopView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopView2.swift; sourceTree = "<group>"; };
+		7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorAgeDays.swift; sourceTree = "<group>"; };
 		79BDA519C9B890FD9A5DFCF3 /* ISFEditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ISFEditorDataFlow.swift; sourceTree = "<group>"; };
 		79D4708D2CE483DD0095B89A /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		7E22146D3DF4853786C78132 /* CREditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CREditorDataFlow.swift; sourceTree = "<group>"; };
@@ -1559,6 +1561,7 @@
 		3811DE2C25C9D49500A708ED /* View */ = {
 			isa = PBXGroup;
 			children = (
+				7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */,
 				7909A4A92D5101D800975822 /* BarViewOptionConfiguration.swift */,
 				7974B64B2D3817C10077EF9F /* LoopViewOption.swift */,
 				7927D7152D082E7300385439 /* CannulaAgeOption.swift */,
@@ -3303,6 +3306,7 @@
 				6BCF84DD2B16843A003AD46E /* LiveActitiyShared.swift in Sources */,
 				195D80B92AF697F700D25097 /* DynamicProvider.swift in Sources */,
 				D6D02515BBFBE64FEBE89856 /* DataTableRootView.swift in Sources */,
+				7987CE052D6A10D80045F6EA /* SensorAgeDays.swift in Sources */,
 				38569349270B5DFB0002C50D /* AppGroupSource.swift in Sources */,
 				F5CA3DB1F9DC8B05792BBFAA /* CGMDataFlow.swift in Sources */,
 				BA00D96F7B2FF169A06FB530 /* CGMStateModel.swift in Sources */,

@@ -681,7 +681,7 @@ extension Home {
             var body: some View {
                 ZStack {
                     Circle()
-                        .fill(backgroundColorCircle.opacity(1.0))
+                        .fill(Color.blue.opacity(1.0))
                         .frame(width: 110, height: 110)
                         .overlay(
                             Circle()
@@ -833,6 +833,25 @@ extension Home {
             }
         }
 
+        private var sensorAgeDays: some View {
+            ZStack {
+                HStack {
+                    Image(systemName: "sensor.tag.radiowaves.forward.fill").font(.system(size: 17)).foregroundStyle(.white)
+                    if state.displayExpiration {
+                        Text("\(state.remainingSensorDays) Days")
+                            .font(.timeSettingFont)
+                            .foregroundColor(.white)
+                    }
+                }
+                .background(TimeEllipseBig(characters: 10))
+            }
+            .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+            .frame(maxHeight: .infinity, alignment: .center)
+            .onAppear {
+                state.settingsDidChange(state.settingsManager.settings)
+            }
+        }
+
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             /* LinearGradient(
                  gradient: Gradient(colors: [
@@ -867,6 +886,7 @@ extension Home {
                                 HStack(spacing: 5) {
                                     tempRateView
                                         .offset(y: 18)
+                                    /* Text("Verbleibende Sensor-Tage: \(state.remainingSensorDays)")*/
                                 }
                             }
                             Spacer()
@@ -884,8 +904,11 @@ extension Home {
                             }
                             if state.displayExpiration {
                                 ZStack {
-                                    sageView
-                                        .offset(y: -35)
+                                    // sageView
+                                    //     .offset(y: -35)
+                                    sensorAgeDays
+                                        .offset(x: -20, y: -35)
+
                                     eventualBGView
                                         .offset(y: 18)
                                 }
@@ -1848,7 +1871,7 @@ extension Home {
                 }
             }
             // .frame(minHeight: UIScreen.main.bounds.height / 1.44) // Je größer der Wert, je kleiner der Chart // ORIGINAL
-            .frame(minHeight: UIScreen.main.bounds.height / 1.5) // Je größer der Wert, je kleiner der Chart
+            .frame(minHeight: UIScreen.main.bounds.height / 1.52) // Je größer der Wert, je kleiner der Chart
         }
 
         var legendPanel: some View {
