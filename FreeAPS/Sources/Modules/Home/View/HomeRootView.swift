@@ -833,17 +833,44 @@ extension Home {
             }
         }
 
+        /* private var sensorAgeDays: some View {
+             ZStack {
+                 HStack {
+                     Image(systemName: "sensor.tag.radiowaves.forward.fill").font(.system(size: 17)).foregroundStyle(.white)
+                     if state.displayExpiration {
+                         Text("\(state.remainingSensorDays) Days")
+                             .font(.timeSettingFont)
+                             .foregroundColor(.white)
+                     }
+                 }
+                 .background(TimeEllipseBig(characters: 10))
+             }
+             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+             .frame(maxHeight: .infinity, alignment: .center)
+             .onAppear {
+                 state.settingsDidChange(state.settingsManager.settings)
+                 state.sensorAgeDays = state.settingsManager.settings.sensorAgeDays
+             }
+         }*/
+
         private var sensorAgeDays: some View {
             ZStack {
                 HStack {
-                    Image(systemName: "sensor.tag.radiowaves.forward.fill").font(.system(size: 17)).foregroundStyle(.white)
+                    Image(systemName: "sensor.tag.radiowaves.forward.fill")
+                        .font(.system(size: 17))
+                        .foregroundStyle(.white)
                     if state.displayExpiration {
                         Text("\(state.remainingSensorDays) Days")
                             .font(.timeSettingFont)
                             .foregroundColor(.white)
                     }
                 }
-                .background(TimeEllipseBig(characters: 10))
+                .background(
+                    TimeEllipseSensorAge(
+                        remainingDays: state.remainingSensorDays,
+                        totalDays: SensorAgeDays(rawValue: state.sensorAgeDays)?.asInt() ?? 14
+                    )
+                )
             }
             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
             .frame(maxHeight: .infinity, alignment: .center)
@@ -2521,9 +2548,6 @@ extension Home {
                             )
                     }
                     .onAppear {
-                        print("Display Expiration:", state.displayExpiration)
-                        print("Sensor Days:", state.sensorDays)
-                        print("CGM Type:", state.cgm)
                         if onboarded.first?.firstRun ?? true {
                             state.fetchPreferences()
                         }

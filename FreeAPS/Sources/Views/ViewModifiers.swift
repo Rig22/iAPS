@@ -26,8 +26,8 @@ struct Sage: View {
     let expiration: Double
     var body: some View {
         let fill = max(amount / expiration, 0.07)
-        let colour: Color = amount <= 8.64E4 ? .red.opacity(0.9) : colorScheme == .light ? .white.opacity(0.7) : .clear
-            .opacity(0.8)
+        let colour: Color = amount <= 8.64E4 ? .red.opacity(0.9) : amount <= 2 * 8.64E4 ? .loopYellow
+            .opacity(0.9) : colorScheme == .light ? .white.opacity(0.7) : .black.opacity(0.8)
         RoundedRectangle(cornerRadius: 15)
             .stroke(colorScheme == .dark ? Color(.clear) : Color(.clear), lineWidth: 2)
             .background(
@@ -312,6 +312,66 @@ struct TimeEllipseBig: View {
             .frame(width: CGFloat(characters * 10), height: 30)
     }
 }
+
+struct TimeEllipseSensorAge: View {
+    var remainingDays: Int
+    var totalDays: Int
+    let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
+
+    var body: some View {
+        let progress = CGFloat(remainingDays) / CGFloat(totalDays)
+        let maxWidth = CGFloat(characters * 10)
+
+        ZStack(alignment: .leading) {
+            // Hintergrund bleibt konstant
+            RoundedRectangle(cornerRadius: 15)
+                .fill(Color.gray.opacity(0.2))
+                .frame(width: maxWidth, height: 30)
+
+            // Farbverlauf für die verbleibenden Tage
+            RoundedRectangle(cornerRadius: 15)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(stops: [
+                            Gradient.Stop(
+                                color: remainingDays == 1 ? .red : (remainingDays == 2 ? .orange : .white.opacity(0.1)),
+                                location: progress
+                            ),
+                            Gradient.Stop(color: Color.clear, location: progress)
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(width: maxWidth * progress, height: 30)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
+    }
+}
+// Pillenform bei der Entleerung
+/* struct TimeEllipseSensorAge: View {
+     var remainingDays: Int
+     var totalDays: Int
+     let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
+
+     var body: some View {
+         let progress = CGFloat(remainingDays) / CGFloat(totalDays)
+         let fillColor: Color = remainingDays == 1 ? .red
+             .opacity(1.0) : (remainingDays == 2 ? .orange.opacity(1.0) : .white.opacity(0.1))
+         let maxWidth = CGFloat(characters * 10)
+
+         ZStack(alignment: .leading) {
+             RoundedRectangle(cornerRadius: 15)
+                 .fill(Color.gray.opacity(0.2))
+                 .frame(width: maxWidth, height: 30)
+
+             RoundedRectangle(cornerRadius: 15)
+                 .fill(fillColor)
+                 .frame(width: maxWidth * progress, height: 30)
+         }
+         .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
+     }
+ } */
 
 struct HeaderBackground: View {
     var body: some View {
