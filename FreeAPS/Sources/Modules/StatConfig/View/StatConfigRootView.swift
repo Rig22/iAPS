@@ -98,7 +98,10 @@ extension StatConfig {
                 GeometryReader { geometry in
                     ScrollView {
                         Form {
-                            Section {
+                            Section(
+                                header: Text("Bar Selection"),
+                                footer: Text("Select the  desired bar view")
+                            ) {
                                 Toggle("Top Bar", isOn: $state.carbInsulinLoopViewOption)
                                 if state.carbInsulinLoopViewOption {
                                     Picker("Select Loop View", selection: $state.loopViewOption) {
@@ -116,9 +119,9 @@ extension StatConfig {
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
                                 }
-                            }
+                                //  }
 
-                            Section {
+                                //  Section {
                                 Toggle("Dana Bar", isOn: $state.danaBar)
 
                                 if state.danaBar {
@@ -176,15 +179,18 @@ extension StatConfig {
 
                                     Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
                                 }
-                            }
+                                // }
 
-                            Section {
+                                // Section {
                                 Toggle("Legend Bar", isOn: $state.legendsSwitch)
                                 Toggle("TT Bar", isOn: $state.tempTargetBar)
                                 Toggle("Bottom Bar", isOn: $state.timeSettings)
                             }
 
-                            Section {
+                            Section(
+                                header: Text("Visual Options"),
+                                footer: Text("According to your taste")
+                            ) {
                                 if #available(iOS 18.0, *) {
                                     Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
                                         ForEach(BackgroundColorOption.allCases) { option in
@@ -204,7 +210,7 @@ extension StatConfig {
                                 }
 
                                 Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
-                                Toggle("3D Button", isOn: $state.button3D)
+                                Toggle("3D Look", isOn: $state.button3D)
                             }
 
                             // Section(header: Text("Sensor Settings"))

@@ -849,6 +849,7 @@ extension Home {
             .frame(maxHeight: .infinity, alignment: .center)
             .onAppear {
                 state.settingsDidChange(state.settingsManager.settings)
+                state.sensorAgeDays = state.settingsManager.settings.sensorAgeDays
             }
         }
 
@@ -1870,7 +1871,6 @@ extension Home {
                         .frame(width: UIScreen.main.bounds.width)
                 }
             }
-            // .frame(minHeight: UIScreen.main.bounds.height / 1.44) // Je größer der Wert, je kleiner der Chart // ORIGINAL
             .frame(minHeight: UIScreen.main.bounds.height / 1.52) // Je größer der Wert, je kleiner der Chart
         }
 
@@ -2305,7 +2305,7 @@ extension Home {
                     loopPreview
                 }
 
-                if state.iobData.count >= 0 {
+                if !state.iobData.isEmpty {
                     ZStack {
                         backgroundView
                         activeCOBView.padding(.bottom, 20)
