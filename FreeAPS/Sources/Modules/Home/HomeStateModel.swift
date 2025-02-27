@@ -138,7 +138,8 @@ extension Home {
             maxBolus: 0,
             maxBolusValue: 1,
             useInsulinBars: true,
-            screenHours: 6
+            screenHours: 6,
+            fpus: true
         )
         /*  var backgroundColor: Color {
              BackgroundColorOption(rawValue: backgroundColorOptionRawValue)?.color ?? .clear
@@ -205,6 +206,7 @@ extension Home {
             data.minimumSMB = settingsManager.settings.minimumSMB
             data.maxBolus = settingsManager.pumpSettings.maxBolus
             data.useInsulinBars = settingsManager.settings.useInsulinBars
+            data.fpus = settingsManager.settings.fpus
             displayDelta = settingsManager.settings.displayDelta
             skipGlucoseChart = settingsManager.settings.skipGlucoseChart
             extended = settingsManager.settings.extendHomeView
@@ -291,9 +293,11 @@ extension Home {
                 .receive(on: DispatchQueue.main)
                 .map { [weak self] error in
                     self?.errorDate = error == nil ? nil : Date()
-                    if let error = error {
-                        info(.default, error.localizedDescription)
-                    }
+                    /* if let error = error,
+                        !error.localizedDescription.contains(NSLocalizedString("Pump is Busy.", comment: "Pump Error"))
+                     {
+                         info(.default, error.localizedDescription)
+                     } */
                     return error?.localizedDescription
                 }
                 .weakAssign(to: \.errorMessage, on: self)
@@ -757,6 +761,7 @@ extension Home.StateModel:
         data.minimumSMB = settingsManager.settings.minimumSMB
         data.maxBolus = settingsManager.pumpSettings.maxBolus
         data.useInsulinBars = settingsManager.settings.useInsulinBars
+        data.fpus = settingsManager.settings.fpus
         skipGlucoseChart = settingsManager.settings.skipGlucoseChart
         displayDelta = settingsManager.settings.displayDelta
         extended = settingsManager.settings.extendHomeView

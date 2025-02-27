@@ -340,7 +340,6 @@ struct MainChartView: View {
                 ZStack {
                     xGridView(fullSize: fullSize)
                     carbsView(fullSize: fullSize)
-                    fpuView(fullSize: fullSize)
                     bolusView(fullSize: fullSize)
                     if data.smooth { unSmoothedGlucoseView(fullSize: fullSize) }
                     else { connectingGlucoseLinesView(fullSize: fullSize) }
@@ -349,6 +348,7 @@ struct MainChartView: View {
                     manualGlucoseCenterView(fullSize: fullSize)
                     announcementView(fullSize: fullSize)
                     predictionsView(fullSize: fullSize)
+                    if data.fpus { fpuView(fullSize: fullSize) }
                 }
                 timeLabelsView(fullSize: fullSize)
             }
@@ -609,9 +609,9 @@ struct MainChartView: View {
     private func fpuView(fullSize: CGSize) -> some View {
         ZStack {
             fpuPath
-                .fill(.orange.opacity(0.5))
+                .fill(Color(.systemGray3))
             fpuPath
-                .stroke(Color.white, lineWidth: 0.2)
+                .stroke(Color.loopYellow, lineWidth: 1)
         }
         .onChange(of: data.carbs) {
             calculateFPUsDots(fullSize: fullSize)

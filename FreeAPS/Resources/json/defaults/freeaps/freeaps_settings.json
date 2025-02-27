@@ -98,5 +98,6 @@
   "displayExpiration": false,
   "sensorDays": 10.0,
   "anubis": false,
-  "sensorStartTime": null
+  "sensorStartTime": null,
+  "fpus": true
 }

@@ -20,6 +20,8 @@ extension StatConfig {
         @Published var extendHomeView: Bool = true
         @Published var displayDelta: Bool = false
         @Published var displayExpiration: Bool = false
+        @Published var anubis: Bool = false
+        @Published var fpus: Bool = true
         // Dana UI Toggels
         @Published var danaIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
@@ -115,6 +117,8 @@ extension StatConfig {
             subscribeSetting(\.extendHomeView, on: $extendHomeView) { extendHomeView = $0 }
             subscribeSetting(\.displayExpiration, on: $displayExpiration) { displayExpiration = $0 }
             subscribeSetting(\.displayDelta, on: $displayDelta) { displayDelta = $0 }
+            //    subscribeSetting(\.anubis, on: $anubis) { anubis = $0 }
+            subscribeSetting(\.fpus, on: $fpus) { fpus = $0 }
             // Dana Toggels
             subscribeSetting(\.danaIconRawValue, on: $danaIconRawValue) { danaIconRawValue = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }

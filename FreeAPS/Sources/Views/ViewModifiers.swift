@@ -348,6 +348,7 @@ struct TimeEllipseSensorAge: View {
         .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
     }
 }
+
 // Pillenform bei der Entleerung
 /* struct TimeEllipseSensorAge: View {
      var remainingDays: Int
