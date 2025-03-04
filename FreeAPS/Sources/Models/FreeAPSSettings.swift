@@ -140,7 +140,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     // Computed property for background color option
     var backgroundColorOption: BackgroundColorOption {
         get {
-            BackgroundColorOption(rawValue: backgroundColorOptionRawValue) ?? .darkBlue
+            BackgroundColorOption(rawValue: backgroundColorOptionRawValue) ?? .navajoWhite4
         }
         set {
             backgroundColorOptionRawValue = newValue.rawValue
