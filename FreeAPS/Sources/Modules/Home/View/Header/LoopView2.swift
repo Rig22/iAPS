@@ -22,7 +22,7 @@ struct LoopView2: View {
         return formatter
     }
 
-    private let rect = CGRect(x: 0, y: 0, width: 45, height: 45)
+    private let rect = CGRect(x: 0, y: 0, width: 46, height: 46)
 
     var body: some View {
         VStack(alignment: .center) {
@@ -103,24 +103,6 @@ struct CircleProgress: View {
     @State private var pulse = false
 
     private let rect = CGRect(x: 0, y: 0, width: 45, height: 45)
-    /*   private var backgroundGradient: AngularGradient {
-         AngularGradient(
-             gradient: Gradient(colors: [
-                 Color(red: 0.262745098, green: 0.7333333333, blue: 0.9137254902),
-                 Color(red: 0.3411764706, green: 0.6666666667, blue: 0.9254901961),
-                 Color(red: 0.4862745098, green: 0.5450980392, blue: 0.9529411765),
-                 Color(red: 0.6235294118, green: 0.4235294118, blue: 0.9803921569),
-                 Color(red: 0.7215686275, green: 0.3411764706, blue: 1),
-                 Color(red: 0.6235294118, green: 0.4235294118, blue: 0.9803921569),
-                 Color(red: 0.4862745098, green: 0.5450980392, blue: 0.9529411765),
-                 Color(red: 0.3411764706, green: 0.6666666667, blue: 0.9254901961),
-                 Color(red: 0.262745098, green: 0.7333333333, blue: 0.9137254902)
-             ]),
-             center: .center,
-             startAngle: .degrees(rotationAngle),
-             endAngle: .degrees(rotationAngle + 360)
-         )
-     }*/
     private var backgroundGradient: AngularGradient {
         AngularGradient(
             gradient: Gradient(colors: [

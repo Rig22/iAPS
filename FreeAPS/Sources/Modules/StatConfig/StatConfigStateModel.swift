@@ -30,12 +30,11 @@ extension StatConfig {
         @Published var legendsSwitch: Bool = false
         @Published var tempTargetBar: Bool = false
         @Published var timeSettings: Bool = false
-        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
-        @Published var backgroundColorSelected: String = BackgroundColorOption.darkBlue.rawValue
+        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.navajoWhite4.rawValue
         @Published var danaBarViewOption: String = "view1"
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
-        @Published var loopViewOption: String = LoopViewOption.view2.rawValue
+        @Published var loopViewOption: String = LoopViewOption.view1.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = true
         @Published var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.all.rawValue
@@ -45,7 +44,7 @@ extension StatConfig {
         @Published var ttBarActive: Bool = false
         @Published var bottomBarActive: Bool = false
         @Published var button3D: Bool = false
-        @Published var sensorAgeDays: String = "Drei_Tage"
+        @Published var sensorAgeDays: String = "Fuenfzehn_Tage"
         @Published var sensorStartTime: Date?
         // Dana UI Toggels
 

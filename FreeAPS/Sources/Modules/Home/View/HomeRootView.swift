@@ -185,40 +185,40 @@ extension Home {
             return scene
         }
 
-        private var sageView: some View {
-            ZStack {
-                if let date = state.recentGlucose?.sessionStartDate {
-                    let expiration = (state.cgm == .xdrip || state.cgm == .glucoseDirect) ? state.sensorDays * 8.64E4 : state.cgm
-                        .expiration
-                    let remainingTime: TimeInterval = expiration - (-1 * date.timeIntervalSinceNow)
+        /*    private var sageView: some View {
+             ZStack {
+                 if let date = state.recentGlucose?.sessionStartDate {
+                     let expiration = (state.cgm == .xdrip || state.cgm == .glucoseDirect) ? state.sensorDays * 8.64E4 : state.cgm
+                         .expiration
+                     let remainingTime: TimeInterval = expiration - (-1 * date.timeIntervalSinceNow)
 
-                    Sage(amount: remainingTime, expiration: expiration).frame(width: 70, height: 26)
+                     Sage(amount: remainingTime, expiration: expiration).frame(width: 70, height: 26)
 
-                    HStack {
-                        Image(systemName: "clock")
-                            .font(.system(size: 12))
-                            .foregroundStyle(.white)
+                     HStack {
+                         Image(systemName: "clock")
+                             .font(.system(size: 12))
+                             .foregroundStyle(.white)
 
-                        Text(
-                            remainingTime >= 2 * 8.64E4 ?
-                                (remainingTimeFormatterDays.string(from: remainingTime) ?? "")
-                                .replacingOccurrences(of: ",", with: " ") :
-                                (remainingTimeFormatter.string(from: remainingTime) ?? "")
-                                .replacingOccurrences(of: ",", with: " ")
-                        )
-                        .font(.system(size: 16))
-                        .foregroundColor(.white)
-                    }
-                    .background(TimeEllipse(characters: 10))
-                } /* else {
-                     EmptyView() // Stellt sicher, dass immer ein View existiert
-                 } */
-            }
-            .font(.timeSettingFont)
-            .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-            .frame(maxHeight: .infinity, alignment: .center)
-            .offset(x: -8, y: 3)
-        }
+                         Text(
+                             remainingTime >= 2 * 8.64E4 ?
+                                 (remainingTimeFormatterDays.string(from: remainingTime) ?? "")
+                                 .replacingOccurrences(of: ",", with: " ") :
+                                 (remainingTimeFormatter.string(from: remainingTime) ?? "")
+                                 .replacingOccurrences(of: ",", with: " ")
+                         )
+                         .font(.system(size: 16))
+                         .foregroundColor(.white)
+                     }
+                     .background(TimeEllipse(characters: 10))
+                 } /* else {
+                      EmptyView() // Stellt sicher, dass immer ein View existiert
+                  } */
+             }
+             .font(.timeSettingFont)
+             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+             .frame(maxHeight: .infinity, alignment: .center)
+             .offset(x: -8, y: 3)
+         }*/
 
         var glucoseView: some View {
             let doubleBolusProgress = Binding<Double?> {
@@ -261,7 +261,7 @@ extension Home {
                         .frame(width: 110, height: 110)
                 } else {
                     Circle()
-                        .fill(angularGradient)
+                        .fill(Color.darkGray.opacity(0.5))
                         .frame(width: 110, height: 110)
                         .overlay(
                             Circle()
@@ -404,7 +404,7 @@ extension Home {
                                 .frame(width: 60, height: 60)
                         } else {
                             Circle()
-                                .fill(angularGradient)
+                                .fill(Color.darkGray.opacity(0.5))
                                 .frame(width: 60, height: 60)
                                 .overlay(
                                     Circle()
@@ -484,7 +484,7 @@ extension Home {
                                 .frame(width: 40, height: 40)
                         } else {
                             Circle()
-                                .fill(angularGradient)
+                                .fill(Color.darkGray.opacity(0.5))
                                 .frame(width: 40, height: 40)
                                 .overlay(
                                     Circle()
@@ -513,6 +513,85 @@ extension Home {
                         .padding(.top, 0)
                 }
                 .offset(y: 10)
+                .onAppear {
+                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+                }
+                .onChange(of: fillFraction) { _, newValue in
+                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+                }
+            }
+        }
+
+        struct SmallerFillablePieSegment: View {
+            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
+
+            var fillFraction: CGFloat
+            var color: Color
+            var backgroundColor: Color
+            var displayText: String
+            var animateProgress: Bool
+            var button3D: Bool // Umschalter für den 3D-Effekt
+
+            let angularGradient = AngularGradient(
+                gradient: Gradient(colors: [
+                    Color.gray.opacity(0.3)
+                ]),
+                center: .center,
+                startAngle: .degrees(0),
+                endAngle: .degrees(360)
+            )
+
+            var body: some View {
+                HStack(alignment: .center, spacing: 10) { // Abstand zwischen Kreis und Text
+                    ZStack {
+                        if button3D {
+                            Circle()
+                                .fill(Color.darkGray.opacity(0.5))
+                                .frame(width: 40, height: 40)
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color.white.opacity(0.9),
+                                            Color.white.opacity(0.4),
+                                            Color.clear,
+                                            Color.black.opacity(0.3),
+                                            Color.black.opacity(0.6)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 2
+                                )
+                                .frame(width: 40, height: 40)
+                        } else {
+                            Circle()
+                                .fill(Color.darkGray.opacity(0.5))
+                                .frame(width: 40, height: 40)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.white, lineWidth: 0)
+                                )
+                        }
+
+                        PieSliceView(
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                        )
+                        .fill(color)
+                        .frame(width: 40, height: 40)
+                        .opacity(0.6)
+                    }
+                    .frame(width: 40, height: 40) // Zwingt den ZStack auf die Kreisgröße
+
+                    // Text rechts vom Kreis
+                    Text(displayText)
+                        .font(.system(size: 16))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, alignment: .leading) // Linksbündig ausrichten
+                }
                 .onAppear {
                     pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
                 }
@@ -624,7 +703,14 @@ extension Home {
             }
         }
 
-        // Header Anfang
+        private var stackedLeftTopView: some View {
+            VStack(spacing: 25) {
+                carbsSmallView
+                insulinSmallView
+            }
+        }
+
+        // headerView Anfang
         // Temp Basal Anfang
         private var tempRateView: some View {
             ZStack {
@@ -663,11 +749,12 @@ extension Home {
                     .background(TimeEllipseBig(characters: 10))
                 }
             }
-            .offset(x: 20, y: 0)
         }
 
         // Temp Basal Ende
+
         // GlucoseWheel Anfang
+
         struct BigFillablePieSegment2: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
@@ -681,7 +768,7 @@ extension Home {
             var body: some View {
                 ZStack {
                     Circle()
-                        .fill(Color.blue.opacity(1.0))
+                        .fill(Color.darkGray.opacity(0.6))
                         .frame(width: 110, height: 110)
                         .overlay(
                             Circle()
@@ -731,7 +818,6 @@ extension Home {
                             displayText: displayText,
                             animateProgress: true
                         )
-                        .frame(width: 110, height: 110)
 
                         // X-Button Overlay
                         Circle()
@@ -758,10 +844,6 @@ extension Home {
             ZStack {
                 VStack {
                     HStack {
-                        /* Image(systemName: "timer")
-                         .font(.system(size: 14))
-                         .foregroundStyle(.teal)*/
-
                         if let eventualBG = state.eventualBG {
                             HStack(spacing: 4) {
                                 Text("⇢")
@@ -817,14 +899,9 @@ extension Home {
                 case .view1:
                     loopView
                         .frame(maxHeight: .infinity)
-                        .offset(y: 25)
-                        .padding(.bottom, 10)
-
                 case .view2:
                     loopView2
                         .frame(maxHeight: .infinity)
-                        .offset(y: 25)
-                        .padding(.bottom, 10)
                 }
             } else {
                 // Fallback-Ansicht, falls der String-Wert ungültig ist
@@ -833,30 +910,86 @@ extension Home {
             }
         }
 
-        /* private var sensorAgeDays: some View {
-             ZStack {
-                 HStack {
-                     Image(systemName: "sensor.tag.radiowaves.forward.fill").font(.system(size: 17)).foregroundStyle(.white)
-                     if state.displayExpiration {
-                         Text("\(state.remainingSensorDays) Days")
-                             .font(.timeSettingFont)
-                             .foregroundColor(.white)
-                     }
-                 }
-                 .background(TimeEllipseBig(characters: 10))
-             }
-             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-             .frame(maxHeight: .infinity, alignment: .center)
-             .onAppear {
-                 state.settingsDidChange(state.settingsManager.settings)
-                 state.sensorAgeDays = state.settingsManager.settings.sensorAgeDays
+        // gerade Kante aber ungenaue Restzeit Darstellung
+        /*   struct TimeEllipseSensorAge: View {
+             var remainingDays: Int
+             var totalDays: Int
+             let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
+
+             var body: some View {
+                 let progress = CGFloat(remainingDays) / CGFloat(totalDays)
+                 // let progress = CGFloat(totalDays) - CGFloat(remainingDays)
+
+                 let maxWidth = CGFloat(characters * 10)
+
+                 ZStack(alignment: .leading) {
+                     // Hintergrund bleibt konstant
+                     RoundedRectangle(cornerRadius: 15)
+                         .fill(Color.gray.opacity(0.2))
+                         .frame(width: maxWidth, height: 24)
+
+                     // Farbverlauf für die verbleibenden Tage
+                     RoundedRectangle(cornerRadius: 15)
+                         .fill(
+                             LinearGradient(
+                                 gradient: Gradient(stops: [
+                                     Gradient.Stop(
+                                         color: remainingDays == 1 ? .red : (remainingDays == 2 ? .orange : .white.opacity(0.1)),
+                                         location: progress
+                                     ),
+                                     Gradient.Stop(color: Color.clear, location: progress)
+                                 ]),
+                                 startPoint: .leading,
+                                 endPoint: .trailing
+                             )
+                         )
+                         .frame(width: maxWidth * progress, height: 24) }
+                     .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
              }
          }*/
+
+        // Farbverlauf mit blur effekt
+        struct TimeEllipseSensorAge: View {
+            var remainingDays: Int
+            var totalDays: Int
+            let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
+
+            var body: some View {
+                let safeTotalDays = max(1, totalDays) // Verhindert Division durch 0
+                let safeRemainingDays = min(max(0, remainingDays), safeTotalDays) // Begrenzung auf gültigen Bereich
+
+                let progress = CGFloat(safeRemainingDays) / CGFloat(safeTotalDays)
+                let maxWidth = CGFloat(characters * 10)
+
+                ZStack(alignment: .leading) {
+                    // Hintergrund bleibt konstant
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(Color.darkGray.opacity(0.5))
+                        .frame(width: maxWidth, height: 24)
+
+                    // Farbverlauf für die verbleibenden Tage
+                    RoundedRectangle(cornerRadius: 15)
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    safeRemainingDays == 1 ? .red : (safeRemainingDays == 2 ? .orange : .green.opacity(1.0)),
+                                    Color.clear
+                                ]),
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        // .frame(width: maxWidth * progress, height: 24)
+                        .frame(width: maxWidth * CGFloat(remainingDays) / CGFloat(totalDays), height: 24)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
+            }
+        }
 
         private var sensorAgeDays: some View {
             ZStack {
                 HStack {
-                    Image(systemName: "sensor.tag.radiowaves.forward.fill")
+                    Image(systemName: "sensor.tag.radiowaves.forward")
                         .font(.system(size: 17))
                         .foregroundStyle(.white)
                     if state.displayExpiration {
@@ -868,7 +1001,10 @@ extension Home {
                 .background(
                     TimeEllipseSensorAge(
                         remainingDays: state.remainingSensorDays,
-                        totalDays: SensorAgeDays(rawValue: state.sensorAgeDays)?.asInt() ?? 14
+                        totalDays: SensorAgeDays(
+                            rawValue:
+                            state.sensorAgeDays
+                        )?.asInt() ?? 10
                     )
                 )
             }
@@ -881,18 +1017,6 @@ extension Home {
         }
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-            /* LinearGradient(
-                 gradient: Gradient(colors: [
-                     .black.opacity(0.7),
-                     .black.opacity(0.5),
-                     .black.opacity(0.3),
-                     .clear,
-                     .clear,
-                     .clear
-                 ]),
-                 startPoint: .top,
-                 endPoint: .bottom
-             )*/
             LinearGradient(
                 gradient: Gradient(colors: [
                     .clear,
@@ -903,7 +1027,7 @@ extension Home {
                 endPoint: .bottom
             )
             .frame(
-                maxHeight: fontSize < .extraExtraLarge ? 115 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
+                maxHeight: fontSize < .extraExtraLarge ? 120 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
             )
             .padding(.top, geo.safeAreaInsets.top)
             .overlay {
@@ -911,80 +1035,69 @@ extension Home {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack {
                             VStack(alignment: .leading, spacing: 8) {
-                                HStack(spacing: 5) {
-                                    tempRateView
-                                        .offset(y: 18)
-                                    /* Text("Verbleibende Sensor-Tage: \(state.remainingSensorDays)")*/
+                                HStack(spacing: 3) {
+                                    stackedLeftTopView
+                                        .offset(x: 20, y: 55)
                                 }
                             }
                             Spacer()
                             HStack {
-                                Spacer()
+                                // Spacer()
                                 if state.bolusProgress != nil, state.bolusAmount != nil {
                                     bolusProgressView2()
-                                        .offset(y: 18)
+                                        .offset(x: -35, y: 53)
 
                                 } else {
                                     glucoseAndLoopView()
-                                        .offset(y: 18)
+                                        .offset(x: -35, y: 53)
                                 }
                                 Spacer()
                             }
-                            if state.displayExpiration {
-                                ZStack {
-                                    // sageView
-                                    //     .offset(y: -35)
-                                    sensorAgeDays
-                                        .offset(x: -20, y: -35)
-
-                                    eventualBGView
-                                        .offset(y: 18)
-                                }
-                            } else {
-                                eventualBGView
-                                    .offset(y: 18)
-                            }
+                            loopViewSelector()
+                                .offset(x: -50, y: 53)
                         }
                     }
-                    .offset(y: state.displayExpiration ? 20 : 80)
-                    Spacer()
                 }
+                tempRateSensorAgeeventualBG
+                    .frame(maxWidth: .infinity, maxHeight: 24) // Höhe testen
+                    .offset(y: -geo.safeAreaInsets.top + 20) // Nach oben schieben
             }
-            .overlay(
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        backgroundColor.opacity(1),
-                        backgroundColor.opacity(1),
-                        Color.black.opacity(0.4),
-                        Color.black.opacity(0.3),
-                        Color.black.opacity(0.2),
-                        Color.black.opacity(0.1),
-                        Color.black.opacity(0.0)
-                    ]),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: 25)
-                .offset(y: 60),
-                alignment: .top
-            )
+            // Schatten oben
+            /* .overlay(
+                 LinearGradient(
+                     gradient: Gradient(colors: [
+                         backgroundColor.opacity(1),
+                         backgroundColor.opacity(1),
+                         Color.black.opacity(0.4),
+                         Color.black.opacity(0.3),
+                         Color.black.opacity(0.2),
+                         Color.black.opacity(0.1),
+                         Color.black.opacity(0.0)
+                     ]),
+                     startPoint: .top,
+                     endPoint: .bottom
+                 )
+                 .frame(height: 25)
+                 .offset(y: 60),
+                 alignment: .top
+             )*/
             // Schatten unten
-            .overlay(
-                LinearGradient(
-                    gradient: Gradient(colors: [
-                        Color.black.opacity(0.5),
-                        Color.black.opacity(0.4),
-                        Color.black.opacity(0.3),
-                        Color.black.opacity(0.2),
-                        Color.black.opacity(0.1),
-                        Color.black.opacity(0)
-                    ]),
-                    startPoint: .bottom,
-                    endPoint: .top
-                )
-                .frame(height: 20),
-                alignment: .bottom
-            )
+            /*  .overlay(
+                 LinearGradient(
+                     gradient: Gradient(colors: [
+                         Color.black.opacity(0.5),
+                         Color.black.opacity(0.4),
+                         Color.black.opacity(0.3),
+                         Color.black.opacity(0.2),
+                         Color.black.opacity(0.1),
+                         Color.black.opacity(0)
+                     ]),
+                     startPoint: .bottom,
+                     endPoint: .top
+                 )
+                 .frame(height: 20),
+                 alignment: .bottom
+             )*/
         }
 
         // Head Ende
@@ -1026,24 +1139,102 @@ extension Home {
             }
         }
 
+        var carbsSmallView: some View {
+            HStack {
+                if let settings = state.settingsManager {
+                    HStack(spacing: 0) {
+                        ZStack {
+                            let substance = Double(state.data.suggestion?.cob ?? 0)
+                            let maxValue = max(Double(settings.preferences.maxCOB), 1)
+                            let fraction = CGFloat(substance / maxValue)
+                            let fill = max(min(fraction, 1.0), 0.0)
+
+                            SmallerFillablePieSegment(
+                                pieSegmentViewModel: carbsPieSegmentViewModel,
+                                fillFraction: fill,
+                                color: .loopYellow,
+                                backgroundColor: .clear,
+                                displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
+                                animateProgress: true,
+                                button3D: state.button3D
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
         // CarbView Ende
 
+        /* var loopView: some View {
+             LoopView(
+                 suggestion: $state.data.suggestion,
+                 enactedSuggestion: $state.enactedSuggestion,
+                 closedLoop: $state.closedLoop,
+                 timerDate: $state.data.timerDate,
+                 isLooping: $state.isLooping,
+                 lastLoopDate: $state.lastLoopDate,
+                 manualTempBasal: $state.manualTempBasal
+             )
+             .onTapGesture {
+                 state.isStatusPopupPresented.toggle()
+             }.onLongPressGesture {
+                 let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                 impactHeavy.impactOccurred()
+                 state.runLoop()
+             }
+         }*/
         var loopView: some View {
-            LoopView(
-                suggestion: $state.data.suggestion,
-                enactedSuggestion: $state.enactedSuggestion,
-                closedLoop: $state.closedLoop,
-                timerDate: $state.data.timerDate,
-                isLooping: $state.isLooping,
-                lastLoopDate: $state.lastLoopDate,
-                manualTempBasal: $state.manualTempBasal
-            )
-            .onTapGesture {
-                state.isStatusPopupPresented.toggle()
-            }.onLongPressGesture {
-                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                impactHeavy.impactOccurred()
-                state.runLoop()
+            ZStack {
+                if state.button3D {
+                    Circle()
+                        .fill(Color.darkGray.opacity(0.5))
+                        .frame(width: 50, height: 50)
+                        .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    Color.white.opacity(0.9), // Lichtreflexion oben links
+                                    Color.white.opacity(0.4),
+                                    Color.clear,
+                                    Color.black.opacity(0.3), // Schatten unten rechts
+                                    Color.black.opacity(0.6)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            lineWidth: 2
+                        )
+                        .frame(width: 50, height: 50)
+                } else {
+                    Circle()
+                        .fill(Color.darkGray.opacity(0.5))
+                        .frame(width: 50, height: 50)
+                        .overlay(
+                            Circle()
+                                .stroke(Color.white, lineWidth: 0)
+                        )
+                }
+
+                LoopView(
+                    suggestion: $state.data.suggestion,
+                    enactedSuggestion: $state.enactedSuggestion,
+                    closedLoop: $state.closedLoop,
+                    timerDate: $state.data.timerDate,
+                    isLooping: $state.isLooping,
+                    lastLoopDate: $state.lastLoopDate,
+                    manualTempBasal: $state.manualTempBasal
+                )
+                .onTapGesture {
+                    state.isStatusPopupPresented.toggle()
+                }
+                .onLongPressGesture {
+                    let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                    impactHeavy.impactOccurred()
+                    state.runLoop()
+                }
             }
         }
 
@@ -1099,6 +1290,41 @@ extension Home {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 45, height: 45)
+                        }
+                    }
+                    .onTapGesture {
+                        if state.pumpDisplayState != nil {
+                            state.setupPump = true
+                        }
+                    }
+                }
+            }
+        }
+
+        var insulinSmallView: some View {
+            HStack {
+                if let settings = state.settingsManager {
+                    HStack(spacing: 0) {
+                        ZStack {
+                            let substance = Double(state.data.suggestion?.iob ?? 0)
+                            let maxValue = max(Double(settings.preferences.maxIOB), 1)
+
+                            let fraction = CGFloat(abs(substance) / maxValue)
+                            let fill = min(fraction, 1.0) // Begrenzung auf max 1
+
+                            let isNegative = substance < 0
+                            let pieColor: Color = isNegative ? .red : .insulin
+                            let _: Double = isNegative ? 90 : -90
+
+                            SmallerFillablePieSegment(
+                                pieSegmentViewModel: insulinPieSegmentViewModel,
+                                fillFraction: fill,
+                                color: pieColor,
+                                backgroundColor: .clear,
+                                displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
+                                animateProgress: true,
+                                button3D: state.button3D
+                            )
                         }
                     }
                     .onTapGesture {
@@ -1499,8 +1725,6 @@ extension Home {
                                 }
                             }
                         }
-                        .padding(.top, 20)
-                        .padding(.bottom, 20)
                     }
                     .onReceive(timer) { _ in
                         state.specialDanaKitFunction()
@@ -1514,6 +1738,8 @@ extension Home {
                 return AnyView(EmptyView())
             }
         }
+
+        // DanaBar 2
 
         var infoPanel3: some View {
             if state.danaBar {
@@ -1534,8 +1760,6 @@ extension Home {
                 return AnyView(EmptyView())
             }
         }
-
-        // DanaBar 2
 
         var info3: some View {
             if state.danaBar {
@@ -1805,8 +2029,6 @@ extension Home {
                                 }
                             }
                         }
-                        .padding(.top, 20)
-                        .padding(.bottom, 20)
                     }
                     .onReceive(timer) { _ in
                         state.specialDanaKitFunction()
@@ -1857,48 +2079,73 @@ extension Home {
             .modal(for: .dataTable, from: self)
         }
 
+        // tempRateSensorAgeeventualBG Anfang
+        var tempRateSensorAgeeventualBG: some View {
+            ZStack {
+                info4
+            }
+            .frame(maxWidth: .infinity)
+        }
+
+        var info4: some View {
+            Group {
+                HStack(spacing: 15) {
+                    Spacer()
+                    HStack {
+                        tempRateView
+                            .foregroundColor(.white)
+                    }
+                    .frame(maxWidth: 100, alignment: .leading)
+                    Spacer()
+                    if state.displayExpiration {
+                        HStack(spacing: 0) {
+                            sensorAgeDays
+                                .foregroundColor(.white)
+                        }
+                    }
+                    Spacer()
+                    HStack {
+                        eventualBGView
+                            .foregroundColor(.white)
+                    }
+                    .padding(.trailing, -22)
+                    .frame(maxWidth: 100, alignment: .trailing)
+                    Spacer()
+                }
+            }
+        }
+
+        // tempRateSensorAgeeventualBG Ende
+
         var chart: some View {
             VStack(spacing: 0) {
-                if state.carbInsulinLoopViewOption {
-                    HStack {
-                        Spacer()
-                        carbsView
-                            .frame(height: 50)
-                            .padding(.top, 10)
-
-                        Spacer()
-
-                        loopViewSelector()
-                            .frame(height: 50)
-
-                        Spacer()
-
-                        insulinView
-                            .frame(height: 50)
-                            .padding(.top, 10)
-
-                        Spacer()
-                    }
-                    .dynamicTypeSize(...DynamicTypeSize.xLarge)
-                    .padding(.horizontal, 10)
-                    .padding(.top, 10)
-                    .padding(.bottom, 30)
-                }
-
                 Group {
                     if state.danaBarViewOption == "view1" {
                         info
+                            .padding(.top, 10)
                     } else {
                         info3
+                            .padding(.top, 10)
                     }
-                    mainChart.padding(.top, 15)
+
+                    /*      if state.carbInsulinLoopViewOption {
+                         HStack {
+                             tempRateSensorAgeeventualBG
+                                 .frame(height: 30)
+                         }
+                         .dynamicTypeSize(...DynamicTypeSize.xLarge)
+                         .padding(.horizontal, 10)
+                         .padding(.top, 40)
+                     }*/
+
+                    mainChart.padding(.top, 35)
                     legendPanel.padding(.top, 15)
-                    tempTargetbar.padding(.top, 20)
+                    tempTargetbar.padding(.top, 30)
                     infoPanel.padding(.top, 20).padding(.bottom, 10)
                         .frame(width: UIScreen.main.bounds.width)
                 }
             }
-            .frame(minHeight: UIScreen.main.bounds.height / 1.52) // Je größer der Wert, je kleiner der Chart
+            .frame(minHeight: UIScreen.main.bounds.height / 1.52) // Je größer der Wert, desto kleiner der Chart
         }
 
         var legendPanel: some View {
@@ -2004,40 +2251,40 @@ extension Home {
         }
 
         var info2: some View {
-            if state.timeSettings {
-                return AnyView(
+            Group {
+                if state.timeSettings {
                     HStack(spacing: 15) {
                         // Linker Stack
                         Spacer()
-
                         HStack {
                             isfView
                                 .foregroundColor(.white)
-                        }.padding(.leading, 0)
-                            .frame(maxWidth: 100, alignment: .leading)
+                        }
+                        .padding(.leading, 0)
+                        .frame(maxWidth: 100, alignment: .leading)
 
                         Spacer()
 
                         // Mittlerer Stack
-
                         HStack(spacing: 0) {
                             timeSetting
                         }
+
                         Spacer()
 
                         // Rechter Stack - TDD
-
                         HStack {
                             tddView
                                 .foregroundColor(.white)
-                        }.padding(.trailing, 25)
-                            .frame(maxWidth: 100, alignment: .trailing)
+                        }
+                        .padding(.trailing, 25)
+                        .frame(maxWidth: 100, alignment: .trailing)
 
                         Spacer()
                     }
-                )
-            } else {
-                return AnyView(EmptyView())
+                } else {
+                    EmptyView()
+                }
             }
         }
 
@@ -2231,7 +2478,7 @@ extension Home {
                             .frame(width: 50, height: 50)
                     } else {
                         Circle()
-                            .fill(Color.gray.opacity(0.3))
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: 50, height: 50)
                             .overlay(
                                 Circle()

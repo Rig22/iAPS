@@ -73,7 +73,7 @@ extension StatConfig {
             VStack(spacing: 0) {
                 ZStack {
                     Image(BarViewOptionConfigurationRawValue(
-                        topBar: state.carbInsulinLoopViewOption,
+                        topBar: state.displayExpiration,
                         danaBar: state.danaBar,
                         legendBar: state.legendsSwitch,
                         ttBar: state.tempTargetBar,
@@ -102,26 +102,7 @@ extension StatConfig {
                                 header: Text("Bar Selection"),
                                 footer: Text("Select the  desired bar view")
                             ) {
-                                Toggle("Top Bar", isOn: $state.carbInsulinLoopViewOption)
-                                if state.carbInsulinLoopViewOption {
-                                    Picker("Select Loop View", selection: $state.loopViewOption) {
-                                        ForEach(LoopViewOption.allCases) { option in
-                                            HStack {
-                                                Image(option == .view1 ? "LoopView1" : "LoopView2")
-                                                    .resizable()
-                                                    .scaledToFit()
-                                                    .frame(width: 30, height: 30)
-                                                Text(option.rawValue)
-                                                    .font(.caption)
-                                            }
-                                            .tag(option)
-                                        }
-                                    }
-                                    .pickerStyle(NavigationLinkPickerStyle())
-                                }
-                                //  }
-
-                                //  Section {
+                                // Toggle("Top Bar", isOn: $state.carbInsulinLoopViewOption)
                                 Toggle("Dana Bar", isOn: $state.danaBar)
 
                                 if state.danaBar {
@@ -191,6 +172,21 @@ extension StatConfig {
                                 header: Text("Visual Options"),
                                 footer: Text("According to your taste")
                             ) {
+                                Picker("Select Loop View", selection: $state.loopViewOption) {
+                                    ForEach(LoopViewOption.allCases) { option in
+                                        HStack {
+                                            Image(option == .view1 ? "LoopView1" : "LoopView2")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 30, height: 30)
+                                            Text(option.rawValue)
+                                                .font(.caption)
+                                        }
+                                        .tag(option)
+                                    }
+                                }
+                                .pickerStyle(NavigationLinkPickerStyle())
+
                                 if #available(iOS 18.0, *) {
                                     Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
                                         ForEach(BackgroundColorOption.allCases) { option in
@@ -213,7 +209,6 @@ extension StatConfig {
                                 Toggle("3D Look", isOn: $state.button3D)
                             }
 
-                            // Section(header: Text("Sensor Settings"))
                             Section(
                                 header: Text("Sensor Settings"),
                                 footer: Text("Long press for setting new Sensor Start Time")

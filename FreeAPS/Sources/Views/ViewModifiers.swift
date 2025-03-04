@@ -269,7 +269,10 @@ struct ColouredBackground: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
             .fill(Color.rig22Background)
-            .shadow(color: Color.black.opacity(0.8), radius: 10, x: 5, y: 5) // Kräftigerer Schatten
+            // .fill(Color.darkGray.opacity(1.0))
+            // .shadow(color: Color.black.opacity(0.8), radius: 5, x: 5, y: 5) // Kräftigerer Schatten
+            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5) // Hauptschatten
+            .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3) // Weichere Schattenebene
     }
 }
 
@@ -293,12 +296,22 @@ struct LoopEllipse: View {
     }
 }
 
+extension View {
+    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
+        }
+    }
+}
+
 struct TimeEllipse: View {
     @Environment(\.colorScheme) var colorScheme
     let characters: Int
     var body: some View {
         RoundedRectangle(cornerRadius: 15)
-            .fill(Color.gray).opacity(0.2)
+            .fill(Color.darkGray.opacity(0.5))
             .frame(width: CGFloat(characters * 7), height: 25)
     }
 }
@@ -308,46 +321,46 @@ struct TimeEllipseBig: View {
     let characters: Int
     var body: some View {
         RoundedRectangle(cornerRadius: 15)
-            .fill(Color.gray).opacity(0.2)
+            .fill(Color.darkGray.opacity(0.5))
             .frame(width: CGFloat(characters * 10), height: 30)
     }
 }
 
-struct TimeEllipseSensorAge: View {
-    var remainingDays: Int
-    var totalDays: Int
-    let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
+/* struct TimeEllipseSensorAge: View {
+     var remainingDays: Int
+     var totalDays: Int
+     let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
 
-    var body: some View {
-        let progress = CGFloat(remainingDays) / CGFloat(totalDays)
-        let maxWidth = CGFloat(characters * 10)
+     var body: some View {
+         let progress = CGFloat(remainingDays) / CGFloat(totalDays)
+         let maxWidth = CGFloat(characters * 10)
 
-        ZStack(alignment: .leading) {
-            // Hintergrund bleibt konstant
-            RoundedRectangle(cornerRadius: 15)
-                .fill(Color.gray.opacity(0.2))
-                .frame(width: maxWidth, height: 30)
+         ZStack(alignment: .leading) {
+             // Hintergrund bleibt konstant
+             RoundedRectangle(cornerRadius: 15)
+                 .fill(Color.gray.opacity(0.2))
+                 .frame(width: maxWidth, height: 24)
 
-            // Farbverlauf für die verbleibenden Tage
-            RoundedRectangle(cornerRadius: 15)
-                .fill(
-                    LinearGradient(
-                        gradient: Gradient(stops: [
-                            Gradient.Stop(
-                                color: remainingDays == 1 ? .red : (remainingDays == 2 ? .orange : .white.opacity(0.1)),
-                                location: progress
-                            ),
-                            Gradient.Stop(color: Color.clear, location: progress)
-                        ]),
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .frame(width: maxWidth * progress, height: 30)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
-    }
-}
+             // Farbverlauf für die verbleibenden Tage
+             RoundedRectangle(cornerRadius: 15)
+                 .fill(
+                     LinearGradient(
+                         gradient: Gradient(stops: [
+                             Gradient.Stop(
+                                 color: remainingDays == 1 ? .red : (remainingDays == 2 ? .orange : .white.opacity(0.1)),
+                                 location: progress
+                             ),
+                             Gradient.Stop(color: Color.clear, location: progress)
+                         ]),
+                         startPoint: .leading,
+                         endPoint: .trailing
+                     )
+                 )
+                 .frame(width: maxWidth * progress, height: 24)
+         }
+         .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
+     }
+ } */
 
 // Pillenform bei der Entleerung
 /* struct TimeEllipseSensorAge: View {

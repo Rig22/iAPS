@@ -59,20 +59,12 @@ struct FillablePieSegment: View {
     var body: some View {
         VStack {
             ZStack {
-                Circle()
-                    .fill(Color.darkGray.opacity(0.5))
-                    .frame(width: 45, height: 45)
-                    .overlay(
-                        Circle()
-                            .stroke(Color.white, lineWidth: 0)
-                    )
-
                 PieSliceView(
                     startAngle: .degrees(-90),
                     endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                 )
                 .fill(color)
-                .frame(width: 45, height: 45)
+                .frame(width: 50, height: 50)
                 .opacity(0.7)
             }
 
@@ -124,19 +116,15 @@ struct LoopView: View {
                     animateProgress: true
                 )
 
-                Image("Loop")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: 48, height: 48)
-
                 Circle()
                     .fill(color)
                     .frame(width: 6, height: 6)
 
                 if isLooping {
                     Circle()
-                        .fill(Color.black.opacity(1.0))
-                        .frame(width: 49, height: 49)
+                        // .fill(Color.rig22Background)
+                        .fill(Color.darkGray.opacity(0.5))
+                        .frame(width: 50, height: 50)
                         .transition(.opacity)
                 }
 
@@ -162,11 +150,17 @@ struct LoopView: View {
                 .fill(
                     AngularGradient(
                         gradient: Gradient(colors: [
-                            Color(red: 0.0, green: 0.8, blue: 0.4), // Helles Grün
-                            Color(red: 0.0, green: 0.6, blue: 0.8), // Übergang zu Blau
-                            Color(red: 0.0, green: 0.4, blue: 1.0), // Blau
-                            Color(red: 0.0, green: 0.6, blue: 0.8), // Übergang zurück zu Grün
-                            Color(red: 0.0, green: 0.8, blue: 0.4) // Helles Grün
+                            Color(red: 0.0, green: 0.8, blue: 0.4).opacity(1.0),
+                            Color(red: 0.0, green: 0.75, blue: 0.5).opacity(1.0),
+                            Color(red: 0.0, green: 0.7, blue: 0.6).opacity(01.0),
+                            Color(red: 0.0, green: 0.6, blue: 0.75).opacity(1.0),
+                            Color(red: 0.0, green: 0.5, blue: 0.85).opacity(1.0),
+                            Color(red: 0.0, green: 0.4, blue: 0.9).opacity(1.0),
+                            Color(red: 0.0, green: 0.5, blue: 0.85).opacity(1.0),
+                            Color(red: 0.0, green: 0.6, blue: 0.75).opacity(1.0),
+                            Color(red: 0.0, green: 0.7, blue: 0.6).opacity(1.0),
+                            Color(red: 0.0, green: 0.75, blue: 0.5).opacity(1.0),
+                            Color(red: 0.0, green: 0.8, blue: 0.4).opacity(1.0)
                         ]),
                         center: .center,
                         angle: .degrees(gradientOffset)
@@ -175,7 +169,7 @@ struct LoopView: View {
                 .frame(width: 50, height: 50)
                 .scaleEffect(scale)
                 .onAppear {
-                    /*  withAnimation(
+                    /* withAnimation(
                          Animation.easeInOut(duration: 1).repeatForever(autoreverses: true)
                      ) {
                          scale = 1.2

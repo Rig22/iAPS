@@ -13,12 +13,15 @@ enum BackgroundColorOption: String, CaseIterable, Identifiable, Encodable {
     case darkGreen
     case black
     case darkGray
-    case blackBerry
+    case snow4
     case darkRed
+    case indianRed4
+    case sienna3
     case burntOrange
     case autumnLeaf
     case mustard
-    case aubergine
+    case navajoWhite4
+    case goldenRod4
 
     var id: String { rawValue }
 
@@ -36,18 +39,24 @@ enum BackgroundColorOption: String, CaseIterable, Identifiable, Encodable {
             return Color(red: 0.00, green: 0.00, blue: 0.00)
         case .darkGray:
             return Color(red: 0.12, green: 0.14, blue: 0.14)
-        case .blackBerry:
-            return Color(red: 0.23, green: 0.04, blue: 0.14)
+        case .snow4:
+            return Color(red: 0.55, green: 0.55, blue: 0.54)
         case .darkRed:
             return Color(red: 0.25, green: 0.07, blue: 0.10)
+        case .indianRed4:
+            return Color(red: 0.55, green: 0.23, blue: 0.23)
+        case .sienna3:
+            return Color(red: 0.80, green: 0.41, blue: 0.22)
         case .burntOrange:
             return Color(red: 0.45, green: 0.22, blue: 0.12)
         case .autumnLeaf:
             return Color(red: 0.58, green: 0.33, blue: 0.09)
         case .mustard:
             return Color(red: 0.28, green: 0.22, blue: 0.10)
-        case .aubergine:
-            return Color(red: 0.15, green: 0.05, blue: 0.25)
+        case .navajoWhite4:
+            return Color(red: 0.55, green: 0.47, blue: 0.39)
+        case .goldenRod4:
+            return Color(red: 0.55, green: 0.41, blue: 0.08)
         }
     }
 }

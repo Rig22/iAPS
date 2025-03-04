@@ -89,13 +89,13 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var danaBar: Bool = false
     var legendsSwitch: Bool = false
     var tempTargetbar: Bool = false
-    var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
+    var backgroundColorOptionRawValue: String = BackgroundColorOption.navajoWhite4.rawValue
     var danaBarViewOption: String = "view1"
     var insulinAgeOption: String = "Drei_Tage"
     var cannulaAgeOption: String = "Drei_Tage"
-    var loopViewOption: String = LoopViewOption.view2.rawValue
+    var loopViewOption: String = LoopViewOption.view1.rawValue
     var chartBackgroundColored: Bool = false
-    var carbInsulinLoopViewOption: Bool = true
+    var carbInsulinLoopViewOption: Bool = false
     var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.none.rawValue
     var topBarActive: Bool = false
     var danaBarActive: Bool = false

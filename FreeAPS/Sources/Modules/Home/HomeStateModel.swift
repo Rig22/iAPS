@@ -86,12 +86,12 @@ extension Home {
         @Published var legendsSwitch: Bool = false
         @Published var tempTargetbar: Bool = false
         @Published var timeSettings: Bool = false
-        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
+        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.navajoWhite4.rawValue
         @Published var danaBarViewOption: String = "view1"
-        @Published var loopViewOption: String = LoopViewOption.view2.rawValue
+        @Published var loopViewOption: String = LoopViewOption.view1.rawValue
         @Published var chartBackgroundColored: Bool = false
-        @Published var carbInsulinLoopViewOption: Bool = true
-        @Published var button3D: Bool = true
+        @Published var carbInsulinLoopViewOption: Bool = false
+        @Published var button3D: Bool = false
         @Published var sensorAgeDays: String = "Fuenfzehn_Tage"
         @Published var sensorStartTime: Date?
         @Published var remainingSensorDays: Int = 0
@@ -740,6 +740,30 @@ extension Home.StateModel:
         setupData()
     }
 
+    private func updateRemainingSensorDays() {
+        if sensorStartTime == nil {
+            sensorStartTime = Date()
+            settingsManager.settings.sensorStartTime = sensorStartTime
+        }
+
+        if let startTime = sensorStartTime {
+            let elapsedDays = Calendar.current.dateComponents([.day], from: startTime, to: Date()).day ?? 0
+
+            if let sensorAge = SensorAgeDays(rawValue: sensorAgeDays) {
+                let totalDays = sensorAge.asInt()
+                remainingSensorDays = max(0, totalDays - elapsedDays)
+            } else {
+                remainingSensorDays = 0
+            }
+        } else {
+            if let sensorAge = SensorAgeDays(rawValue: sensorAgeDays) {
+                remainingSensorDays = sensorAge.asInt()
+            } else {
+                remainingSensorDays = 0
+            }
+        }
+    }
+
     func settingsDidChange(_ settings: FreeAPSSettings) {
         allowManualTemp = !settings.closedLoop
         uploadStats = settingsManager.settings.uploadStats
@@ -791,31 +815,8 @@ extension Home.StateModel:
         button3D = settingsManager.settings.button3D
         sensorAgeDays = settingsManager.settings.sensorAgeDays
         sensorStartTime = settingsManager.settings.sensorStartTime
-
-        // Falls keine Startzeit gesetzt ist, verwende das aktuelle Datum
-        if sensorStartTime == nil {
-            sensorStartTime = Date()
-            settingsManager.settings.sensorStartTime = sensorStartTime
-        }
-
-        // Berechne die verbleibenden Sensor-Tage
-        if let startTime = sensorStartTime {
-            let elapsedDays = Calendar.current.dateComponents([.day], from: startTime, to: Date()).day ?? 0
-
-            if let sensorAge = SensorAgeDays(rawValue: sensorAgeDays) {
-                let totalDays = sensorAge.asInt() // Sensorlaufzeit in Tagen
-                remainingSensorDays = max(0, totalDays - elapsedDays)
-            } else {
-                remainingSensorDays = 0 // Fallback, falls kein gültiger Wert gefunden wird
-            }
-        } else {
-            // Falls keine Startzeit vorhanden ist, nutze die Standard-Sensorlaufzeit
-            if let sensorAge = SensorAgeDays(rawValue: sensorAgeDays) {
-                remainingSensorDays = sensorAge.asInt()
-            } else {
-                remainingSensorDays = 0
-            }
-        }
+        updateRemainingSensorDays()
+        // Dana UI Toggels
     }
 
     func pumpHistoryDidUpdate(_: [PumpHistoryEvent]) {
