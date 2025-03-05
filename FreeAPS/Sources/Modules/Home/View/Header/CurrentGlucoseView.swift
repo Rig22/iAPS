@@ -138,15 +138,6 @@ struct CurrentGlucoseView: View {
     }
 
     var body: some View {
-        let angularGradient = AngularGradient(
-            gradient: Gradient(colors: [
-                Color.rig22Background
-            ]),
-            center: .center,
-            startAngle: .degrees(0),
-            endAngle: .degrees(360)
-        )
-
         ZStack {
             // TriangleShape(color: triangleColor)
             TriangleShape(color: currentTriangleColor)

@@ -15,47 +15,12 @@ enum SensorAgeDays: String, Codable, CaseIterable {
     case Vierzehn_Tage
     case Fuenfzehn_Tage
 
-    var displayName: String {
-        switch self {
-        case .Ein_Tag: return "24"
-        case .Zwei_Tage: return "48"
-        case .Drei_Tage: return "72"
-        case .Vier_Tage: return "96"
-        case .Fuenf_Tage: return "120"
-        case .Sechs_Tage: return "144"
-        case .Sieben_Tage: return "168"
-        case .Acht_Tage: return "192"
-        case .Neun_Tage: return "216"
-        case .Zehn_Tage: return "240"
-        case .Elf_Tage: return "264"
-        case .Zwoelf_Tage: return "288"
-        case .Dreizehn_Tage: return "312"
-        case .Vierzehn_Tage: return "336"
-        case .Fuenfzehn_Tage: return "360"
-        }
+    /// Lokalisierter Anzeigename
+    var localizedName: String {
+        "\(asInt()) Tage"
     }
 
-    var sensorAgeDays: Double {
-        switch self {
-        case .Ein_Tag: return 24
-        case .Zwei_Tage: return 48
-        case .Drei_Tage: return 72
-        case .Vier_Tage: return 96
-        case .Fuenf_Tage: return 120
-        case .Sechs_Tage: return 144
-        case .Sieben_Tage: return 168
-        case .Acht_Tage: return 192
-        case .Neun_Tage: return 216
-        case .Zehn_Tage: return 240
-        case .Elf_Tage: return 264
-        case .Zwoelf_Tage: return 288
-        case .Dreizehn_Tage: return 312
-        case .Vierzehn_Tage: return 336
-        case .Fuenfzehn_Tage: return 360
-        }
-    }
-
-    // Neue Methode asInt
+    /// Anzahl der Tage als Integer
     func asInt() -> Int {
         switch self {
         case .Ein_Tag: return 1
@@ -74,5 +39,10 @@ enum SensorAgeDays: String, Codable, CaseIterable {
         case .Vierzehn_Tage: return 14
         case .Fuenfzehn_Tage: return 15
         }
+    }
+
+    /// Anzahl der Stunden als Double (optional für Berechnungen)
+    var hours: Double {
+        Double(asInt()) * 24
     }
 }

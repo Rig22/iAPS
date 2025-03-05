@@ -20,35 +20,6 @@ struct RoundedBackground: ViewModifier {
     }
 }
 
-struct Sage: View {
-    @Environment(\.colorScheme) var colorScheme
-    let amount: Double
-    let expiration: Double
-    var body: some View {
-        let fill = max(amount / expiration, 0.07)
-        let colour: Color = amount <= 8.64E4 ? .red.opacity(0.9) : amount <= 2 * 8.64E4 ? .loopYellow
-            .opacity(0.9) : colorScheme == .light ? .white.opacity(0.7) : .black.opacity(0.8)
-        RoundedRectangle(cornerRadius: 15)
-            .stroke(colorScheme == .dark ? Color(.clear) : Color(.clear), lineWidth: 2)
-            .background(
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(stops: [
-                                Gradient.Stop(
-                                    color: colour,
-                                    location: fill
-                                ),
-                                Gradient.Stop(color: Color.clear, location: fill)
-                            ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-            )
-    }
-}
-
 struct BoolTag: ViewModifier {
     let bool: Bool
     @Environment(\.colorScheme) var colorScheme
@@ -326,6 +297,75 @@ struct TimeEllipseBig: View {
     }
 }
 
+// Farbverlauf mit blur effekt
+struct TimeEllipseSensorAge: View {
+    var remainingDays: Int
+    var totalDays: Int
+    let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
+
+    var body: some View {
+        let safeTotalDays = max(1, totalDays) // Verhindert Division durch 0
+        let safeRemainingDays = min(max(0, remainingDays), safeTotalDays) // Begrenzung auf gültigen Bereich
+
+        let progress = CGFloat(safeRemainingDays) / CGFloat(safeTotalDays)
+        let maxWidth = CGFloat(characters * 10)
+
+        ZStack(alignment: .leading) {
+            // Hintergrund bleibt konstant
+            RoundedRectangle(cornerRadius: 15)
+                .fill(Color.darkGray.opacity(0.5))
+                .frame(width: maxWidth, height: 24)
+
+            // Farbverlauf für die verbleibenden Tage
+            RoundedRectangle(cornerRadius: 15)
+                .fill(
+                    LinearGradient(
+                        gradient: Gradient(colors: [
+                            safeRemainingDays == 1 ? .red : (safeRemainingDays == 2 ? .orange : .green.opacity(1.0)),
+                            Color.clear
+                        ]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                // .frame(width: maxWidth * progress, height: 24)
+                .frame(width: maxWidth * CGFloat(remainingDays) / CGFloat(totalDays), height: 24)
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
+    }
+}
+
+// Jon Original-- nur TimeEllipseSensoeAge statt ursprünglich sage
+/* struct TimeEllipseSensorAge: View {
+     @Environment(\.colorScheme) var colorScheme
+     let amount: Double
+     let expiration: Double
+     var body: some View {
+         let fill = max(amount / expiration, 0.07)
+         let colour: Color = amount <= 8.64E4 ? .red.opacity(0.9) : amount <= 2 * 8.64E4 ? .orange
+             .opacity(0.8) : colorScheme == .light ? .white.opacity(0.7) : .black.opacity(0.8)
+         RoundedRectangle(cornerRadius: 15)
+             .stroke(colorScheme == .dark ? Color(.systemGray2) : Color(.systemGray6), lineWidth: 2)
+             .background(
+                 RoundedRectangle(cornerRadius: 15)
+                     .fill(
+                         LinearGradient(
+                             gradient: Gradient(stops: [
+                                 Gradient.Stop(
+                                     color: colour,
+                                     location: fill
+                                 ),
+                                 Gradient.Stop(color: Color.clear, location: fill)
+                             ]),
+                             startPoint: .leading,
+                             endPoint: .trailing
+                         )
+                     )
+             )
+     }
+ } */
+
+// gerade Kante
 /* struct TimeEllipseSensorAge: View {
      var remainingDays: Int
      var totalDays: Int
@@ -371,12 +411,12 @@ struct TimeEllipseBig: View {
      var body: some View {
          let progress = CGFloat(remainingDays) / CGFloat(totalDays)
          let fillColor: Color = remainingDays == 1 ? .red
-             .opacity(1.0) : (remainingDays == 2 ? .orange.opacity(1.0) : .white.opacity(0.1))
+             .opacity(1.0) : (remainingDays == 2 ? .orange.opacity(1.0) : .green.opacity(0.5))
          let maxWidth = CGFloat(characters * 10)
 
          ZStack(alignment: .leading) {
              RoundedRectangle(cornerRadius: 15)
-                 .fill(Color.gray.opacity(0.2))
+                 .fill(Color.darkGray.opacity(0.5))
                  .frame(width: maxWidth, height: 30)
 
              RoundedRectangle(cornerRadius: 15)

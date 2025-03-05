@@ -228,14 +228,7 @@ extension Home {
                     state.bolusProgress = newDecimalValue
                 }
             }
-            let angularGradient = AngularGradient(
-                gradient: Gradient(colors: [
-                    Color.gray.opacity(0.3)
-                ]),
-                center: .center,
-                startAngle: .degrees(0),
-                endAngle: .degrees(360)
-            )
+
             return ZStack {
                 if state.button3D {
                     Circle()
@@ -910,81 +903,32 @@ extension Home {
             }
         }
 
-        // gerade Kante aber ungenaue Restzeit Darstellung
-        /*   struct TimeEllipseSensorAge: View {
-             var remainingDays: Int
-             var totalDays: Int
-             let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
-
-             var body: some View {
-                 let progress = CGFloat(remainingDays) / CGFloat(totalDays)
-                 // let progress = CGFloat(totalDays) - CGFloat(remainingDays)
-
-                 let maxWidth = CGFloat(characters * 10)
-
-                 ZStack(alignment: .leading) {
-                     // Hintergrund bleibt konstant
-                     RoundedRectangle(cornerRadius: 15)
-                         .fill(Color.gray.opacity(0.2))
-                         .frame(width: maxWidth, height: 24)
-
-                     // Farbverlauf für die verbleibenden Tage
-                     RoundedRectangle(cornerRadius: 15)
-                         .fill(
-                             LinearGradient(
-                                 gradient: Gradient(stops: [
-                                     Gradient.Stop(
-                                         color: remainingDays == 1 ? .red : (remainingDays == 2 ? .orange : .white.opacity(0.1)),
-                                         location: progress
-                                     ),
-                                     Gradient.Stop(color: Color.clear, location: progress)
-                                 ]),
-                                 startPoint: .leading,
-                                 endPoint: .trailing
-                             )
-                         )
-                         .frame(width: maxWidth * progress, height: 24) }
-                     .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
+        /*    private var sensorAgeDays: some View {
+             ZStack {
+                 HStack {
+                     Image(systemName: "sensor.tag.radiowaves.forward")
+                         .font(.system(size: 17))
+                         .foregroundStyle(.white)
+                     if state.displayExpiration {
+                         Text("\(state.remainingSensorDays) Days")
+                             .font(.timeSettingFont)
+                             .foregroundColor(.white)
+                     }
+                 }
+                 .background(
+                     TimeEllipseSensorAge(
+                         remainingDays: state.remainingSensorDays,
+                         totalDays: state.sensorAgeDays.asInt()
+                     )
+                 )
+             }
+             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+             .frame(maxHeight: .infinity, alignment: .center)
+             .onAppear {
+                 state.settingsDidChange(state.settingsManager.settings)
+                 state.sensorAgeDays = state.settingsManager.settings.sensorAgeDays
              }
          }*/
-
-        // Farbverlauf mit blur effekt
-        struct TimeEllipseSensorAge: View {
-            var remainingDays: Int
-            var totalDays: Int
-            let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
-
-            var body: some View {
-                let safeTotalDays = max(1, totalDays) // Verhindert Division durch 0
-                let safeRemainingDays = min(max(0, remainingDays), safeTotalDays) // Begrenzung auf gültigen Bereich
-
-                let progress = CGFloat(safeRemainingDays) / CGFloat(safeTotalDays)
-                let maxWidth = CGFloat(characters * 10)
-
-                ZStack(alignment: .leading) {
-                    // Hintergrund bleibt konstant
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(Color.darkGray.opacity(0.5))
-                        .frame(width: maxWidth, height: 24)
-
-                    // Farbverlauf für die verbleibenden Tage
-                    RoundedRectangle(cornerRadius: 15)
-                        .fill(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    safeRemainingDays == 1 ? .red : (safeRemainingDays == 2 ? .orange : .green.opacity(1.0)),
-                                    Color.clear
-                                ]),
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
-                        // .frame(width: maxWidth * progress, height: 24)
-                        .frame(width: maxWidth * CGFloat(remainingDays) / CGFloat(totalDays), height: 24)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
-            }
-        }
 
         private var sensorAgeDays: some View {
             ZStack {
@@ -1001,10 +945,7 @@ extension Home {
                 .background(
                     TimeEllipseSensorAge(
                         remainingDays: state.remainingSensorDays,
-                        totalDays: SensorAgeDays(
-                            rawValue:
-                            state.sensorAgeDays
-                        )?.asInt() ?? 10
+                        totalDays: state.sensorAgeDays.asInt()
                     )
                 )
             }
@@ -1012,7 +953,14 @@ extension Home {
             .frame(maxHeight: .infinity, alignment: .center)
             .onAppear {
                 state.settingsDidChange(state.settingsManager.settings)
-                state.sensorAgeDays = state.settingsManager.settings.sensorAgeDays
+
+                // Konvertiere den String aus den Settings in SensorAgeDays
+                if let sensorAge = SensorAgeDays(rawValue: state.settingsManager.settings.sensorAgeDays.rawValue) {
+                    state.sensorAgeDays = sensorAge
+                } else {
+                    state.sensorAgeDays = .Fuenfzehn_Tage
+                    print("WARNUNG: Ungültiger SensorAgeDays-String! Setze Standardwert: Fuenfzehn_Tage")
+                }
             }
         }
 
@@ -1063,11 +1011,11 @@ extension Home {
                     .offset(y: -geo.safeAreaInsets.top + 20) // Nach oben schieben
             }
             // Schatten oben
-            /* .overlay(
+            /*  .overlay(
                  LinearGradient(
                      gradient: Gradient(colors: [
-                         backgroundColor.opacity(1),
-                         backgroundColor.opacity(1),
+                         // backgroundColor.opacity(1),
+                         // backgroundColor.opacity(1),
                          Color.black.opacity(0.4),
                          Color.black.opacity(0.3),
                          Color.black.opacity(0.2),

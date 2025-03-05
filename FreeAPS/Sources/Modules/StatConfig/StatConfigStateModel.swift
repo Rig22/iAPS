@@ -44,7 +44,7 @@ extension StatConfig {
         @Published var ttBarActive: Bool = false
         @Published var bottomBarActive: Bool = false
         @Published var button3D: Bool = false
-        @Published var sensorAgeDays: String = "Fuenfzehn_Tage"
+        @Published var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
         @Published var sensorStartTime: Date?
         // Dana UI Toggels
 

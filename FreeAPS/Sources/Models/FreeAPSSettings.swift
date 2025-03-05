@@ -103,7 +103,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var ttBarActive: Bool = false
     var bottomBarActive: Bool = false
     var button3D: Bool = false
-    var sensorAgeDays: String = "Fuenfzehn_Tage"
+    var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
     var sensorStartTime: Date?
     // Dana-Toggles
     // Auto ISF

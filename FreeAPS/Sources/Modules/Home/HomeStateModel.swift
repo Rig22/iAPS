@@ -92,7 +92,7 @@ extension Home {
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = false
         @Published var button3D: Bool = false
-        @Published var sensorAgeDays: String = "Fuenfzehn_Tage"
+        var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
         @Published var sensorStartTime: Date?
         @Published var remainingSensorDays: Int = 0
         // Dana UI Toggels
@@ -235,7 +235,6 @@ extension Home {
             button3D = settingsManager.settings.button3D
             sensorAgeDays = settingsManager.settings.sensorAgeDays
             sensorStartTime = settingsManager.settings.sensorStartTime
-
             // Dana UI Toggels
 
             broadcaster.register(GlucoseObserver.self, observer: self)
@@ -742,25 +741,17 @@ extension Home.StateModel:
 
     private func updateRemainingSensorDays() {
         if sensorStartTime == nil {
+            print("WARNUNG: sensorStartTime ist nil, setze auf aktuelles Datum!")
             sensorStartTime = Date()
             settingsManager.settings.sensorStartTime = sensorStartTime
         }
 
         if let startTime = sensorStartTime {
             let elapsedDays = Calendar.current.dateComponents([.day], from: startTime, to: Date()).day ?? 0
-
-            if let sensorAge = SensorAgeDays(rawValue: sensorAgeDays) {
-                let totalDays = sensorAge.asInt()
-                remainingSensorDays = max(0, totalDays - elapsedDays)
-            } else {
-                remainingSensorDays = 0
-            }
+            let totalDays = sensorAgeDays.asInt()
+            remainingSensorDays = max(0, totalDays - elapsedDays)
         } else {
-            if let sensorAge = SensorAgeDays(rawValue: sensorAgeDays) {
-                remainingSensorDays = sensorAge.asInt()
-            } else {
-                remainingSensorDays = 0
-            }
+            remainingSensorDays = sensorAgeDays.asInt()
         }
     }
 

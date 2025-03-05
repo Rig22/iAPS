@@ -216,21 +216,9 @@ extension StatConfig {
                                 Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)
                                 if state.displayExpiration {
                                     Picker("Select Sensor Span", selection: $state.sensorAgeDays) {
-                                        Text("1 Tag").tag("Ein_Tag")
-                                        Text("2 Tage").tag("Zwei_Tage")
-                                        Text("3 Tage").tag("Drei_Tage")
-                                        Text("4 Tage").tag("Vier_Tage")
-                                        Text("5 Tage").tag("Fuenf_Tage")
-                                        Text("6 Tage").tag("Sechs_Tage")
-                                        Text("7 Tage").tag("Sieben_Tage")
-                                        Text("8 Tage").tag("Acht_Tage")
-                                        Text("9 Tage").tag("Neun_Tage")
-                                        Text("10 Tage").tag("Zehn_Tage")
-                                        Text("11 Tage").tag("Elf_Tage")
-                                        Text("12 Tage").tag("Zwoelf_Tage")
-                                        Text("13 Tage").tag("Dreizehn_Tage")
-                                        Text("14 Tage").tag("Vierzehn_Tage")
-                                        Text("15 Tage").tag("Fuenfzehn_Tage")
+                                        ForEach(SensorAgeDays.allCases, id: \.self) { sensorAge in
+                                            Text(sensorAge.localizedName).tag(sensorAge)
+                                        }
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
 
