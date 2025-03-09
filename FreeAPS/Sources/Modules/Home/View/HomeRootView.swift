@@ -903,43 +903,26 @@ extension Home {
             }
         }
 
-        /*    private var sensorAgeDays: some View {
-             ZStack {
-                 HStack {
-                     Image(systemName: "sensor.tag.radiowaves.forward")
-                         .font(.system(size: 17))
-                         .foregroundStyle(.white)
-                     if state.displayExpiration {
-                         Text("\(state.remainingSensorDays) Days")
-                             .font(.timeSettingFont)
-                             .foregroundColor(.white)
-                     }
-                 }
-                 .background(
-                     TimeEllipseSensorAge(
-                         remainingDays: state.remainingSensorDays,
-                         totalDays: state.sensorAgeDays.asInt()
-                     )
-                 )
-             }
-             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-             .frame(maxHeight: .infinity, alignment: .center)
-             .onAppear {
-                 state.settingsDidChange(state.settingsManager.settings)
-                 state.sensorAgeDays = state.settingsManager.settings.sensorAgeDays
-             }
-         }*/
-
         private var sensorAgeDays: some View {
             ZStack {
                 HStack {
                     Image(systemName: "sensor.tag.radiowaves.forward")
                         .font(.system(size: 17))
                         .foregroundStyle(.white)
+
                     if state.displayExpiration {
-                        Text("\(state.remainingSensorDays) Days")
-                            .font(.timeSettingFont)
-                            .foregroundColor(.white)
+                        let totalHours = state.sensorAgeDays.asInt() * 24
+                        let remainingHours = max(0, totalHours - state.elapsedHours)
+
+                        if remainingHours >= 24 {
+                            Text("\(remainingHours / 24) Days")
+                                .font(.timeSettingFont)
+                                .foregroundColor(.white)
+                        } else {
+                            Text("\(remainingHours) Hours")
+                                .font(.timeSettingFont)
+                                .foregroundColor(.white)
+                        }
                     }
                 }
                 .background(
@@ -953,14 +936,7 @@ extension Home {
             .frame(maxHeight: .infinity, alignment: .center)
             .onAppear {
                 state.settingsDidChange(state.settingsManager.settings)
-
-                // Konvertiere den String aus den Settings in SensorAgeDays
-                if let sensorAge = SensorAgeDays(rawValue: state.settingsManager.settings.sensorAgeDays.rawValue) {
-                    state.sensorAgeDays = sensorAge
-                } else {
-                    state.sensorAgeDays = .Fuenfzehn_Tage
-                    print("WARNUNG: Ungültiger SensorAgeDays-String! Setze Standardwert: Fuenfzehn_Tage")
-                }
+                state.sensorAgeDays = state.settingsManager.settings.sensorAgeDays
             }
         }
 
@@ -2684,16 +2660,7 @@ extension Home {
                             ScrollViewReader { _ in
                                 LazyVStack {
                                     chart.padding(.top, 10)
-                                    /* if !state.skipGlucoseChart {
-                                         glucoseHeaderView().padding(.top, 10)
-                                     }
-                                       preview.padding(.top, 30)
-                                      loopPreview.padding(.top, 10).padding(.bottom, 25)
-                                      if state.iobData.count >= 0 {
-                                          activeCOBView.padding(.bottom, 25)
-                                          activeIOBView.padding(.bottom, 25)
-                                      }*/
-                                    DayView.padding(.bottom, 30).padding(.top, 30)
+                                    DayView.padding(.bottom, 40).padding(.top, 30)
                                 }
                                 .background(GeometryReader { geo in
                                     let offset = -geo.frame(in: .named(scrollSpace)).minY

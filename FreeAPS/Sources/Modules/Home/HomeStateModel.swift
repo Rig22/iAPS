@@ -95,6 +95,7 @@ extension Home {
         var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
         @Published var sensorStartTime: Date?
         @Published var remainingSensorDays: Int = 0
+        @Published var remainingSensorHours: Int?
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -150,6 +151,15 @@ extension Home {
             default:
                 return .blue // Standardfarbe, falls keine Übereinstimmung gefunden wird
             }
+        }
+
+        var elapsedHours: Int {
+            guard let startTime = sensorStartTime else {
+                return 0
+            }
+
+            let hours = Calendar.current.dateComponents([.hour], from: startTime, to: Date()).hour ?? 0
+            return hours
         }
 
         var danaIconOption: DanaIconOption {
@@ -740,18 +750,23 @@ extension Home.StateModel:
     }
 
     private func updateRemainingSensorDays() {
-        if sensorStartTime == nil {
-            print("WARNUNG: sensorStartTime ist nil, setze auf aktuelles Datum!")
-            sensorStartTime = Date()
-            settingsManager.settings.sensorStartTime = sensorStartTime
-        }
-
         if let startTime = sensorStartTime {
-            let elapsedDays = Calendar.current.dateComponents([.day], from: startTime, to: Date()).day ?? 0
-            let totalDays = sensorAgeDays.asInt()
-            remainingSensorDays = max(0, totalDays - elapsedDays)
+            let now = Date()
+            let elapsedHours = Calendar.current.dateComponents([.hour], from: startTime, to: now).hour ?? 0
+            let totalHours = sensorAgeDays.asInt() * 24 // Gesamtstunden des Sensors
+            let remainingHours = max(0, totalHours - elapsedHours) // verbleibende Stunden
+
+            // Wenn mehr als 24 Stunden verbleiben, in Tagen anzeigen
+            if remainingHours >= 24 {
+                remainingSensorDays = remainingHours / 24
+                remainingSensorHours = nil
+            } else {
+                remainingSensorDays = 0
+                remainingSensorHours = remainingHours
+            }
         } else {
             remainingSensorDays = sensorAgeDays.asInt()
+            remainingSensorHours = nil
         }
     }
 
