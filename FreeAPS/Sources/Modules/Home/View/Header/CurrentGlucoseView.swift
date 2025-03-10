@@ -77,52 +77,6 @@ struct CurrentGlucoseView: View {
         return formatter
     }
 
-    // Sage Time Past
-    /* private var sageView: some View {
-         ZStack {
-             if let date = recentGlucose?.sessionStartDate {
-                 let timeAgo: TimeInterval = -1 * date.timeIntervalSinceNow
-                 background(TimeEllipseBig(characters: 10))
-                     .overlay {
-                         HStack {
-                             Text(
-                                 (daysFormatter.string(from: timeAgo) ?? "").trimmingCharacters(in: .whitespaces)
-                                     .replacingOccurrences(of: ",", with: " ")
-                             )
-                         }
-                     }
-             }
-         }
-         .font(.footnote)
-         .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-         .frame(maxHeight: .infinity, alignment: .center).offset(x: 128, y: 3)
-     } */
-
-    // Not needed now
-    /* private var sageView: some View {
-         ZStack {
-             if let date = recentGlucose?.sessionStartDate {
-                 let expiration = (cgm == .xdrip || cgm == .glucoseDirect) ? sensordays * 8.64E4 : cgm.expiration
-                 let remainingTime: TimeInterval = expiration - (-1 * date.timeIntervalSinceNow)
-                 Sage(amount: remainingTime, expiration: expiration).frame(width: 59, height: 26)
-                     .overlay {
-                         HStack {
-                             Text(
-                                 remainingTime >= 2 * 8.64E4 ?
-                                     (remainingTimeFormatterDays.string(from: remainingTime) ?? "")
-                                     .replacingOccurrences(of: ",", with: " ") :
-                                     (remainingTimeFormatter.string(from: remainingTime) ?? "")
-                                     .replacingOccurrences(of: ",", with: " ")
-                             )
-                         }
-                     }
-             }
-         }
-         .font(.footnote)
-         .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-         .frame(maxHeight: .infinity, alignment: .center).offset(x: 140.5, y: 3)
-     } */
-
     private func deltaView(_ deltaInt: Int) -> some View {
         ZStack {
             let deltaConverted = units == .mmolL ? deltaInt.asMmolL : Decimal(deltaInt)

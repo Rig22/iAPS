@@ -179,31 +179,8 @@ struct TooOldValue: View {
     }
 }
 
-/* struct ColouredRoundedBackground: View {
-     @Environment(\.colorScheme) var colorScheme
-
-     var body: some View {
-         Rectangle()
-             // RoundedRectangle(cornerRadius: 15)
-             .fill(
-                 Color.black
-             )
-     }
- } */
 extension Color {
-    static let rig22Background2 = Color(red: 0.38, green: 0.29, blue: 0.21)
-}
-
-extension Color {
-    static let rig22Background = Color(red: 0.10, green: 0.10, blue: 0.10)
-}
-
-extension Color {
-    static let rig22bottomPanel = Color(red: 0.08, green: 0.15, blue: 0.20)
-}
-
-extension Color {
-    static let rig22BGGlucoseWheel = Color(red: 0.17, green: 0.21, blue: 0.24)
+    static let rig22Background = Color(red: 0.25, green: 0.25, blue: 0.25)
 }
 
 extension Color {
@@ -236,10 +213,10 @@ struct addColouredBackground: View {
 struct ColouredBackground: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
-            // .fill(Color.rig22Background)
-            .fill(Color.darkGray.opacity(1.0))
-            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5) // Hauptschatten
-            .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3) // Weichere Schattenebene
+            .fill(Color.rig22Background)
+        // .fill(Color.darkGray.opacity(1.0))
+        // .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
+        // .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3)
     }
 }
 
@@ -272,49 +249,6 @@ extension View {
         }
     }
 }
-
-/* struct TimeEllipseSensorAge: View {
-     var remainingDays: Int
-     var remainingHours: Int?
-     var totalDays: Int
-     let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
-
-     var body: some View {
-         let safeTotalDays = max(1, totalDays)
-         let safeRemainingDays = min(max(0, remainingDays), safeTotalDays)
-         let maxWidth = CGFloat(characters * 10)
-
-         ZStack(alignment: .leading) {
-             // Hintergrund
-             RoundedRectangle(cornerRadius: 15)
-                 .fill(Color.darkGray.opacity(1.0))
-                 .frame(width: maxWidth, height: 24)
-
-             // Falls noch mindestens 1 Tag verbleibt, nutze den Farbbalken
-             if safeRemainingDays > 0 {
-                 RoundedRectangle(cornerRadius: 15)
-                     .fill(
-                         LinearGradient(
-                             gradient: Gradient(colors: [
-                                 safeRemainingDays == 1 ? .red
-                                     .opacity(0.8) : (safeRemainingDays == 2 ? .orange.opacity(0.8) : .green.opacity(0.8)),
-                                 Color.clear
-                             ]),
-                             startPoint: .leading,
-                             endPoint: .trailing
-                         )
-                     )
-                     .frame(width: maxWidth * CGFloat(safeRemainingDays) / CGFloat(safeTotalDays), height: 24)
-             } else {
-                 // Wenn nur noch Stunden übrig sind, wird die gesamte Ellipse rot
-                 RoundedRectangle(cornerRadius: 15)
-                     .fill(Color.red)
-                     .frame(width: maxWidth, height: 24)
-             }
-         }
-         .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
-     }
- } */
 
 struct HeaderBackground: View {
     var body: some View {
@@ -422,9 +356,9 @@ extension View {
         modifier(BoolTag(bool: bool))
     }
 
-    func addColouredBackground() -> some View {
-        ColouredBackground()
-    }
+    /*  func addColouredBackground() -> some View {
+         ColouredBackground()
+     }*/
 
     func addHeaderBackground() -> some View {
         HeaderBackground()

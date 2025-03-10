@@ -341,7 +341,7 @@ extension Home {
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: 2
+                            lineWidth: 4
                         )
                         .frame(width: 110, height: 110)
                 } else {
@@ -651,7 +651,7 @@ extension Home {
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     ),
-                                    lineWidth: 2
+                                    lineWidth: 1
                                 )
                                 .frame(width: 40, height: 40)
                         } else {
@@ -736,7 +736,7 @@ extension Home {
                                         startPoint: .topLeading,
                                         endPoint: .bottomTrailing
                                     ),
-                                    lineWidth: 2
+                                    lineWidth: 1
                                 )
                                 .frame(width: 40, height: 40)
                         } else {
@@ -1091,8 +1091,8 @@ extension Home {
             var remainingDays: Int
             var remainingHours: Int?
             var totalDays: Int
-            let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
-            var button3D: Bool // Neuer Parameter für den 3D-Modus
+            let characters: Int = 10
+            var button3D: Bool
 
             var body: some View {
                 let safeTotalDays = max(1, totalDays)
@@ -2291,20 +2291,9 @@ extension Home {
                             .padding(.top, 10)
                     }
 
-                    /*      if state.carbInsulinLoopViewOption {
-                         HStack {
-                             tempRateSensorAgeeventualBG
-                                 .frame(height: 30)
-                         }
-                         .dynamicTypeSize(...DynamicTypeSize.xLarge)
-                         .padding(.horizontal, 10)
-                         .padding(.top, 40)
-                     }*/
-
                     mainChart.padding(.top, 35)
-                    legendPanel
-                        .offset(x: 80, y: -55)
-                    tempTargetbar.padding(.top, 30)
+                    legendPanel.padding(.top, 25)
+                    tempTargetbar.padding(.top, 35)
                     infoPanel.padding(.top, 20).padding(.bottom, 10)
                         .frame(width: UIScreen.main.bounds.width)
                 }
@@ -2343,6 +2332,7 @@ extension Home {
                             }
                         }
                     }
+                    .background(TimeEllipseBig(characters: 17, button3D: state.button3D))
                 )
             } else {
                 return AnyView(EmptyView())
@@ -2387,6 +2377,8 @@ extension Home {
                         .frame(maxWidth: UIScreen.main.bounds.width * 0.3, alignment: .trailing)
                 }
             }
+
+            .background(TimeEllipse(characters: 17, button3D: state.button3D))
         }
 
         // BottomInfoBar mit TimeButtons
