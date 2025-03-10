@@ -139,6 +139,13 @@ struct CurrentGlucoseView: View {
 
     var body: some View {
         ZStack {
+            Circle()
+                .fill(Color.darkGray.opacity(1.0))
+                .frame(width: 110, height: 110)
+                .overlay(
+                    Circle()
+                        .stroke(Color.white, lineWidth: 0)
+                )
             // TriangleShape(color: triangleColor)
             TriangleShape(color: currentTriangleColor)
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))

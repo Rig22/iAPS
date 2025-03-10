@@ -191,6 +191,10 @@ struct TooOldValue: View {
      }
  } */
 extension Color {
+    static let rig22Background2 = Color(red: 0.38, green: 0.29, blue: 0.21)
+}
+
+extension Color {
     static let rig22Background = Color(red: 0.10, green: 0.10, blue: 0.10)
 }
 
@@ -240,8 +244,6 @@ struct ColouredBackground: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
             .fill(Color.rig22Background)
-            // .fill(Color.darkGray.opacity(1.0))
-            // .shadow(color: Color.black.opacity(0.8), radius: 5, x: 5, y: 5) // Kräftigerer Schatten
             .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5) // Hauptschatten
             .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3) // Weichere Schattenebene
     }
@@ -282,7 +284,7 @@ struct TimeEllipse: View {
     let characters: Int
     var body: some View {
         RoundedRectangle(cornerRadius: 15)
-            .fill(Color.darkGray.opacity(0.5))
+            .fill(Color.darkGray.opacity(1.0))
             .frame(width: CGFloat(characters * 7), height: 25)
     }
 }
@@ -292,7 +294,7 @@ struct TimeEllipseBig: View {
     let characters: Int
     var body: some View {
         RoundedRectangle(cornerRadius: 15)
-            .fill(Color.darkGray.opacity(0.5))
+            .fill(Color.darkGray.opacity(1.0))
             .frame(width: CGFloat(characters * 10), height: 30)
     }
 }
@@ -311,7 +313,7 @@ struct TimeEllipseSensorAge: View {
         ZStack(alignment: .leading) {
             // Hintergrund
             RoundedRectangle(cornerRadius: 15)
-                .fill(Color.darkGray.opacity(0.5))
+                .fill(Color.darkGray.opacity(1.0))
                 .frame(width: maxWidth, height: 24)
 
             // Falls noch mindestens 1 Tag verbleibt, nutze den Farbbalken
@@ -320,7 +322,8 @@ struct TimeEllipseSensorAge: View {
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                safeRemainingDays == 1 ? .red : (safeRemainingDays == 2 ? .orange : .green),
+                                safeRemainingDays == 1 ? .red
+                                    .opacity(0.8) : (safeRemainingDays == 2 ? .orange.opacity(0.8) : .green.opacity(0.8)),
                                 Color.clear
                             ]),
                             startPoint: .leading,

@@ -455,7 +455,7 @@ extension Home {
                     ZStack {
                         if button3D {
                             Circle()
-                                .fill(Color.darkGray.opacity(0.5))
+                                .fill(Color.darkGray.opacity(1.0))
                                 .frame(width: 40, height: 40)
                                 .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
 
@@ -477,7 +477,7 @@ extension Home {
                                 .frame(width: 40, height: 40)
                         } else {
                             Circle()
-                                .fill(Color.darkGray.opacity(0.5))
+                                .fill(Color.darkGray.opacity(1.0))
                                 .frame(width: 40, height: 40)
                                 .overlay(
                                     Circle()
@@ -539,7 +539,7 @@ extension Home {
                     ZStack {
                         if button3D {
                             Circle()
-                                .fill(Color.darkGray.opacity(0.5))
+                                .fill(Color.darkGray.opacity(1.0))
                                 .frame(width: 40, height: 40)
                                 .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
@@ -561,7 +561,7 @@ extension Home {
                                 .frame(width: 40, height: 40)
                         } else {
                             Circle()
-                                .fill(Color.darkGray.opacity(0.5))
+                                .fill(Color.darkGray.opacity(1.0))
                                 .frame(width: 40, height: 40)
                                 .overlay(
                                     Circle()
@@ -605,15 +605,15 @@ extension Home {
             var body: some View {
                 VStack {
                     ZStack {
-                        /* Circle()
-                         .fill(Color.black.opacity(1.0))
-                         .frame(width: 110, height: 110)
-                         .overlay(
-                             Circle()
-                                 .stroke(Color.white, lineWidth: 0)
-                         )*/
                         Circle()
-                            .fill(Color.darkGray.opacity(0.5))
+                            .fill(Color.darkGray.opacity(1.0))
+                            .frame(width: 110, height: 110)
+                            .overlay(
+                                Circle()
+                                    .stroke(Color.white, lineWidth: 0)
+                            )
+                        Circle()
+                            .fill(Color.darkGray.opacity(1.0))
                             .frame(width: 110, height: 110)
                             .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
 
@@ -751,7 +751,8 @@ extension Home {
         struct BigFillablePieSegment2: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
-            private let backgroundColorCircle = Color(red: 0.31, green: 0.42, blue: 0.66)
+            // private let backgroundColorCircle = Color(red: 0.31, green: 0.42, blue: 0.66)
+            private let backgroundColorCircle = Color.darkGray.opacity(1.0)
 
             var fillFraction: CGFloat
             var color: Color
@@ -761,7 +762,7 @@ extension Home {
             var body: some View {
                 ZStack {
                     Circle()
-                        .fill(Color.darkGray.opacity(0.6))
+                        .fill(Color.darkGray.opacity(1.0))
                         .frame(width: 110, height: 110)
                         .overlay(
                             Circle()
@@ -895,6 +896,7 @@ extension Home {
                 case .view2:
                     loopView2
                         .frame(maxHeight: .infinity)
+                        .offset(y: 10)
                 }
             } else {
                 // Fallback-Ansicht, falls der String-Wert ungültig ist
@@ -951,7 +953,7 @@ extension Home {
                 endPoint: .bottom
             )
             .frame(
-                maxHeight: fontSize < .extraExtraLarge ? 120 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
+                maxHeight: fontSize < .extraExtraLarge ? 140 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
             )
             .padding(.top, geo.safeAreaInsets.top)
             .overlay {
@@ -961,7 +963,7 @@ extension Home {
                             VStack(alignment: .leading, spacing: 8) {
                                 HStack(spacing: 3) {
                                     stackedLeftTopView
-                                        .offset(x: 20, y: 55)
+                                        .offset(x: 30, y: 65)
                                 }
                             }
                             Spacer()
@@ -969,16 +971,16 @@ extension Home {
                                 // Spacer()
                                 if state.bolusProgress != nil, state.bolusAmount != nil {
                                     bolusProgressView2()
-                                        .offset(x: -35, y: 53)
+                                        .offset(x: -35, y: 63)
 
                                 } else {
                                     glucoseAndLoopView()
-                                        .offset(x: -35, y: 53)
+                                        .offset(x: -35, y: 63)
                                 }
                                 Spacer()
                             }
                             loopViewSelector()
-                                .offset(x: -50, y: 53)
+                                .offset(x: -50, y: 63)
                         }
                     }
                 }
@@ -1112,7 +1114,7 @@ extension Home {
             ZStack {
                 if state.button3D {
                     Circle()
-                        .fill(Color.darkGray.opacity(0.5))
+                        .fill(Color.darkGray.opacity(1.0))
                         .frame(width: 50, height: 50)
                         .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
 
@@ -1134,7 +1136,7 @@ extension Home {
                         .frame(width: 50, height: 50)
                 } else {
                     Circle()
-                        .fill(Color.darkGray.opacity(0.5))
+                        .fill(Color.darkGray.opacity(1.0))
                         .frame(width: 50, height: 50)
                         .overlay(
                             Circle()
@@ -2069,7 +2071,7 @@ extension Home {
                         .frame(width: UIScreen.main.bounds.width)
                 }
             }
-            .frame(minHeight: UIScreen.main.bounds.height / 1.52) // Je größer der Wert, desto kleiner der Chart
+            .frame(minHeight: UIScreen.main.bounds.height / 1.60) // Je größer der Wert, desto kleiner der Chart
         }
 
         var legendPanel: some View {
@@ -2272,7 +2274,7 @@ extension Home {
                 let isTarget = (state.tempTarget != nil)
                 HStack {
                     ZStack {
-                        buttonWithCircle(iconName: "carbs3", circleColor: Color.darkGray.opacity(0.5)) {
+                        buttonWithCircle(iconName: "carbs3", circleColor: Color.darkGray.opacity(1.0)) {
                             state.showModal(for: .addCarbs(editMode: false, override: false))
                         }
                         if let carbsReq = state.carbsRequired {
@@ -2286,7 +2288,7 @@ extension Home {
                     }
                     Spacer()
 
-                    buttonWithCircle(iconName: "iob", circleColor: Color.darkGray.opacity(0.5)) {
+                    buttonWithCircle(iconName: "iob", circleColor: Color.darkGray.opacity(1.0)) {
                         (state.bolusProgress != nil) ? showBolusActiveAlert = true :
                             state.showModal(for: .bolus(
                                 waitForSuggestion: state.useCalc ? true : false,
@@ -2296,7 +2298,7 @@ extension Home {
                     Spacer()
 
                     if state.allowManualTemp {
-                        buttonWithCircle(iconName: "insulin", circleColor: Color.darkGray.opacity(0.5)) {
+                        buttonWithCircle(iconName: "insulin", circleColor: Color.darkGray.opacity(1.0)) {
                             state.showModal(for: .manualTempBasal)
                         }
                         Spacer()
@@ -2304,7 +2306,7 @@ extension Home {
 
                     buttonWithCircle(
                         iconName: isOverride ? "profilefill" : "profile",
-                        circleColor: Color.darkGray.opacity(0.5)
+                        circleColor: Color.darkGray.opacity(1.0)
                     ) {
                         if isOverride {
                             showCancelAlert.toggle()
@@ -2317,7 +2319,7 @@ extension Home {
                     if state.useTargetButton {
                         buttonWithCircle(
                             iconName: isTarget ? "temptargetactive" : "temptarget",
-                            circleColor: Color.darkGray.opacity(0.5)
+                            circleColor: Color.darkGray.opacity(1.0)
                         ) {
                             if isTarget {
                                 showCancelTTAlert.toggle()
@@ -2328,7 +2330,7 @@ extension Home {
                         Spacer()
                     }
 
-                    buttonWithCircle(iconName: "ux", circleColor: Color.darkGray.opacity(0.5)) {
+                    buttonWithCircle(iconName: "ux", circleColor: Color.darkGray.opacity(1.0)) {
                         state.showModal(for: .statisticsConfig)
                     }
                     Spacer()
@@ -2337,7 +2339,7 @@ extension Home {
                          state.showModal(for: .settings)
                      }*/
 
-                    buttonWithCircle(iconName: "settings2", circleColor: Color.darkGray.opacity(0.5)) {
+                    buttonWithCircle(iconName: "settings2", circleColor: Color.darkGray.opacity(1.0)) {
                         if !didLongPress {
                             state.showModal(for: .settings)
                         }
@@ -2380,7 +2382,7 @@ extension Home {
                 ZStack {
                     if state.button3D {
                         Circle()
-                            .fill(Color.darkGray.opacity(0.5))
+                            .fill(Color.darkGray.opacity(1.0))
                             .frame(width: 50, height: 50)
                             .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
 
@@ -2402,7 +2404,7 @@ extension Home {
                             .frame(width: 50, height: 50)
                     } else {
                         Circle()
-                            .fill(Color.darkGray.opacity(0.5))
+                            .fill(Color.darkGray.opacity(1.0))
                             .frame(width: 50, height: 50)
                             .overlay(
                                 Circle()
