@@ -185,6 +185,98 @@ extension Home {
             return scene
         }
 
+        struct TimeEllipse: View {
+            let characters: Int
+            var button3D: Bool = false
+
+            var body: some View {
+                ZStack {
+                    if button3D {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.darkGray.opacity(1.0))
+                            .frame(width: CGFloat(characters * 7), height: 25)
+                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.white.opacity(0.6),
+                                        Color.white.opacity(0.3),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.black.opacity(0.3)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 2
+                            )
+                            .frame(width: CGFloat(characters * 7), height: 25)
+                    } else {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.darkGray.opacity(1.0))
+                            .frame(width: CGFloat(characters * 7), height: 25)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color.white, lineWidth: 0)
+                            )
+                    }
+                }
+            }
+        }
+
+        struct TimeEllipseBig: View {
+            let characters: Int
+            var button3D: Bool = false
+
+            var body: some View {
+                ZStack {
+                    if button3D {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.darkGray.opacity(1.0))
+                            .frame(width: CGFloat(characters * 14), height: 30)
+                            .shadow(color: Color.black.opacity(0.4), radius: 3, x: 3, y: 3)
+
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.white.opacity(0.6),
+                                        Color.white.opacity(0.3),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.black.opacity(0.3)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 2
+                            )
+                            .frame(width: CGFloat(characters * 14), height: 30)
+                    } else {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.darkGray.opacity(1.0))
+                            .frame(width: CGFloat(characters * 14), height: 30)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color.white, lineWidth: 0)
+                            )
+                    }
+                }
+            }
+        }
+
         /*    private var sageView: some View {
              ZStack {
                  if let date = state.recentGlucose?.sessionStartDate {
@@ -234,16 +326,16 @@ extension Home {
                     Circle()
                         .fill(Color.darkGray.opacity(0.5))
                         .frame(width: 110, height: 110)
-                        .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+                        .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
                     Circle()
                         .stroke(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    Color.white.opacity(0.9), // Lichtreflexion oben links
+                                    Color.white.opacity(0.9),
                                     Color.white.opacity(0.4),
                                     Color.clear,
-                                    Color.black.opacity(0.3), // Schatten unten rechts
+                                    Color.black.opacity(0.3),
                                     Color.black.opacity(0.6)
                                 ]),
                                 startPoint: .topLeading,
@@ -377,16 +469,16 @@ extension Home {
                             Circle()
                                 .fill(Color.darkGray.opacity(0.5))
                                 .frame(width: 60, height: 60)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
                             Circle()
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            Color.white.opacity(0.9), // Lichtreflexion oben links
+                                            Color.white.opacity(0.9),
                                             Color.white.opacity(0.4),
                                             Color.clear,
-                                            Color.black.opacity(0.3), // Schatten unten rechts
+                                            Color.black.opacity(0.3),
                                             Color.black.opacity(0.6)
                                         ]),
                                         startPoint: .topLeading,
@@ -457,16 +549,16 @@ extension Home {
                             Circle()
                                 .fill(Color.darkGray.opacity(1.0))
                                 .frame(width: 40, height: 40)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
                             Circle()
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            Color.white.opacity(0.9), // Lichtreflexion oben links
+                                            Color.white.opacity(0.9),
                                             Color.white.opacity(0.4),
                                             Color.clear,
-                                            Color.black.opacity(0.3), // Schatten unten rechts
+                                            Color.black.opacity(0.3),
                                             Color.black.opacity(0.6)
                                         ]),
                                         startPoint: .topLeading,
@@ -515,7 +607,91 @@ extension Home {
             }
         }
 
-        struct SmallerFillablePieSegment: View {
+        struct SmallerFillablePieSegmentCarbs: View {
+            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
+
+            var fillFraction: CGFloat
+            var color: Color
+            var backgroundColor: Color
+            var displayText: String
+            var animateProgress: Bool
+            var button3D: Bool // Umschalter für den 3D-Effekt
+
+            let angularGradient = AngularGradient(
+                gradient: Gradient(colors: [
+                    Color.gray.opacity(0.3)
+                ]),
+                center: .center,
+                startAngle: .degrees(0),
+                endAngle: .degrees(360)
+            )
+
+            var body: some View {
+                HStack(alignment: .center, spacing: 10) { // Abstand zwischen Kreis und Text
+                    ZStack {
+                        if button3D {
+                            Circle()
+                                .fill(Color.darkGray.opacity(1.0))
+                                .frame(width: 40, height: 40)
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            Circle()
+                                .fill(Color.orange)
+                                .frame(width: 5, height: 5)
+
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color.white.opacity(0.9),
+                                            Color.white.opacity(0.4),
+                                            Color.clear,
+                                            Color.black.opacity(0.3),
+                                            Color.black.opacity(0.6)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 2
+                                )
+                                .frame(width: 40, height: 40)
+                        } else {
+                            Circle()
+                                .fill(Color.darkGray.opacity(1.0))
+                                .frame(width: 40, height: 40)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.white, lineWidth: 0)
+                                )
+                            Circle()
+                                .fill(Color.orange)
+                                .frame(width: 5, height: 5)
+                        }
+
+                        PieSliceView(
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                        )
+                        .fill(color)
+                        .frame(width: 40, height: 40)
+                        .opacity(0.6)
+                    }
+                    .frame(width: 40, height: 40)
+
+                    Text(displayText)
+                        .font(.system(size: 16))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, alignment: .leading) // Linksbündig ausrichten
+                }
+                .onAppear {
+                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+                }
+                .onChange(of: fillFraction) { _, newValue in
+                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+                }
+            }
+        }
+
+        struct SmallerFillablePieSegmentInsulin: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
             var fillFraction: CGFloat
@@ -544,6 +720,10 @@ extension Home {
                                 .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
                             Circle()
+                                .fill(Color.blue)
+                                .frame(width: 5, height: 5)
+
+                            Circle()
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
@@ -567,6 +747,9 @@ extension Home {
                                     Circle()
                                         .stroke(Color.white, lineWidth: 0)
                                 )
+                            Circle()
+                                .fill(Color.blue)
+                                .frame(width: 5, height: 5)
                         }
 
                         PieSliceView(
@@ -577,9 +760,8 @@ extension Home {
                         .frame(width: 40, height: 40)
                         .opacity(0.6)
                     }
-                    .frame(width: 40, height: 40) // Zwingt den ZStack auf die Kreisgröße
+                    .frame(width: 40, height: 40)
 
-                    // Text rechts vom Kreis
                     Text(displayText)
                         .font(.system(size: 16))
                         .foregroundColor(.white)
@@ -615,16 +797,16 @@ extension Home {
                         Circle()
                             .fill(Color.darkGray.opacity(1.0))
                             .frame(width: 110, height: 110)
-                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
                         Circle()
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        Color.white.opacity(0.9), // Lichtreflexion oben links
+                                        Color.white.opacity(0.9),
                                         Color.white.opacity(0.4),
                                         Color.clear,
-                                        Color.black.opacity(0.3), // Schatten unten rechts
+                                        Color.black.opacity(0.3),
                                         Color.black.opacity(0.6)
                                     ]),
                                     startPoint: .topLeading,
@@ -739,7 +921,7 @@ extension Home {
                         }
                     }
                     .font(.timeSettingFont)
-                    .background(TimeEllipseBig(characters: 10))
+                    .background(TimeEllipse(characters: 15, button3D: state.button3D))
                 }
             }
         }
@@ -872,7 +1054,7 @@ extension Home {
                         }
                     }
                     .font(.timeSettingFont)
-                    .background(TimeEllipseBig(characters: 10))
+                    .background(TimeEllipse(characters: 15, button3D: state.button3D))
                 }
             }
             .offset(x: -20, y: 0)
@@ -905,6 +1087,79 @@ extension Home {
             }
         }
 
+        struct TimeEllipseSensorAge: View {
+            var remainingDays: Int
+            var remainingHours: Int?
+            var totalDays: Int
+            let characters: Int = 10 // Fixe Basisbreite für den Hintergrund
+            var button3D: Bool // Neuer Parameter für den 3D-Modus
+
+            var body: some View {
+                let safeTotalDays = max(1, totalDays)
+                let safeRemainingDays = min(max(0, remainingDays), safeTotalDays)
+                let maxWidth = CGFloat(characters * 10)
+
+                ZStack(alignment: .leading) {
+                    if button3D {
+                        // **3D Hintergrund mit Schatten**
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.darkGray.opacity(1.0))
+                            .frame(width: maxWidth, height: 24)
+                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Tiefe
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(
+                                        LinearGradient(
+                                            gradient: Gradient(colors: [
+                                                Color.white.opacity(1.0),
+                                                Color.white.opacity(0.8),
+                                                Color.gray.opacity(0.2),
+                                                Color.gray.opacity(0.2),
+                                                Color.gray.opacity(0.2),
+                                                Color.gray.opacity(0.2),
+                                                Color.gray.opacity(0.2),
+                                                Color.gray.opacity(0.2),
+                                                Color.gray.opacity(0.2),
+                                                Color.black.opacity(0.6)
+                                            ]),
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        ),
+                                        lineWidth: 3
+                                    )
+                            )
+                    } else {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.darkGray.opacity(1.0))
+                            .frame(width: maxWidth, height: 24)
+                    }
+
+                    // **Farbiger Fortschrittsbalken**
+                    if safeRemainingDays > 0 {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        safeRemainingDays == 1 ? .red.opacity(0.8)
+                                            : (safeRemainingDays == 2 ? .orange.opacity(0.8) : .green.opacity(0.8)),
+                                        Color.clear
+                                    ]),
+                                    startPoint: .leading,
+                                    endPoint: .trailing
+                                )
+                            )
+                            .frame(width: maxWidth * CGFloat(safeRemainingDays) / CGFloat(safeTotalDays), height: 24)
+                    } else {
+                        // **Alarm: Weniger als 1 Tag → Ganze Ellipse wird rot**
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.red)
+                            .frame(width: maxWidth, height: 24)
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 15)) // Verhindert Überlauf
+            }
+        }
+
         private var sensorAgeDays: some View {
             ZStack {
                 HStack {
@@ -930,7 +1185,8 @@ extension Home {
                 .background(
                     TimeEllipseSensorAge(
                         remainingDays: state.remainingSensorDays,
-                        totalDays: state.sensorAgeDays.asInt()
+                        totalDays: state.sensorAgeDays.asInt(),
+                        button3D: state.button3D
                     )
                 )
             }
@@ -1075,7 +1331,7 @@ extension Home {
                             let fraction = CGFloat(substance / maxValue)
                             let fill = max(min(fraction, 1.0), 0.0)
 
-                            SmallerFillablePieSegment(
+                            SmallerFillablePieSegmentCarbs(
                                 pieSegmentViewModel: carbsPieSegmentViewModel,
                                 fillFraction: fill,
                                 color: .loopYellow,
@@ -1091,41 +1347,22 @@ extension Home {
         }
 
         // CarbView Ende
-
-        /* var loopView: some View {
-             LoopView(
-                 suggestion: $state.data.suggestion,
-                 enactedSuggestion: $state.enactedSuggestion,
-                 closedLoop: $state.closedLoop,
-                 timerDate: $state.data.timerDate,
-                 isLooping: $state.isLooping,
-                 lastLoopDate: $state.lastLoopDate,
-                 manualTempBasal: $state.manualTempBasal
-             )
-             .onTapGesture {
-                 state.isStatusPopupPresented.toggle()
-             }.onLongPressGesture {
-                 let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                 impactHeavy.impactOccurred()
-                 state.runLoop()
-             }
-         }*/
         var loopView: some View {
             ZStack {
                 if state.button3D {
                     Circle()
                         .fill(Color.darkGray.opacity(1.0))
                         .frame(width: 50, height: 50)
-                        .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+                        .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
                     Circle()
                         .stroke(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    Color.white.opacity(0.9), // Lichtreflexion oben links
+                                    Color.white.opacity(0.9),
                                     Color.white.opacity(0.4),
                                     Color.clear,
-                                    Color.black.opacity(0.3), // Schatten unten rechts
+                                    Color.black.opacity(0.3),
                                     Color.black.opacity(0.6)
                                 ]),
                                 startPoint: .topLeading,
@@ -1194,7 +1431,7 @@ extension Home {
                             let maxValue = max(Double(settings.preferences.maxIOB), 1)
 
                             let fraction = CGFloat(abs(substance) / maxValue)
-                            let fill = min(fraction, 1.0) // Begrenzung auf max 1
+                            let fill = min(fraction, 1.0)
 
                             let isNegative = substance < 0
                             let pieColor: Color = isNegative ? .red : .insulin
@@ -1236,13 +1473,13 @@ extension Home {
                             let maxValue = max(Double(settings.preferences.maxIOB), 1)
 
                             let fraction = CGFloat(abs(substance) / maxValue)
-                            let fill = min(fraction, 1.0) // Begrenzung auf max 1
+                            let fill = min(fraction, 1.0)
 
                             let isNegative = substance < 0
                             let pieColor: Color = isNegative ? .red : .insulin
                             let _: Double = isNegative ? 90 : -90
 
-                            SmallerFillablePieSegment(
+                            SmallerFillablePieSegmentInsulin(
                                 pieSegmentViewModel: insulinPieSegmentViewModel,
                                 fillFraction: fill,
                                 color: pieColor,
@@ -1446,7 +1683,7 @@ extension Home {
                                            let maxInsulinAge = Double(insulinAgeOption.displayName)
                                         {
                                             if CGFloat(totalHours) >= CGFloat(maxInsulinAge) {
-                                                return .red.opacity(1.0) // Überschritten: Rot
+                                                return .red.opacity(1.0)
                                             }
 
                                             let warningThreshold = maxInsulinAge * 0.75
@@ -1508,7 +1745,7 @@ extension Home {
                                         let remainingHours = cannulaAgeOption
                                             .maxCannulaAge - cannulaHours
                                         if remainingHours <= 0 {
-                                            return 1.0 // Vollständig gefüllt bei Überschreitung
+                                            return 1.0
                                         } else {
                                             return CGFloat(min(max(
                                                 remainingHours / cannulaAgeOption.maxCannulaAge,
@@ -1516,7 +1753,7 @@ extension Home {
                                             ), 1.0))
                                         }
                                     } else {
-                                        return 0.0 // Leer, wenn keine Werte vorhanden sind
+                                        return 0.0
                                     }
                                 }()
 
@@ -1532,7 +1769,7 @@ extension Home {
                                         let dangerThreshold = maxCannulaAge
 
                                         if cannulaHours >= maxCannulaAge {
-                                            return .red.opacity(1.0) // Überschritten: Rot
+                                            return .red.opacity(1.0)
                                         }
 
                                         switch CGFloat(cannulaHours) {
@@ -1544,7 +1781,7 @@ extension Home {
                                             return .green.opacity(0.7)
                                         }
                                     } else {
-                                        return .clear // Fallback-Farbe für unbekanntes Alter
+                                        return .clear
                                     }
                                 }()
 
@@ -1794,7 +2031,7 @@ extension Home {
                                         let dangerThreshold = maxCannulaAge
 
                                         if cannulaHours >= maxCannulaAge {
-                                            return .red.opacity(1.0) // Überschritten: Rot
+                                            return .red.opacity(1.0)
                                         }
 
                                         switch CGFloat(cannulaHours) {
@@ -1806,7 +2043,7 @@ extension Home {
                                             return .green.opacity(0.7)
                                         }
                                     } else {
-                                        return .clear // Fallback-Farbe für unbekanntes Alter
+                                        return .clear
                                     }
                                 }()
 
@@ -2065,7 +2302,8 @@ extension Home {
                      }*/
 
                     mainChart.padding(.top, 35)
-                    legendPanel.padding(.top, 15)
+                    legendPanel
+                        .offset(x: 80, y: -55)
                     tempTargetbar.padding(.top, 30)
                     infoPanel.padding(.top, 20).padding(.bottom, 10)
                         .frame(width: UIScreen.main.bounds.width)
@@ -2173,7 +2411,7 @@ extension Home {
             .foregroundStyle(Color.white)
             .font(.timeSettingFont)
             .padding(.vertical, 15)
-            .background(TimeEllipse(characters: string.count))
+            .background(TimeEllipse(characters: string.count, button3D: state.button3D))
         }
 
         var info2: some View {
@@ -2223,7 +2461,6 @@ extension Home {
             ZStack {
                 HStack {
                     HStack {
-                        // Image(systemName: "divide")
                         Text("ISF")
                             .font(.system(size: 14))
                             .foregroundStyle(.white)
@@ -2232,7 +2469,7 @@ extension Home {
                             .foregroundStyle(.white)
                             .font(.timeSettingFont)
                     }
-                    .background(TimeEllipse(characters: 12))
+                    .background(TimeEllipse(characters: 12, button3D: state.button3D))
                     .onTapGesture {
                         if state.autoisf {
                             displayAutoHistory.toggle()
@@ -2247,18 +2484,16 @@ extension Home {
             ZStack {
                 HStack {
                     Image(systemName: "circle.slash").font(.system(size: 13)).foregroundStyle(.white)
-                    /* Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0")").foregroundStyle(.white)*/
 
                     Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0") U")
                         .foregroundStyle(.white)
                 }
                 .font(.timeSettingFont)
-                .background(TimeEllipse(characters: 12))
+                .background(TimeEllipse(characters: 12, button3D: state.button3D))
             }.offset(x: 0)
         }
 
         @State private var didLongPress = false
-        // buttonPanel line.diagonal circle.slash circle.and.line.horizontal
 
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {
@@ -2355,7 +2590,6 @@ extension Home {
                     )
                 }
                 .padding(.horizontal, state.allowManualTemp ? 5 : 24)
-                // .padding(.bottom, geo.safeAreaInsets.bottom)
                 .padding(.bottom, 15)
             }
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
@@ -2384,16 +2618,16 @@ extension Home {
                         Circle()
                             .fill(Color.darkGray.opacity(1.0))
                             .frame(width: 50, height: 50)
-                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Schatten für Tiefe
+                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
                         Circle()
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        Color.white.opacity(0.9), // Lichtreflexion oben links
+                                        Color.white.opacity(0.9),
                                         Color.white.opacity(0.4),
                                         Color.clear,
-                                        Color.black.opacity(0.3), // Schatten unten rechts
+                                        Color.black.opacity(0.3),
                                         Color.black.opacity(0.6)
                                     ]),
                                     startPoint: .topLeading,
@@ -2462,11 +2696,11 @@ extension Home {
                                         Text(name).font(.system(size: 15)).foregroundStyle(Color.white)
                                     }
                                 }
-                            } else { Text("📉") } // Hypo Treatment is not actually a preset
+                            } else { Text("📉") }
                         } else if override.percentage != 100 {
                             Text(override.percentage.formatted() + " %").font(.statusFont).foregroundStyle(.secondary)
                         } else if override.smbIsOff, !override.smbIsAlwaysOff {
-                            Text("No ").font(.statusFont).foregroundStyle(.secondary) // "No" as in no SMBs
+                            Text("No ").font(.statusFont).foregroundStyle(.secondary)
                             Image(systemName: "syringe")
                                 .font(.previewNormal).foregroundStyle(.secondary)
                         } else if override.smbIsOff {

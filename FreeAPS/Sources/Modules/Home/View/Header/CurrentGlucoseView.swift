@@ -262,7 +262,7 @@ struct CurrentGlucoseView: View {
 
     var colourGlucoseText: Color {
         let whichGlucose = recentGlucose?.glucose ?? 0
-        let defaultColor = Color.white.opacity(0.7)
+        let defaultColor = Color.white.opacity(1.0)
         // let defaultColor = Color.green.opacity(0.7)
 
         guard lowGlucose < highGlucose else { return .primary }
