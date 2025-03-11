@@ -298,6 +298,7 @@ extension Home {
                                         Color.white.opacity(0.1),
                                         Color.gray.opacity(0.3),
                                         Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.1),
                                         Color.black.opacity(0.3)
                                     ]),
                                     startPoint: .topLeading,
@@ -383,7 +384,7 @@ extension Home {
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: 4
+                            lineWidth: 3
                         )
                         .frame(width: 110, height: 110)
                 } else {
@@ -1162,7 +1163,7 @@ extension Home {
                                                 Color.gray.opacity(0.2),
                                                 Color.gray.opacity(0.2),
                                                 Color.gray.opacity(0.2),
-                                                Color.black.opacity(0.6)
+                                                Color.black.opacity(0.3)
                                             ]),
                                             startPoint: .topLeading,
                                             endPoint: .bottomTrailing
