@@ -86,7 +86,7 @@ extension Home {
         @Published var legendsSwitch: Bool = false
         @Published var tempTargetbar: Bool = false
         @Published var timeSettings: Bool = false
-        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.navajoWhite4.rawValue
+        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.teal.rawValue
         @Published var danaBarViewOption: String = "view1"
         @Published var loopViewOption: String = LoopViewOption.view1.rawValue
         @Published var chartBackgroundColored: Bool = false

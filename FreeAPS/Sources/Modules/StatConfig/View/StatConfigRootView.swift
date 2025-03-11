@@ -254,12 +254,10 @@ extension StatConfig {
                                         HStack {
                                             Text("Last sensor start time:")
                                                 .font(.subheadline)
-                                                .foregroundColor(.white)
                                             Spacer()
                                             if let startTime = displayedStartTime {
                                                 Text(startTime)
                                                     .font(.subheadline)
-                                                    .foregroundColor(.white)
                                             }
                                         }
                                         .padding(.top)

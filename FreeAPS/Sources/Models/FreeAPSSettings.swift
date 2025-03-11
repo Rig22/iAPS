@@ -89,7 +89,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var danaBar: Bool = false
     var legendsSwitch: Bool = false
     var tempTargetbar: Bool = false
-    var backgroundColorOptionRawValue: String = BackgroundColorOption.navajoWhite4.rawValue
+    var backgroundColorOptionRawValue: String = BackgroundColorOption.teal.rawValue
     var danaBarViewOption: String = "view1"
     var insulinAgeOption: String = "Drei_Tage"
     var cannulaAgeOption: String = "Drei_Tage"
@@ -140,7 +140,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     // Computed property for background color option
     var backgroundColorOption: BackgroundColorOption {
         get {
-            BackgroundColorOption(rawValue: backgroundColorOptionRawValue) ?? .navajoWhite4
+            BackgroundColorOption(rawValue: backgroundColorOptionRawValue) ?? .teal
         }
         set {
             backgroundColorOptionRawValue = newValue.rawValue

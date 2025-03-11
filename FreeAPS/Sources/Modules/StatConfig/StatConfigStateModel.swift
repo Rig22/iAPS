@@ -30,7 +30,7 @@ extension StatConfig {
         @Published var legendsSwitch: Bool = false
         @Published var tempTargetBar: Bool = false
         @Published var timeSettings: Bool = false
-        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.navajoWhite4.rawValue
+        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.teal.rawValue
         @Published var danaBarViewOption: String = "view1"
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"

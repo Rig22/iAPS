@@ -180,7 +180,7 @@ struct TooOldValue: View {
 }
 
 extension Color {
-    static let rig22Background = Color(red: 0.25, green: 0.25, blue: 0.25)
+    static let rig22Background = Color(red: 0.10, green: 0.10, blue: 0.10)
 }
 
 extension Color {
@@ -214,9 +214,9 @@ struct ColouredBackground: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
             .fill(Color.rig22Background)
-        // .fill(Color.darkGray.opacity(1.0))
-        // .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
-        // .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3)
+            // .fill(Color.darkGray.opacity(1.0))
+            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
+            .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3)
     }
 }
 

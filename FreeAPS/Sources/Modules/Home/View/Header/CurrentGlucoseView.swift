@@ -94,7 +94,7 @@ struct CurrentGlucoseView: View {
     var body: some View {
         ZStack {
             Circle()
-                .fill(Color.darkGray.opacity(1.0))
+                .fill(Color.darkGray.opacity(0.5))
                 .frame(width: 110, height: 110)
                 .overlay(
                     Circle()

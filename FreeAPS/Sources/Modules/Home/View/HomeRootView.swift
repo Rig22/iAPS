@@ -193,7 +193,7 @@ extension Home {
                 ZStack {
                     if button3D {
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: CGFloat(characters * 7), height: 25)
                             .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
@@ -220,7 +220,7 @@ extension Home {
                             .frame(width: CGFloat(characters * 7), height: 25)
                     } else {
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: CGFloat(characters * 7), height: 25)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 15)
@@ -239,7 +239,7 @@ extension Home {
                 ZStack {
                     if button3D {
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: CGFloat(characters * 14), height: 30)
                             .shadow(color: Color.black.opacity(0.4), radius: 3, x: 3, y: 3)
 
@@ -266,7 +266,49 @@ extension Home {
                             .frame(width: CGFloat(characters * 14), height: 30)
                     } else {
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkGray.opacity(0.5))
+                            .frame(width: CGFloat(characters * 14), height: 30)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 15)
+                                    .stroke(Color.white, lineWidth: 0)
+                            )
+                    }
+                }
+            }
+        }
+
+        struct TimeEllipseLegend: View {
+            let characters: Int
+            var button3D: Bool = false
+
+            var body: some View {
+                ZStack {
+                    if button3D {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.darkGray.opacity(0.5))
+                            .frame(width: CGFloat(characters * 14), height: 30)
+                            .shadow(color: Color.black.opacity(0.4), radius: 3, x: 3, y: 3)
+
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.white.opacity(0.6),
+                                        Color.white.opacity(0.3),
+                                        Color.white.opacity(0.1),
+                                        Color.gray.opacity(0.3),
+                                        Color.gray.opacity(0.2),
+                                        Color.black.opacity(0.3)
+                                    ]),
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                ),
+                                lineWidth: 2
+                            )
+                            .frame(width: CGFloat(characters * 14), height: 30)
+                    } else {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: CGFloat(characters * 14), height: 30)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 15)
@@ -547,7 +589,7 @@ extension Home {
                     ZStack {
                         if button3D {
                             Circle()
-                                .fill(Color.darkGray.opacity(1.0))
+                                .fill(Color.darkGray.opacity(0.5))
                                 .frame(width: 40, height: 40)
                                 .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
@@ -569,7 +611,7 @@ extension Home {
                                 .frame(width: 40, height: 40)
                         } else {
                             Circle()
-                                .fill(Color.darkGray.opacity(1.0))
+                                .fill(Color.darkGray.opacity(0.5))
                                 .frame(width: 40, height: 40)
                                 .overlay(
                                     Circle()
@@ -631,7 +673,7 @@ extension Home {
                     ZStack {
                         if button3D {
                             Circle()
-                                .fill(Color.darkGray.opacity(1.0))
+                                .fill(Color.darkGray.opacity(0.5))
                                 .frame(width: 40, height: 40)
                                 .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
                             Circle()
@@ -656,7 +698,7 @@ extension Home {
                                 .frame(width: 40, height: 40)
                         } else {
                             Circle()
-                                .fill(Color.darkGray.opacity(1.0))
+                                .fill(Color.darkGray.opacity(0.5))
                                 .frame(width: 40, height: 40)
                                 .overlay(
                                     Circle()
@@ -715,7 +757,7 @@ extension Home {
                     ZStack {
                         if button3D {
                             Circle()
-                                .fill(Color.darkGray.opacity(1.0))
+                                .fill(Color.darkGray.opacity(0.5))
                                 .frame(width: 40, height: 40)
                                 .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
@@ -741,7 +783,7 @@ extension Home {
                                 .frame(width: 40, height: 40)
                         } else {
                             Circle()
-                                .fill(Color.darkGray.opacity(1.0))
+                                .fill(Color.darkGray.opacity(0.5))
                                 .frame(width: 40, height: 40)
                                 .overlay(
                                     Circle()
@@ -788,14 +830,14 @@ extension Home {
                 VStack {
                     ZStack {
                         Circle()
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: 110, height: 110)
                             .overlay(
                                 Circle()
                                     .stroke(Color.white, lineWidth: 0)
                             )
                         Circle()
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: 110, height: 110)
                             .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
@@ -934,7 +976,7 @@ extension Home {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
             // private let backgroundColorCircle = Color(red: 0.31, green: 0.42, blue: 0.66)
-            private let backgroundColorCircle = Color.darkGray.opacity(1.0)
+            private let backgroundColorCircle = Color.blue.opacity(0.5)
 
             var fillFraction: CGFloat
             var color: Color
@@ -944,7 +986,7 @@ extension Home {
             var body: some View {
                 ZStack {
                     Circle()
-                        .fill(Color.darkGray.opacity(1.0))
+                        .fill(Color.darkGray.opacity(0.5))
                         .frame(width: 110, height: 110)
                         .overlay(
                             Circle()
@@ -1103,7 +1145,7 @@ extension Home {
                     if button3D {
                         // **3D Hintergrund mit Schatten**
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: maxWidth, height: 24)
                             .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3) // Tiefe
                             .overlay(
@@ -1130,7 +1172,7 @@ extension Home {
                             )
                     } else {
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: maxWidth, height: 24)
                     }
 
@@ -1351,7 +1393,7 @@ extension Home {
             ZStack {
                 if state.button3D {
                     Circle()
-                        .fill(Color.darkGray.opacity(1.0))
+                        .fill(Color.darkGray.opacity(0.5))
                         .frame(width: 50, height: 50)
                         .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
@@ -1373,7 +1415,7 @@ extension Home {
                         .frame(width: 50, height: 50)
                 } else {
                     Circle()
-                        .fill(Color.darkGray.opacity(1.0))
+                        .fill(Color.darkGray.opacity(0.5))
                         .frame(width: 50, height: 50)
                         .overlay(
                             Circle()
@@ -2332,7 +2374,7 @@ extension Home {
                             }
                         }
                     }
-                    .background(TimeEllipseBig(characters: 17, button3D: state.button3D))
+                    .background(TimeEllipseLegend(characters: 17, button3D: state.button3D))
                 )
             } else {
                 return AnyView(EmptyView())
@@ -2608,7 +2650,7 @@ extension Home {
                 ZStack {
                     if state.button3D {
                         Circle()
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: 50, height: 50)
                             .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
 
@@ -2630,7 +2672,7 @@ extension Home {
                             .frame(width: 50, height: 50)
                     } else {
                         Circle()
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkGray.opacity(0.5))
                             .frame(width: 50, height: 50)
                             .overlay(
                                 Circle()
