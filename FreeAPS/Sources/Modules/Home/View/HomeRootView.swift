@@ -201,9 +201,10 @@ extension Home {
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        Color.white.opacity(0.6),
                                         Color.white.opacity(0.3),
-                                        Color.gray.opacity(0.2),
+                                        Color.white.opacity(0.2),
+                                        Color.white.opacity(0.1),
+                                        Color.gray.opacity(0.1),
                                         Color.gray.opacity(0.2),
                                         Color.gray.opacity(0.2),
                                         Color.gray.opacity(0.2),
@@ -222,52 +223,6 @@ extension Home {
                         RoundedRectangle(cornerRadius: 15)
                             .fill(Color.darkGray.opacity(0.5))
                             .frame(width: CGFloat(characters * 7), height: 25)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
-                    }
-                }
-            }
-        }
-
-        struct TimeEllipseBig: View {
-            let characters: Int
-            var button3D: Bool = false
-
-            var body: some View {
-                ZStack {
-                    if button3D {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: CGFloat(characters * 14), height: 30)
-                            .shadow(color: Color.black.opacity(0.4), radius: 3, x: 3, y: 3)
-
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color.white.opacity(0.6),
-                                        Color.white.opacity(0.3),
-                                        Color.gray.opacity(0.2),
-                                        Color.gray.opacity(0.2),
-                                        Color.gray.opacity(0.2),
-                                        Color.gray.opacity(0.2),
-                                        Color.gray.opacity(0.2),
-                                        Color.gray.opacity(0.2),
-                                        Color.gray.opacity(0.2),
-                                        Color.black.opacity(0.3)
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 2
-                            )
-                            .frame(width: CGFloat(characters * 14), height: 30)
-                    } else {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: CGFloat(characters * 14), height: 30)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 15)
                                     .stroke(Color.white, lineWidth: 0)
@@ -293,12 +248,16 @@ extension Home {
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        Color.white.opacity(0.6),
                                         Color.white.opacity(0.3),
+                                        Color.white.opacity(0.2),
                                         Color.white.opacity(0.1),
-                                        Color.gray.opacity(0.3),
-                                        Color.gray.opacity(0.2),
                                         Color.gray.opacity(0.1),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
+                                        Color.gray.opacity(0.2),
                                         Color.black.opacity(0.3)
                                     ]),
                                     startPoint: .topLeading,
@@ -819,108 +778,6 @@ extension Home {
             }
         }
 
-        struct BigFillablePieSegment: View {
-            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
-
-            var fillFraction: CGFloat
-            var color: Color
-            var displayText: String
-            var animateProgress: Bool
-
-            var body: some View {
-                VStack {
-                    ZStack {
-                        Circle()
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: 110, height: 110)
-                            .overlay(
-                                Circle()
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
-                        Circle()
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: 110, height: 110)
-                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-
-                        Circle()
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        Color.white.opacity(0.9),
-                                        Color.white.opacity(0.4),
-                                        Color.clear,
-                                        Color.black.opacity(0.3),
-                                        Color.black.opacity(0.6)
-                                    ]),
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                ),
-                                lineWidth: 2
-                            )
-                            .frame(width: 110, height: 110)
-
-                        PieSliceView(
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                        )
-                        .fill(color)
-                        .frame(width: 110, height: 110)
-                        .opacity(1.0)
-                    }
-
-                    Text(displayText)
-                        .font(.system(size: 18))
-                        .foregroundColor(.white)
-                        .padding(.top, 5)
-                }
-                .offset(y: 14)
-                .onAppear {
-                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-                }
-                .onChange(of: fillFraction) { _, newValue in
-                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-                }
-            }
-        }
-
-        @StateObject private var bolusPieSegmentViewModel = PieSegmentViewModel()
-
-        @ViewBuilder private func bolusProgressView() -> some View {
-            if let progress = state.bolusProgress, let amount = state.bolusAmount {
-                let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
-                let bolusedValue = amount * progress
-                let bolused = bolusProgressFormatter.string(from: bolusedValue as NSNumber) ?? ""
-                let formattedAmount = amount.formatted(.number.precision(.fractionLength(2)))
-                let displayText = "\(bolused) / \(formattedAmount) U"
-
-                VStack {
-                    ZStack {
-                        BigFillablePieSegment(
-                            pieSegmentViewModel: bolusPieSegmentViewModel,
-                            fillFraction: fillFraction,
-                            color: backgroundColor,
-                            displayText: displayText,
-                            animateProgress: true
-                        )
-                        .frame(width: 110, height: 110)
-                        .overlay(
-                            Circle()
-                                .fill(Color.red)
-                                .frame(width: 25, height: 25)
-                                .overlay(
-                                    Image(systemName: "xmark")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(.white)
-                                )
-                                .onTapGesture {
-                                    state.cancelBolus()
-                                }
-                        )
-                    }
-                }
-            }
-        }
-
         private var stackedLeftTopView: some View {
             VStack(spacing: 25) {
                 carbsSmallView
@@ -928,7 +785,7 @@ extension Home {
             }
         }
 
-        // headerView Anfang
+        // HEADERVIEW Anfang
         // Temp Basal Anfang
         private var tempRateView: some View {
             ZStack {
@@ -980,20 +837,13 @@ extension Home {
             private let backgroundColorCircle = Color.blue.opacity(0.5)
 
             var fillFraction: CGFloat
+            var backgroundColor: Color?
             var color: Color
             var displayText: String
             var animateProgress: Bool
 
             var body: some View {
                 ZStack {
-                    Circle()
-                        .fill(Color.darkGray.opacity(0.5))
-                        .frame(width: 110, height: 110)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.white, lineWidth: 0)
-                        )
-
                     PieSliceView(
                         startAngle: .degrees(-90),
                         endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
@@ -1031,14 +881,15 @@ extension Home {
                 VStack {
                     ZStack {
                         BigFillablePieSegment2(
-                            pieSegmentViewModel: bolusPieSegmentViewModel2,
+                            pieSegmentViewModel:
+                            bolusPieSegmentViewModel2,
                             fillFraction: fillFraction,
-                            color: backgroundColor,
+                            backgroundColor: backgroundColor,
+                            color: .blue,
                             displayText: displayText,
                             animateProgress: true
                         )
 
-                        // X-Button Overlay
                         Circle()
                             .fill(Color.red)
                             .frame(width: 25, height: 25)
@@ -2421,7 +2272,7 @@ extension Home {
                 }
             }
 
-            .background(TimeEllipse(characters: 17, button3D: state.button3D))
+            .background(TimeEllipse(characters: 20, button3D: state.button3D))
         }
 
         // BottomInfoBar mit TimeButtons
