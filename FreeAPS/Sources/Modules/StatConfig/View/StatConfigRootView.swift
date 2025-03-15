@@ -72,16 +72,16 @@ extension StatConfig {
         var body: some View {
             VStack(spacing: 0) {
                 ZStack {
-                    Image(BarViewOptionConfigurationRawValue(
-                        topBar: state.displayExpiration,
-                        danaBar: state.danaBar,
-                        legendBar: state.legendsSwitch,
-                        ttBar: state.tempTargetBar,
-                        bottomBar: state.timeSettings
-                    ).imageName)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 360, height: 280)
+                    /*  Image(BarViewOptionConfigurationRawValue(
+                         topBar: state.displayExpiration,
+                         danaBar: state.danaBar,
+                         legendBar: state.legendsSwitch,
+                         ttBar: state.tempTargetBar,
+                         bottomBar: state.timeSettings
+                     ).imageName)
+                         .resizable()
+                         .scaledToFit()
+                         .frame(width: 360, height: 280)*/
 
                     if state.danaBar && state.danaBarViewOption == "view2" {
                         Image(state.danaIconRawValue)
@@ -90,7 +90,8 @@ extension StatConfig {
                             .offset(x: -53, y: -55)
                     }
                 }
-                .frame(width: 360, height: 280)
+                // .frame(width: 360, height: 280)
+                .frame(width: 360, height: 0)
                 .padding(.top, 20)
                 .padding(.leading, 110)
                 .padding(.bottom, 10)
@@ -103,7 +104,7 @@ extension StatConfig {
                                 footer: Text("Select the  desired bar view")
                             ) {
                                 // Toggle("Top Bar", isOn: $state.carbInsulinLoopViewOption)
-                                Toggle("Dana Bar", isOn: $state.danaBar)
+                                Toggle("Dana Bars", isOn: $state.danaBar)
 
                                 if state.danaBar {
                                     Picker("Wähle eine Ansicht", selection: $state.danaBarViewOption) {
@@ -160,53 +161,10 @@ extension StatConfig {
 
                                     Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
                                 }
-                                // }
 
-                                // Section {
                                 Toggle("Legend Bar", isOn: $state.legendsSwitch)
                                 Toggle("TT Bar", isOn: $state.tempTargetBar)
                                 Toggle("Bottom Bar", isOn: $state.timeSettings)
-                            }
-
-                            Section(
-                                header: Text("Visual Options"),
-                                footer: Text("According to your taste")
-                            ) {
-                                Picker("Select Loop View", selection: $state.loopViewOption) {
-                                    ForEach(LoopViewOption.allCases) { option in
-                                        HStack {
-                                            Image(option == .view1 ? "LoopView1" : "LoopView2")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 30, height: 30)
-                                            Text(option.rawValue)
-                                                .font(.caption)
-                                        }
-                                        .tag(option)
-                                    }
-                                }
-                                .pickerStyle(NavigationLinkPickerStyle())
-
-                                if #available(iOS 18.0, *) {
-                                    Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
-                                        ForEach(BackgroundColorOption.allCases) { option in
-                                            HStack {
-                                                Rectangle()
-                                                    .fill(option.color)
-                                                    .frame(width: 25, height: 25)
-                                                    .cornerRadius(4)
-
-                                                Text(option.rawValue.capitalized)
-                                                    .foregroundColor(.primary)
-                                            }
-                                            .tag(option.rawValue)
-                                        }
-                                    }
-                                    .pickerStyle(NavigationLinkPickerStyle())
-                                }
-
-                                Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
-                                Toggle("3D Look", isOn: $state.button3D)
                             }
 
                             Section(
@@ -268,6 +226,62 @@ extension StatConfig {
                                         displayedStartTime = loadSensorStartTime()
                                     }
                                 }
+                            }
+
+                            Section(
+                                header: Text("Visual Options"),
+                                footer: Text("According to your taste")
+                            ) {
+                                Picker("Select Loop View", selection: $state.loopViewOption) {
+                                    ForEach(LoopViewOption.allCases) { option in
+                                        HStack {
+                                            Image(option == .view1 ? "LoopView1" : "LoopView2")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 30, height: 30)
+                                            Text(option.rawValue)
+                                                .font(.caption)
+                                        }
+                                        .tag(option)
+                                    }
+                                }
+                                .pickerStyle(NavigationLinkPickerStyle())
+
+                                Picker("Select Bolus Progress View", selection: $state.bolusProgressViewOption) {
+                                    ForEach(BolusProgressViewOption.allCases) { option in
+                                        HStack {
+                                            Image(option == .bolusview1 ? "BolusView1" : "BolusView2")
+                                                .resizable()
+                                                .scaledToFit()
+                                                .frame(width: 30, height: 30)
+                                            Text(option.rawValue)
+                                                .font(.caption)
+                                        }
+                                        .tag(option)
+                                    }
+                                }
+                                .pickerStyle(NavigationLinkPickerStyle())
+
+                                if #available(iOS 18.0, *) {
+                                    Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
+                                        ForEach(BackgroundColorOption.allCases) { option in
+                                            HStack {
+                                                Rectangle()
+                                                    .fill(option.color)
+                                                    .frame(width: 25, height: 25)
+                                                    .cornerRadius(4)
+
+                                                Text(option.rawValue.capitalized)
+                                                    .foregroundColor(.primary)
+                                            }
+                                            .tag(option.rawValue)
+                                        }
+                                    }
+                                    .pickerStyle(NavigationLinkPickerStyle())
+                                }
+
+                                Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
+                                Toggle("3D Look", isOn: $state.button3D)
                             }
 
                             Section(header: Text("Chart settings")) {

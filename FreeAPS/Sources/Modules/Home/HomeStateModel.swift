@@ -98,6 +98,7 @@ extension Home {
         @Published var sensorStartTime: Date?
         @Published var remainingSensorDays: Int = 0
         @Published var remainingSensorHours: Int?
+        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -247,6 +248,8 @@ extension Home {
             button3D = settingsManager.settings.button3D
             sensorAgeDays = settingsManager.settings.sensorAgeDays
             sensorStartTime = settingsManager.settings.sensorStartTime
+            bolusProgressViewOption = settingsManager.settings.bolusProgressViewOption
+
             // Dana UI Toggels
 
             broadcaster.register(GlucoseObserver.self, observer: self)
@@ -618,7 +621,7 @@ extension Home {
 
         private func setStatusTitle() {
             guard let suggestion = data.suggestion else {
-                statusTitle = "No suggestion"
+                statusTitle = NSLocalizedString("No suggestion", comment: "Status title when there is no suggestion")
                 return
             }
 
@@ -827,6 +830,7 @@ extension Home.StateModel:
         sensorAgeDays = settingsManager.settings.sensorAgeDays
         sensorStartTime = settingsManager.settings.sensorStartTime
         updateRemainingSensorDays()
+        bolusProgressViewOption = settingsManager.settings.bolusProgressViewOption
         // Dana UI Toggels
     }
 

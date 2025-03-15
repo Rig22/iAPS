@@ -105,6 +105,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var button3D: Bool = false
     var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
     var sensorStartTime: Date?
+    var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false
@@ -271,6 +272,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case button3D
         case sensorAgeDays
         case sensorStartTime
+        case bolusProgressViewOption
         // Dana Toggles
         // AutoISF
         case autoisf
@@ -412,6 +414,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.button3D, forKey: .button3D)
         try container.encode(settings.sensorAgeDays, forKey: .sensorAgeDays)
         try container.encodeIfPresent(settings.sensorStartTime, forKey: .sensorStartTime)
+        try container.encode(settings.bolusProgressViewOption, forKey: .bolusProgressViewOption)
         // Dana Toggels
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)
