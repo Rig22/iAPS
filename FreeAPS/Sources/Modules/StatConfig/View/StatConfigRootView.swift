@@ -72,16 +72,16 @@ extension StatConfig {
         var body: some View {
             VStack(spacing: 0) {
                 ZStack {
-                    /*  Image(BarViewOptionConfigurationRawValue(
-                         topBar: state.displayExpiration,
-                         danaBar: state.danaBar,
-                         legendBar: state.legendsSwitch,
-                         ttBar: state.tempTargetBar,
-                         bottomBar: state.timeSettings
-                     ).imageName)
-                         .resizable()
-                         .scaledToFit()
-                         .frame(width: 360, height: 280)*/
+                    Image(BarViewOptionConfigurationRawValue(
+                        topBar: state.displayExpiration,
+                        danaBar: state.danaBar,
+                        legendBar: state.legendsSwitch,
+                        ttBar: state.tempTargetBar,
+                        bottomBar: state.timeSettings
+                    ).imageName)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 360, height: 280)
 
                     if state.danaBar && state.danaBarViewOption == "view2" {
                         Image(state.danaIconRawValue)
@@ -90,8 +90,7 @@ extension StatConfig {
                             .offset(x: -53, y: -55)
                     }
                 }
-                // .frame(width: 360, height: 280)
-                .frame(width: 360, height: 0)
+                .frame(width: 360, height: 280)
                 .padding(.top, 20)
                 .padding(.leading, 110)
                 .padding(.bottom, 10)

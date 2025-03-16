@@ -1647,6 +1647,14 @@ extension Home {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 40, height: 40)
+
+                            if state.settingsManager?.settings.insulinBadge == true {
+                                if concentration.last?.concentration == 1 {
+                                    NonStandardInsulin(concentration: 1) // Zeigt U100 als Standardwert an
+                                } else if (concentration.last?.concentration ?? 1) != 1 {
+                                    NonStandardInsulin(concentration: concentration.last?.concentration ?? 1)
+                                }
+                            }
                         }
                     }
                 }
