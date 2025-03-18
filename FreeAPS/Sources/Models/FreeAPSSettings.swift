@@ -2,7 +2,7 @@ import Foundation
 
 // Originale FreeAPSSettings Struktur
 struct FreeAPSSettings: JSON, Equatable, Codable {
-    var units: GlucoseUnits = .mmolL
+    var units: GlucoseUnits = .mgdL
     var closedLoop: Bool = false
     var allowAnnouncements: Bool = false
     var useAutotune: Bool = false
@@ -13,7 +13,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var insulinReqPercentage: Decimal = 70
     var skipBolusScreenAfterCarbs: Bool = false
     var displayHR: Bool = false
-    var cgm: CGMType = .nightscout
+    var cgm: CGMType = .glucoseDirect
     var uploadGlucose: Bool = true
     var useCalendar: Bool = false
     var displayCalendarIOBandCOB: Bool = false
@@ -83,6 +83,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var displayExpiration = false
     var sensorDays: Double = 10
     var fpus: Bool = true
+    var fpuAmounts: Bool = false
     // Dana-Toggles
     var timeSettings: Bool = false
     var danaIconRawValue: String = "ic_dana_rs"
@@ -248,6 +249,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case displayExpiration
         case sensorDays
         case fpus
+        case fpuAmount
         // Dana Toggles
         case danaIconRawValue
         case danaBar
@@ -390,6 +392,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.displayExpiration, forKey: .displayExpiration)
         try container.encode(settings.sensorDays, forKey: .sensorDays)
         try container.encode(settings.fpus, forKey: .fpus)
+        try container.encode(settings.fpuAmounts, forKey: .fpuAmount)
         // Dana Toggels
         try container.encodeIfPresent(settings.sensorStartTime, forKey: .sensorStartTime)
         try container.encode(settings.danaBar, forKey: .danaBar)

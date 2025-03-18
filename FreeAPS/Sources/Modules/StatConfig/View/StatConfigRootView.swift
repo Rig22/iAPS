@@ -296,6 +296,9 @@ extension StatConfig {
                                 Toggle("Standing / Laying TIR Chart", isOn: $state.oneDimensionalGraph)
                                 Toggle("Use insulin bars", isOn: $state.useInsulinBars)
                                 Toggle("Display carb equivalents", isOn: $state.fpus)
+                                if state.fpus {
+                                    Toggle("Display carb equivalent amount", isOn: $state.fpuAmounts)
+                                }
                             }
                             // Toggle("Display Glucose Delta", isOn: $state.displayDelta)
 

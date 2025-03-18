@@ -480,7 +480,7 @@ extension Home {
                     )
                     .font(.system(size: 13))
                     .foregroundStyle(Color.white)
-                    .offset(y: -73)
+                    .offset(y: -78)
                 }
             }
         }
@@ -1743,7 +1743,7 @@ extension Home {
                         Image("vial")
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 45, height: 45)
+                            .frame(width: 40, height: 40)
                     }
                 }
             }
@@ -2070,16 +2070,11 @@ extension Home {
                     }
                     .frame(maxWidth: 100, alignment: .leading)
                     Spacer()
-                    /*  if state.displayExpiration {
-                         HStack(spacing: 0) {
-                             sensorAgeDays
-                                 .foregroundColor(.white)
-                         }
-                     }*/
                     HStack {
                         if state.isConnected {
                             BluetoothConnectionView
                                 .foregroundColor(.white)
+                                .offset(y: -5)
                         }
                     }
                     Spacer()
