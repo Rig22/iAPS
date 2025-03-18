@@ -87,7 +87,7 @@ extension StatConfig {
                         Image(state.danaIconRawValue)
                             .resizable()
                             .frame(width: 25, height: 18)
-                            .offset(x: -53, y: -55)
+                            .offset(x: -100, y: -55)
                     }
                 }
                 .frame(width: 360, height: 280)
