@@ -48,6 +48,7 @@ extension StatConfig {
         @Published var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
         @Published var sensorStartTime: Date?
         @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
+        @Published var sensorStartTimeDefault = Date.distantPast
         // Dana UI Toggels
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
@@ -148,6 +149,8 @@ extension StatConfig {
             subscribeSetting(\.sensorAgeDays, on: $sensorAgeDays) { sensorAgeDays = $0 }
             subscribeSetting(\.sensorStartTime, on: $sensorStartTime) { sensorStartTime = $0 }
             subscribeSetting(\.bolusProgressViewOption, on: $bolusProgressViewOption) { bolusProgressViewOption = $0 }
+            subscribeSetting(\.sensorStartTimeDefault, on: $sensorStartTimeDefault) { sensorStartTimeDefault = $0 }
+
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {

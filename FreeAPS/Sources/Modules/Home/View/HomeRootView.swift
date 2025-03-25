@@ -285,41 +285,6 @@ extension Home {
             }
         }
 
-        /*    private var sageView: some View {
-             ZStack {
-                 if let date = state.recentGlucose?.sessionStartDate {
-                     let expiration = (state.cgm == .xdrip || state.cgm == .glucoseDirect) ? state.sensorDays * 8.64E4 : state.cgm
-                         .expiration
-                     let remainingTime: TimeInterval = expiration - (-1 * date.timeIntervalSinceNow)
-
-                     Sage(amount: remainingTime, expiration: expiration).frame(width: 70, height: 26)
-
-                     HStack {
-                         Image(systemName: "clock")
-                             .font(.system(size: 12))
-                             .foregroundStyle(.white)
-
-                         Text(
-                             remainingTime >= 1 * 8.64E4 ?
-                                 (remainingTimeFormatterDays.string(from: remainingTime) ?? "")
-                                 .replacingOccurrences(of: ",", with: " ") :
-                                 (remainingTimeFormatter.string(from: remainingTime) ?? "")
-                                 .replacingOccurrences(of: ",", with: " ")
-                         )
-                         .font(.system(size: 16))
-                         .foregroundColor(.white)
-                     }
-                     .background(TimeEllipse(characters: 10))
-                 } /* else {
-                      EmptyView() // Stellt sicher, dass immer ein View existiert
-                  } */
-             }
-             .font(.timeSettingFont)
-             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-             .frame(maxHeight: .infinity, alignment: .center)
-             .offset(x: -8, y: 3)
-         }*/
-
         var glucoseView: some View {
             let doubleBolusProgress = Binding<Double?> {
                 state.bolusProgress.map { Double(truncating: $0 as NSNumber) }
@@ -393,11 +358,21 @@ extension Home {
             }
         }
 
-        // Fortschrittsanzeige der Bolus Abgabe
+        /*  private func startProgress() {
+             Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { timer in
+                 withAnimation(Animation.linear(duration: 0.02)) {
+                     progress += 0.01
+                 }
+                 if progress >= 1.0 {
+                     timer.invalidate()
+                 }
+             }
+         }*/
+
         private func startProgress() {
-            Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { timer in
-                withAnimation(Animation.linear(duration: 0.02)) {
-                    progress += 0.01
+            Timer.scheduledTimer(withTimeInterval: 0.05, repeats: true) { timer in
+                withAnimation(Animation.interpolatingSpring(stiffness: 50, damping: 10)) {
+                    progress = min(progress + 0.02, 1.0) // Fortschritt begrenzen
                 }
                 if progress >= 1.0 {
                     timer.invalidate()
@@ -567,6 +542,128 @@ extension Home {
                     }
                 } else {
                     progress = Double(newValue)
+                }
+            }
+        }
+
+        struct MarqueeText: View {
+            var text: String
+            var fontSize: CGFloat = 15
+            var textColor: Color = .white
+
+            @State private var offset: CGFloat = 0
+            let animationDuration: Double = 20.0 // Geschwindigkeit des Texts
+
+            var body: some View {
+                HStack {
+                    Text(text)
+                        .font(.system(size: fontSize))
+                        .foregroundColor(textColor)
+                        .lineLimit(1)
+                        .padding(.leading, 0)
+                        .offset(x: offset)
+                        .onAppear {
+                            // Sobald der View erscheint, starte die Animation
+                            withAnimation(
+                                Animation.linear(duration: animationDuration)
+                                    .repeatForever(autoreverses: false)
+                            ) {
+                                // Start der Animation: Text wird von rechts nach links verschoben
+                                offset = -UIScreen.main.bounds.width - 0
+                            }
+                        }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading) // Text bleibt auf der linken Seite
+                .clipped() // Verhindert, dass der Text über den Bildschirmrand hinausgeht
+            }
+        }
+
+        struct SmallFillablePieSegmentSensorAge: View {
+            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
+
+            var fillFraction: CGFloat
+            var color: Color
+            var backgroundColor: Color
+            var displayText: String
+            var symbolSize: CGFloat
+            var symbol: String
+            var animateProgress: Bool
+            var button3D: Bool
+
+            let angularGradient = AngularGradient(
+                gradient: Gradient(colors: [
+                    Color.gray.opacity(0.3)
+                ]),
+                center: .center,
+                startAngle: .degrees(0),
+                endAngle: .degrees(360)
+            )
+
+            var body: some View {
+                VStack {
+                    ZStack {
+                        if button3D {
+                            Circle()
+                                .fill(Color.darkGray.opacity(0.5))
+                                .frame(width: 40, height: 40)
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            Color.white.opacity(0.9),
+                                            Color.white.opacity(0.4),
+                                            Color.clear,
+                                            Color.black.opacity(0.3),
+                                            Color.black.opacity(0.6)
+                                        ]),
+                                        startPoint: .topLeading,
+                                        endPoint: .bottomTrailing
+                                    ),
+                                    lineWidth: 2
+                                )
+                                .frame(width: 40, height: 40)
+                        } else {
+                            Circle()
+                                .fill(Color.darkGray.opacity(0.5))
+                                .frame(width: 40, height: 40)
+                                .overlay(
+                                    Circle()
+                                        .stroke(Color.white, lineWidth: 0)
+                                )
+                        }
+
+                        PieSliceView(
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                        )
+                        .fill(color)
+                        .frame(width: 40, height: 40)
+                        .opacity(0.6) // Transparenz der Pie Farb Füllung
+
+                        Image(systemName: symbol)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: symbolSize, height: symbolSize)
+                            .foregroundColor(.white)
+                    }
+                    Text(displayText)
+                        .font(.system(size: 15))
+                        .foregroundColor(.white)
+                        .padding(.top, 0)
+                    // Hier kommt der Lauftext
+                    /*  MarqueeText(text: displayText)
+                     .padding(.top, 0)
+                     .frame(maxWidth: .infinity)
+                     .background(Color.clear)*/
+                }
+                .offset(y: 10)
+                .onAppear {
+                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+                }
+                .onChange(of: fillFraction) { _, newValue in
+                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
                 }
             }
         }
@@ -906,69 +1003,6 @@ extension Home {
             }
         }
 
-        struct SmallerFillablePieSegmentSensorAge: View {
-            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
-
-            var fillFraction: CGFloat
-            var color: Color
-            var backgroundColor: Color
-            var animateProgress: Bool
-            var button3D: Bool
-
-            var body: some View {
-                HStack(alignment: .center, spacing: 0) {
-                    ZStack {
-                        if button3D {
-                            Circle()
-                                .fill(Color.darkGray.opacity(0.5))
-                                .frame(width: 40, height: 40)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-
-                            Circle()
-                                .stroke(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            Color.white.opacity(0.9),
-                                            Color.white.opacity(0.4),
-                                            Color.clear,
-                                            Color.black.opacity(0.3),
-                                            Color.black.opacity(0.6)
-                                        ]),
-                                        startPoint: .topLeading,
-                                        endPoint: .bottomTrailing
-                                    ),
-                                    lineWidth: 1
-                                )
-                                .frame(width: 40, height: 40)
-                        } else {
-                            Circle()
-                                .fill(Color.darkGray.opacity(0.5))
-                                .frame(width: 40, height: 40)
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.white, lineWidth: 0)
-                                )
-                        }
-
-                        PieSliceView(
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                        )
-                        .fill(color)
-                        .frame(width: 40, height: 40)
-                        .opacity(0.6)
-                    }
-                    .frame(width: 40, height: 40)
-                }
-                .onAppear {
-                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-                }
-                .onChange(of: fillFraction) { _, newValue in
-                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-                }
-            }
-        }
-
         struct BigFillablePieSegment2: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
@@ -1151,6 +1185,7 @@ extension Home {
                 case .view1:
                     loopView
                         .frame(maxHeight: .infinity)
+                        .offset(y: -3)
                 case .view2:
                     loopView2
                         .frame(maxHeight: .infinity)
@@ -1502,10 +1537,10 @@ extension Home {
         @State private var timer: Timer? = nil
 
         func startTimer() {
-            timer?.invalidate() // Falls ein vorheriger Timer existiert, wir er gestoppt
+            timer?.invalidate() // Falls ein vorheriger Timer existiert, wird er gestoppt
             timer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: true) { _ in
                 state.specialDanaKitFunction()
-
+                state.updateRemainingSensorDays()
                 // Nach 15 Sekunden auf 60 Sekunden Intervall wechseln
                 if timerInterval == 2 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
@@ -1530,7 +1565,7 @@ extension Home {
                         Image(state.danaIconOption.rawValue)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 75, height: 50)
+                            .frame(width: 70, height: 50)
                     }
 
                     Text("⇢")
@@ -1578,7 +1613,7 @@ extension Home {
                                 animateProgress: true,
                                 button3D: state.button3D
                             )
-                            .frame(width: 45, height: 45)
+                            .frame(width: 52, height: 45)
 
                             Image("vial")
                                 .resizable()
@@ -1738,7 +1773,7 @@ extension Home {
                             animateProgress: true,
                             button3D: state.button3D
                         )
-                        .frame(width: 45, height: 45)
+                        .frame(width: 52, height: 45)
 
                         Image("vial")
                             .resizable()
@@ -1756,10 +1791,15 @@ extension Home {
                        let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
                     {
                         let remainingHours = max(cannulaAgeOption.maxCannulaAge - cannulaHours, 0)
-                        let days = Int(remainingHours) / 24
-                        let hours = Int(remainingHours) % 24
+                        let totalRemainingMinutes = Int(remainingHours * 60) // Umwandlung in Minuten
 
-                        return "\(days)d\(hours)h"
+                        if totalRemainingMinutes < 60 {
+                            return "\(totalRemainingMinutes) min" // Falls unter einer Stunde, nur Minuten anzeigen
+                        } else {
+                            let days = totalRemainingMinutes / (24 * 60)
+                            let hours = (totalRemainingMinutes % (24 * 60)) / 60
+                            return "\(days)d\(hours)h"
+                        }
                     } else {
                         return "--"
                     }
@@ -1774,7 +1814,8 @@ extension Home {
                     {
                         let remainingHours = cannulaAgeOption
                             .maxCannulaAge - cannulaHours
-                        if remainingHours <= 0 {
+                        if remainingHours <= 1 { // Test ob es bei unter oder gleich einer Stunde komplett rot wird
+                            // if remainingHours <= 0 { Original. Unter 1 Stunde zeigt er immer noch den roten Pie Anteil
                             return 1.0
                         } else {
                             return CGFloat(min(max(
@@ -1796,7 +1837,7 @@ extension Home {
                     {
                         let maxCannulaAge = cannulaAgeOption.maxCannulaAge
                         let warningThreshold = maxCannulaAge * 0.75
-                        let dangerThreshold = maxCannulaAge
+                        let dangerThreshold = maxCannulaAge * 0.85
 
                         if cannulaHours >= maxCannulaAge {
                             return .red.opacity(1.0)
@@ -1827,7 +1868,7 @@ extension Home {
                         animateProgress: true,
                         button3D: state.button3D
                     )
-                    .frame(width: 45, height: 45)
+                    .frame(width: 52, height: 45)
 
                     Image("infusion")
                         .resizable()
@@ -1884,7 +1925,7 @@ extension Home {
                                 animateProgress: true,
                                 button3D: state.button3D
                             )
-                            .frame(width: 45, height: 45)
+                            .frame(width: 52, height: 45)
 
                             Image("battery")
                                 .resizable()
@@ -1897,15 +1938,14 @@ extension Home {
         }
 
         @StateObject private var sensorAgeSegmentViewModel = PieSegmentViewModel()
+        @State private var sensorAgeText: String = ""
 
         private var sensorAgeDays: some View {
             Group {
                 if state.displayExpiration {
                     let totalHours = state.sensorAgeDays.asInt() * 24
-                    let remainingHours = max(0, totalHours - state.elapsedHours)
-
-                    let fillFraction: CGFloat = remainingHours < 24 ? 1.0 : CGFloat(remainingHours) / CGFloat(totalHours)
-
+                    let remainingHours = max(1, totalHours - state.elapsedHours)
+                    let fillFraction: CGFloat = remainingHours <= 1 ? 1.0 : CGFloat(remainingHours) / CGFloat(totalHours)
                     let sensorColor: Color = remainingHours < 24 ? .red.opacity(0.8) : {
                         switch remainingHours {
                         case ...24: return .red.opacity(0.7)
@@ -1915,21 +1955,18 @@ extension Home {
                     }()
 
                     let sensorAgeText: String = {
-                        let totalHours = state.sensorAgeDays.asInt() * 24
-                        let remainingHours = max(0, totalHours - state.elapsedHours)
-
-                        if remainingHours >= 24 {
-                            let days = remainingHours / 24
-                            let hours = remainingHours % 24
-                            return hours > 0 ? "\(days)d\(hours)h" : "\(days)d"
+                        if let minutes = state.remainingSensorMinutes {
+                            return "\(minutes) min"
                         } else {
-                            return "\(remainingHours)h"
+                            let days = state.remainingSensorDays
+                            let hours = state.remainingSensorHours ?? 0
+                            return hours >= 1 ? "\(days)d\(hours)h" : "\(days)d\(hours)h"
                         }
                     }()
 
                     VStack(spacing: 5) {
                         ZStack {
-                            SmallFillablePieSegment(
+                            SmallFillablePieSegmentSensorAge(
                                 pieSegmentViewModel: sensorAgeSegmentViewModel,
                                 fillFraction: fillFraction,
                                 color: sensorColor,
@@ -1940,7 +1977,7 @@ extension Home {
                                 animateProgress: true,
                                 button3D: state.button3D
                             )
-                            .frame(width: 45, height: 45)
+                            .frame(width: 52, height: 45)
 
                             Image(systemName: "sensor.tag.radiowaves.forward")
                                 .resizable()
@@ -1955,6 +1992,7 @@ extension Home {
             .onAppear {
                 state.settingsDidChange(state.settingsManager.settings)
                 state.sensorAgeDays = state.settingsManager.settings.sensorAgeDays
+                // state.updateRemainingSensorDays()
             }
         }
 
@@ -2000,9 +2038,11 @@ extension Home {
                     if state.danaBarViewOption == "view1" {
                         danaBar1
                             .padding(.top, 10)
+                            .padding(.bottom, 10)
                     } else {
                         danaBar2
                             .padding(.top, 10)
+                            .padding(.bottom, 10)
                     }
                     mainChart.padding(.top, 35)
                     legendPanel.padding(.top, 25)
@@ -2074,7 +2114,7 @@ extension Home {
                         if state.isConnected {
                             BluetoothConnectionView
                                 .foregroundColor(.white)
-                                .offset(y: -5)
+                                .offset(y: -10)
                         }
                     }
                     Spacer()

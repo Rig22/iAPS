@@ -98,6 +98,8 @@ extension Home {
         @Published var sensorStartTime: Date?
         @Published var remainingSensorDays: Int = 0
         @Published var remainingSensorHours: Int?
+        @Published var remainingSensorMinutes: Int?
+        @Published var elapsedMinutes: Int = 0
         @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
         // Dana UI Toggels
         // specialDanaKitFunction
@@ -759,24 +761,29 @@ extension Home.StateModel:
         setupData()
     }
 
-    private func updateRemainingSensorDays() {
+    func updateRemainingSensorDays() {
         if let startTime = sensorStartTime {
             let now = Date()
-            let elapsedHours = Calendar.current.dateComponents([.hour], from: startTime, to: now).hour ?? 0
-            let totalHours = sensorAgeDays.asInt() * 24 // Gesamtstunden des Sensors
-            let remainingHours = max(0, totalHours - elapsedHours) // verbleibende Stunden
 
-            // Wenn mehr als 24 Stunden verbleiben, in Tagen anzeigen
-            if remainingHours >= 24 {
-                remainingSensorDays = remainingHours / 24
-                remainingSensorHours = nil
+            // Berechnung der vergangenen Zeit
+            elapsedMinutes = Int(now.timeIntervalSince(startTime) / 60)
+            let totalMinutes = sensorAgeDays.asInt() * 24 * 60
+            let remainingMinutes = max(0, totalMinutes - elapsedMinutes)
+
+            // Anzeige in Tagen, Stunden oder Minuten
+            if remainingMinutes >= 60 {
+                remainingSensorDays = remainingMinutes / (24 * 60)
+                remainingSensorHours = (remainingMinutes % (24 * 60)) / 60
+                remainingSensorMinutes = nil
             } else {
                 remainingSensorDays = 0
-                remainingSensorHours = remainingHours
+                remainingSensorHours = 0
+                remainingSensorMinutes = remainingMinutes
             }
         } else {
             remainingSensorDays = sensorAgeDays.asInt()
             remainingSensorHours = nil
+            remainingSensorMinutes = nil
         }
     }
 
