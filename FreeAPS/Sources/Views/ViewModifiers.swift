@@ -184,6 +184,10 @@ extension Color {
 }
 
 extension Color {
+    static let rig22BGGlucoseWheel = Color(red: 0.17, green: 0.21, blue: 0.24)
+}
+
+extension Color {
     static let iconColor = (red: 0.49, green: 0.55, blue: 0.96, alpha: 1.00)
 }
 

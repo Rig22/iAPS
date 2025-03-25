@@ -22,6 +22,7 @@ extension StatConfig {
         @Published var displayExpiration: Bool = false
         @Published var anubis: Bool = false
         @Published var fpus: Bool = true
+        @Published var fpuAmounts: Bool = false
         // Dana UI Toggels
         @Published var danaIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
@@ -46,6 +47,8 @@ extension StatConfig {
         @Published var button3D: Bool = false
         @Published var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
         @Published var sensorStartTime: Date?
+        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
+        @Published var sensorStartTimeDefault = Date.distantPast
         // Dana UI Toggels
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
@@ -118,6 +121,7 @@ extension StatConfig {
             subscribeSetting(\.displayDelta, on: $displayDelta) { displayDelta = $0 }
             //    subscribeSetting(\.anubis, on: $anubis) { anubis = $0 }
             subscribeSetting(\.fpus, on: $fpus) { fpus = $0 }
+            subscribeSetting(\.fpuAmounts, on: $fpuAmounts) { fpuAmounts = $0 }
             // Dana Toggels
             subscribeSetting(\.danaIconRawValue, on: $danaIconRawValue) { danaIconRawValue = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
@@ -144,6 +148,9 @@ extension StatConfig {
             subscribeSetting(\.button3D, on: $button3D) { button3D = $0 }
             subscribeSetting(\.sensorAgeDays, on: $sensorAgeDays) { sensorAgeDays = $0 }
             subscribeSetting(\.sensorStartTime, on: $sensorStartTime) { sensorStartTime = $0 }
+            subscribeSetting(\.bolusProgressViewOption, on: $bolusProgressViewOption) { bolusProgressViewOption = $0 }
+            subscribeSetting(\.sensorStartTimeDefault, on: $sensorStartTimeDefault) { sensorStartTimeDefault = $0 }
+
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {

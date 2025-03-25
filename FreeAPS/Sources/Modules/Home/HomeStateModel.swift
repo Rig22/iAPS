@@ -61,6 +61,8 @@ extension Home {
         @Published var useCalc: Bool = true
         @Published var hours: Int = 6
         @Published var iobData: [IOBData] = []
+        @Published var carbData: Decimal = 0
+        @Published var iobs: Decimal = 0
         @Published var neg: Int = 0
         @Published var tddChange: Decimal = 0
         @Published var tddAverage: Decimal = 0
@@ -96,6 +98,9 @@ extension Home {
         @Published var sensorStartTime: Date?
         @Published var remainingSensorDays: Int = 0
         @Published var remainingSensorHours: Int?
+        @Published var remainingSensorMinutes: Int?
+        @Published var elapsedMinutes: Int = 0
+        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -140,7 +145,8 @@ extension Home {
             maxBolusValue: 1,
             useInsulinBars: true,
             screenHours: 6,
-            fpus: true
+            fpus: true,
+            fpuAmounts: false
         )
         /*  var backgroundColor: Color {
              BackgroundColorOption(rawValue: backgroundColorOptionRawValue)?.color ?? .clear
@@ -217,6 +223,7 @@ extension Home {
             data.maxBolus = settingsManager.pumpSettings.maxBolus
             data.useInsulinBars = settingsManager.settings.useInsulinBars
             data.fpus = settingsManager.settings.fpus
+            data.fpuAmounts = settingsManager.settings.fpuAmounts
             displayDelta = settingsManager.settings.displayDelta
             skipGlucoseChart = settingsManager.settings.skipGlucoseChart
             extended = settingsManager.settings.extendHomeView
@@ -245,6 +252,8 @@ extension Home {
             button3D = settingsManager.settings.button3D
             sensorAgeDays = settingsManager.settings.sensorAgeDays
             sensorStartTime = settingsManager.settings.sensorStartTime
+            bolusProgressViewOption = settingsManager.settings.bolusProgressViewOption
+
             // Dana UI Toggels
 
             broadcaster.register(GlucoseObserver.self, observer: self)
@@ -616,7 +625,7 @@ extension Home {
 
         private func setStatusTitle() {
             guard let suggestion = data.suggestion else {
-                statusTitle = "No suggestion"
+                statusTitle = NSLocalizedString("No suggestion", comment: "Status title when there is no suggestion")
                 return
             }
 
@@ -668,29 +677,32 @@ extension Home {
         private func setupData() {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
-                if let data = self.provider.reasons() {
+                let reasonData = self.provider.reasons
+                if let data = self.provider.iobData(reasonData) {
                     self.iobData = data
+                    self.carbData = data.map(\.cob).reduce(0, +)
+                    self.iobs = data.map(\.iob).reduce(0, +)
                     neg = data.filter({ $0.iob < 0 }).count * 5
-                    let tdds = CoreDataStorage().fetchTDD(interval: DateFilter().tenDays)
-                    let yesterday = (tdds.first(where: {
-                        ($0.timestamp ?? .distantFuture) <= Date().addingTimeInterval(-24.hours.timeInterval)
-                    })?.tdd ?? 0) as Decimal
-                    let oneDaysAgo = CoreDataStorage().fetchTDD(interval: DateFilter().today).last
-                    tddChange = ((tdds.first?.tdd ?? 0) as Decimal) - yesterday
-                    tddYesterday = (oneDaysAgo?.tdd ?? 0) as Decimal
-                    tdd2DaysAgo = (tdds.first(where: {
-                        ($0.timestamp ?? .distantFuture) <= (oneDaysAgo?.timestamp ?? .distantPast)
-                            .addingTimeInterval(-1.days.timeInterval)
-                    })?.tdd ?? 0) as Decimal
-                    tdd3DaysAgo = (tdds.first(where: {
-                        ($0.timestamp ?? .distantFuture) <= (oneDaysAgo?.timestamp ?? .distantPast)
-                            .addingTimeInterval(-2.days.timeInterval)
-                    })?.tdd ?? 0) as Decimal
+                }
+                let tdds = CoreDataStorage().fetchTDD(interval: DateFilter().tenDays)
+                let yesterday = (tdds.first(where: {
+                    ($0.timestamp ?? .distantFuture) <= Date().addingTimeInterval(-24.hours.timeInterval)
+                })?.tdd ?? 0) as Decimal
+                let oneDaysAgo = CoreDataStorage().fetchTDD(interval: DateFilter().today).last
+                tddChange = ((tdds.first?.tdd ?? 0) as Decimal) - yesterday
+                tddYesterday = (oneDaysAgo?.tdd ?? 0) as Decimal
+                tdd2DaysAgo = (tdds.first(where: {
+                    ($0.timestamp ?? .distantFuture) <= (oneDaysAgo?.timestamp ?? .distantPast)
+                        .addingTimeInterval(-1.days.timeInterval)
+                })?.tdd ?? 0) as Decimal
+                tdd3DaysAgo = (tdds.first(where: {
+                    ($0.timestamp ?? .distantFuture) <= (oneDaysAgo?.timestamp ?? .distantPast)
+                        .addingTimeInterval(-2.days.timeInterval)
+                })?.tdd ?? 0) as Decimal
 
-                    if let tdds_ = self.provider.dynamicVariables {
-                        tddAverage = ((tdds.first?.tdd ?? 0) as Decimal) - tdds_.average_total_data
-                        tddActualAverage = tdds_.average_total_data
-                    }
+                if let tdds_ = self.provider.dynamicVariables {
+                    tddAverage = ((tdds.first?.tdd ?? 0) as Decimal) - tdds_.average_total_data
+                    tddActualAverage = tdds_.average_total_data
                 }
             }
         }
@@ -749,24 +761,29 @@ extension Home.StateModel:
         setupData()
     }
 
-    private func updateRemainingSensorDays() {
+    func updateRemainingSensorDays() {
         if let startTime = sensorStartTime {
             let now = Date()
-            let elapsedHours = Calendar.current.dateComponents([.hour], from: startTime, to: now).hour ?? 0
-            let totalHours = sensorAgeDays.asInt() * 24 // Gesamtstunden des Sensors
-            let remainingHours = max(0, totalHours - elapsedHours) // verbleibende Stunden
 
-            // Wenn mehr als 24 Stunden verbleiben, in Tagen anzeigen
-            if remainingHours >= 24 {
-                remainingSensorDays = remainingHours / 24
-                remainingSensorHours = nil
+            // Berechnung der vergangenen Zeit
+            elapsedMinutes = Int(now.timeIntervalSince(startTime) / 60)
+            let totalMinutes = sensorAgeDays.asInt() * 24 * 60
+            let remainingMinutes = max(0, totalMinutes - elapsedMinutes)
+
+            // Anzeige in Tagen, Stunden oder Minuten
+            if remainingMinutes >= 60 {
+                remainingSensorDays = remainingMinutes / (24 * 60)
+                remainingSensorHours = (remainingMinutes % (24 * 60)) / 60
+                remainingSensorMinutes = nil
             } else {
                 remainingSensorDays = 0
-                remainingSensorHours = remainingHours
+                remainingSensorHours = 0
+                remainingSensorMinutes = remainingMinutes
             }
         } else {
             remainingSensorDays = sensorAgeDays.asInt()
             remainingSensorHours = nil
+            remainingSensorMinutes = nil
         }
     }
 
@@ -792,6 +809,7 @@ extension Home.StateModel:
         data.maxBolus = settingsManager.pumpSettings.maxBolus
         data.useInsulinBars = settingsManager.settings.useInsulinBars
         data.fpus = settingsManager.settings.fpus
+        data.fpuAmounts = settingsManager.settings.fpuAmounts
         skipGlucoseChart = settingsManager.settings.skipGlucoseChart
         displayDelta = settingsManager.settings.displayDelta
         extended = settingsManager.settings.extendHomeView
@@ -822,6 +840,7 @@ extension Home.StateModel:
         sensorAgeDays = settingsManager.settings.sensorAgeDays
         sensorStartTime = settingsManager.settings.sensorStartTime
         updateRemainingSensorDays()
+        bolusProgressViewOption = settingsManager.settings.bolusProgressViewOption
         // Dana UI Toggels
     }
 
