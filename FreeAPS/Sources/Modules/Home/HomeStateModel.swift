@@ -94,13 +94,17 @@ extension Home {
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = false
         @Published var button3D: Bool = false
-        var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
+        @Published var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
         @Published var sensorStartTime: Date?
-        @Published var remainingSensorDays: Int = 0
+        @Published var remainingSensorDays: Int?
         @Published var remainingSensorHours: Int?
         @Published var remainingSensorMinutes: Int?
         @Published var elapsedMinutes: Int = 0
         @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
+        @Published var incidenceOfLight: Bool = false
+        @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
+        @Published var insulinHours: Double?
+        @Published var insulinAge: String = "--"
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -253,9 +257,9 @@ extension Home {
             sensorAgeDays = settingsManager.settings.sensorAgeDays
             sensorStartTime = settingsManager.settings.sensorStartTime
             bolusProgressViewOption = settingsManager.settings.bolusProgressViewOption
-
+            incidenceOfLight = settingsManager.settings.incidenceOfLight
+            lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
             // Dana UI Toggels
-
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
             broadcaster.register(SettingsObserver.self, observer: self)
@@ -407,33 +411,71 @@ extension Home {
             setupOverrideHistory()
         }
 
-        // DanaKitspecial Funktions
+        /*  // DanaKitspecial Funktions
+         func specialDanaKitFunction() {
+             guard let pumpManager = provider.apsManager.pumpManager as? DanaKitPumpManager else {
+                 return
+             }
+
+             if let cannulaDate = pumpManager.state.cannulaDate {
+                 cannulaHours = -cannulaDate.timeIntervalSinceNow / 3600 // Store as Double
+                 cannulaAge = String(format: "%.0fh", cannulaHours ?? 0) // Store for display
+
+             } else {
+                 cannulaHours = nil
+                 cannulaAge = "--"
+             }
+
+             if let reservoirDate = pumpManager.state.reservoirDate {
+                 reservoirAge = formatToDaysAndHours(reservoirDate)
+
+             } else {
+                 reservoirAge = "--"
+             }
+
+             reservoirLevel = pumpManager.state.reservoirLevel
+             isConnected = pumpManager.state.isConnected
+
+             let batteryCharge = pumpManager.state.batteryRemaining
+             pumpBatteryChargeRemaining = String(format: "%.0f", batteryCharge)
+         }*/
+
         func specialDanaKitFunction() {
             guard let pumpManager = provider.apsManager.pumpManager as? DanaKitPumpManager else {
                 return
             }
 
             if let cannulaDate = pumpManager.state.cannulaDate {
-                cannulaHours = -cannulaDate.timeIntervalSinceNow / 3600 // Store as Double
-                cannulaAge = String(format: "%.0fh", cannulaHours ?? 0) // Store for display
-
+                cannulaHours = -cannulaDate.timeIntervalSinceNow / 3600
+                cannulaAge = String(format: "%.0fh", cannulaHours ?? 0)
             } else {
                 cannulaHours = nil
                 cannulaAge = "--"
             }
 
-            if let reservoirDate = pumpManager.state.reservoirDate {
-                reservoirAge = formatToDaysAndHours(reservoirDate)
-
-            } else {
-                reservoirAge = "--"
-            }
-
+            /*  if let reservoirDate = pumpManager.state.reservoirDate {
+                 updateInsulinAge() // 🔄 Hier wird die neue Funktion aufgerufen
+             }*/
+            updateInsulinAge()
             reservoirLevel = pumpManager.state.reservoirLevel
             isConnected = pumpManager.state.isConnected
 
             let batteryCharge = pumpManager.state.batteryRemaining
             pumpBatteryChargeRemaining = String(format: "%.0f", batteryCharge)
+        }
+
+        func updateInsulinAge() {
+            guard let pumpManager = provider.apsManager.pumpManager as? DanaKitPumpManager else {
+                return
+            }
+
+            if let reservoirDate = pumpManager.state.reservoirDate {
+                insulinHours = -reservoirDate.timeIntervalSinceNow / 3600 // Speichert den Wert als Double
+                insulinAge = String(format: "%.0fh", insulinHours ?? 0) // Formatierte Anzeige
+            } else {
+                insulinHours = nil
+                insulinAge = "--"
+            }
         }
 
         private func formatToDaysAndHours(_ date: Date) -> String {
@@ -764,23 +806,31 @@ extension Home.StateModel:
     func updateRemainingSensorDays() {
         if let startTime = sensorStartTime {
             let now = Date()
-
-            // Berechnung der vergangenen Zeit
             elapsedMinutes = Int(now.timeIntervalSince(startTime) / 60)
             let totalMinutes = sensorAgeDays.asInt() * 24 * 60
             let remainingMinutes = max(0, totalMinutes - elapsedMinutes)
 
-            // Anzeige in Tagen, Stunden oder Minuten
+            // Neue Logik: Nur Stunden anzeigen, wenn < 24h
             if remainingMinutes >= 60 {
-                remainingSensorDays = remainingMinutes / (24 * 60)
-                remainingSensorHours = (remainingMinutes % (24 * 60)) / 60
-                remainingSensorMinutes = nil
+                let remainingDays = remainingMinutes / (24 * 60)
+                let remainingHours = (remainingMinutes % (24 * 60)) / 60
+
+                if remainingDays == 0 {
+                    remainingSensorDays = nil // Keine Tage anzeigen
+                    remainingSensorHours = remainingHours
+                    remainingSensorMinutes = nil
+                } else {
+                    remainingSensorDays = remainingDays
+                    remainingSensorHours = remainingHours
+                    remainingSensorMinutes = nil
+                }
             } else {
-                remainingSensorDays = 0
-                remainingSensorHours = 0
+                remainingSensorDays = nil
+                remainingSensorHours = nil
                 remainingSensorMinutes = remainingMinutes
             }
         } else {
+            // Fallback: Maximalzeit anzeigen, wenn kein Startzeitpunkt gesetzt ist
             remainingSensorDays = sensorAgeDays.asInt()
             remainingSensorHours = nil
             remainingSensorMinutes = nil
@@ -841,6 +891,8 @@ extension Home.StateModel:
         sensorStartTime = settingsManager.settings.sensorStartTime
         updateRemainingSensorDays()
         bolusProgressViewOption = settingsManager.settings.bolusProgressViewOption
+        incidenceOfLight = settingsManager.settings.incidenceOfLight
+        lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
         // Dana UI Toggels
     }
 

@@ -108,6 +108,9 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var sensorStartTime: Date?
     var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
     var sensorStartTimeDefault = Date.distantPast
+    var incidenceOfLight = false
+    var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
+    var insulinHours: Double?
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false
@@ -277,6 +280,9 @@ struct EncodableFreeAPSSettings: Encodable {
         case sensorStartTime
         case bolusProgressViewOption
         case sensorStartTimeDefault
+        case incidenceOfLight
+        case lightGlowOverlaySelector
+        case insulinHours
         // Dana Toggles
         // AutoISF
         case autoisf
@@ -420,6 +426,9 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encodeIfPresent(settings.sensorStartTime, forKey: .sensorStartTime)
         try container.encode(settings.bolusProgressViewOption, forKey: .bolusProgressViewOption)
         try container.encode(settings.sensorStartTimeDefault, forKey: .sensorStartTimeDefault)
+        try container.encode(settings.incidenceOfLight, forKey: .incidenceOfLight)
+        try container.encode(settings.lightGlowOverlaySelector, forKey: .lightGlowOverlaySelector)
+        try container.encode(settings.insulinHours, forKey: .insulinHours)
         // Dana Toggels
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)

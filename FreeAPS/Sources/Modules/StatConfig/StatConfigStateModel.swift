@@ -49,6 +49,8 @@ extension StatConfig {
         @Published var sensorStartTime: Date?
         @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
         @Published var sensorStartTimeDefault = Date.distantPast
+        @Published var incidenceOfLight: Bool = false
+        @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
         // Dana UI Toggels
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
@@ -150,7 +152,8 @@ extension StatConfig {
             subscribeSetting(\.sensorStartTime, on: $sensorStartTime) { sensorStartTime = $0 }
             subscribeSetting(\.bolusProgressViewOption, on: $bolusProgressViewOption) { bolusProgressViewOption = $0 }
             subscribeSetting(\.sensorStartTimeDefault, on: $sensorStartTimeDefault) { sensorStartTimeDefault = $0 }
-
+            subscribeSetting(\.incidenceOfLight, on: $incidenceOfLight) { incidenceOfLight = $0 }
+            subscribeSetting(\.lightGlowOverlaySelector, on: $lightGlowOverlaySelector) { lightGlowOverlaySelector = $0 }
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {
