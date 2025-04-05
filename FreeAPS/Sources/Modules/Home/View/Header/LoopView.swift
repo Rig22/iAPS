@@ -122,7 +122,6 @@ struct LoopView: View {
 
                 if isLooping {
                     Circle()
-                        // .fill(Color.rig22Background)
                         .fill(Color.darkGray.opacity(0.5))
                         .frame(width: 50, height: 50)
                         .transition(.opacity)
@@ -195,13 +194,13 @@ struct LoopView: View {
 
         if delta <= 6.minutes.timeInterval {
             guard actualSuggestion?.deliverAt != nil else {
-                return .white
+                return .white.opacity(0.4)
             }
-            return .green
+            return .white.opacity(0.4)
         } else if delta <= 9.minutes.timeInterval {
-            return .white
+            return .yellow
         } else {
-            return .white
+            return .red
         }
     }
 
@@ -216,11 +215,11 @@ struct LoopView: View {
         if delta < 1.minutes.timeInterval {
             return .clear // unter 1 Minute
         } else if delta <= 6.minutes.timeInterval {
-            return .green.opacity(0.7) // grün für 1-5 Minuten
+            return .white.opacity(0.5) // grün für 1-5 Minuten
         } else if delta < 10.minutes.timeInterval {
-            return .yellow.opacity(0.7) // Gelb für 6-9 Minuten
+            return .white.opacity(0.5) // Gelb für 6-9 Minuten
         } else {
-            return .red // Rot ab Minute 10
+            return .white.opacity(0.5) // Rot ab Minute 10
         }
     }
 

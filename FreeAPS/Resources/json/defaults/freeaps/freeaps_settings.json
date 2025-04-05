@@ -103,7 +103,9 @@
   "sensorAgeDays": "Fuenfzehn_Tage",
   "sensorStartTime": "distantPast",
   "bolusProgressViewOption": "bolusview1",
+  "lightGlowOverlaySelector": "atriumview1",
   "sensorStartTimeDefault": "distantPast",
+  "incidenceOfLight": "false"
   "autoisf": false,
   "smbDeliveryRatioBGrange": 0.0,
   "smbDeliveryRatioMin": 0.5,

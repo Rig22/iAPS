@@ -87,6 +87,16 @@ extension StatConfig {
             return nil
         }
 
+        private func imageName(for option: LightGlowOverlaySelector) -> String {
+            switch option {
+            case .atriumview: return "Moonlight"
+            case .atriumview1: return "FullMoon"
+            case .atriumview2: return "MiddaySun"
+            case .atriumview3: return "EveningSun"
+            case .atriumview4: return "RedSun"
+            }
+        }
+
         var body: some View {
             VStack(spacing: 0) {
                 ZStack {
@@ -182,7 +192,7 @@ extension StatConfig {
                             Section(
                                 footer: Text("Select the  desired bar view")
                             ) {
-                                Toggle("Legend Bar", isOn: $state.legendsSwitch)
+                                // Toggle("Legend Bar", isOn: $state.legendsSwitch)
                                 Toggle("TT Bar", isOn: $state.tempTargetBar)
                                 Toggle("Bottom Bar", isOn: $state.timeSettings)
                             }
@@ -238,9 +248,25 @@ extension StatConfig {
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
                                 }
-
                                 Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
                                 Toggle("3D Look", isOn: $state.button3D)
+                                Toggle("Atrium Light", isOn: $state.incidenceOfLight)
+                                if state.incidenceOfLight {
+                                    Picker("Select your Atrium", selection: $state.lightGlowOverlaySelector) {
+                                        ForEach(LightGlowOverlaySelector.allCases) { option in
+                                            HStack {
+                                                Image(imageName(for: option))
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 30, height: 30)
+                                                Text(option.rawValue)
+                                                    .font(.caption)
+                                            }
+                                            .tag(option)
+                                        }
+                                    }
+                                    .pickerStyle(NavigationLinkPickerStyle())
+                                }
                             }
 
                             Section(
