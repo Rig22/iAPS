@@ -94,7 +94,7 @@ extension StatConfig {
             case .atriumview2: return "MiddaySun"
             case .atriumview3: return "EveningSun"
             case .atriumview4: return "RedSun"
-            }
+            case .atriumview5: return "NortherLights" }
         }
 
         var body: some View {
@@ -115,7 +115,8 @@ extension StatConfig {
                         Image(state.danaIconRawValue)
                             .resizable()
                             .frame(width: 25, height: 18)
-                            .offset(x: -100, y: -55)
+                            // .offset(x: -100, y: -55)
+                            .offset(x: -53, y: -55)
                     }
                 }
                 .frame(width: 360, height: 280)
@@ -231,25 +232,25 @@ extension StatConfig {
                                 }
                                 .pickerStyle(NavigationLinkPickerStyle())
 
-                                if #available(iOS 18.0, *) {
-                                    Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
-                                        ForEach(BackgroundColorOption.allCases) { option in
-                                            HStack {
-                                                Rectangle()
-                                                    .fill(option.color)
-                                                    .frame(width: 25, height: 25)
-                                                    .cornerRadius(4)
-
-                                                Text(option.rawValue.capitalized)
-                                                    .foregroundColor(.primary)
-                                            }
-                                            .tag(option.rawValue)
+                                Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
+                                    ForEach(BackgroundColorOption.allCases) { option in
+                                        HStack {
+                                            Rectangle()
+                                                .fill(option.color)
+                                                .frame(width: 25, height: 25)
+                                                .cornerRadius(4)
+                                            Text(option.rawValue)
+                                                .font(.caption)
                                         }
+                                        .tag(option.rawValue)
                                     }
-                                    .pickerStyle(NavigationLinkPickerStyle())
                                 }
+                                .pickerStyle(NavigationLinkPickerStyle())
+
                                 Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
                                 Toggle("3D Look", isOn: $state.button3D)
+                                if state.button3D {
+                                    Toggle("Icons Backgrounds ⇢ Dark", isOn: $state.button3DBackground) }
                                 Toggle("Atrium Light", isOn: $state.incidenceOfLight)
                                 if state.incidenceOfLight {
                                     Picker("Select your Atrium", selection: $state.lightGlowOverlaySelector) {
@@ -311,14 +312,12 @@ extension StatConfig {
                                                         displayedStartTime = formatDate(newStartTime)
                                                         saveSensorStartTime(newStartTime)
 
-                                                        // Haptisches Feedback
                                                         let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
                                                         impactHeavy.impactOccurred()
 
                                                         print("New sensor started at: \(newStartTime)")
                                                     }
                                             )
-                                        // Anzeige der letzten Startzeit
                                         HStack {
                                             Text("Last sensor start time:")
                                                 .font(.subheadline)

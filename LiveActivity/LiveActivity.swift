@@ -169,7 +169,7 @@ struct LiveActivity: Widget {
             Text(context.state.iob)
             Text(" U")
         }
-        .foregroundStyle(.blue)
+        .foregroundStyle(.mint)
     }
 
     private func cob(context: ActivityViewContext<LiveActivityAttributes>, size _: Size) -> some View {

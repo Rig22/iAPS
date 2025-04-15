@@ -177,6 +177,7 @@ extension Home {
         struct TimeEllipse: View {
             let characters: Int
             var button3D: Bool = false
+            var button3DBackground: Bool = false
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
@@ -188,26 +189,26 @@ extension Home {
                             : Color.white.opacity(0.9)
 
                         let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                            ? lightGlowOverlaySelector.highlightColor
                             : Color.white.opacity(0.4)
 
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: CGFloat(characters * 7), height: 25)
-                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                        if button3DBackground {
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color.darkGray.opacity(0.5))
+                                .frame(width: CGFloat(characters * 7), height: 25)
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                        }
 
                         RoundedRectangle(cornerRadius: 15)
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        glowColor1,
-                                        glowColor2.opacity(0.4),
+                                        glowColor1.opacity(0.5),
+                                        glowColor2.opacity(0.3),
                                         Color.clear,
                                         Color.black.opacity(0.3),
                                         Color.black.opacity(0.6)
                                     ]),
-                                    // startPoint: .topLeading,
-                                    // endPoint: .bottomTrailing
                                     startPoint: .top,
                                     endPoint: .bottom
 
@@ -228,9 +229,10 @@ extension Home {
             }
         }
 
-        struct TimeEllipseLegend: View {
+        struct TimeEllipseBig: View {
             let characters: Int
             var button3D: Bool = false
+            var button3DBackground: Bool = false
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
@@ -242,20 +244,22 @@ extension Home {
                             : Color.white.opacity(0.9)
 
                         let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                            ? lightGlowOverlaySelector.highlightColor
                             : Color.white.opacity(0.4)
 
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: CGFloat(characters * 14), height: 30)
-                            .shadow(color: Color.black.opacity(0.4), radius: 3, x: 3, y: 3)
+                        if button3DBackground {
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.darkGray.opacity(0.5))
+                                .frame(width: CGFloat(characters * 10), height: 25)
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                        }
 
                         RoundedRectangle(cornerRadius: 15)
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        glowColor1,
-                                        glowColor2.opacity(0.4),
+                                        glowColor1.opacity(1.0),
+                                        glowColor2.opacity(0.8),
                                         Color.clear,
                                         Color.black.opacity(0.3),
                                         Color.black.opacity(0.6)
@@ -266,16 +270,129 @@ extension Home {
                                 ),
                                 lineWidth: 1
                             )
-                            .frame(width: CGFloat(characters * 14), height: 30)
+                            .frame(width: CGFloat(characters * 10), height: 26)
                     } else {
                         RoundedRectangle(cornerRadius: 15)
                             .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: CGFloat(characters * 14), height: 30)
+                            .frame(width: CGFloat(characters * 10), height: 26)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 15)
                                     .stroke(Color.white, lineWidth: 0)
                             )
                     }
+                }
+            }
+        }
+
+        struct BatteryEllipse: View {
+            var battery: Battery?
+            var button3D: Bool
+            var button3DBackground: Bool
+            var incidenceOfLight: Bool
+            var lightGlowOverlaySelector: LightGlowOverlaySelector
+            @State private var isLowBatteryBlinking = false
+
+            private var shouldBlink: Bool {
+                guard let percent = battery?.percent else { return false }
+                return percent <= 50
+            }
+
+            private var batteryColor: Color {
+                guard let percent = battery?.percent else { return .gray }
+                switch percent {
+                case ...25: return .red
+                case ...50: return .yellow
+                default: return .green
+                }
+            }
+
+            private var batterySymbol: String {
+                guard let percent = battery?.percent else { return "battery.0" }
+                switch percent {
+                case 81 ... 100: return "battery.100"
+                case 61 ... 80: return "battery.75"
+                case 41 ... 60: return "battery.50"
+                case 21 ... 40: return "battery.25"
+                default: return "battery.0"
+                }
+            }
+
+            private var percentageText: String {
+                if let percent = battery?.percent {
+                    return "\(percent)%"
+                } else {
+                    return "--"
+                }
+            }
+
+            var body: some View {
+                ZStack {
+                    if button3D {
+                        let glowColor1 = incidenceOfLight
+                            ? lightGlowOverlaySelector.highlightColor
+                            : Color.white.opacity(0.9)
+
+                        let glowColor2 = incidenceOfLight
+                            ? lightGlowOverlaySelector.highlightColor
+                            : Color.white.opacity(0.4)
+
+                        if button3DBackground {
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color.darkGray.opacity(0.5))
+                                .frame(width: 74, height: 25) // Feste Breite für Batterie
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                        }
+
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        glowColor1.opacity(0.9),
+                                        glowColor2.opacity(0.6),
+                                        Color.clear,
+                                        Color.black.opacity(0.3),
+                                        Color.black.opacity(0.6)
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                ),
+                                lineWidth: 1
+                            )
+                            .frame(width: 74, height: 25)
+                    } else {
+                        RoundedRectangle(cornerRadius: 15)
+                            .fill(Color.darkGray.opacity(0.5))
+                            .frame(width: 74, height: 25)
+                    }
+
+                    HStack(spacing: 6) {
+                        Image(systemName: batterySymbol)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(batteryColor)
+                            .opacity(shouldBlink ? (isLowBatteryBlinking ? 0.5 : 1) : 1)
+
+                        Text(percentageText)
+                            .font(.system(size: 12))
+                            .foregroundColor(.white)
+                    }
+                    .padding(.horizontal, 8)
+                }
+                .onAppear { startBlinkAnimationIfNeeded() }
+                .onChange(of: battery?.percent) {
+                    startBlinkAnimationIfNeeded()
+                } }
+
+            private func startBlinkAnimationIfNeeded() {
+                isLowBatteryBlinking = false
+                guard shouldBlink else { return }
+
+                withAnimation(
+                    Animation.easeInOut(duration: 0.8)
+                        .repeatForever(autoreverses: true)
+                ) {
+                    isLowBatteryBlinking = true
                 }
             }
         }
@@ -283,7 +400,7 @@ extension Home {
         struct LightGlowOverlay: View {
             var body: some View {
                 RadialGradient(gradient: Gradient(colors: [
-                    Color.white.opacity(0.3),
+                    Color.gray.opacity(0.7),
                     Color.clear
                 ]), center: .top, startRadius: 50, endRadius: 200)
                     .ignoresSafeArea()
@@ -335,6 +452,17 @@ extension Home {
             }
         }
 
+        struct LightGlowOverlay5: View {
+            var body: some View {
+                RadialGradient(gradient: Gradient(colors: [
+                    Color.NorthernLights.opacity(0.7),
+                    Color.clear
+                ]), center: .top, startRadius: 50, endRadius: 200)
+                    .ignoresSafeArea()
+                    .offset(y: -50)
+            }
+        }
+
         var glucoseView: some View {
             let doubleBolusProgress = Binding<Double?> {
                 state.bolusProgress.map { Double(truncating: $0 as NSNumber) }
@@ -344,7 +472,7 @@ extension Home {
                 }
             }
 
-            return ZStack {
+            return ZStack(alignment: .center) {
                 let incidenceOfLight = state.incidenceOfLight
                 let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                     .atriumview
@@ -355,20 +483,22 @@ extension Home {
                         : Color.white.opacity(0.9)
 
                     let glowColor2 = incidenceOfLight
-                        ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                        ? lightGlowOverlaySelector.highlightColor
                         : Color.white.opacity(0.4)
 
-                    Circle()
-                        .fill(Color.darkGray.opacity(0.5))
-                        .frame(width: 110, height: 110)
-                        .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                    if state.button3DBackground {
+                        Circle()
+                            .fill(Color.darkGray.opacity(0.4))
+                            .frame(width: 110, height: 110)
+                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                    }
 
                     Circle()
                         .stroke(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    glowColor1,
-                                    glowColor2.opacity(0.4),
+                                    glowColor1.opacity(0.9),
+                                    glowColor2.opacity(0.6),
                                     Color.clear,
                                     Color.black.opacity(0.3),
                                     Color.black.opacity(0.6)
@@ -376,17 +506,13 @@ extension Home {
                                 startPoint: .top,
                                 endPoint: .bottom
                             ),
-                            lineWidth: 1
+                            lineWidth: 2
                         )
                         .frame(width: 110, height: 110)
                 } else {
                     Circle()
                         .fill(Color.darkGray.opacity(0.5))
                         .frame(width: 110, height: 110)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.white, lineWidth: 0)
-                        )
                 }
 
                 CurrentGlucoseView(
@@ -490,6 +616,44 @@ extension Home {
 
         @ViewBuilder private func bolusProgressView(progress: Decimal, amount: Decimal) -> some View {
             ZStack {
+                let incidenceOfLight = state.incidenceOfLight
+                let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                    .atriumview
+
+                if state.button3D {
+                    let glowColor1 = incidenceOfLight
+                        ? lightGlowOverlaySelector.highlightColor
+                        : Color.white.opacity(0.9)
+
+                    let glowColor2 = incidenceOfLight
+                        ?lightGlowOverlaySelector.highlightColor
+                        : Color.white.opacity(0.4)
+
+                    if state.button3DBackground {
+                        Circle()
+                            .fill(Color.darkGray.opacity(0.4))
+                            .frame(width: 110, height: 110)
+                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                    }
+
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    glowColor1.opacity(0.9),
+                                    glowColor2.opacity(0.6),
+                                    Color.clear,
+                                    Color.black.opacity(0.3),
+                                    Color.black.opacity(0.6)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            ),
+                            lineWidth: 2
+                        )
+                        .frame(width: 118, height: 118)
+                } else {}
+
                 let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
 
                 ProgressView(value: Double(truncating: progress as NSNumber))
@@ -529,41 +693,42 @@ extension Home {
             if let progress = state.bolusProgress, let amount = state.bolusAmount {
                 let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
                 let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
-                let formattedAmount = amount.formatted(.number.precision(.fractionLength(2)))
-                let displayText = "\(bolused) / \(formattedAmount) U"
 
-                VStack {
-                    ZStack {
-                        Circle()
-                            .fill(Color.darkGray.opacity(0.7))
-                            .frame(width: 110, height: 110)
+                ZStack(alignment: .center) {
+                    BigFillablePieSegment2(
+                        pieSegmentViewModel: bolusPieSegmentViewModel2,
+                        fillFraction: fillFraction,
+                        backgroundColor: backgroundColor,
+                        color: .white.opacity(0.3),
+                        animateProgress: true,
+                        button3D: state.button3D,
+                        button3DBackground: state.button3DBackground,
+                        incidenceOfLight: state.incidenceOfLight,
+                        lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                            .atriumview
+                    )
+                    .frame(width: 110, height: 110)
 
-                        BigFillablePieSegment2(
-                            pieSegmentViewModel:
-                            bolusPieSegmentViewModel2,
-                            fillFraction: fillFraction,
-                            backgroundColor: backgroundColor,
-                            color: .white.opacity(0.5),
-                            displayText: displayText,
-                            animateProgress: true,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
+                    Circle()
+                        .fill(Color.red)
+                        .frame(width: 25, height: 25)
+                        .overlay(
+                            Image(systemName: "xmark")
+                                .font(.system(size: 14))
+                                .foregroundColor(.white)
                         )
+                        .onTapGesture { state.cancelBolus() }
 
-                        Circle()
-                            .fill(Color.red)
-                            .frame(width: 25, height: 25)
-                            .overlay(
-                                Image(systemName: "xmark")
-                                    .font(.system(size: 14))
-                                    .foregroundColor(.white)
-                            )
-                            .onTapGesture {
-                                state.cancelBolus()
-                            }
-                    }
+                    Text(
+                        bolused + " " + NSLocalizedString("of", comment: "") + " " +
+                            amount.formatted(.number.precision(.fractionLength(2))) +
+                            NSLocalizedString(" U", comment: " ")
+                    )
+                    .font(.system(size: 13))
+                    .foregroundStyle(Color.white)
+                    .offset(y: -72)
                 }
+                .frame(width: 110, height: 110)
             }
         }
 
@@ -655,6 +820,7 @@ extension Home {
             var symbol: String
             var animateProgress: Bool
             var button3D: Bool
+            var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
@@ -676,20 +842,22 @@ extension Home {
                                 : Color.white.opacity(0.9)
 
                             let glowColor2 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                                ? lightGlowOverlaySelector.highlightColor
                                 : Color.white.opacity(0.4)
 
-                            Circle()
-                                .fill(Color.darkGray.opacity(0.5))
-                                .frame(width: 40, height: 40)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            if button3DBackground {
+                                Circle()
+                                    .fill(Color.darkGray.opacity(0.4))
+                                    .frame(width: 40, height: 40)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            }
 
                             Circle()
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            glowColor1,
-                                            glowColor2.opacity(0.4),
+                                            glowColor1.opacity(0.7),
+                                            glowColor2.opacity(0.3),
                                             Color.clear,
                                             Color.black.opacity(0.3),
                                             Color.black.opacity(0.6)
@@ -744,7 +912,7 @@ extension Home {
             }
         }
 
-        struct FillablePieSegment: View {
+        struct SmallFillablePieSegment: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
             var fillFraction: CGFloat
@@ -755,6 +923,7 @@ extension Home {
             var symbol: String
             var animateProgress: Bool
             var button3D: Bool
+            var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
@@ -773,43 +942,39 @@ extension Home {
                         if button3D {
                             let glowColor1 = incidenceOfLight
                                 ? lightGlowOverlaySelector.highlightColor
-                                : Color.white.opacity(0.9)
+                                : Color.white.opacity(0.7)
 
                             let glowColor2 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                                ? lightGlowOverlaySelector.highlightColor
                                 : Color.white.opacity(0.4)
 
-                            Circle()
-                                .fill(Color.darkGray.opacity(0.5))
-                                .frame(width: 60, height: 60)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            if button3DBackground {
+                                Circle()
+                                    .fill(Color.darkGray.opacity(0.4))
+                                    .frame(width: 40, height: 40)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            }
 
                             Circle()
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            glowColor1,
-                                            glowColor2.opacity(0.4),
+                                            glowColor1.opacity(0.7),
+                                            glowColor2.opacity(0.3),
                                             Color.clear,
                                             Color.black.opacity(0.3),
                                             Color.black.opacity(0.6)
                                         ]),
-                                        // startPoint: .topLeading,
-                                        // endPoint: .bottomTrailing
                                         startPoint: .top,
                                         endPoint: .bottom
                                     ),
                                     lineWidth: 1
                                 )
-                                .frame(width: 60, height: 60)
+                                .frame(width: 40, height: 40)
                         } else {
                             Circle()
                                 .fill(Color.darkGray.opacity(0.5))
-                                .frame(width: 60, height: 60)
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.white, lineWidth: 0)
-                                )
+                                .frame(width: 40, height: 40)
                         }
 
                         PieSliceView(
@@ -817,12 +982,18 @@ extension Home {
                             endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                         )
                         .fill(color)
-                        .frame(width: 60, height: 60)
+                        .frame(width: 40, height: 40)
                         .opacity(0.6)
+
+                        Image(systemName: symbol)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: symbolSize, height: symbolSize)
+                            .foregroundColor(.white)
                     }
 
                     Text(displayText)
-                        .font(.system(size: 18))
+                        .font(.system(size: 15))
                         .foregroundColor(.white)
                         .padding(.top, 0)
                 }
@@ -836,7 +1007,7 @@ extension Home {
             }
         }
 
-        struct SmallFillablePieSegment: View {
+        struct SmallFillablePieSegmentBluetooth: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
             var fillFraction: CGFloat
@@ -847,6 +1018,7 @@ extension Home {
             var symbol: String
             var animateProgress: Bool
             var button3D: Bool
+            var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
@@ -865,29 +1037,29 @@ extension Home {
                         if button3D {
                             let glowColor1 = incidenceOfLight
                                 ? lightGlowOverlaySelector.highlightColor
-                                : Color.white.opacity(0.9)
+                                : Color.white.opacity(0.7)
 
                             let glowColor2 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                                ? lightGlowOverlaySelector.highlightColor
                                 : Color.white.opacity(0.4)
 
-                            Circle()
-                                .fill(Color.darkGray.opacity(0.5))
-                                .frame(width: 40, height: 40)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            if button3DBackground {
+                                Circle()
+                                    .fill(Color.darkGray.opacity(0.4))
+                                    .frame(width: 40, height: 40)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            }
 
                             Circle()
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            glowColor1,
-                                            glowColor2.opacity(0.4),
+                                            glowColor1.opacity(0.9),
+                                            glowColor2.opacity(0.6),
                                             Color.clear,
                                             Color.black.opacity(0.3),
                                             Color.black.opacity(0.6)
                                         ]),
-                                        // startPoint: .topLeading,
-                                        // endPoint: .bottomTrailing
                                         startPoint: .top,
                                         endPoint: .bottom
                                     ),
@@ -898,10 +1070,6 @@ extension Home {
                             Circle()
                                 .fill(Color.darkGray.opacity(0.5))
                                 .frame(width: 40, height: 40)
-                                .overlay(
-                                    Circle()
-                                        .stroke(Color.white, lineWidth: 0)
-                                )
                         }
 
                         PieSliceView(
@@ -910,7 +1078,7 @@ extension Home {
                         )
                         .fill(color)
                         .frame(width: 40, height: 40)
-                        .opacity(0.6) // Transparenz der Pie Farb Füllung
+                        .opacity(0.6)
 
                         Image(systemName: symbol)
                             .resizable()
@@ -943,6 +1111,7 @@ extension Home {
             var displayText: String
             var animateProgress: Bool
             var button3D: Bool
+            var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
@@ -964,23 +1133,22 @@ extension Home {
                                 : Color.white.opacity(0.9)
 
                             let glowColor2 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                                ? lightGlowOverlaySelector.highlightColor
                                 : Color.white.opacity(0.4)
 
-                            Circle()
-                                .fill(Color.darkGray.opacity(0.5))
-                                .frame(width: 40, height: 40)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                            /* Circle()
-                             .fill(Color.orange)
-                             .frame(width: 5, height: 5)*/
+                            if button3DBackground {
+                                Circle()
+                                    .fill(Color.darkGray.opacity(0.4))
+                                    .frame(width: 40, height: 40)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            }
 
                             Circle()
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            glowColor1,
-                                            glowColor2.opacity(0.4),
+                                            glowColor1.opacity(0.8),
+                                            glowColor2.opacity(0.5),
                                             Color.clear,
                                             Color.black.opacity(0.3),
                                             Color.black.opacity(0.6)
@@ -1006,9 +1174,6 @@ extension Home {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 30, height: 30)
-                            /* Circle()
-                             .fill(Color.orange)
-                             .frame(width: 5, height: 5)*/
                         }
 
                         PieSliceView(
@@ -1044,17 +1209,9 @@ extension Home {
             var displayText: String
             var animateProgress: Bool
             var button3D: Bool
+            var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
-
-            let angularGradient = AngularGradient(
-                gradient: Gradient(colors: [
-                    Color.gray.opacity(0.3)
-                ]),
-                center: .center,
-                startAngle: .degrees(0),
-                endAngle: .degrees(360)
-            )
 
             var body: some View {
                 HStack(alignment: .center, spacing: 5) {
@@ -1065,24 +1222,22 @@ extension Home {
                                 : Color.white.opacity(0.9)
 
                             let glowColor2 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                                ? lightGlowOverlaySelector.highlightColor
                                 : Color.white.opacity(0.4)
 
-                            Circle()
-                                .fill(Color.darkGray.opacity(0.5))
-                                .frame(width: 40, height: 40)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-
-                            /*   Circle()
-                             .fill(Color.insulin)
-                             .frame(width: 5, height: 5)*/
+                            if button3DBackground {
+                                Circle()
+                                    .fill(Color.darkGray.opacity(0.4))
+                                    .frame(width: 40, height: 40)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            }
 
                             Circle()
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            glowColor1,
-                                            glowColor2.opacity(0.4),
+                                            glowColor1.opacity(0.8),
+                                            glowColor2.opacity(0.5),
                                             Color.clear,
                                             Color.black.opacity(0.3),
                                             Color.black.opacity(0.6)
@@ -1108,9 +1263,6 @@ extension Home {
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 30, height: 30)
-                            /*   Circle()
-                             .fill(Color.insulin)
-                             .frame(width: 5, height: 5)*/
                         }
 
                         PieSliceView(
@@ -1146,17 +1298,9 @@ extension Home {
             var displayText: String
             var animateProgress: Bool
             var button3D: Bool
+            var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
-
-            let angularGradient = AngularGradient(
-                gradient: Gradient(colors: [
-                    Color.gray.opacity(0.3)
-                ]),
-                center: .center,
-                startAngle: .degrees(0),
-                endAngle: .degrees(360)
-            )
 
             var body: some View {
                 HStack(alignment: .center, spacing: 5) {
@@ -1167,24 +1311,22 @@ extension Home {
                                 : Color.white.opacity(0.9)
 
                             let glowColor2 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                                ? lightGlowOverlaySelector.highlightColor
                                 : Color.white.opacity(0.4)
 
-                            Circle()
-                                .fill(Color.darkGray.opacity(0.5))
-                                .frame(width: 40, height: 40)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-
-                            Circle()
-                                .fill(Color.insulin)
-                                .frame(width: 5, height: 5)
+                            if button3DBackground {
+                                Circle()
+                                    .fill(Color.darkGray.opacity(0.4))
+                                    .frame(width: 40, height: 40)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            }
 
                             Circle()
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
                                             glowColor1,
-                                            glowColor2.opacity(0.4),
+                                            glowColor2.opacity(0.3),
                                             Color.clear,
                                             Color.black.opacity(0.3),
                                             Color.black.opacity(0.6)
@@ -1203,9 +1345,6 @@ extension Home {
                                     Circle()
                                         .stroke(Color.white, lineWidth: 0)
                                 )
-                            Circle()
-                                .fill(Color.insulin)
-                                .frame(width: 5, height: 5)
                         }
 
                         PieSliceView(
@@ -1235,19 +1374,50 @@ extension Home {
         struct BigFillablePieSegment2: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
-            // private let backgroundColorCircle = Color(red: 0.31, green: 0.42, blue: 0.66)
-            private let backgroundColorCircle = Color.blue.opacity(0.5)
-
             var fillFraction: CGFloat
             var backgroundColor: Color?
             var color: Color
-            var displayText: String
             var animateProgress: Bool
+            var button3D: Bool
+            var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
             var body: some View {
                 ZStack {
+                    if button3D {
+                        let glowColor1 = incidenceOfLight
+                            ? lightGlowOverlaySelector.highlightColor
+                            : Color.white.opacity(0.9)
+
+                        let glowColor2 = incidenceOfLight
+                            ? lightGlowOverlaySelector.highlightColor
+                            : Color.white.opacity(0.4)
+
+                        /*    if state.button3DBackground {
+                             Circle()
+                                 .fill(Color.darkGray.opacity(0.4))
+                                 .frame(width: 45, height: 45)
+                                 .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                         }*/
+
+                        Circle()
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        glowColor1.opacity(0.9),
+                                        glowColor2.opacity(0.6),
+                                        Color.clear,
+                                        Color.black.opacity(0.3),
+                                        Color.black.opacity(0.6)
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                ),
+                                lineWidth: 1
+                            )
+                    } else {}
+
                     PieSliceView(
                         startAngle: .degrees(-90),
                         endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
@@ -1255,13 +1425,6 @@ extension Home {
                     .fill(color)
                     .frame(width: 110, height: 110)
                     .opacity(1.0)
-
-                    Text(displayText)
-                        .font(.system(size: 14))
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-                        .frame(width: 100)
-                        .offset(y: 27)
                 }
                 .onAppear {
                     pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
@@ -1308,7 +1471,7 @@ extension Home {
                                     .foregroundColor(.white)
                                     +
                                     Text(manualBasalString)
-                                    .font(.system(size: 16))
+                                    .font(.system(size: 14))
                                     .foregroundColor(.white)
                             }
                         } else {
@@ -1319,9 +1482,10 @@ extension Home {
                     }
                     .font(.timeSettingFont)
                     .background(
-                        TimeEllipse(
-                            characters: 17,
+                        TimeEllipseBig(
+                            characters: 10,
                             button3D: state.button3D,
+                            button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview
@@ -1336,20 +1500,21 @@ extension Home {
         private var BluetoothConnectionView: some View {
             Group {
                 let connectionFraction: CGFloat = state.isConnected ? 1.0 : 0.0
-                let connectionColor: Color = state.isConnected ? .green.opacity(0.8) : .green.opacity(0.8)
+                let connectionColor: Color = state.isConnected ? .white.opacity(0.3) : .green.opacity(0.8)
 
                 HStack {
                     ZStack {
-                        SmallFillablePieSegment(
+                        SmallFillablePieSegmentBluetooth(
                             pieSegmentViewModel: connectionPieSegmentViewModel,
                             fillFraction: connectionFraction,
                             color: connectionColor,
-                            backgroundColor: .gray,
+                            backgroundColor: .blue,
                             displayText: " ",
                             symbolSize: 0,
                             symbol: "cross.vial",
                             animateProgress: true,
                             button3D: state.button3D,
+                            button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview
@@ -1364,6 +1529,17 @@ extension Home {
                     }
                 }
             }
+        }
+
+        var batteryView: some View {
+            BatteryEllipse(
+                battery: state.battery,
+                button3D: state.button3D,
+                button3DBackground: state.button3DBackground,
+                incidenceOfLight: state.incidenceOfLight,
+                lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
+            )
+            .offset(y: 0)
         }
 
         // eventualBG Anfang
@@ -1407,9 +1583,10 @@ extension Home {
                     }
                     .font(.timeSettingFont)
                     .background(
-                        TimeEllipse(
-                            characters: 17,
+                        TimeEllipseBig(
+                            characters: 10,
                             button3D: state.button3D,
+                            button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview
@@ -1417,7 +1594,6 @@ extension Home {
                     )
                 }
             }
-            .offset(x: -20, y: 0)
         }
 
         // eventualBG Ende
@@ -1442,7 +1618,6 @@ extension Home {
                         .offset(y: 10)
                 }
             } else {
-                // Fallback-Ansicht, falls der String-Wert ungültig ist
                 Text("Ungültige Ansichtsauswahl")
                     .foregroundColor(.red)
             }
@@ -1450,62 +1625,55 @@ extension Home {
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             LinearGradient(
-                gradient: Gradient(colors: [
-                    .clear,
-                    .clear,
-                    .clear
-                ]),
+                gradient: Gradient(colors: [.clear, .clear, .clear]),
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .frame(
-                maxHeight: fontSize < .extraExtraLarge ? 140 + geo.safeAreaInsets.top : 0 + geo.safeAreaInsets.top
-            )
-            .padding(.top, geo.safeAreaInsets.top)
-            .overlay {
-                if state.incidenceOfLight {
-                    if let selectedOverlay = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) {
-                        switch selectedOverlay {
-                        case .atriumview:
-                            LightGlowOverlay()
-                        case .atriumview1:
-                            LightGlowOverlay1()
-                        case .atriumview2:
-                            LightGlowOverlay2()
-                        case .atriumview3:
-                            LightGlowOverlay3()
-                        case .atriumview4:
-                            LightGlowOverlay4()
-                        }
-                    } else {
-                        EmptyView() // Optional, falls der Wert ungültig ist
+            .frame(maxHeight: headerHeight(for: geo))
+            .overlay(alignment: .top) {
+                lightGlowOverlayContent()
+                VStack(spacing: 12) {
+                    HStack {
+                        Spacer()
+                        tempRateSensorAgeeventualBG
+                            .frame(height: 24)
+                            .padding(.trailing, 16)
                     }
-                } else {
-                    EmptyView()
+
+                    // Drei Hauptkomponenten
+                    HStack(spacing: 0) {
+                        stackedLeftTopView
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.leading, 32)
+                        bolusProgressViewSelector()
+                            .frame(maxWidth: .infinity)
+                        loopViewSelector()
+                            .frame(maxWidth: .infinity, alignment: .trailing)
+                            .padding(.trailing, 32)
+                    }
+                    .padding(.top, 10)
                 }
+                .padding(.top, geo.safeAreaInsets.top + 20)
+            }
+        }
 
-                VStack {
-                    VStack(alignment: .leading) {
-                        HStack {
-                            VStack(alignment: .leading) {
-                                HStack {
-                                    stackedLeftTopView
-                                        .offset(x: 40, y: 65)
-                                }
-                            }
-                            HStack {
-                                bolusProgressViewSelector()
-                                    .offset(x: -105, y: 63)
-                            }
+        private func headerHeight(for geo: GeometryProxy) -> CGFloat {
+            let baseHeight: CGFloat = 205
+            return baseHeight + geo.safeAreaInsets.top
+        }
 
-                            loopViewSelector()
-                                .offset(x: -50, y: 63)
-                        }
+        @ViewBuilder private func lightGlowOverlayContent() -> some View {
+            if state.incidenceOfLight {
+                if let selectedOverlay = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) {
+                    switch selectedOverlay {
+                    case .atriumview: LightGlowOverlay()
+                    case .atriumview1: LightGlowOverlay1()
+                    case .atriumview2: LightGlowOverlay2()
+                    case .atriumview3: LightGlowOverlay3()
+                    case .atriumview4: LightGlowOverlay4()
+                    case .atriumview5: LightGlowOverlay5()
                     }
                 }
-                tempRateSensorAgeeventualBG
-                    .frame(maxWidth: .infinity, maxHeight: 24)
-                    .offset(y: -geo.safeAreaInsets.top + 20) // Nach oben schieben
             }
         }
 
@@ -1529,11 +1697,12 @@ extension Home {
                             SmallerFillablePieSegmentCarbs(
                                 pieSegmentViewModel: carbsPieSegmentViewModel,
                                 fillFraction: fill,
-                                color: .white.opacity(0.5),
+                                color: .white.opacity(0.3),
                                 backgroundColor: .clear,
                                 displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
                                 animateProgress: true,
                                 button3D: state.button3D,
+                                button3DBackground: state.button3DBackground,
                                 incidenceOfLight: state.incidenceOfLight,
                                 lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                     .atriumview
@@ -1560,7 +1729,7 @@ extension Home {
                             let fill = min(fraction, 1.0)
 
                             let isNegative = substance < 0
-                            let pieColor: Color = isNegative ? .red : .white.opacity(0.5)
+                            let pieColor: Color = isNegative ? .red : .white.opacity(0.2)
                             let _: Double = isNegative ? 90 : -90
 
                             SmallerFillablePieSegmentInsulin(
@@ -1571,6 +1740,7 @@ extension Home {
                                 displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
                                 animateProgress: true,
                                 button3D: state.button3D,
+                                button3DBackground: state.button3DBackground,
                                 incidenceOfLight: state.incidenceOfLight,
                                 lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                     .atriumview
@@ -1588,6 +1758,10 @@ extension Home {
 
         // InsulinView Ende
 
+        // Loop Views Anfang
+
+        // LoopView 1 gefüllter Pie
+
         var loopView: some View {
             ZStack {
                 let incidenceOfLight = state.incidenceOfLight
@@ -1600,13 +1774,15 @@ extension Home {
                         : Color.white.opacity(0.9)
 
                     let glowColor2 = incidenceOfLight
-                        ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                        ? lightGlowOverlaySelector.highlightColor
                         : Color.white.opacity(0.4)
 
-                    Circle()
-                        .fill(Color.darkGray.opacity(0.5))
-                        .frame(width: 50, height: 50)
-                        .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                    if state.button3DBackground {
+                        Circle()
+                            .fill(Color.darkGray.opacity(0.4))
+                            .frame(width: 50, height: 50)
+                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                    }
 
                     Circle()
                         .stroke(
@@ -1654,33 +1830,77 @@ extension Home {
             }
         }
 
+        // Ring Loop
+
         var loopView2: some View {
-            LoopView2(
-                suggestion: $state.data.suggestion,
-                enactedSuggestion: $state.enactedSuggestion,
-                closedLoop: $state.closedLoop,
-                timerDate: $state.data.timerDate,
-                isLooping: $state.isLooping,
-                lastLoopDate: $state.lastLoopDate,
-                manualTempBasal: $state.manualTempBasal
-            )
-            .onTapGesture {
-                state.isStatusPopupPresented.toggle()
-            }.onLongPressGesture {
-                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                impactHeavy.impactOccurred()
-                state.runLoop()
+            ZStack {
+                let incidenceOfLight = state.incidenceOfLight
+                let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                    .atriumview
+
+                if state.button3D {
+                    let glowColor1 = incidenceOfLight
+                        ? lightGlowOverlaySelector.highlightColor
+                        : Color.white.opacity(0.9)
+
+                    let glowColor2 = incidenceOfLight
+                        ?lightGlowOverlaySelector.highlightColor
+                        : Color.white.opacity(0.4)
+
+                    // Schatten
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    glowColor1.opacity(0.8),
+                                    glowColor2.opacity(0.6),
+                                    Color.clear,
+                                    Color.black.opacity(0.3),
+                                    Color.black.opacity(0.6)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            ),
+                            lineWidth: 1
+                        )
+                        .frame(width: 45, height: 45)
+                        .offset(y: -12)
+
+                } else {}
+
+                LoopView2(
+                    suggestion: $state.data.suggestion,
+                    enactedSuggestion: $state.enactedSuggestion,
+                    closedLoop: $state.closedLoop,
+                    timerDate: $state.data.timerDate,
+                    isLooping: $state.isLooping,
+                    lastLoopDate: $state.lastLoopDate,
+                    manualTempBasal: $state.manualTempBasal,
+                    button3DBackground: $state.button3DBackground
+                )
+                .onTapGesture {
+                    state.isStatusPopupPresented.toggle()
+                }.onLongPressGesture {
+                    let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                    impactHeavy.impactOccurred()
+                    state.runLoop()
+                }
             }
         }
+
+        // LoopView 2 Ende
+
+        // Loop Views Ende
 
         // DanaBars
 
         @StateObject private var cannulaPieSegmentViewModel = PieSegmentViewModel()
-        @StateObject private var batteryPieSegmentViewModel = PieSegmentViewModel()
+        //   @StateObject private var batteryPieSegmentViewModel = PieSegmentViewModel()
         @StateObject private var reservoirPieSegmentViewModel = PieSegmentViewModel()
         @StateObject private var reservoirAgePieSegmentViewModel = PieSegmentViewModel()
         @StateObject private var connectionPieSegmentViewModel = PieSegmentViewModel()
         @StateObject private var insulinAgePieSegmentViewModel = PieSegmentViewModel()
+        @StateObject private var batteryAgePieSegmentViewModel = PieSegmentViewModel()
 
         // Insulin Concentration Badge ->
         struct NonStandardInsulin: View {
@@ -1695,7 +1915,7 @@ extension Home {
             var body: some View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 15)
-                        .fill(Color(.insulin).opacity(0.5))
+                        .fill(Color(.blue).opacity(0.5))
                         .frame(width: 37, height: 17)
                         .overlay {
                             Text("U" + (formatter.string(from: concentration * 100 as NSNumber) ?? ""))
@@ -1724,8 +1944,11 @@ extension Home {
                                 cannulaAgeView
                             }
                             HStack(spacing: 10) {
-                                batteryView
+                                batteryAgeView
                             }
+                            /*  HStack(spacing: 10) {
+                                 batteryView
+                             }*/
                             HStack(spacing: 10) {
                                 sensorAgeDays
                             }
@@ -1748,18 +1971,20 @@ extension Home {
                     VStack(spacing: 20) {
                         HStack(spacing: 20) {
                             HStack(spacing: 10) {
-                                pumpIconView
-                                    .offset(y: 8)
-                            }
-                            HStack(spacing: 10) {
                                 reservoirView
                             }
                             HStack(spacing: 10) {
                                 cannulaAgeView
                             }
                             HStack(spacing: 10) {
-                                batteryView
+                                pumpIconView
                             }
+                            HStack(spacing: 10) {
+                                batteryAgeView
+                            }
+                            /* HStack(spacing: 10) {
+                                 batteryView
+                             }*/
                             HStack(spacing: 10) {
                                 sensorAgeDays
                             }
@@ -1809,9 +2034,9 @@ extension Home {
                             .frame(width: 70)
                     }
 
-                    Text("⇢")
-                        .font(.system(size: 20))
-                        .foregroundStyle(Color.white)
+                    /*  Text("⇢")
+                     .font(.system(size: 20))
+                     .foregroundStyle(Color.white)*/
                 }
                 .onTapGesture {
                     if state.pumpDisplayState != nil {
@@ -1835,7 +2060,7 @@ extension Home {
                         } else if reservoir < 50 {
                             return .yellow
                         } else {
-                            return .white.opacity(0.5)
+                            return .white.opacity(0.3)
                         }
                     }()
 
@@ -1861,11 +2086,12 @@ extension Home {
                                 symbol: "cross.vial",
                                 animateProgress: true,
                                 button3D: state.button3D,
+                                button3DBackground: state.button3DBackground,
                                 incidenceOfLight: state.incidenceOfLight,
                                 lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                     .atriumview
                             )
-                            .frame(width: 52, height: 45)
+                            .frame(width: 60, height: 45)
 
                             Image("vial")
                                 .resizable()
@@ -1893,25 +2119,24 @@ extension Home {
         private var insulinAgeView: some View {
             Group {
                 let insulinDisplayText: String = {
-                    if let insulinHours = state.insulinHours,
-                       let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption)
-                    {
-                        let remainingHours = max(insulinAgeOption.maxInsulinAge - insulinHours, 0)
-                        let totalRemainingMinutes = Int(remainingHours * 60)
-
-                        if totalRemainingMinutes < 60 {
-                            return "\(totalRemainingMinutes)min"
-                        } else {
-                            let days = totalRemainingMinutes / (24 * 60)
-                            let hours = (totalRemainingMinutes % (24 * 60)) / 60
-                            if days > 0 {
-                                return "\(days)d\(hours)h"
-                            } else {
-                                return "\(hours)h"
-                            }
-                        }
-                    } else {
+                    guard let insulinHours = state.insulinHours,
+                          let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption)
+                    else {
                         return "--"
+                    }
+
+                    let remainingHours = max(insulinAgeOption.maxInsulinAge - insulinHours, 0)
+                    let totalRemainingMinutes = Int(remainingHours * 60)
+                    let days = totalRemainingMinutes / (24 * 60)
+                    let hours = (totalRemainingMinutes % (24 * 60)) / 60
+                    let minutes = totalRemainingMinutes % 60
+
+                    if days >= 1 {
+                        return "\(days)d\(hours)h"
+                    } else if hours >= 1 {
+                        return "\(hours)h\(minutes)m"
+                    } else {
+                        return "\(minutes)m"
                     }
                 }()
 
@@ -1956,7 +2181,7 @@ extension Home {
                         case warningThreshold ..< dangerThreshold:
                             return .yellow
                         default:
-                            return .white.opacity(0.5)
+                            return .white.opacity(0.3)
                         }
                     } else {
                         return .clear
@@ -1974,11 +2199,12 @@ extension Home {
                         symbol: "cross.vial",
                         animateProgress: true,
                         button3D: state.button3D,
+                        button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview
                     )
-                    .frame(width: 52, height: 45)
+                    .frame(width: 60, height: 45)
 
                     Image("vial")
                         .resizable()
@@ -1991,23 +2217,24 @@ extension Home {
         private var cannulaAgeView: some View {
             Group {
                 let cannulaDisplayText: String = {
-                    if let cannulaHours = state.cannulaHours,
-                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
-                    {
-                        let remainingHours = max(cannulaAgeOption.maxCannulaAge - cannulaHours, 0)
-                        let totalRemainingMinutes = Int(remainingHours * 60)
-
-                        if totalRemainingMinutes < 60 {
-                            return "\(totalRemainingMinutes)min"
-                        } else if remainingHours < 24 {
-                            return "\(Int(remainingHours))h"
-                        } else {
-                            let days = totalRemainingMinutes / (24 * 60)
-                            let hours = (totalRemainingMinutes % (24 * 60)) / 60
-                            return "\(days)d\(hours)h"
-                        }
-                    } else {
+                    guard let cannulaHours = state.cannulaHours,
+                          let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
+                    else {
                         return "--"
+                    }
+
+                    let remainingHours = max(cannulaAgeOption.maxCannulaAge - cannulaHours, 0)
+                    let totalRemainingMinutes = Int(remainingHours * 60)
+                    let days = totalRemainingMinutes / (24 * 60)
+                    let hours = (totalRemainingMinutes % (24 * 60)) / 60
+                    let minutes = totalRemainingMinutes % 60
+
+                    if days >= 1 {
+                        return "\(days)d\(hours)h"
+                    } else if hours >= 1 {
+                        return "\(hours)h\(minutes)m"
+                    } else {
+                        return "\(minutes)m"
                     }
                 }()
 
@@ -2054,7 +2281,7 @@ extension Home {
                         case warningThreshold ..< dangerThreshold:
                             return .yellow
                         default:
-                            return .white.opacity(0.5)
+                            return .white.opacity(0.3)
                         }
                     } else {
                         return .clear
@@ -2072,11 +2299,12 @@ extension Home {
                         symbol: "cross.vial",
                         animateProgress: true,
                         button3D: state.button3D,
+                        button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview
                     )
-                    .frame(width: 52, height: 45)
+                    .frame(width: 60, height: 45)
 
                     Image("infusion")
                         .resizable()
@@ -2086,63 +2314,107 @@ extension Home {
             }
         }
 
-        private var batteryView: some View {
+        /* private var batteryView: some View {
+             Group {
+                 var batteryColor: Color {
+                     if let batteryChargeString = state.pumpBatteryChargeRemaining,
+                        let batteryCharge = Double(batteryChargeString)
+                     {
+                         switch batteryCharge {
+                         case ...25:
+                             return .red
+                         case ...50:
+                             return .yellow
+                         default:
+                             return .white.opacity(0.3)
+                         }
+                     } else {
+                         return Color.gray.opacity(0.3)
+                     }
+                 }
+
+                 let batteryText: String = {
+                     if let batteryChargeString = state.pumpBatteryChargeRemaining,
+                        let batteryCharge = Double(batteryChargeString)
+                     {
+                         return "\(Int(batteryCharge))%"
+                     } else {
+                         return "--"
+                     }
+                 }()
+
+                 if let batteryChargeString = state.pumpBatteryChargeRemaining,
+                    let batteryCharge = Double(batteryChargeString)
+                 {
+                     let batteryFraction = CGFloat(batteryCharge) / 100.0
+
+                     VStack(spacing: 5) {
+                         ZStack {
+                             SmallFillablePieSegment(
+                                 pieSegmentViewModel: batteryPieSegmentViewModel,
+                                 fillFraction: batteryFraction,
+                                 color: batteryColor,
+                                 backgroundColor: .clear,
+                                 displayText: batteryText,
+                                 symbolSize: 0,
+                                 symbol: "cross.vial",
+                                 animateProgress: true,
+                                 button3D: state.button3D,
+                                 button3DBackground: state.button3DBackground,
+                                 incidenceOfLight: state.incidenceOfLight,
+                                 lightGlowOverlaySelector: LightGlowOverlaySelector(
+                                     rawValue: state.lightGlowOverlaySelector
+                                 ) ??
+                                     .atriumview
+                             )
+                             .frame(width: 60, height: 45)
+
+                             Image("battery")
+                                 .resizable()
+                                 .scaledToFit()
+                                 .frame(width: 40, height: 40)
+                         }
+                     }
+                 }
+             }
+         }*/
+
+        private var batteryAgeView: some View {
             Group {
-                var batteryColor: Color {
-                    if let batteryChargeString = state.pumpBatteryChargeRemaining,
-                       let batteryCharge = Double(batteryChargeString)
-                    {
-                        switch batteryCharge {
-                        case ...25:
-                            return .red
-                        case ...50:
-                            return .yellow
-                        default:
-                            return .white.opacity(0.5)
-                        }
-                    } else {
-                        return Color.gray.opacity(0.3)
+                var batteryAgeColor: Color {
+                    guard let remainingHours = state.batteryHours else { return .gray }
+                    switch remainingHours {
+                    case ..<24: return .red // <1 Tag übrig
+                    case ..<72: return .yellow // 1-3 Tage übrig
+                    // default: return .green // >3 Tage übrig
+                    default: return .white.opacity(0.3)
                     }
                 }
 
-                let batteryText: String = {
-                    if let batteryChargeString = state.pumpBatteryChargeRemaining,
-                       let batteryCharge = Double(batteryChargeString)
-                    {
-                        return "\(Int(batteryCharge))%"
-                    } else {
-                        return "--"
-                    }
-                }()
+                VStack(spacing: 5) {
+                    ZStack {
+                        SmallFillablePieSegment(
+                            pieSegmentViewModel: batteryAgePieSegmentViewModel,
+                            fillFraction: state.batteryAgeFraction,
+                            color: batteryAgeColor,
+                            backgroundColor: .clear,
+                            displayText: state.batteryAge,
+                            symbolSize: 0,
+                            symbol: "cross.vial",
+                            animateProgress: true,
+                            button3D: state.button3D,
+                            button3DBackground: state.button3DBackground,
+                            incidenceOfLight: state.incidenceOfLight,
+                            lightGlowOverlaySelector: LightGlowOverlaySelector(
+                                rawValue: state.lightGlowOverlaySelector
+                            ) ?? .atriumview
+                        )
+                        .frame(width: 60, height: 45)
 
-                if let batteryChargeString = state.pumpBatteryChargeRemaining,
-                   let batteryCharge = Double(batteryChargeString)
-                {
-                    let batteryFraction = CGFloat(batteryCharge) / 100.0
-
-                    VStack(spacing: 5) {
-                        ZStack {
-                            SmallFillablePieSegment(
-                                pieSegmentViewModel: batteryPieSegmentViewModel,
-                                fillFraction: batteryFraction,
-                                color: batteryColor,
-                                backgroundColor: .clear,
-                                displayText: batteryText,
-                                symbolSize: 0,
-                                symbol: "cross.vial",
-                                animateProgress: true,
-                                button3D: state.button3D,
-                                incidenceOfLight: state.incidenceOfLight,
-                                lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                    .atriumview
-                            )
-                            .frame(width: 52, height: 45)
-
-                            Image("battery")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 40, height: 40)
-                        }
+                        Image("battery")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40, height: 40)
                     }
                 }
             }
@@ -2162,29 +2434,24 @@ extension Home {
                         switch remainingHours {
                         case ...24: return .red
                         case ...48: return .yellow
-                        default: return .white.opacity(0.5)
+                        default: return .white.opacity(0.3)
                         }
                     }()
 
-                    /*   let sensorAgeText: String = {
-                         if let minutes = state.remainingSensorMinutes {
-                             return "\(minutes)min"
-                         } else {
-                             let days = state.remainingSensorDays
-                             let hours = state.remainingSensorHours ?? 0
-                             return hours >= 1 ? "\(days)d\(hours)h" : "\(days)d\(hours)h"
-                         }
-                     }()*/
-
                     let sensorAgeText: String = {
-                        if let minutes = state.remainingSensorMinutes {
-                            return "\(minutes)min"
-                        } else if let hours = state.remainingSensorHours, state.remainingSensorDays == nil {
-                            return "\(hours)h"
-                        } else if let days = state.remainingSensorDays, let hours = state.remainingSensorHours {
-                            return "\(days)d\(hours)h"
-                        } else {
+                        guard let days = state.remainingSensorDays,
+                              let hours = state.remainingSensorHours,
+                              let minutes = state.remainingSensorMinutes
+                        else {
                             return "\(state.sensorAgeDays.asInt())d"
+                        }
+
+                        if days >= 1 {
+                            return "\(days)d\(hours)h"
+                        } else if hours >= 1 {
+                            return "\(hours)h\(minutes)m"
+                        } else {
+                            return "\(minutes)m"
                         }
                     }()
 
@@ -2200,11 +2467,12 @@ extension Home {
                                 symbol: "cross.vial",
                                 animateProgress: true,
                                 button3D: state.button3D,
+                                button3DBackground: state.button3DBackground,
                                 incidenceOfLight: state.incidenceOfLight,
                                 lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                     .atriumview
                             )
-                            .frame(width: 52, height: 45)
+                            .frame(width: 60, height: 45)
 
                             Image(systemName: "sensor.tag.radiowaves.forward")
                                 .resizable()
@@ -2280,56 +2548,6 @@ extension Home {
             .frame(minHeight: UIScreen.main.bounds.height / 1.60) // Je größer der Wert, desto kleiner der Chart
         }
 
-        /*  var legendPanel: some View {
-             if state.legendsSwitch {
-                 return AnyView(
-                     ZStack {
-                         HStack {
-                             Group {
-                                 Circle().fill(Color.insulin).frame(width: 8, height: 8)
-                                     .padding(.leading, 8)
-                                 Text("IOB")
-                                     .font(.system(size: 12, weight: .bold)).foregroundColor(.insulin)
-                             }
-                             Group {
-                                 Circle().fill(Color.zt).frame(width: 8, height: 8)
-                                     .padding(.leading, 8)
-                                 Text("ZT")
-                                     .font(.system(size: 12, weight: .bold)).foregroundColor(.zt)
-                             }
-                             Group {
-                                 Circle().fill(Color.loopYellow).frame(width: 8, height: 8)
-                                     .padding(.leading, 8)
-                                 Text("COB")
-                                     .font(.system(size: 12, weight: .bold)).foregroundColor(.loopYellow)
-                             }
-                             Group {
-                                 Circle().fill(Color.uam).frame(width: 8, height: 8)
-                                     .padding(.leading, 8)
-                                 Text("UAM")
-                                     .font(.system(size: 12, weight: .bold)).foregroundColor(.uam)
-                             }
-                         }
-                     }
-                     .background(
-                         TimeEllipseLegend(
-                             characters: 17,
-                             button3D: state.button3D,
-                             incidenceOfLight: state.incidenceOfLight,
-                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                 .atriumview
-                         )
-                     )
-                 )
-             } else {
-                 return AnyView(EmptyView())
-             }
-         }*/
-
-        /*                            incidenceOfLight: state.incidenceOfLight,
-         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-             .atriumview*/
-
         // tempRateSensorAgeeventualBG Anfang
         var tempRateSensorAgeeventualBG: some View {
             ZStack {
@@ -2338,36 +2556,38 @@ extension Home {
             .frame(maxWidth: .infinity)
         }
 
+        // info4 start
         var info4: some View {
-            Group {
-                HStack(spacing: 15) {
-                    Spacer()
-                    HStack {
-                        tempRateView
+            HStack(spacing: 45) {
+                tempRateView
+                    .foregroundColor(.white)
+                    .frame(width: 100, alignment: .leading)
+
+                // Zentrale Gruppe (Bluetooth/Battery)
+                ZStack {
+                    // BatteryView (unsichtbar bei Bluetooth)
+                    batteryView
+                        .frame(width: 70, height: 25)
+                        .opacity(state.isConnected ? 0 : 1)
+
+                    // Bluetooth-Symbol (überlagert)
+                    if state.isConnected {
+                        BluetoothConnectionView
                             .foregroundColor(.white)
+                            .offset(y: -10)
+                            .animation(.easeInOut(duration: 0.3), value: state.isConnected)
                     }
-                    .frame(maxWidth: 100, alignment: .leading)
-                    Spacer()
-                    HStack {
-                        if state.isConnected {
-                            BluetoothConnectionView
-                                .foregroundColor(.white)
-                                .offset(y: -10)
-                        }
-                    }
-                    Spacer()
-                    HStack {
-                        eventualBGView
-                            .foregroundColor(.white)
-                    }
-                    .padding(.trailing, -22)
-                    .frame(maxWidth: 100, alignment: .trailing)
-                    Spacer()
                 }
+                .frame(width: 70)
+
+                eventualBGView
+                    .foregroundColor(.white)
+                    .frame(width: 100, alignment: .trailing)
             }
+            .padding(.horizontal) // Gleichmäßiger Rand links/rechts
         }
 
-        // tempRateSensorAgeeventualBG Ende
+        // info4 Ende
 
         var tempTargetbar: some View {
             ZStack {
@@ -2412,13 +2632,14 @@ extension Home {
                 TimeEllipse(
                     characters: 17,
                     button3D: state.button3D,
+                    button3DBackground: state.button3DBackground,
                     incidenceOfLight: state.incidenceOfLight,
                     lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
                 )
             )
         }
 
-        // BottomInfoBar mit TimeButtons
+        // BottomInfoBar Start
         var bottomBar: some View {
             Group {
                 if state.timeSettings {
@@ -2478,6 +2699,7 @@ extension Home {
                         TimeEllipse(
                             characters: 12,
                             button3D: state.button3D,
+                            button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview
@@ -2510,6 +2732,7 @@ extension Home {
                 TimeEllipse(
                     characters: 12,
                     button3D: state.button3D,
+                    button3DBackground: state.button3DBackground,
                     incidenceOfLight: state.incidenceOfLight,
                     lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
                 )
@@ -2528,6 +2751,7 @@ extension Home {
                     TimeEllipse(
                         characters: 12,
                         button3D: state.button3D,
+                        button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview
@@ -2536,6 +2760,9 @@ extension Home {
             }
         }
 
+        // BottomInfoBar End
+
+        // ButtonPanel Start
         @State private var didLongPress = false
 
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
@@ -2663,20 +2890,22 @@ extension Home {
                             : Color.white.opacity(0.9)
 
                         let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                            ? lightGlowOverlaySelector.highlightColor
                             : Color.white.opacity(0.4)
 
-                        Circle()
-                            .fill(Color.darkGray.opacity(0.5))
-                            .frame(width: 50, height: 50)
-                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                        if state.button3DBackground {
+                            Circle()
+                                .fill(Color.darkGray.opacity(0.4))
+                                .frame(width: 50, height: 50)
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                        }
 
                         Circle()
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        glowColor1,
-                                        glowColor2.opacity(0.4),
+                                        glowColor1.opacity(0.5),
+                                        glowColor2.opacity(0.3),
                                         Color.clear,
                                         Color.black.opacity(0.3),
                                         Color.black.opacity(0.6)
@@ -2767,6 +2996,8 @@ extension Home {
                 }
             }
         }
+
+        // ButtonPanel End
 
         var DayView: some View {
             let isChartBackgroundColored: Bool = state.settingsManager?.settings.chartBackgroundColored ?? false

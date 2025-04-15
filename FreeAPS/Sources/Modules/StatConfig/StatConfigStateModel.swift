@@ -51,6 +51,7 @@ extension StatConfig {
         @Published var sensorStartTimeDefault = Date.distantPast
         @Published var incidenceOfLight: Bool = false
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
+        @Published var button3DBackground: Bool = false
         // Dana UI Toggels
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
@@ -154,6 +155,7 @@ extension StatConfig {
             subscribeSetting(\.sensorStartTimeDefault, on: $sensorStartTimeDefault) { sensorStartTimeDefault = $0 }
             subscribeSetting(\.incidenceOfLight, on: $incidenceOfLight) { incidenceOfLight = $0 }
             subscribeSetting(\.lightGlowOverlaySelector, on: $lightGlowOverlaySelector) { lightGlowOverlaySelector = $0 }
+            subscribeSetting(\.button3DBackground, on: $button3DBackground) { button3DBackground = $0 }
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {

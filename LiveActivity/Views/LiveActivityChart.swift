@@ -177,7 +177,7 @@ struct LiveActivityChart: View {
                     )
                     .symbolSize(predictionsSymbolSize)
                     .opacity(predictionsOpacity)
-                    .foregroundStyle(Color.blue)
+                    .foregroundStyle(Color.mint)
                 }
             }
 
@@ -267,10 +267,10 @@ struct LiveActivityChart: View {
                 HStack(spacing: 0.5) {
                     Text(context.state.iob)
                         .font(.system(size: 20))
-                        .foregroundStyle(Color(.blue))
+                        .foregroundStyle(Color(.systemMint))
                     Text("U")
                         .font(.system(size: 20).smallCaps())
-                        .foregroundStyle(Color(.blue))
+                        .foregroundStyle(Color(.systemMint))
                 }
                 .fontWidth(.condensed)
                 .frame(maxWidth: .infinity, alignment: .leading)

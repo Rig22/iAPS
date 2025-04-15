@@ -179,6 +179,14 @@ struct TooOldValue: View {
     }
 }
 
+// Atrium Lights START
+
+extension Color {
+    static let NorthernLights = Color(red: 0.50, green: 1.00, blue: 0.00)
+}
+
+// Atrium Lights ENDE
+
 extension Color {
     static let rig22Background = Color(red: 0.10, green: 0.10, blue: 0.10)
 }

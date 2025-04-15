@@ -63,23 +63,27 @@ struct FillablePieSegment: View {
                     startAngle: .degrees(-90),
                     endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                 )
-                .fill(color)
+                .fill(.white.opacity(0.5))
                 .frame(width: 50, height: 50)
-                .opacity(0.7)
+                .opacity(0.4)
             }
 
-            Text(displayText)
-                .font(.system(size: 14))
-                .foregroundColor(.white)
-                .padding(.top, 0)
+            /*  Text(displayText)
+             .font(.system(size: 14))
+             .foregroundColor(.white)
+             .padding(.top, 0)*/
         }
-        .offset(y: 10)
-        .onAppear {
-            pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-        }
-        .onChange(of: fillFraction) { _, newValue in
-            pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-        }
+        Text(displayText)
+            .font(.system(size: 14))
+            .foregroundColor(.white)
+            .frame(maxWidth: .infinity, alignment: .trailing)
+            .offset(x: 9)
+            .onAppear {
+                pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+            }
+            .onChange(of: fillFraction) { _, newValue in
+                pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+            }
     }
 }
 
@@ -112,18 +116,19 @@ struct LoopView: View {
                     fillFraction: min(CGFloat(minutesAgo) / 5.0, 1.0),
                     color: pieColor,
                     backgroundColor: .clear,
-                    displayText: minutesAgo == 0 ? "< 1 min" : "\(minutesAgo) min",
+                    // displayText: minutesAgo == 0 ? "< 1 min" : "\(minutesAgo) min",
+                    displayText: "\(minutesAgo)min",
                     animateProgress: true
                 )
 
                 Circle()
                     .fill(color)
-                    .frame(width: 6, height: 6)
+                    .frame(width: 7, height: 7)
 
                 if isLooping {
                     Circle()
                         .fill(Color.darkGray.opacity(0.5))
-                        .frame(width: 50, height: 50)
+                        .frame(width: 45, height: 45)
                         .transition(.opacity)
                 }
 
@@ -149,23 +154,14 @@ struct LoopView: View {
                 .fill(
                     AngularGradient(
                         gradient: Gradient(colors: [
-                            Color(red: 0.0, green: 0.8, blue: 0.4).opacity(1.0),
-                            Color(red: 0.0, green: 0.75, blue: 0.5).opacity(1.0),
-                            Color(red: 0.0, green: 0.7, blue: 0.6).opacity(01.0),
-                            Color(red: 0.0, green: 0.6, blue: 0.75).opacity(1.0),
-                            Color(red: 0.0, green: 0.5, blue: 0.85).opacity(1.0),
-                            Color(red: 0.0, green: 0.4, blue: 0.9).opacity(1.0),
-                            Color(red: 0.0, green: 0.5, blue: 0.85).opacity(1.0),
-                            Color(red: 0.0, green: 0.6, blue: 0.75).opacity(1.0),
-                            Color(red: 0.0, green: 0.7, blue: 0.6).opacity(1.0),
-                            Color(red: 0.0, green: 0.75, blue: 0.5).opacity(1.0),
-                            Color(red: 0.0, green: 0.8, blue: 0.4).opacity(1.0)
+                            Color(red: 81 / 255, green: 81 / 255, blue: 81 / 255, opacity: 0.5),
+                            Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255, opacity: 0.5)
                         ]),
                         center: .center,
                         angle: .degrees(gradientOffset)
                     )
                 )
-                .frame(width: 50, height: 50)
+                .frame(width: 45, height: 45)
                 .scaleEffect(scale)
                 .onAppear {
                     /* withAnimation(
@@ -194,9 +190,9 @@ struct LoopView: View {
 
         if delta <= 6.minutes.timeInterval {
             guard actualSuggestion?.deliverAt != nil else {
-                return .white.opacity(0.4)
+                return .white.opacity(0.8)
             }
-            return .white.opacity(0.4)
+            return .white.opacity(0.8)
         } else if delta <= 9.minutes.timeInterval {
             return .yellow
         } else {

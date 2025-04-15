@@ -174,25 +174,25 @@ struct MainChartView: View {
             HStack {
                 Group {
                     Circle().fill(Color.insulin).frame(width: 5, height: 5)
-                        .padding(.leading, 6)
+                        .padding(.leading, 1)
                     Text("IOB")
                         .font(.system(size: 10, weight: .bold)).foregroundColor(.insulin)
                 }
                 Group {
                     Circle().fill(Color.zt).frame(width: 5, height: 5)
-                        .padding(.leading, 6)
+                        .padding(.leading, 1)
                     Text("ZT")
                         .font(.system(size: 10, weight: .bold)).foregroundColor(.zt)
                 }
                 Group {
                     Circle().fill(Color.loopYellow).frame(width: 5, height: 5)
-                        .padding(.leading, 6)
+                        .padding(.leading, 1)
                     Text("COB")
                         .font(.system(size: 10, weight: .bold)).foregroundColor(.loopYellow)
                 }
                 Group {
                     Circle().fill(Color.uam).frame(width: 5, height: 5)
-                        .padding(.leading, 6)
+                        .padding(.leading, 1)
                     Text("UAM")
                         .font(.system(size: 10, weight: .bold)).foregroundColor(.uam)
                 }
