@@ -51,12 +51,11 @@ extension StatConfig {
         }()
 
         func BarViewOptionConfigurationRawValue(
-            topBar: Bool, danaBar: Bool, legendBar: Bool, ttBar: Bool, bottomBar: Bool
+            topBar: Bool, danaBar: Bool, ttBar: Bool, bottomBar: Bool
         ) -> BarViewOptionConfiguration {
             let activeBars = [
                 (topBar, "top"),
                 (danaBar, "dana"),
-                (legendBar, "legend"),
                 (ttBar, "tt"),
                 (bottomBar, "bottom")
             ].compactMap { $0.0 ? $0.1 : nil }
@@ -97,13 +96,21 @@ extension StatConfig {
             case .atriumview5: return "NortherLights" }
         }
 
+        // Hilfsfunktion für Beschreibungstexte
+        private func getDescription(for option: DanaBarOption) -> String {
+            switch option {
+            case .max: return "Vollständige Anzeige mit InsulinAlter"
+            case .icon: return "Mit Pumpen-Icon"
+            case .min: return "Minimalistische Ansicht"
+            }
+        }
+
         var body: some View {
             VStack(spacing: 0) {
                 ZStack {
                     Image(BarViewOptionConfigurationRawValue(
                         topBar: state.displayExpiration,
                         danaBar: state.danaBar,
-                        legendBar: state.legendsSwitch,
                         ttBar: state.tempTargetBar,
                         bottomBar: state.timeSettings
                     ).imageName)
@@ -111,11 +118,14 @@ extension StatConfig {
                         .scaledToFit()
                         .frame(width: 360, height: 280)
 
-                    if state.danaBar && state.danaBarViewOption == "view2" {
+                    if state.danaBar && state.danaBarOption == DanaBarOption.icon.rawValue {
+                        Circle()
+                            .fill(Color.darkGray.opacity(1.0))
+                            .frame(width: 20, height: 20)
+                            .offset(x: -53, y: -55)
                         Image(state.danaIconRawValue)
                             .resizable()
-                            .frame(width: 25, height: 18)
-                            // .offset(x: -100, y: -55)
+                            .frame(width: 20, height: 12)
                             .offset(x: -53, y: -55)
                     }
                 }
@@ -134,13 +144,31 @@ extension StatConfig {
                                     Toggle("Dana Bars", isOn: $state.danaBar)
 
                                     if state.danaBar {
-                                        Picker("Wähle eine Ansicht", selection: $state.danaBarViewOption) {
-                                            Text("DanaBar 1").tag("view1")
-                                            Text("DanaBar 2").tag("view2")
-                                        }
-                                        .pickerStyle(SegmentedPickerStyle())
+                                        Picker("Wähle eine Ansicht", selection: $state.danaBarOption) {
+                                            ForEach(DanaBarOption.allCases) { option in
+                                                HStack(spacing: 12) {
+                                                    Image(option.previewImageName)
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 60, height: 40)
+                                                        .cornerRadius(6)
+                                                        .shadow(radius: 2)
 
-                                        if state.danaBarViewOption == "view2" {
+                                                    VStack(alignment: .leading) {
+                                                        Text(option.rawValue)
+                                                            .font(.subheadline)
+                                                        Text(getDescription(for: option))
+                                                            .font(.caption)
+                                                            .foregroundColor(.gray)
+                                                    }
+                                                }
+                                                .tag(option.rawValue)
+                                            }
+                                        }
+                                        .pickerStyle(NavigationLinkPickerStyle())
+
+                                        // DanaBar 2 spezifische Einstellungen
+                                        if state.danaBarOption == DanaBarOption.icon.rawValue {
                                             if #available(iOS 18.0, *) {
                                                 Picker("Pump Icon", selection: $state.danaIconRawValue) {
                                                     ForEach(DanaIconOption.allCases, id: \.rawValue) { option in
@@ -158,7 +186,9 @@ extension StatConfig {
                                                 .pickerStyle(NavigationLinkPickerStyle())
                                             }
                                         }
-                                        if state.danaBarViewOption == "view1" {
+
+                                        // DanaBar Max spezifische Einstellungen
+                                        if state.danaBarOption == DanaBarOption.max.rawValue {
                                             Picker(
                                                 "Max Reservoir Insulin Age",
                                                 selection: $state.insulinAgeOption
@@ -177,6 +207,7 @@ extension StatConfig {
                                             .pickerStyle(NavigationLinkPickerStyle())
                                         }
 
+                                        // Gemeinsame Einstellungen für alle Ansichten
                                         Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
                                             Text("1 Day").tag("Ein_Tag")
                                             Text("2 Days").tag("Zwei_Tage")

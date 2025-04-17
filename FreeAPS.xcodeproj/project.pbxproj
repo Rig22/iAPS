@@ -317,7 +317,6 @@
 		7927D7162D082E8400385439 /* CannulaAgeOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7927D7152D082E7300385439 /* CannulaAgeOption.swift */; };
 		792E4EC32CF8C95800ADE3DC /* DanaIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */; };
 		792F32F62CD9DCAF009E7F7A /* BackgroundColorOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */; };
-		793F48E22D0203D30029BC95 /* DanaBarViewOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793F48E12D0203BF0029BC95 /* DanaBarViewOption.swift */; };
 		795CBE122D3F60B20044854B /* BGTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE112D3F60A30044854B /* BGTextField.swift */; };
 		795CBE142D3F943A0044854B /* AutoISFsettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE132D3F942B0044854B /* AutoISFsettings.swift */; };
 		795CBE162D3F949D0044854B /* ChartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE152D3F94900044854B /* ChartModel.swift */; };
@@ -327,6 +326,7 @@
 		797CA82B2D85AD69009D5ACC /* BolusProgressViewOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797CA82A2D85AD4B009D5ACC /* BolusProgressViewOption.swift */; };
 		7987CE052D6A10D80045F6EA /* SensorAgeDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */; };
 		798BC9172D6F9C4700ADABFD /* TemporaryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798BC9162D6F9AAF00ADABFD /* TemporaryData.swift */; };
+		799A4F0C2DB0E616004B5834 /* DanaBarOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799A4F0B2DB0E605004B5834 /* DanaBarOption.swift */; };
 		79D4708E2CE483EE0095B89A /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D4708D2CE483DD0095B89A /* Token.swift */; };
 		79FE39982D81E55A00BCD63B /* FunctionScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE39972D81E54200BCD63B /* FunctionScript.swift */; };
 		79FE399A2D81E5BE00BCD63B /* WebViewScriptExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE39992D81E5AB00BCD63B /* WebViewScriptExecutor.swift */; };
@@ -953,7 +953,6 @@
 		7927D7152D082E7300385439 /* CannulaAgeOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CannulaAgeOption.swift; sourceTree = "<group>"; };
 		792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaIconOption.swift; sourceTree = "<group>"; };
 		792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundColorOption.swift; sourceTree = "<group>"; };
-		793F48E12D0203BF0029BC95 /* DanaBarViewOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaBarViewOption.swift; sourceTree = "<group>"; };
 		795CBE112D3F60A30044854B /* BGTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGTextField.swift; sourceTree = "<group>"; };
 		795CBE132D3F942B0044854B /* AutoISFsettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoISFsettings.swift; sourceTree = "<group>"; };
 		795CBE152D3F94900044854B /* ChartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartModel.swift; sourceTree = "<group>"; };
@@ -963,6 +962,7 @@
 		797CA82A2D85AD4B009D5ACC /* BolusProgressViewOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BolusProgressViewOption.swift; sourceTree = "<group>"; };
 		7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorAgeDays.swift; sourceTree = "<group>"; };
 		798BC9162D6F9AAF00ADABFD /* TemporaryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryData.swift; sourceTree = "<group>"; };
+		799A4F0B2DB0E605004B5834 /* DanaBarOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaBarOption.swift; sourceTree = "<group>"; };
 		79BDA519C9B890FD9A5DFCF3 /* ISFEditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ISFEditorDataFlow.swift; sourceTree = "<group>"; };
 		79D4708D2CE483DD0095B89A /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		79FE39972D81E54200BCD63B /* FunctionScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionScript.swift; sourceTree = "<group>"; };
@@ -1573,6 +1573,7 @@
 		3811DE2C25C9D49500A708ED /* View */ = {
 			isa = PBXGroup;
 			children = (
+				799A4F0B2DB0E605004B5834 /* DanaBarOption.swift */,
 				797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */,
 				797CA82A2D85AD4B009D5ACC /* BolusProgressViewOption.swift */,
 				7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */,
@@ -1580,7 +1581,6 @@
 				7974B64B2D3817C10077EF9F /* LoopViewOption.swift */,
 				7927D7152D082E7300385439 /* CannulaAgeOption.swift */,
 				791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */,
-				793F48E12D0203BF0029BC95 /* DanaBarViewOption.swift */,
 				792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */,
 				792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */,
 				7910CDA62CD53A0E001E77AC /* Chart */,
@@ -3341,8 +3341,8 @@
 				903D18976088B09110BCBE29 /* LibreConfigStateModel.swift in Sources */,
 				9050F378F0063C064D7FFC86 /* LibreConfigRootView.swift in Sources */,
 				192A9A122C0F5361000BBC29 /* MealsShortcuts.swift in Sources */,
-				793F48E22D0203D30029BC95 /* DanaBarViewOption.swift in Sources */,
 				B7C465E9472624D8A2BE2A6A /* CalibrationsDataFlow.swift in Sources */,
+				799A4F0C2DB0E616004B5834 /* DanaBarOption.swift in Sources */,
 				320D030F724170A637F06D50 /* CalibrationsProvider.swift in Sources */,
 				19E1F7E829D082D0005C8D20 /* IconConfigDataFlow.swift in Sources */,
 				797A852E2D97E8EF00DAB622 /* LightGlowOverlaySelector.swift in Sources */,

@@ -1615,7 +1615,7 @@ extension Home {
                 case .view2:
                     loopView2
                         .frame(maxHeight: .infinity)
-                        .offset(y: 10)
+                        .offset(x: -20, y: 10)
                 }
             } else {
                 Text("Ungültige Ansichtsauswahl")
@@ -1929,7 +1929,7 @@ extension Home {
 
         // DanaBar 1
 
-        var danaBar1: some View {
+        var danaBarMax: some View {
             if state.danaBar {
                 return AnyView(
                     VStack(spacing: 20) {
@@ -1965,7 +1965,7 @@ extension Home {
 
         // DanaBar 2 mit Pumpen Icon
 
-        var danaBar2: some View {
+        var danaBarIcon: some View {
             if state.danaBar {
                 return AnyView(
                     VStack(spacing: 20) {
@@ -1983,6 +1983,40 @@ extension Home {
                                 batteryAgeView
                             }
                             /* HStack(spacing: 10) {
+                                 batteryView
+                             }*/
+                            HStack(spacing: 10) {
+                                sensorAgeDays
+                            }
+                        }
+                    }
+                    .onChange(of: state.insulinConcentration) { _, newValue in
+                        if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {}
+                    }.dynamicTypeSize(...DynamicTypeSize.xxLarge)
+                )
+            } else {
+                return AnyView(EmptyView())
+            }
+        }
+
+        var danaBarMin: some View {
+            if state.danaBar {
+                return AnyView(
+                    VStack(spacing: 20) {
+                        HStack(spacing: 20) {
+                            HStack(spacing: 10) {
+                                reservoirView
+                            }
+                            /*   HStack(spacing: 10) {
+                                 insulinAgeView
+                             }*/
+                            HStack(spacing: 10) {
+                                cannulaAgeView
+                            }
+                            /*  HStack(spacing: 10) {
+                                 batteryAgeView
+                             }*/
+                            /*  HStack(spacing: 10) {
                                  batteryView
                              }*/
                             HStack(spacing: 10) {
@@ -2314,94 +2348,49 @@ extension Home {
             }
         }
 
-        /* private var batteryView: some View {
-             Group {
-                 var batteryColor: Color {
-                     if let batteryChargeString = state.pumpBatteryChargeRemaining,
-                        let batteryCharge = Double(batteryChargeString)
-                     {
-                         switch batteryCharge {
-                         case ...25:
-                             return .red
-                         case ...50:
-                             return .yellow
-                         default:
-                             return .white.opacity(0.3)
-                         }
-                     } else {
-                         return Color.gray.opacity(0.3)
-                     }
-                 }
-
-                 let batteryText: String = {
-                     if let batteryChargeString = state.pumpBatteryChargeRemaining,
-                        let batteryCharge = Double(batteryChargeString)
-                     {
-                         return "\(Int(batteryCharge))%"
-                     } else {
-                         return "--"
-                     }
-                 }()
-
-                 if let batteryChargeString = state.pumpBatteryChargeRemaining,
-                    let batteryCharge = Double(batteryChargeString)
-                 {
-                     let batteryFraction = CGFloat(batteryCharge) / 100.0
-
-                     VStack(spacing: 5) {
-                         ZStack {
-                             SmallFillablePieSegment(
-                                 pieSegmentViewModel: batteryPieSegmentViewModel,
-                                 fillFraction: batteryFraction,
-                                 color: batteryColor,
-                                 backgroundColor: .clear,
-                                 displayText: batteryText,
-                                 symbolSize: 0,
-                                 symbol: "cross.vial",
-                                 animateProgress: true,
-                                 button3D: state.button3D,
-                                 button3DBackground: state.button3DBackground,
-                                 incidenceOfLight: state.incidenceOfLight,
-                                 lightGlowOverlaySelector: LightGlowOverlaySelector(
-                                     rawValue: state.lightGlowOverlaySelector
-                                 ) ??
-                                     .atriumview
-                             )
-                             .frame(width: 60, height: 45)
-
-                             Image("battery")
-                                 .resizable()
-                                 .scaledToFit()
-                                 .frame(width: 40, height: 40)
-                         }
-                     }
-                 }
-             }
-         }*/
-
         private var batteryAgeView: some View {
             Group {
                 var batteryAgeColor: Color {
-                    guard let remainingHours = state.batteryHours else { return .gray }
-                    switch remainingHours {
-                    case ..<24: return .red // <1 Tag übrig
-                    case ..<72: return .yellow // 1-3 Tage übrig
-                    // default: return .green // >3 Tage übrig
-                    default: return .white.opacity(0.3)
+                    if let batteryHours = state.batteryHours {
+                        switch batteryHours {
+                        case 168...: // >7 Tage = Rot
+                            return .red
+                        case 72 ..< 168: // 3-7 Tage = Gelb
+                            return .yellow
+                        default: // <3 Tage = Weiß/Transparent
+                            return .white.opacity(0.3)
+                        }
+                    } else {
+                        return .gray.opacity(0.3)
                     }
                 }
+
+                let batteryAgeText: String = {
+                    if let batteryHours = state.batteryHours {
+                        let totalMinutes = Int(batteryHours * 60)
+                        if totalMinutes < 60 {
+                            return "\(totalMinutes)min"
+                        } else {
+                            let days = totalMinutes / (24 * 60)
+                            let hours = (totalMinutes % (24 * 60)) / 60
+                            return days > 0 ? "\(days)d\(hours)h" : "\(hours)h"
+                        }
+                    } else {
+                        return "--"
+                    }
+                }()
 
                 VStack(spacing: 5) {
                     ZStack {
                         SmallFillablePieSegment(
                             pieSegmentViewModel: batteryAgePieSegmentViewModel,
-                            fillFraction: state.batteryAgeFraction,
+                            fillFraction: 1.0, // Volle Kreis-Anzeige (kein Füllstand)
                             color: batteryAgeColor,
                             backgroundColor: .clear,
-                            displayText: state.batteryAge,
+                            displayText: batteryAgeText,
                             symbolSize: 0,
                             symbol: "cross.vial",
-                            animateProgress: true,
+                            animateProgress: false,
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
@@ -2529,23 +2518,24 @@ extension Home {
         var chart: some View {
             VStack(spacing: 0) {
                 Group {
-                    if state.danaBarViewOption == "view1" {
-                        danaBar1
-                            .padding(.top, 10)
-                            .padding(.bottom, 10)
-                    } else {
-                        danaBar2
-                            .padding(.top, 10)
-                            .padding(.bottom, 10)
+                    switch DanaBarOption(rawValue: state.danaBarOption) ?? .max {
+                    case .max:
+                        danaBarMax
+                            .padding(.vertical, 10)
+                    case .min:
+                        danaBarMin
+                            .padding(.vertical, 10)
+                    case .icon:
+                        danaBarIcon
+                            .padding(.vertical, 10)
                     }
                     mainChart.padding(.top, 35)
-                    // legendPanel.padding(.top, 25)
                     tempTargetbar.padding(.top, 35)
                     bottomBar.padding(.top, 20).padding(.bottom, 10)
                         .frame(width: UIScreen.main.bounds.width)
                 }
             }
-            .frame(minHeight: UIScreen.main.bounds.height / 1.60) // Je größer der Wert, desto kleiner der Chart
+            .frame(minHeight: UIScreen.main.bounds.height / 1.62) // Je größer der Wert, desto kleiner der Chart
         }
 
         // tempRateSensorAgeeventualBG Anfang
@@ -2768,11 +2758,6 @@ extension Home {
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {
                 backgroundColor
-                    /* LinearGradient(
-                         gradient: Gradient(colors: [.clear, .clear]),
-                         startPoint: .top,
-                         endPoint: .bottom
-                     )*/
                     .frame(height: 50 + geo.safeAreaInsets.bottom)
 
                 let isOverride = fetchedPercent.first?.enabled ?? false

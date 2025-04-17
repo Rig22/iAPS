@@ -89,7 +89,7 @@ extension Home {
         @Published var tempTargetbar: Bool = false
         @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.teal.rawValue
-        @Published var danaBarViewOption: String = "view1"
+        @Published var danaBarOption: String = DanaBarOption.max.rawValue
         @Published var loopViewOption: String = LoopViewOption.view1.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = false
@@ -250,7 +250,7 @@ extension Home {
             tempTargetbar = settingsManager.settings.tempTargetbar
             timeSettings = settingsManager.settings.timeSettings
             backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
-            danaBarViewOption = settingsManager.settings.danaBarViewOption
+            danaBarOption = settingsManager.settings.danaBarOption
             insulinAgeOption = settingsManager.settings.insulinAgeOption
             cannulaAgeOption = settingsManager.settings.cannulaAgeOption
             loopViewOption = settingsManager.settings.loopViewOption
@@ -454,39 +454,64 @@ extension Home {
         }
 
         // Aktueller Füllstand des Pie-Charts (0.0 = leer, 1.0 = voll)
-        @Published var batteryAgeFraction: Double = 1.0
+        //   @Published var batteryAgeFraction: Double = 1.0
 
-        private let maxBatteryAgeHours: Double = 10 * 24 // 10 Tage in Stunden
+        //   private let maxBatteryAgeHours: Double = 10 * 24 // 10 Tage in Stunden
+
+        /*   func updateBatteryAge() {
+             guard let pumpManager = provider.apsManager.pumpManager as? DanaKitPumpManager,
+                   let lastBatteryChangeDate = pumpManager.state.batteryAge
+             else {
+                 batteryHours = nil
+                 batteryAge = "--"
+                 batteryAgeFraction = 0.0 // Pie leer = keine Daten
+                 return
+             }
+
+             // VERBLEIBENDE Stunden berechnen (10 Tage - Alter)
+             let hoursSinceChange = abs(lastBatteryChangeDate.timeIntervalSinceNow) / 3600
+             let remainingHours = max(0, maxBatteryAgeHours - hoursSinceChange) // Nie negativ
+             batteryHours = remainingHours
+
+             // Pie-Füllstand: Linear von 1.0 (neu) bis 0.0 (10 Tage)
+             batteryAgeFraction = remainingHours / maxBatteryAgeHours
+
+             // Textformatierung: Restzeit (wie bei Insulin/Cannula)
+             let totalMinutes = Int(remainingHours * 60)
+             if totalMinutes < 60 {
+                 batteryAge = "\(totalMinutes)min"
+             } else {
+                 let days = totalMinutes / (24 * 60)
+                 let hours = (totalMinutes % (24 * 60)) / 60
+                 batteryAge = days > 0 ? "\(days)d\(hours)h" : "\(hours)h"
+             }
+             if hoursSinceChange >= maxBatteryAgeHours {
+                 print("⚠️ Akku sollte gewechselt werden!")
+             }
+         }*/
 
         func updateBatteryAge() {
             guard let pumpManager = provider.apsManager.pumpManager as? DanaKitPumpManager,
                   let lastBatteryChangeDate = pumpManager.state.batteryAge
             else {
+                // Fallback, falls keine Pumpe oder kein Datum vorhanden
                 batteryHours = nil
                 batteryAge = "--"
-                batteryAgeFraction = 0.0 // Pie leer = keine Daten
                 return
             }
 
-            // VERBLEIBENDE Stunden berechnen (10 Tage - Alter)
+            // Stunden seit dem Batteriewechsel berechnen (positiver Wert)
             let hoursSinceChange = abs(lastBatteryChangeDate.timeIntervalSinceNow) / 3600
-            let remainingHours = max(0, maxBatteryAgeHours - hoursSinceChange) // Nie negativ
-            batteryHours = remainingHours
+            batteryHours = hoursSinceChange
 
-            // Pie-Füllstand: Linear von 1.0 (neu) bis 0.0 (10 Tage)
-            batteryAgeFraction = remainingHours / maxBatteryAgeHours
-
-            // Textformatierung: Restzeit (wie bei Insulin/Cannula)
-            let totalMinutes = Int(remainingHours * 60)
+            // Formatierung: "Xh" oder "XdYh" (wie bei Insulin/Cannula)
+            let totalMinutes = Int(hoursSinceChange * 60)
             if totalMinutes < 60 {
                 batteryAge = "\(totalMinutes)min"
             } else {
                 let days = totalMinutes / (24 * 60)
                 let hours = (totalMinutes % (24 * 60)) / 60
                 batteryAge = days > 0 ? "\(days)d\(hours)h" : "\(hours)h"
-            }
-            if hoursSinceChange >= maxBatteryAgeHours {
-                print("⚠️ Akku sollte gewechselt werden!")
             }
         }
 
@@ -883,7 +908,7 @@ extension Home.StateModel:
         tempTargetbar = settingsManager.settings.tempTargetbar
         timeSettings = settingsManager.settings.timeSettings
         backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
-        danaBarViewOption = settingsManager.settings.danaBarViewOption
+        danaBarOption = settingsManager.settings.danaBarOption
         loopViewOption = settingsManager.settings.loopViewOption
         chartBackgroundColored = settingsManager.settings.chartBackgroundColored
         carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
