@@ -32,7 +32,7 @@ extension StatConfig {
         @Published var tempTargetBar: Bool = false
         @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.teal.rawValue
-        @Published var danaBarViewOption: String = "view1"
+        @Published var danaBarOption: String = DanaBarOption.max.rawValue
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
         @Published var loopViewOption: String = LoopViewOption.view1.rawValue
@@ -41,7 +41,6 @@ extension StatConfig {
         @Published var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.all.rawValue
         @Published var topBarActive: Bool = true
         @Published var danaBarActive: Bool = false
-        @Published var legendBarActive: Bool = false
         @Published var ttBarActive: Bool = false
         @Published var bottomBarActive: Bool = false
         @Published var button3D: Bool = false
@@ -51,6 +50,7 @@ extension StatConfig {
         @Published var sensorStartTimeDefault = Date.distantPast
         @Published var incidenceOfLight: Bool = false
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
+        @Published var button3DBackground: Bool = false
         // Dana UI Toggels
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
@@ -61,43 +61,27 @@ extension StatConfig {
         func BarViewOptionConfigurationRawValue(
             topBar: Bool,
             danaBar: Bool,
-            legendBar: Bool,
             ttBar: Bool,
             bottomBar: Bool
         ) -> BarViewOptionConfiguration {
-            switch (topBar, danaBar, legendBar, ttBar, bottomBar) {
-            case (false, false, false, false, false): return .none
-            case (true, false, false, false, false): return .top
-            case (false, true, false, false, false): return .dana
-            case (false, false, true, false, false): return .legend
-            case (false, false, false, true, false): return .tt
-            case (false, false, false, false, true): return .bottom
-            case (true, true, false, false, false): return .topDana
-            case (true, false, true, false, false): return .topLegend
-            case (true, false, false, true, false): return .topTT
-            case (true, false, false, false, true): return .topBottom
-            case (false, true, true, false, false): return .danaLegend
-            case (false, true, false, true, false): return .danaTT
-            case (false, true, false, false, true): return .danaBottom
-            case (false, false, true, true, false): return .legendTT
-            case (false, false, true, false, true): return .legendBottom
-            case (false, false, false, true, true): return .ttBottom
-            case (true, true, true, false, false): return .topDanaLegend
-            case (true, true, false, true, false): return .topDanaTT
-            case (true, true, false, false, true): return .topDanaBottom
-            case (true, false, true, true, false): return .topLegendTT
-            case (true, false, true, false, true): return .topLegendBottom
-            case (true, false, false, true, true): return .topTTBottom
-            case (false, true, true, true, false): return .danaLegendTT
-            case (false, true, true, false, true): return .danaLegendBottom
-            case (false, true, false, true, true): return .danaTTBottom
-            case (false, false, true, true, true): return .legendTTBottom
-            case (true, true, true, true, false): return .topDanaLegendTT
-            case (true, true, true, false, true): return .topDanaLegendBottom
-            case (true, true, false, true, true): return .topDanaTTBottom
-            case (true, false, true, true, true): return .topLegendTTBottom
-            case (false, true, true, true, true): return .danaLegendTTBottom
-            case (true, true, true, true, true): return .all
+            switch (topBar, danaBar, ttBar, bottomBar) {
+            case (false, false, false, false): return .none
+            case (true, false, false, false): return .top
+            case (false, true, false, false): return .dana
+            case (false, false, true, false): return .tt
+            case (false, false, false, true): return .bottom
+            case (true, true, false, false): return .topDana
+            case (true, false, true, false): return .topTT
+            case (true, false, false, true): return .topBottom
+            case (false, true, true, false): return .danaTT
+            case (false, true, false, true): return .danaBottom
+            case (false, false, true, true): return .ttBottom
+            case (true, true, true, false): return .topDanaTT
+            case (true, true, false, true): return .topDanaBottom
+            case (true, false, true, true): return .topTTBottom
+            case (false, true, true, true): return .danaTTBottom
+            case (true, true, true, true): return .all
+            default: return .none // Fallback für nicht abgedeckte Fälle
             }
         }
 
@@ -127,7 +111,7 @@ extension StatConfig {
             // Dana Toggels
             subscribeSetting(\.danaIconRawValue, on: $danaIconRawValue) { danaIconRawValue = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
-            subscribeSetting(\.danaBarViewOption, on: $danaBarViewOption) { danaBarViewOption = $0 }
+            subscribeSetting(\.danaBarOption, on: $danaBarOption) { danaBarOption = $0 }
             subscribeSetting(\.insulinAgeOption, on: $insulinAgeOption) { insulinAgeOption = $0 }
             subscribeSetting(\.cannulaAgeOption, on: $cannulaAgeOption) { cannulaAgeOption = $0 }
             subscribeSetting(\.loopViewOption, on: $loopViewOption) { loopViewOption = $0 }
@@ -144,7 +128,6 @@ extension StatConfig {
                 barViewOptionConfigurationRawValue = $0 }
             subscribeSetting(\.topBarActive, on: $topBarActive) { topBarActive = $0 }
             subscribeSetting(\.danaBarActive, on: $danaBarActive) { danaBarActive = $0 }
-            subscribeSetting(\.legendBarActive, on: $legendBarActive) { legendBarActive = $0 }
             subscribeSetting(\.ttBarActive, on: $ttBarActive) { ttBarActive = $0 }
             subscribeSetting(\.bottomBarActive, on: $bottomBarActive) { bottomBarActive = $0 }
             subscribeSetting(\.button3D, on: $button3D) { button3D = $0 }
@@ -154,6 +137,7 @@ extension StatConfig {
             subscribeSetting(\.sensorStartTimeDefault, on: $sensorStartTimeDefault) { sensorStartTimeDefault = $0 }
             subscribeSetting(\.incidenceOfLight, on: $incidenceOfLight) { incidenceOfLight = $0 }
             subscribeSetting(\.lightGlowOverlaySelector, on: $lightGlowOverlaySelector) { lightGlowOverlaySelector = $0 }
+            subscribeSetting(\.button3DBackground, on: $button3DBackground) { button3DBackground = $0 }
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {

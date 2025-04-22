@@ -1,6 +1,6 @@
 import CoreBluetooth
 import HealthKit
-import LoopKit
+@preconcurrency import LoopKit
 import UIKit
 import UserNotifications
 

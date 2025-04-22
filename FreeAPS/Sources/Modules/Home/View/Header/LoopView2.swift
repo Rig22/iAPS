@@ -1,3 +1,4 @@
+
 import SwiftDate
 import SwiftUI
 import UIKit
@@ -16,6 +17,8 @@ struct LoopView2: View {
     @Binding var manualTempBasal: Bool
     @State private var scale: CGFloat = 1.0
 
+    @Binding var button3DBackground: Bool
+
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
         formatter.timeStyle = .short
@@ -28,7 +31,7 @@ struct LoopView2: View {
         VStack(alignment: .center) {
             ZStack {
                 if isLooping {
-                    CircleProgress()
+                    CircleProgress(button3DBackground: button3DBackground)
                 } else {
                     Circle()
                         .strokeBorder(color, lineWidth: 6)
@@ -73,7 +76,8 @@ struct LoopView2: View {
             guard actualSuggestion?.deliverAt != nil else {
                 return .loopYellow.opacity(0.8)
             }
-            return .loopGreen.opacity(0.8)
+            // Farbe des Rings ohne isLooping
+            return button3DBackground ? .darkGray.opacity(0.5) : .darkGray.opacity(0.3)
         } else if delta <= 10.minutes.timeInterval {
             return .loopYellow.opacity(0.8)
         } else {
@@ -102,16 +106,18 @@ struct CircleProgress: View {
     @State private var rotationAngle = 0.0
     @State private var pulse = false
 
+    let button3DBackground: Bool // <- Übergabe
+
     private let rect = CGRect(x: 0, y: 0, width: 45, height: 45)
+
     private var backgroundGradient: AngularGradient {
         AngularGradient(
-            gradient: Gradient(colors: [
-                Color(red: 0.0, green: 0.8, blue: 0.4), // Helles Grün
-                Color(red: 0.0, green: 0.6, blue: 0.8), // Übergang zu Blau
-                Color(red: 0.0, green: 0.4, blue: 1.0), // Blau
-                Color(red: 0.0, green: 0.6, blue: 0.8), // Übergang zurück zu Grün
-                Color(red: 0.0, green: 0.8, blue: 0.4) // Helles Grün
-            ]),
+            gradient: Gradient(
+                colors: [
+                    Color(red: 81 / 255, green: 81 / 255, blue: 81 / 255, opacity: 0.5),
+                    Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255, opacity: 0.5)
+                ]
+            ),
             center: .center,
             startAngle: .degrees(rotationAngle),
             endAngle: .degrees(rotationAngle + 360)
@@ -124,8 +130,8 @@ struct CircleProgress: View {
         ZStack {
             Circle()
                 .trim(from: 0, to: 1)
-                .stroke(backgroundGradient, style: StrokeStyle(lineWidth: pulse ? 10 : 5))
-                .scaleEffect(pulse ? 0.7 : 1)
+                .stroke(backgroundGradient, style: StrokeStyle(lineWidth: pulse ? 8 : 6))
+                .scaleEffect(pulse ? 0.95 : 1)
                 .animation(
                     Animation.easeInOut(duration: 1.5).repeatForever(autoreverses: true),
                     value: pulse
@@ -143,6 +149,6 @@ struct CircleProgress: View {
 
 struct CircleProgress_Previews: PreviewProvider {
     static var previews: some View {
-        CircleProgress()
+        CircleProgress(button3DBackground: false)
     }
 }

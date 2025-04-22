@@ -91,7 +91,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var legendsSwitch: Bool = false
     var tempTargetbar: Bool = false
     var backgroundColorOptionRawValue: String = BackgroundColorOption.teal.rawValue
-    var danaBarViewOption: String = "view1"
+    var danaBarOption: String = DanaBarOption.max.rawValue
     var insulinAgeOption: String = "Drei_Tage"
     var cannulaAgeOption: String = "Drei_Tage"
     var loopViewOption: String = LoopViewOption.view1.rawValue
@@ -100,7 +100,6 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.none.rawValue
     var topBarActive: Bool = false
     var danaBarActive: Bool = false
-    var legendBarActive: Bool = false
     var ttBarActive: Bool = false
     var bottomBarActive: Bool = false
     var button3D: Bool = false
@@ -111,6 +110,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var incidenceOfLight = false
     var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
     var insulinHours: Double?
+    var button3DBackground: Bool = false
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false
@@ -263,7 +263,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case tempTargetbar
         case timeSettings
         case backgroundColorOptionRawValue
-        case danaBarViewOption
+        case danaBarOption
         case insulinAgeOption
         case cannulaAgeOption
         case loopViewOption
@@ -271,7 +271,6 @@ struct EncodableFreeAPSSettings: Encodable {
         case carbInsulinLoopViewOption
         case topBarActive
         case danaBarActive
-        case legendBarActive
         case ttBarActive
         case bottomBarActive
         case barViewOptionConfigurationRawValue
@@ -283,6 +282,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case incidenceOfLight
         case lightGlowOverlaySelector
         case insulinHours
+        case button3DBackground
         // Dana Toggles
         // AutoISF
         case autoisf
@@ -409,7 +409,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.tempTargetbar, forKey: .tempTargetbar)
         try container.encode(settings.timeSettings, forKey: .timeSettings)
         try container.encode(settings.backgroundColorOptionRawValue, forKey: .backgroundColorOptionRawValue)
-        try container.encode(settings.danaBarViewOption, forKey: .danaBarViewOption)
+        try container.encode(settings.danaBarOption, forKey: .danaBarOption)
         try container.encode(settings.insulinAgeOption, forKey: .insulinAgeOption)
         try container.encode(settings.cannulaAgeOption, forKey: .cannulaAgeOption)
         try container.encode(settings.loopViewOption, forKey: .loopViewOption)
@@ -417,7 +417,6 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.carbInsulinLoopViewOption, forKey: .carbInsulinLoopViewOption)
         try container.encode(settings.topBarActive, forKey: .topBarActive)
         try container.encode(settings.danaBarActive, forKey: .danaBarActive)
-        try container.encode(settings.legendBarActive, forKey: .legendBarActive)
         try container.encode(settings.ttBarActive, forKey: .ttBarActive)
         try container.encode(settings.bottomBarActive, forKey: .bottomBarActive)
         try container.encode(settings.barViewOptionConfigurationRawValue, forKey: .barViewOptionConfigurationRawValue)
@@ -429,6 +428,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.incidenceOfLight, forKey: .incidenceOfLight)
         try container.encode(settings.lightGlowOverlaySelector, forKey: .lightGlowOverlaySelector)
         try container.encode(settings.insulinHours, forKey: .insulinHours)
+        try container.encode(settings.button3DBackground, forKey: .button3DBackground)
         // Dana Toggels
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)
