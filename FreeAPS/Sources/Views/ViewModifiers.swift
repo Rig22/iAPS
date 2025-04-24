@@ -419,6 +419,33 @@ extension UnevenRoundedRectangle {
         )
 }
 
+// BlinkingModifier
+struct BlinkingModifier: ViewModifier {
+    let shouldBlink: Bool
+    @State private var isBlinking = false
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(shouldBlink ? (isBlinking ? 0.3 : 1) : 1)
+            .onAppear { startAnimation() }
+            .onChange(of: shouldBlink) { // Neue iOS 17 Syntax
+                startAnimation()
+            }
+    }
+
+    private func startAnimation() {
+        isBlinking = false
+        guard shouldBlink else { return }
+
+        withAnimation(
+            Animation.easeInOut(duration: 0.8)
+                .repeatForever(autoreverses: true)
+        ) {
+            isBlinking = true
+        }
+    }
+}
+
 extension UIImage {
     /// Code suggested by Mamad Farrahi, but slightly modified. Need to find some newer version later.
     func fillImageUpToPortion(color: Color, portion: Double) -> Image {

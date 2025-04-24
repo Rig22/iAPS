@@ -96,12 +96,12 @@ extension StatConfig {
             case .atriumview5: return "NortherLights" }
         }
 
-        // Hilfsfunktion für Beschreibungstexte
         private func getDescription(for option: DanaBarOption) -> String {
             switch option {
             case .max: return "Vollständige Anzeige mit InsulinAlter"
             case .icon: return "Mit Pumpen-Icon"
             case .min: return "Minimalistische Ansicht"
+            case .marquee: return "Laufschrift"
             }
         }
 
@@ -120,7 +120,7 @@ extension StatConfig {
 
                     if state.danaBar && state.danaBarOption == DanaBarOption.icon.rawValue {
                         Circle()
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkerGray.opacity(1.0))
                             .frame(width: 20, height: 20)
                             .offset(x: -53, y: -55)
                         Image(state.danaIconRawValue)
@@ -138,7 +138,8 @@ extension StatConfig {
                     ScrollView {
                         Form {
                             Section(
-                                header: Text("Bar Selection")
+                                header: Text("Bar Selection"),
+                                footer: Text("Select the  desired bar view")
                             )
                                 {
                                     Toggle("Dana Bars", isOn: $state.danaBar)
@@ -219,15 +220,9 @@ extension StatConfig {
 
                                         Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
                                     }
+                                    Toggle("TT Bar", isOn: $state.tempTargetBar)
+                                    Toggle("Bottom Bar", isOn: $state.timeSettings)
                                 }
-
-                            Section(
-                                footer: Text("Select the  desired bar view")
-                            ) {
-                                // Toggle("Legend Bar", isOn: $state.legendsSwitch)
-                                Toggle("TT Bar", isOn: $state.tempTargetBar)
-                                Toggle("Bottom Bar", isOn: $state.timeSettings)
-                            }
 
                             Section(
                                 header: Text("Visual Options"),

@@ -127,7 +127,7 @@ struct LoopView: View {
 
                 if isLooping {
                     Circle()
-                        .fill(Color.darkGray.opacity(0.5))
+                        .fill(Color.darkerGray.opacity(0.5))
                         .frame(width: 45, height: 45)
                         .transition(.opacity)
                 }
