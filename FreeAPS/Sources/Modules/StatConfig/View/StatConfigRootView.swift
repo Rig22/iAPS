@@ -296,6 +296,10 @@ extension StatConfig {
                                 }
                             }
 
+                            Section {
+                                Text("App Icons").navigationLink(to: .iconConfig, from: self)
+                            } header: { Text("Choose your App Icon") }
+
                             Section(
                                 header: Text("Sensor Settings"),
                                 footer: Text("Long press for setting new Sensor Start Time")

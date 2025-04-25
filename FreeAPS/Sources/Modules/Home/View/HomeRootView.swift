@@ -2105,9 +2105,21 @@ extension Home {
         private func createMarqueeText() -> String {
             var components = [String]()
 
-            // Reservoir
+            // Reservoir mit Insulin-Konzentration
             if let reservoir = state.reservoirLevel {
-                components.append("Reservoir: \(reservoir == 0 ? "--" : "\(reservoir)U")")
+                if reservoir == 0 {
+                    components.append("Reservoir: --")
+                } else {
+                    let concentrationValue = concentration.last?.concentration ?? 1.0
+                    let adjustedReservoir = Double(reservoir) * concentrationValue
+
+                    let formatter = NumberFormatter()
+                    formatter.numberStyle = .decimal
+                    formatter.maximumFractionDigits = 0
+                    let formattedReservoir = formatter.string(from: NSNumber(value: adjustedReservoir)) ?? "\(adjustedReservoir)"
+
+                    components.append("Reservoir: \(formattedReservoir)U")
+                }
             }
 
             // Insulin Age
