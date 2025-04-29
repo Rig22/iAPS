@@ -1,4 +1,3 @@
-
 /*
   Localizable.strings
   iAPS
@@ -2178,6 +2177,9 @@ Enact a temp Basal or a temp target */
 
 /* */
 "Share your data anonymously" = "Share your data anonymously";
+
+/* Setting Title */
+"Sharing" = "Sharing";
 
 /* ——————————Contact Image ————————*/
 

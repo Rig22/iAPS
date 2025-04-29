@@ -317,6 +317,7 @@
 		7927D7162D082E8400385439 /* CannulaAgeOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7927D7152D082E7300385439 /* CannulaAgeOption.swift */; };
 		792E4EC32CF8C95800ADE3DC /* DanaIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */; };
 		792F32F62CD9DCAF009E7F7A /* BackgroundColorOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */; };
+		7949F9012DC11A710058BF94 /* SystemSoundsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7949F9002DC11A550058BF94 /* SystemSoundsManager.swift */; };
 		795CBE122D3F60B20044854B /* BGTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE112D3F60A30044854B /* BGTextField.swift */; };
 		795CBE142D3F943A0044854B /* AutoISFsettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE132D3F942B0044854B /* AutoISFsettings.swift */; };
 		795CBE162D3F949D0044854B /* ChartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE152D3F94900044854B /* ChartModel.swift */; };
@@ -953,6 +954,7 @@
 		7927D7152D082E7300385439 /* CannulaAgeOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CannulaAgeOption.swift; sourceTree = "<group>"; };
 		792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaIconOption.swift; sourceTree = "<group>"; };
 		792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundColorOption.swift; sourceTree = "<group>"; };
+		7949F9002DC11A550058BF94 /* SystemSoundsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemSoundsManager.swift; sourceTree = "<group>"; };
 		795CBE112D3F60A30044854B /* BGTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGTextField.swift; sourceTree = "<group>"; };
 		795CBE132D3F942B0044854B /* AutoISFsettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoISFsettings.swift; sourceTree = "<group>"; };
 		795CBE152D3F94900044854B /* ChartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartModel.swift; sourceTree = "<group>"; };
@@ -1957,6 +1959,7 @@
 		388E5A5A25B6F05F0019842D /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				7949F9002DC11A550058BF94 /* SystemSoundsManager.swift */,
 				79D4708D2CE483DD0095B89A /* Token.swift */,
 				FEFA5C10299F814A00765C17 /* CoreDataStack.swift */,
 				38F37827261260DC009DB701 /* Color+Extensions.swift */,
@@ -3035,6 +3038,7 @@
 				3870FF4725EC187A0088248F /* BloodGlucose.swift in Sources */,
 				38A0364225ED069400FCBB52 /* TempBasal.swift in Sources */,
 				797CA82B2D85AD69009D5ACC /* BolusProgressViewOption.swift in Sources */,
+				7949F9012DC11A710058BF94 /* SystemSoundsManager.swift in Sources */,
 				3811DE1725C9D40400A708ED /* Screen.swift in Sources */,
 				383948DA25CD64D500E91849 /* Glucose.swift in Sources */,
 				CE94598029E9E3BD0047C9C6 /* WatchConfigDataFlow.swift in Sources */,

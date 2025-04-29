@@ -79,6 +79,8 @@ extension Home {
         @Published var displayExpiration = false
         @Published var cgm: CGMType = .nightscout
         @Published var sensorDays: Double = 10
+        @Published var carbButton: Bool = true
+        @Published var profileButton: Bool = true
         // Dana UI Toggels
         @Published var danaIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
@@ -243,6 +245,8 @@ extension Home {
             displayExpiration = settingsManager.settings.displayExpiration
             cgm = settingsManager.settings.cgm
             sensorDays = settingsManager.settings.sensorDays
+            carbButton = settingsManager.settings.carbButton
+            profileButton = settingsManager.settings.profileButton
             // Dana UI Toggels
             danaIconRawValue = settingsManager.settings.danaIconRawValue
             danaBar = settingsManager.settings.danaBar
@@ -861,6 +865,8 @@ extension Home.StateModel:
         displayExpiration = settingsManager.settings.displayExpiration
         cgm = settingsManager.settings.cgm
         sensorDays = settingsManager.settings.sensorDays
+        carbButton = settingsManager.settings.carbButton
+        profileButton = settingsManager.settings.profileButton
         setupGlucose()
         setupOverrideHistory()
         setupData()

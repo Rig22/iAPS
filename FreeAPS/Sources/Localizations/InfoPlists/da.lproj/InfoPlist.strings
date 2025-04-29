@@ -1,20 +1,8 @@
-/* Privacy - NFC Scan Usage Description */
-"NFCReaderUsageDescription" = "NFC bruges til at scanne Libre sensorer.";
-
-/* Privacy - Bluetooth Always Usage Description */
-"NSBluetoothAlwaysUsageDescription" = "Bluetooth bliver brugt til at kommunikere med din insulin pumpe og dine glukose monitor enheder";
-
-/* Privacy - Bluetooth Peripheral Usage Description */
-"NSBluetoothPeripheralUsageDescription" = "Bluetooth bliver brugt til at kommunikere med din insulin pumpe og dine glukose monitor enheder";
-
-/* Privacy - Face ID Usage Description */
-"NSFaceIDUsageDescription" = "For autoriseret adgang til bolus";
-
-/* Privacy - Calendars Usage Description */
-"NSCalendarsUsageDescription" = "Kalender bruges til at oprette en ny glucose begivenheder.";
-
-/* Privacy - Health Update Usage Description */
-"NSHealthUpdateUsageDescription" = "Health App bruges til at opbevare blodglukose, insulin og kulhydrater";
+/* Privacy - Health Records Usage Description */
+"NSHealthClinicalHealthRecordsShareUsageDescription" = "For the iAPS app to work on the Apple Watch, please ensure that you have enabled HealthKit permissions.";
 
 /* Privacy - Health Share Usage Description */
-"NSHealthShareUsageDescription" = "Health App bruges til at opbevare blodglukose, insulin og kulhydrater";
+"NSHealthShareUsageDescription" = "For the iAPS app to work on the Apple Watch, please ensure that you have enabled HealthKit permissions.";
+
+/* Privacy - Health Update Usage Description */
+"NSHealthUpdateUsageDescription" = "For the iAPS app to work on the Apple Watch, please ensure that you have enabled HealthKit permissions.";

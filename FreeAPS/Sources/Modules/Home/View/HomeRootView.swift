@@ -218,7 +218,7 @@ extension Home {
                             .frame(width: CGFloat(characters * 7), height: 25)
                     } else {
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.gray.opacity(0.5))
+                            .fill(Color.black.opacity(0.2))
                             .frame(width: CGFloat(characters * 7), height: 25)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 15)
@@ -273,7 +273,7 @@ extension Home {
                             .frame(width: CGFloat(characters * 10), height: 26)
                     } else {
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.black.opacity(0.5))
+                            .fill(Color.black.opacity(0.2))
                             .frame(width: CGFloat(characters * 10), height: 26)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 15)
@@ -511,7 +511,7 @@ extension Home {
                         .frame(width: 110, height: 110)
                 } else {
                     Circle()
-                        .fill(Color.black.opacity(0.5))
+                        .fill(Color.black.opacity(0.2))
                         .frame(width: 110, height: 110)
                 }
 
@@ -839,7 +839,7 @@ extension Home {
                                 .frame(width: 40, height: 40)
                         } else {
                             Circle()
-                                .fill(Color.black.opacity(0.5))
+                                .fill(Color.black.opacity(0.2))
                                 .frame(width: 40, height: 40)
                                 .overlay(
                                     Circle()
@@ -937,7 +937,7 @@ extension Home {
                                 .frame(width: 40, height: 40)
                         } else {
                             Circle()
-                                .fill(Color.black.opacity(0.5))
+                                .fill(Color.black.opacity(0.2))
                                 .frame(width: 40, height: 40)
                         }
 
@@ -1032,7 +1032,7 @@ extension Home {
                                 .frame(width: 40, height: 40)
                         } else {
                             Circle()
-                                .fill(Color.black.opacity(0.5))
+                                .fill(Color.black.opacity(0.2))
                                 .frame(width: 40, height: 40)
                         }
 
@@ -1128,7 +1128,7 @@ extension Home {
                                 .frame(width: 30, height: 30)
                         } else {
                             Circle()
-                                .fill(Color.black.opacity(0.5))
+                                .fill(Color.black.opacity(0.2))
                                 .frame(width: 40, height: 40)
                                 .overlay(
                                     Circle()
@@ -1216,7 +1216,7 @@ extension Home {
                                 .frame(width: 30, height: 30)
                         } else {
                             Circle()
-                                .fill(Color.black.opacity(0.5))
+                                .fill(Color.black.opacity(0.2))
                                 .frame(width: 40, height: 40)
                                 .overlay(
                                     Circle()
@@ -1301,7 +1301,7 @@ extension Home {
                                 .frame(width: 40, height: 40)
                         } else {
                             Circle()
-                                .fill(Color.black.opacity(0.5))
+                                .fill(Color.black.opacity(0.2))
                                 .frame(width: 40, height: 40)
                                 .overlay(
                                     Circle()
@@ -1800,7 +1800,7 @@ extension Home {
                         .frame(width: 50, height: 50)
                 } else {
                     Circle()
-                        .fill(Color.black.opacity(0.5))
+                        .fill(Color.black.opacity(0.2))
                         .frame(width: 50, height: 50)
                         .overlay(
                             Circle()
@@ -3177,22 +3177,27 @@ extension Home {
 
                 let isOverride = fetchedPercent.first?.enabled ?? false
                 let isTarget = (state.tempTarget != nil)
-                HStack {
-                    ZStack {
-                        buttonWithCircle(iconName: "carbs3", circleColor: Color.black.opacity(1.0)) {
-                            state.showModal(for: .addCarbs(editMode: false, override: false))
-                        }
-                        if let carbsReq = state.carbsRequired {
-                            Text(numberFormatter.string(from: carbsReq as NSNumber)!)
-                                .font(.caption)
-                                .foregroundColor(.white)
-                                .padding(4)
-                                .background(Capsule().fill(Color.red))
-                                .offset(x: 20, y: 10)
-                        }
-                    }
-                    Spacer()
 
+                HStack {
+                    // Carb Button
+                    if state.carbButton {
+                        ZStack {
+                            buttonWithCircle(iconName: "carbs3", circleColor: Color.black.opacity(1.0)) {
+                                state.showModal(for: .addCarbs(editMode: false, override: false))
+                            }
+                            if let carbsReq = state.carbsRequired {
+                                Text(numberFormatter.string(from: carbsReq as NSNumber)!)
+                                    .font(.caption)
+                                    .foregroundColor(.white)
+                                    .padding(4)
+                                    .background(Capsule().fill(Color.red))
+                                    .offset(x: 20, y: 10)
+                            }
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+
+                    // IOB Button
                     buttonWithCircle(iconName: "iob", circleColor: Color.black.opacity(1.0)) {
                         (state.bolusProgress != nil) ? showBolusActiveAlert = true :
                             state.showModal(for: .bolus(
@@ -3200,27 +3205,32 @@ extension Home {
                                 fetch: false
                             ))
                     }
-                    Spacer()
+                    .frame(maxWidth: .infinity)
 
+                    // Manual Temp Basal Button
                     if state.allowManualTemp {
                         buttonWithCircle(iconName: "insulin", circleColor: Color.black.opacity(1.0)) {
                             state.showModal(for: .manualTempBasal)
                         }
-                        Spacer()
+                        .frame(maxWidth: .infinity)
                     }
 
-                    buttonWithCircle(
-                        iconName: isOverride ? "profilefill" : "profile",
-                        circleColor: Color.black.opacity(1.0)
-                    ) {
-                        if isOverride {
-                            showCancelAlert.toggle()
-                        } else {
-                            state.showModal(for: .overrideProfilesConfig)
+                    // Profile Button
+                    if state.profileButton {
+                        buttonWithCircle(
+                            iconName: isOverride ? "profilefill" : "profile",
+                            circleColor: Color.black.opacity(1.0)
+                        ) {
+                            if isOverride {
+                                showCancelAlert.toggle()
+                            } else {
+                                state.showModal(for: .overrideProfilesConfig)
+                            }
                         }
+                        .frame(maxWidth: .infinity)
                     }
-                    Spacer()
 
+                    // Target Button
                     if state.useTargetButton {
                         buttonWithCircle(
                             iconName: isTarget ? "temptargetactive" : "temptarget",
@@ -3232,14 +3242,16 @@ extension Home {
                                 state.showModal(for: .addTempTarget)
                             }
                         }
-                        Spacer()
+                        .frame(maxWidth: .infinity)
                     }
 
+                    // Statistics Button
                     buttonWithCircle(iconName: "ux", circleColor: Color.black.opacity(1.0)) {
                         state.showModal(for: .statisticsConfig)
                     }
-                    Spacer()
+                    .frame(maxWidth: .infinity)
 
+                    // Settings Button
                     buttonWithCircle(iconName: "settings2", circleColor: Color.black.opacity(1.0)) {
                         if !didLongPress {
                             state.showModal(for: .settings)
@@ -3254,10 +3266,12 @@ extension Home {
                             didLongPress = true
                         }
                     )
+                    .frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal, state.allowManualTemp ? 5 : 24)
+                .padding(.horizontal, 5) // Geringerer horizontaler Padding, da Buttons den Raum ausfüllen
                 .padding(.bottom, 15)
             }
+            // Rest des Codes bleibt unverändert
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .confirmationDialog("Cancel Profile Override", isPresented: $showCancelAlert) {
                 Button("Cancel Profile Override", role: .destructive) {
@@ -3318,7 +3332,7 @@ extension Home {
                             .frame(width: 50, height: 50)
                     } else {
                         Circle()
-                            .fill(Color.black.opacity(0.5))
+                            .fill(Color.black.opacity(0.2))
                             .frame(width: 50, height: 50)
                             .overlay(
                                 Circle()

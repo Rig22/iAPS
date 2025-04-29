@@ -60,6 +60,11 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var liveActivityChartDynamicRange = true
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = false
+    var hypoSound: String = "New/Anticipalte.caf"
+    var hyperSound: String = "New/Anticipalte.caf"
+    var ascending: String = "New/Anticipalte.caf"
+    var descending: String = "New/Anticipalte.caf"
+    var carbSound: String = "New/Anticipalte.caf"
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
     var allowedRemoteBolusAmount: Decimal = 0.0
@@ -112,6 +117,8 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var insulinHours: Double?
     var button3DBackground: Bool = false
     var batteryIconOption: Bool = false
+    var carbButton: Bool = true
+    var profileButton: Bool = true
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false
@@ -233,6 +240,11 @@ struct EncodableFreeAPSSettings: Encodable {
         case liveActivityThresholdLines
         case useTargetButton
         case alwaysUseColors
+        case hypoSound
+        case hyperSound
+        case ascending
+        case descending
+        case carbSound
         case profilesOrTempTargets
         case allowBolusShortcut
         case allowedRemoteBolusAmount
@@ -285,6 +297,8 @@ struct EncodableFreeAPSSettings: Encodable {
         case insulinHours
         case button3DBackground
         case batteryIconOption
+        case carbButton
+        case profileButton
         // Dana Toggles
         // AutoISF
         case autoisf
@@ -380,7 +394,11 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.liveActivityChartThresholdLines, forKey: .liveActivityChartThresholdLines)
         try container.encode(settings.liveActivityChartDynamicRange, forKey: .liveActivityChartDynamicRange)
         // ----
-        try container.encode(settings.useTargetButton, forKey: .useTargetButton)
+        try container.encode(settings.hypoSound, forKey: .hypoSound)
+        try container.encode(settings.hyperSound, forKey: .hyperSound)
+        try container.encode(settings.ascending, forKey: .ascending)
+        try container.encode(settings.descending, forKey: .descending)
+        try container.encode(settings.carbSound, forKey: .carbSound)
         try container.encode(settings.alwaysUseColors, forKey: .alwaysUseColors)
         try container.encode(settings.profilesOrTempTargets, forKey: .profilesOrTempTargets)
         try container.encode(settings.allowBolusShortcut, forKey: .allowBolusShortcut)
@@ -432,6 +450,8 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.insulinHours, forKey: .insulinHours)
         try container.encode(settings.button3DBackground, forKey: .button3DBackground)
         try container.encode(settings.batteryIconOption, forKey: .batteryIconOption)
+        try container.encode(settings.carbButton, forKey: .carbButton)
+        try container.encode(settings.profileButton, forKey: .profileButton)
         // Dana Toggels
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)
