@@ -222,13 +222,23 @@ struct addColouredBackground: View {
     }
 }
 
+/* struct ColouredBackground: View {
+     var body: some View {
+         RoundedRectangle(cornerRadius: 10)
+             .fill(Color.rig22Background)
+             // .fill(Color.darkGray.opacity(1.0))
+             .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
+             .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3)
+     }
+ } */
+
 struct ColouredBackground: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
-            .fill(Color.rig22Background)
-            // .fill(Color.darkGray.opacity(1.0))
-            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
-            .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3)
+            .fill(Color.black.opacity(0.2))
+        // .fill(Color.darkGray.opacity(1.0))
+        // .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
+        // .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3)
     }
 }
 

@@ -285,16 +285,12 @@ extension Home {
         }
 
         struct BatteryEllipse: View {
-            // MARK: - Properties
-
             var battery: Battery?
             var button3D: Bool
             var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
             @State private var isLowBatteryBlinking = false
-
-            // MARK: - Battery Logic
 
             private var shouldBlink: Bool {
                 guard let percent = battery?.percent else { return false }
@@ -322,215 +318,84 @@ extension Home {
             }
 
             private var percentageText: String {
-                battery?.percent != nil ? "\(battery!.percent)%" : "--"
+                if let percent = battery?.percent {
+                    return "\(percent)%"
+                } else {
+                    return "--"
+                }
             }
-
-            // MARK: - Body
 
             var body: some View {
                 ZStack {
-                    backgroundShape
-                    batteryContent
-                }
-                .onAppear(perform: startBlinkAnimationIfNeeded)
-                .onChange(of: battery?.percent) { _ in
-                    startBlinkAnimationIfNeeded()
-                }
-            }
-
-            // MARK: - View Components
-
-            private var backgroundShape: some View {
-                Group {
                     if button3D {
-                        button3DBackground ? Color.black.opacity(0.2).cornerRadius(15) : nil
-                        glowBorder
+                        let glowColor1 = incidenceOfLight
+                            ? lightGlowOverlaySelector.highlightColor
+                            : Color.white.opacity(0.9)
+
+                        let glowColor2 = incidenceOfLight
+                            ? lightGlowOverlaySelector.highlightColor
+                            : Color.white.opacity(0.4)
+
+                        if button3DBackground {
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color.black.opacity(0.2))
+                                .frame(width: 74, height: 25) // Feste Breite für Batterie
+                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                        }
+
+                        RoundedRectangle(cornerRadius: 15)
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        glowColor1.opacity(0.9),
+                                        glowColor2.opacity(0.6),
+                                        Color.clear,
+                                        Color.black.opacity(0.3),
+                                        Color.black.opacity(0.6)
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                ),
+                                lineWidth: 1
+                            )
+                            .frame(width: 74, height: 25)
                     } else {
                         RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.black.opacity(0.5))
+                            .fill(Color.black.opacity(0.2))
+                            .frame(width: 74, height: 25)
                     }
+
+                    HStack(spacing: 6) {
+                        Image(systemName: batterySymbol)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 20, height: 20)
+                            .foregroundColor(batteryColor)
+                            .opacity(shouldBlink ? (isLowBatteryBlinking ? 0.5 : 1) : 1)
+
+                        Text(percentageText)
+                            .font(.system(size: 12))
+                            .foregroundColor(.white)
+                    }
+                    .padding(.horizontal, 8)
                 }
-                .frame(width: 74, height: 25)
-            }
-
-            private var glowBorder: some View {
-                RoundedRectangle(cornerRadius: 15)
-                    .strokeBorder(
-                        LinearGradient(
-                            gradient: Gradient(colors: glowColors),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        ),
-                        lineWidth: 1
-                    )
-            }
-
-            private var glowColors: [Color] {
-                let baseColor = incidenceOfLight
-                    ? lightGlowOverlaySelector.highlightColor
-                    : Color.white
-
-                return [
-                    baseColor.opacity(0.9),
-                    baseColor.opacity(0.6),
-                    Color.clear,
-                    Color.black.opacity(0.3),
-                    Color.black.opacity(0.6)
-                ]
-            }
-
-            private var batteryContent: some View {
-                HStack(spacing: 6) {
-                    Image(systemName: batterySymbol)
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
-                        .foregroundColor(batteryColor)
-                        .opacity(blinkOpacity)
-
-                    Text(percentageText)
-                        .font(.system(size: 12))
-                        .foregroundColor(.white)
-                }
-                .padding(.horizontal, 8)
-            }
-
-            // MARK: - Blink Logic
-
-            private var blinkOpacity: CGFloat {
-                shouldBlink ? (isLowBatteryBlinking ? 0.5 : 1) : 1
-            }
+                .onAppear { startBlinkAnimationIfNeeded() }
+                .onChange(of: battery?.percent) {
+                    startBlinkAnimationIfNeeded()
+                } }
 
             private func startBlinkAnimationIfNeeded() {
-                withAnimation(shouldBlink ? blinkAnimation : nil) {
-                    isLowBatteryBlinking = shouldBlink
+                isLowBatteryBlinking = false
+                guard shouldBlink else { return }
+
+                withAnimation(
+                    Animation.easeInOut(duration: 0.8)
+                        .repeatForever(autoreverses: true)
+                ) {
+                    isLowBatteryBlinking = true
                 }
             }
-
-            private var blinkAnimation: Animation {
-                .easeInOut(duration: 0.8).repeatForever(autoreverses: true)
-            }
         }
-
-        // MARK: - Battery Model
-
-        /*     struct Battery {
-             var percent: Int  // Als Int deklariert
-             // Weitere Properties...
-         }*/
-
-        /*     struct BatteryEllipse: View {
-             var battery: Battery?
-             var button3D: Bool
-             var button3DBackground: Bool
-             var incidenceOfLight: Bool
-             var lightGlowOverlaySelector: LightGlowOverlaySelector
-             @State private var isLowBatteryBlinking = false
-
-             private var shouldBlink: Bool {
-                 guard let percent = battery?.percent else { return false }
-                 return percent <= 50
-             }
-
-             private var batteryColor: Color {
-                 guard let percent = battery?.percent else { return .gray }
-                 switch percent {
-                 case ...25: return .red
-                 case ...50: return .yellow
-                 default: return .green
-                 }
-             }
-
-             private var batterySymbol: String {
-                 guard let percent = battery?.percent else { return "battery.0" }
-                 switch percent {
-                 case 81 ... 100: return "battery.100"
-                 case 61 ... 80: return "battery.75"
-                 case 41 ... 60: return "battery.50"
-                 case 21 ... 40: return "battery.25"
-                 default: return "battery.0"
-                 }
-             }
-
-             private var percentageText: String {
-                 if let percent = battery?.percent {
-                     return "\(percent)%"
-                 } else {
-                     return "--"
-                 }
-             }
-
-             var body: some View {
-                 ZStack {
-                     if button3D {
-                         let glowColor1 = incidenceOfLight
-                             ? lightGlowOverlaySelector.highlightColor
-                             : Color.white.opacity(0.9)
-
-                         let glowColor2 = incidenceOfLight
-                             ? lightGlowOverlaySelector.highlightColor
-                             : Color.white.opacity(0.4)
-
-                         if button3DBackground {
-                             RoundedRectangle(cornerRadius: 15)
-                                 .fill(Color.black.opacity(0.2))
-                                 .frame(width: 74, height: 25) // Feste Breite für Batterie
-                                 .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                         }
-
-                         RoundedRectangle(cornerRadius: 15)
-                             .stroke(
-                                 LinearGradient(
-                                     gradient: Gradient(colors: [
-                                         glowColor1.opacity(0.9),
-                                         glowColor2.opacity(0.6),
-                                         Color.clear,
-                                         Color.black.opacity(0.3),
-                                         Color.black.opacity(0.6)
-                                     ]),
-                                     startPoint: .top,
-                                     endPoint: .bottom
-                                 ),
-                                 lineWidth: 1
-                             )
-                             .frame(width: 74, height: 25)
-                     } else {
-                         RoundedRectangle(cornerRadius: 15)
-                             .fill(Color.black.opacity(0.5))
-                             .frame(width: 74, height: 25)
-                     }
-
-                     HStack(spacing: 6) {
-                         Image(systemName: batterySymbol)
-                             .resizable()
-                             .scaledToFit()
-                             .frame(width: 20, height: 20)
-                             .foregroundColor(batteryColor)
-                             .opacity(shouldBlink ? (isLowBatteryBlinking ? 0.5 : 1) : 1)
-
-                         Text(percentageText)
-                             .font(.system(size: 12))
-                             .foregroundColor(.white)
-                     }
-                     .padding(.horizontal, 8)
-                 }
-                 .onAppear { startBlinkAnimationIfNeeded() }
-                 .onChange(of: battery?.percent) {
-                     startBlinkAnimationIfNeeded()
-                 } }
-
-             private func startBlinkAnimationIfNeeded() {
-                 isLowBatteryBlinking = false
-                 guard shouldBlink else { return }
-
-                 withAnimation(
-                     Animation.easeInOut(duration: 0.8)
-                         .repeatForever(autoreverses: true)
-                 ) {
-                     isLowBatteryBlinking = true
-                 }
-             }
-         }*/
 
         struct LightGlowOverlay: View {
             var body: some View {
@@ -910,83 +775,6 @@ extension Home {
                 } else {
                     progress = Double(newValue)
                 }
-            }
-        }
-
-        struct MarqueeText: View {
-            // MARK: - Configuration
-
-            var text: String
-            var fontSize: CGFloat = 15
-            var textColor: Color = .white
-            var startDelay: Double = 2.0
-            var animationDuration: Double = 10.0
-
-            // MARK: - Animation State
-
-            @State private var offset: CGFloat = 0
-            @State private var textWidth: CGFloat = 0
-            @State private var containerWidth: CGFloat = 0
-
-            var body: some View {
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        // Unsichtbare Breitenmessung
-                        Text(text)
-                            .font(.system(size: fontSize))
-                            .lineLimit(1)
-                            .fixedSize()
-                            .background(GeometryReader { geo in
-                                Color.clear
-                                    .onAppear {
-                                        textWidth = geo.size.width
-                                        containerWidth = geometry.size.width
-                                        startAnimation()
-                                    }
-                            })
-                            .hidden()
-
-                        // Sichtbarer Lauftext
-                        Text(text)
-                            .font(.system(size: fontSize))
-                            .foregroundColor(textColor)
-                            .lineLimit(1)
-                            .fixedSize()
-                            .offset(x: offset)
-                    }
-                    .frame(width: containerWidth)
-                    .clipped()
-                }
-                .frame(height: fontSize * 1.5)
-            }
-
-            // MARK: - Animation Logic
-
-            private func startAnimation() {
-                offset = containerWidth // Startposition rechts
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + startDelay) {
-                    withAnimation(
-                        .linear(duration: animationDuration)
-                            .repeatForever(autoreverses: false)
-                    ) {
-                        offset = -textWidth // Endposition links
-                    }
-                }
-            }
-        }
-
-        // Blinking Modifier (existierend)
-        struct BlinkingModifier: ViewModifier {
-            let shouldBlink: Bool
-
-            func body(content: Content) -> some View {
-                content
-                    .opacity(shouldBlink ? 1 : 1)
-                    .animation(
-                        shouldBlink ? .easeInOut(duration: 0.8).repeatForever() : .none,
-                        value: shouldBlink
-                    )
             }
         }
 
@@ -1693,7 +1481,7 @@ extension Home {
                     .font(.timeSettingFont)
                     .background(
                         TimeEllipseBig(
-                            characters: 10,
+                            characters: 11,
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
@@ -2236,6 +2024,63 @@ extension Home {
         }
 
         //  DanaBar Marquee
+
+        struct MarqueeText: View {
+            var text: String
+            var fontSize: CGFloat = 15
+            var textColor: Color = .white
+            var startDelay: Double = 2.0
+            var animationDuration: Double = 10.0
+
+            @State private var offset: CGFloat = 0
+            @State private var textWidth: CGFloat = 0
+            @State private var containerWidth: CGFloat = 0
+
+            var body: some View {
+                GeometryReader { geometry in
+                    ZStack(alignment: .leading) {
+                        // Unsichtbare Breitenmessung
+                        Text(text)
+                            .font(.system(size: fontSize))
+                            .lineLimit(1)
+                            .fixedSize()
+                            .background(GeometryReader { geo in
+                                Color.clear
+                                    .onAppear {
+                                        textWidth = geo.size.width
+                                        containerWidth = geometry.size.width
+                                        startAnimation()
+                                    }
+                            })
+                            .hidden()
+
+                        // Sichtbarer Lauftext
+                        Text(text)
+                            .font(.system(size: fontSize))
+                            .foregroundColor(textColor)
+                            .lineLimit(1)
+                            .fixedSize()
+                            .offset(x: offset)
+                    }
+                    .frame(width: containerWidth)
+                    .clipped()
+                }
+                .frame(height: fontSize * 1.5)
+            }
+
+            private func startAnimation() {
+                offset = containerWidth // Startposition rechts
+
+                DispatchQueue.main.asyncAfter(deadline: .now() + startDelay) {
+                    withAnimation(
+                        .linear(duration: animationDuration)
+                            .repeatForever(autoreverses: false)
+                    ) {
+                        offset = -textWidth // Endposition links
+                    }
+                }
+            }
+        }
 
         var danaBarMarquee: some View {
             Group {
