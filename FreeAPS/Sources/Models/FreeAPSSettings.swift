@@ -111,6 +111,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
     var insulinHours: Double?
     var button3DBackground: Bool = false
+    var batteryIconOption: Bool = false
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false
@@ -283,6 +284,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case lightGlowOverlaySelector
         case insulinHours
         case button3DBackground
+        case batteryIconOption
         // Dana Toggles
         // AutoISF
         case autoisf
@@ -429,6 +431,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.lightGlowOverlaySelector, forKey: .lightGlowOverlaySelector)
         try container.encode(settings.insulinHours, forKey: .insulinHours)
         try container.encode(settings.button3DBackground, forKey: .button3DBackground)
+        try container.encode(settings.batteryIconOption, forKey: .batteryIconOption)
         // Dana Toggels
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)

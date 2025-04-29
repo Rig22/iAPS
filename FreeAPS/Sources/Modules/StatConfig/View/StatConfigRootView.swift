@@ -102,6 +102,7 @@ extension StatConfig {
             case .icon: return "Mit Pumpen-Icon"
             case .min: return "Minimalistische Ansicht"
             case .marquee: return "Laufschrift"
+            case .simple: return "Traditionelle Ansicht"
             }
         }
 
@@ -208,6 +209,26 @@ extension StatConfig {
                                             .pickerStyle(NavigationLinkPickerStyle())
                                         }
 
+                                        // DanaBar Simple spezifische Einstellungen
+                                        if state.danaBarOption == DanaBarOption.simple.rawValue {
+                                            Picker(
+                                                "Max Reservoir Insulin Age",
+                                                selection: $state.insulinAgeOption
+                                            ) {
+                                                Text("1 Day").tag("Ein_Tag")
+                                                Text("2 Days").tag("Zwei_Tage")
+                                                Text("3 Days").tag("Drei_Tage")
+                                                Text("4 Days").tag("Vier_Tage")
+                                                Text("5 Days").tag("Fuenf_Tage")
+                                                Text("6 Days").tag("Sechs_Tage")
+                                                Text("7 Days").tag("Sieben_Tage")
+                                                Text("8 Days").tag("Acht_Tage")
+                                                Text("9 Days").tag("Neun_Tage")
+                                                Text("10 Days").tag("Zehn_Tage")
+                                            }
+                                            .pickerStyle(NavigationLinkPickerStyle())
+                                        }
+
                                         // Gemeinsame Einstellungen für alle Ansichten
                                         Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
                                             Text("1 Day").tag("Ein_Tag")
@@ -294,6 +315,7 @@ extension StatConfig {
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
                                 }
+                                Toggle("Batterie Anzeige", isOn: $state.batteryIconOption)
                             }
 
                             Section {

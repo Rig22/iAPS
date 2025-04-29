@@ -77,7 +77,7 @@ struct LoopView2: View {
                 return .loopYellow.opacity(0.8)
             }
             // Farbe des Rings ohne isLooping
-            return button3DBackground ? .darkerGray.opacity(0.5) : .darkerGray.opacity(0.3)
+            return button3DBackground ? .black.opacity(0.3) : .black.opacity(0.1)
         } else if delta <= 10.minutes.timeInterval {
             return .loopYellow.opacity(0.8)
         } else {
