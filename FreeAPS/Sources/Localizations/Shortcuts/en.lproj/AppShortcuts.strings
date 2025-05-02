@@ -1,77 +1,53 @@
-import AppIntents
-import Foundation
+/* iAPS Temporary Target shortcut*/
+"Activate ${applicationName} temporary target" = "Activate ${applicationName} temporary target";
 
-struct AppShortcuts: AppShortcutsProvider {
-    @AppShortcutsBuilder static var appShortcuts: [AppShortcut] {
-        AppShortcut(
-            intent: ApplyTempPresetIntent(),
-            phrases: [
-                "Activate \(.applicationName) temporary target",
-                "\(.applicationName) apply a temporary target"
-            ]
-        )
-        AppShortcut(
-            intent: ListStateIntent(),
-            phrases: [
-                "List \(.applicationName) state",
-                "\(.applicationName) state"
-            ]
-        )
-        AppShortcut(
-            intent: AddCarbPresentIntent(),
-            phrases: [
-                "Add carbs in \(.applicationName)",
-                "\(.applicationName) allows to add carbs"
-            ]
-        )
-        AppShortcut(
-            intent: ApplyOverrideIntent(),
-            phrases: [
-                "Activate an \(.applicationName) Override Preset",
-                "Activates an \(.applicationName) Override Preset"
-            ]
-        )
-        AppShortcut(
-            intent: CancelOverrideIntent(),
-            phrases: [
-                "Cancel \(.applicationName) Overide",
-                "Cancels an active \(.applicationName) override"
-            ]
-        )
-        AppShortcut(
-            intent: BolusIntent(),
-            phrases: [
-                "\(.applicationName) Bolus",
-                "\(.applicationName) Enacts a bolus"
-            ]
-        )
-        AppShortcut(
-            intent: ApplyMealPresetIntent(),
-            phrases: [
-                "\(.applicationName) Meal Presets",
-                "Uses an \(.applicationName) Meal Preset"
-            ]
-        )
-        AppShortcut(
-            intent: ModeIntent(),
-            phrases: [
-                "\(.applicationName) Loop Mode",
-                "Activates an \(.applicationName) Loop Mode"
-            ]
-        )
-        AppShortcut(
-            intent: BasalIntent(),
-            phrases: [
-                "\(.applicationName) Temp Basal",
-                "Enacts an \(.applicationName) Temp Basal"
-            ]
-        )
-        AppShortcut(
-            intent: SuspendResumeIntent(),
-            phrases: [
-                "\(.applicationName) Suspend/Resume",
-                "Suspends/Resumes your \(.applicationName) pump"
-            ]
-        )
-    }
-}
+/* iAPS Temporary Target shortcut Description */
+"${applicationName} apply a temporary target" = "${applicationName} apply a temporary target";
+
+/* iAPS Status shortcut */
+"List ${applicationName} state" = "List ${applicationName} state";
+
+/* iAPS Status shortcut Description*/
+"${applicationName} state" = "${applicationName} state";
+
+/* iAPS Add carbs shortcut */
+"Add carbs in ${applicationName}" = "Add carbs in ${applicationName}";
+
+/* iAPS Add carbs shortcut description */
+"${applicationName} allows to add carbs" = "${applicationName} allows to add carbs";
+
+/* iAPS Override shortcut */
+"Activate an ${applicationName} Override Preset" = "Activate an ${applicationName} Override Preset";
+
+/* iAPS Override shortcut description */
+"Activates an ${applicationName} Override Preset" = "Activates an ${applicationName} Override Preset";
+
+/* iAPS Cancel Override shortcut */
+"Cancel ${applicationName} Overide" =  "Cancel ${applicationName} Overide";
+
+/* iAPS Cancel Override shortcut description */
+"Cancels an active ${applicationName} override" = "Cancels an active ${applicationName} override";
+
+/* iAPS Bolus shortcut */
+"${applicationName} Bolus" = "${applicationName} Bolus";
+
+/* iAPS Bolus shortcut description */
+"${applicationName} Enacts a bolus" = "${applicationName} Enacts a bolus";
+
+/* iAPS Loop Mode shortcut */
+"${applicationName} Loop Mode" = "${applicationName} Loop Mode";
+
+/* iAPS Loop Mode shortcut description */
+"Activates an ${applicationName} Loop Mode" = "Activates an ${applicationName} Loop Mode";
+
+/* iAPS Basal shortcut */
+"${applicationName} Temp Basal" = "${applicationName} Temp Basal";
+
+/* iAPS Basal shortcut description */
+"Enacts an ${applicationName} Temp Basal" = "Enacts an ${applicationName} Temp Basal";
+
+/* iAPS Suspend/Resume shortcut */
+"${applicationName} Suspend/Resume" = "${applicationName} Suspend/Resume";
+
+/* iAPS Suspend/Resume  shortcut description */
+"Suspends/Resumes your ${applicationName} pump" = "Suspends/Resumes your ${applicationName} pump";

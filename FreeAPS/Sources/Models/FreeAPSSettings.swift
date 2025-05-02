@@ -65,6 +65,8 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var ascending: String = "New/Anticipalte.caf"
     var descending: String = "New/Anticipalte.caf"
     var carbSound: String = "New/Anticipalte.caf"
+    var bolusFailure = "Silent"
+    var missingLoops = true
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
     var allowedRemoteBolusAmount: Decimal = 0.0
@@ -110,7 +112,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var button3D: Bool = false
     var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
     var sensorStartTime: Date?
-    var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
+    var bolusProgressViewOption: String = BolusProgressViewOption.bolusview2.rawValue
     var sensorStartTimeDefault = Date.distantPast
     var incidenceOfLight = false
     var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
@@ -245,6 +247,8 @@ struct EncodableFreeAPSSettings: Encodable {
         case ascending
         case descending
         case carbSound
+        case bolusFailure
+        case missingLoops
         case profilesOrTempTargets
         case allowBolusShortcut
         case allowedRemoteBolusAmount
@@ -399,6 +403,8 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.ascending, forKey: .ascending)
         try container.encode(settings.descending, forKey: .descending)
         try container.encode(settings.carbSound, forKey: .carbSound)
+        try container.encode(settings.bolusFailure, forKey: .bolusFailure)
+        try container.encode(settings.missingLoops, forKey: .missingLoops)
         try container.encode(settings.alwaysUseColors, forKey: .alwaysUseColors)
         try container.encode(settings.profilesOrTempTargets, forKey: .profilesOrTempTargets)
         try container.encode(settings.allowBolusShortcut, forKey: .allowBolusShortcut)

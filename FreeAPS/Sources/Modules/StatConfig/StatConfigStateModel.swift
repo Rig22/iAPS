@@ -48,7 +48,7 @@ extension StatConfig {
         @Published var button3D: Bool = false
         @Published var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
         @Published var sensorStartTime: Date?
-        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
+        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview2.rawValue
         @Published var sensorStartTimeDefault = Date.distantPast
         @Published var incidenceOfLight: Bool = false
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue

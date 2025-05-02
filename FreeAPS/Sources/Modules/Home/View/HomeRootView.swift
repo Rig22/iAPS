@@ -2223,10 +2223,19 @@ extension Home {
                                 let hours = (totalMinutes % (24 * 60)) / 60
                                 let minutes = totalMinutes % 60
 
+                                /*  if days >= 1 {
+                                         return "\(days)d\(hours)h"
+                                     } else if hours >= 1 {
+                                         return "\(hours)h\(minutes)m"
+                                     } else {
+                                         return "\(minutes)m"
+                                     }
+                                 }()*/
+
                                 if days >= 1 {
                                     return "\(days)d\(hours)h"
                                 } else if hours >= 1 {
-                                    return "\(hours)h\(minutes)m"
+                                    return "\(hours)h"
                                 } else {
                                     return "\(minutes)m"
                                 }
@@ -2274,7 +2283,8 @@ extension Home {
                                     if days >= 1 {
                                         return "\(days)d\(hours)h"
                                     } else if hours >= 1 {
-                                        return "\(hours)h\(minutes)m"
+                                        // return "\(hours)h\(minutes)m"
+                                        return "\(hours)h"
                                     } else {
                                         return "\(minutes)m"
                                     }
@@ -2312,6 +2322,16 @@ extension Home {
                             }
                         }
                     }
+                    .background(
+                        TimeEllipse(
+                            characters: 54,
+                            button3D: state.button3D,
+                            button3DBackground: state.button3DBackground,
+                            incidenceOfLight: state.incidenceOfLight,
+                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                                .atriumview
+                        )
+                    )
                     .font(.system(size: 14, weight: .medium)) // Schrift für alle einheitlich
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)

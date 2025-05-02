@@ -102,7 +102,7 @@ extension Home {
         @Published var remainingSensorHours: Int?
         @Published var remainingSensorMinutes: Int?
         @Published var elapsedMinutes: Int = 0
-        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
+        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview2.rawValue
         @Published var incidenceOfLight: Bool = false
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
         @Published var insulinHours: Double?

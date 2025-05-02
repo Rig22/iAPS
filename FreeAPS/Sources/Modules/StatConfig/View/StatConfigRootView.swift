@@ -297,7 +297,10 @@ extension StatConfig {
                                 Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
                                 Toggle("3D Look", isOn: $state.button3D)
                                 if state.button3D {
-                                    Toggle("Icons Backgrounds ⇢ Dark", isOn: $state.button3DBackground) }
+                                    Toggle(
+                                        "Icons Backgrounds ⇢ Dark",
+                                        isOn: $state.button3DBackground
+                                    ) }
                                 Toggle("Atrium Light", isOn: $state.incidenceOfLight)
                                 if state.incidenceOfLight {
                                     Picker("Select your Atrium", selection: $state.lightGlowOverlaySelector) {
