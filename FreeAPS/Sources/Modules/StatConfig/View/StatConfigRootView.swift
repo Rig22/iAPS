@@ -320,6 +320,7 @@ extension StatConfig {
                                 }
                                 Toggle("Batterie Anzeige", isOn: $state.batteryIconOption)
                             }
+                            Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
 
                             Section {
                                 Text("App Icons").navigationLink(to: .iconConfig, from: self)

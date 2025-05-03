@@ -10,6 +10,7 @@ struct CurrentGlucoseView: View {
     @Binding var highGlucose: Decimal
     @Binding var bolusProgress: Double?
     @Binding var displayDelta: Bool
+    @Binding var alwaysUseColors: Bool
     // @Binding var scrolling: Bool
     @Binding var displayExpiration: Bool
     @Binding var cgm: CGMType
@@ -108,7 +109,7 @@ struct CurrentGlucoseView: View {
                             } ?? "--"
                     )
                     .font(.system(size: 30, weight: .bold))
-                    .foregroundColor(alarm == nil || colourGlucoseText == .red ? colourGlucoseText : .yellow)
+                    .foregroundColor(alwaysUseColors ? colourGlucoseText : .white)
                 }
                 HStack {
                     let elapsedSeconds = -1 * (recentGlucose?.dateString.timeIntervalSinceNow ?? 0)
@@ -209,8 +210,8 @@ struct CurrentGlucoseView: View {
 
     var colourGlucoseText: Color {
         let whichGlucose = recentGlucose?.glucose ?? 0
-        let defaultColor = Color.white.opacity(1.0)
-        // let defaultColor = Color.green.opacity(0.7)
+        // let defaultColor = Color.white.opacity(1.0)
+        let defaultColor = Color.green.opacity(0.7)
 
         guard lowGlucose < highGlucose else { return .primary }
 

@@ -525,6 +525,7 @@ extension Home {
                     highGlucose: $state.data.highGlucose,
                     bolusProgress: doubleBolusProgress,
                     displayDelta: $state.displayDelta,
+                    alwaysUseColors: $state.alwaysUseColors,
                     displayExpiration: $state.displayExpiration, cgm: $state.cgm, sensordays: $state.sensorDays
                 )
                 .onTapGesture {
