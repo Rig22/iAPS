@@ -23,6 +23,8 @@ extension StatConfig {
         @Published var anubis: Bool = false
         @Published var fpus: Bool = true
         @Published var fpuAmounts: Bool = false
+        @Published var carbButton: Bool = true
+        @Published var profileButton: Bool = true
         // Dana UI Toggels
         @Published var danaIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
@@ -46,11 +48,12 @@ extension StatConfig {
         @Published var button3D: Bool = false
         @Published var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
         @Published var sensorStartTime: Date?
-        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
+        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview2.rawValue
         @Published var sensorStartTimeDefault = Date.distantPast
         @Published var incidenceOfLight: Bool = false
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
         @Published var button3DBackground: Bool = false
+        @Published var batteryIconOption: Bool = false
         // Dana UI Toggels
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
@@ -108,6 +111,8 @@ extension StatConfig {
             //    subscribeSetting(\.anubis, on: $anubis) { anubis = $0 }
             subscribeSetting(\.fpus, on: $fpus) { fpus = $0 }
             subscribeSetting(\.fpuAmounts, on: $fpuAmounts) { fpuAmounts = $0 }
+            subscribeSetting(\.carbButton, on: $carbButton) { carbButton = $0 }
+            subscribeSetting(\.profileButton, on: $profileButton) { profileButton = $0 }
             // Dana Toggels
             subscribeSetting(\.danaIconRawValue, on: $danaIconRawValue) { danaIconRawValue = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
@@ -138,6 +143,7 @@ extension StatConfig {
             subscribeSetting(\.incidenceOfLight, on: $incidenceOfLight) { incidenceOfLight = $0 }
             subscribeSetting(\.lightGlowOverlaySelector, on: $lightGlowOverlaySelector) { lightGlowOverlaySelector = $0 }
             subscribeSetting(\.button3DBackground, on: $button3DBackground) { button3DBackground = $0 }
+            subscribeSetting(\.batteryIconOption, on: $batteryIconOption) { batteryIconOption = $0 }
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {

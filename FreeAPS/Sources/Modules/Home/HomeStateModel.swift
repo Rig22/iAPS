@@ -79,6 +79,8 @@ extension Home {
         @Published var displayExpiration = false
         @Published var cgm: CGMType = .nightscout
         @Published var sensorDays: Double = 10
+        @Published var carbButton: Bool = true
+        @Published var profileButton: Bool = true
         // Dana UI Toggels
         @Published var danaIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
@@ -100,14 +102,15 @@ extension Home {
         @Published var remainingSensorHours: Int?
         @Published var remainingSensorMinutes: Int?
         @Published var elapsedMinutes: Int = 0
-        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview1.rawValue
+        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview2.rawValue
         @Published var incidenceOfLight: Bool = false
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
         @Published var insulinHours: Double?
         @Published var insulinAge: String = "--"
-        @Published var button3DBackground: Bool = false
         @Published var batteryHours: Double?
         @Published var batteryAge: String = "--"
+        @Published var button3DBackground: Bool = false
+        @Published var batteryIconOption: Bool = false
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -242,6 +245,8 @@ extension Home {
             displayExpiration = settingsManager.settings.displayExpiration
             cgm = settingsManager.settings.cgm
             sensorDays = settingsManager.settings.sensorDays
+            carbButton = settingsManager.settings.carbButton
+            profileButton = settingsManager.settings.profileButton
             // Dana UI Toggels
             danaIconRawValue = settingsManager.settings.danaIconRawValue
             danaBar = settingsManager.settings.danaBar
@@ -263,6 +268,7 @@ extension Home {
             incidenceOfLight = settingsManager.settings.incidenceOfLight
             lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
             button3DBackground = settingsManager.settings.button3DBackground
+            batteryIconOption = settingsManager.settings.batteryIconOption
             // Dana UI Toggels
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -452,43 +458,6 @@ extension Home {
                 insulinAge = "--"
             }
         }
-
-        // Aktueller Füllstand des Pie-Charts (0.0 = leer, 1.0 = voll)
-        //   @Published var batteryAgeFraction: Double = 1.0
-
-        //   private let maxBatteryAgeHours: Double = 10 * 24 // 10 Tage in Stunden
-
-        /*   func updateBatteryAge() {
-             guard let pumpManager = provider.apsManager.pumpManager as? DanaKitPumpManager,
-                   let lastBatteryChangeDate = pumpManager.state.batteryAge
-             else {
-                 batteryHours = nil
-                 batteryAge = "--"
-                 batteryAgeFraction = 0.0 // Pie leer = keine Daten
-                 return
-             }
-
-             // VERBLEIBENDE Stunden berechnen (10 Tage - Alter)
-             let hoursSinceChange = abs(lastBatteryChangeDate.timeIntervalSinceNow) / 3600
-             let remainingHours = max(0, maxBatteryAgeHours - hoursSinceChange) // Nie negativ
-             batteryHours = remainingHours
-
-             // Pie-Füllstand: Linear von 1.0 (neu) bis 0.0 (10 Tage)
-             batteryAgeFraction = remainingHours / maxBatteryAgeHours
-
-             // Textformatierung: Restzeit (wie bei Insulin/Cannula)
-             let totalMinutes = Int(remainingHours * 60)
-             if totalMinutes < 60 {
-                 batteryAge = "\(totalMinutes)min"
-             } else {
-                 let days = totalMinutes / (24 * 60)
-                 let hours = (totalMinutes % (24 * 60)) / 60
-                 batteryAge = days > 0 ? "\(days)d\(hours)h" : "\(hours)h"
-             }
-             if hoursSinceChange >= maxBatteryAgeHours {
-                 print("⚠️ Akku sollte gewechselt werden!")
-             }
-         }*/
 
         func updateBatteryAge() {
             guard let pumpManager = provider.apsManager.pumpManager as? DanaKitPumpManager,
@@ -896,6 +865,8 @@ extension Home.StateModel:
         displayExpiration = settingsManager.settings.displayExpiration
         cgm = settingsManager.settings.cgm
         sensorDays = settingsManager.settings.sensorDays
+        carbButton = settingsManager.settings.carbButton
+        profileButton = settingsManager.settings.profileButton
         setupGlucose()
         setupOverrideHistory()
         setupData()
@@ -920,6 +891,7 @@ extension Home.StateModel:
         incidenceOfLight = settingsManager.settings.incidenceOfLight
         lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
         button3DBackground = settingsManager.settings.button3DBackground
+        batteryIconOption = settingsManager.settings.batteryIconOption
         // Dana UI Toggels
     }
 

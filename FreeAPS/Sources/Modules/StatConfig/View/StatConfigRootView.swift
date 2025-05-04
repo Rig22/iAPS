@@ -96,12 +96,13 @@ extension StatConfig {
             case .atriumview5: return "NortherLights" }
         }
 
-        // Hilfsfunktion für Beschreibungstexte
         private func getDescription(for option: DanaBarOption) -> String {
             switch option {
             case .max: return "Vollständige Anzeige mit InsulinAlter"
             case .icon: return "Mit Pumpen-Icon"
             case .min: return "Minimalistische Ansicht"
+            case .marquee: return "Laufschrift"
+            case .simple: return "Traditionelle Ansicht"
             }
         }
 
@@ -120,7 +121,7 @@ extension StatConfig {
 
                     if state.danaBar && state.danaBarOption == DanaBarOption.icon.rawValue {
                         Circle()
-                            .fill(Color.darkGray.opacity(1.0))
+                            .fill(Color.darkerGray.opacity(1.0))
                             .frame(width: 20, height: 20)
                             .offset(x: -53, y: -55)
                         Image(state.danaIconRawValue)
@@ -138,7 +139,8 @@ extension StatConfig {
                     ScrollView {
                         Form {
                             Section(
-                                header: Text("Bar Selection")
+                                header: Text("Bar Selection"),
+                                footer: Text("Select the  desired bar view")
                             )
                                 {
                                     Toggle("Dana Bars", isOn: $state.danaBar)
@@ -207,6 +209,26 @@ extension StatConfig {
                                             .pickerStyle(NavigationLinkPickerStyle())
                                         }
 
+                                        // DanaBar Simple spezifische Einstellungen
+                                        if state.danaBarOption == DanaBarOption.simple.rawValue {
+                                            Picker(
+                                                "Max Reservoir Insulin Age",
+                                                selection: $state.insulinAgeOption
+                                            ) {
+                                                Text("1 Day").tag("Ein_Tag")
+                                                Text("2 Days").tag("Zwei_Tage")
+                                                Text("3 Days").tag("Drei_Tage")
+                                                Text("4 Days").tag("Vier_Tage")
+                                                Text("5 Days").tag("Fuenf_Tage")
+                                                Text("6 Days").tag("Sechs_Tage")
+                                                Text("7 Days").tag("Sieben_Tage")
+                                                Text("8 Days").tag("Acht_Tage")
+                                                Text("9 Days").tag("Neun_Tage")
+                                                Text("10 Days").tag("Zehn_Tage")
+                                            }
+                                            .pickerStyle(NavigationLinkPickerStyle())
+                                        }
+
                                         // Gemeinsame Einstellungen für alle Ansichten
                                         Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
                                             Text("1 Day").tag("Ein_Tag")
@@ -219,15 +241,9 @@ extension StatConfig {
 
                                         Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
                                     }
+                                    Toggle("TT Bar", isOn: $state.tempTargetBar)
+                                    Toggle("Bottom Bar", isOn: $state.timeSettings)
                                 }
-
-                            Section(
-                                footer: Text("Select the  desired bar view")
-                            ) {
-                                // Toggle("Legend Bar", isOn: $state.legendsSwitch)
-                                Toggle("TT Bar", isOn: $state.tempTargetBar)
-                                Toggle("Bottom Bar", isOn: $state.timeSettings)
-                            }
 
                             Section(
                                 header: Text("Visual Options"),
@@ -281,7 +297,10 @@ extension StatConfig {
                                 Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
                                 Toggle("3D Look", isOn: $state.button3D)
                                 if state.button3D {
-                                    Toggle("Icons Backgrounds ⇢ Dark", isOn: $state.button3DBackground) }
+                                    Toggle(
+                                        "Icons Backgrounds ⇢ Dark",
+                                        isOn: $state.button3DBackground
+                                    ) }
                                 Toggle("Atrium Light", isOn: $state.incidenceOfLight)
                                 if state.incidenceOfLight {
                                     Picker("Select your Atrium", selection: $state.lightGlowOverlaySelector) {
@@ -299,7 +318,13 @@ extension StatConfig {
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
                                 }
+                                Toggle("Batterie Anzeige", isOn: $state.batteryIconOption)
                             }
+                            Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
+
+                            Section {
+                                Text("App Icons").navigationLink(to: .iconConfig, from: self)
+                            } header: { Text("Choose your App Icon") }
 
                             Section(
                                 header: Text("Sensor Settings"),
@@ -389,6 +414,8 @@ extension StatConfig {
 
                             Section(header: Text("Button Panel")) {
                                 Toggle("Display Temp Targets Button", isOn: $state.useTargetButton)
+                                Toggle("Display Profile Override Button", isOn: $state.profileButton)
+                                Toggle("Display Meal Button", isOn: $state.carbButton)
                             }
 
                             Section(header: Text("Statistics settings")) {

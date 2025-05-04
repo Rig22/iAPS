@@ -1,20 +1,8 @@
-/* Privacy - NFC Scan Usage Description */
-"NFCReaderUsageDescription" = "NFC wird zum Scannen von Libre Sensoren benutzt.";
-
-/* Privacy - Bluetooth Always Usage Description */
-"NSBluetoothAlwaysUsageDescription" = "Bluetooth wird verwendet, um mit Insulinpumpen und CGMs zu kommunizieren.";
-
-/* Privacy - Bluetooth Peripheral Usage Description */
-"NSBluetoothPeripheralUsageDescription" = "Bluetooth wird verwendet, um mit Insulinpumpen und CGMs zu kommunizieren.";
-
-/* Privacy - Face ID Usage Description */
-"NSFaceIDUsageDescription" = "Autorisierung für Bolusabgabe";
-
-/* Privacy - Calendars Usage Description */
-"NSCalendarsUsageDescription" = "BZ-Werte werden im Kalender als temporärer Termin erstellt.";
-
-/* Privacy - Health Update Usage Description */
-"NSHealthUpdateUsageDescription" = "Die Apple Health App wird zum Speichern von Blutzuckerwerten, Insulin und Kohlenhydraten verwendet";
+/* Privacy - Health Records Usage Description */
+"NSHealthClinicalHealthRecordsShareUsageDescription" = "For the iAPS app to work on the Apple Watch, please ensure that you have enabled HealthKit permissions.";
 
 /* Privacy - Health Share Usage Description */
-"NSHealthShareUsageDescription" = "Die Apple Health App wird zum Speichern von Blutzuckerwerten, Insulin und Kohlenhydraten verwendet";
+"NSHealthShareUsageDescription" = "For the iAPS app to work on the Apple Watch, please ensure that you have enabled HealthKit permissions.";
+
+/* Privacy - Health Update Usage Description */
+"NSHealthUpdateUsageDescription" = "For the iAPS app to work on the Apple Watch, please ensure that you have enabled HealthKit permissions.";

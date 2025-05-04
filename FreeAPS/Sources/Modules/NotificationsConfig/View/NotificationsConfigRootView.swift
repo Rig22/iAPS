@@ -1,4 +1,5 @@
 import ActivityKit
+import AVFoundation
 import Combine
 import SwiftUI
 import Swinject
@@ -7,6 +8,12 @@ extension NotificationsConfig {
     struct RootView: BaseView {
         let resolver: Resolver
         @StateObject var state = StateModel()
+        @State private var currentSoundID: SystemSoundID = 1336
+        @State private var isPlay = false
+        @State private var currentName: String = ""
+
+        let soundManager = SystemSoundsManager()
+        let silent = "Silent"
 
         @State private var systemLiveActivitySetting: Bool = { ActivityAuthorizationInfo().areActivitiesEnabled }()
 
@@ -34,11 +41,71 @@ extension NotificationsConfig {
 
             if !systemLiveActivitySetting {
                 footer =
-                    "Live activities are turned OFF in system settings. To enable live activities, go to Settings app -> iAPS -> Turn live Activities ON.\n\n" +
-                    footer
+                    NSLocalizedString(
+                        "Live activities are turned OFF in system settings. To enable live activities, go to Settings app -> iAPS -> Turn live Activities ON.\n\n",
+                        comment: "footer"
+                    ) + NSLocalizedString(footer, comment: "Footer")
             }
 
             return footer
+        }
+
+        private func playSound(_ s: String? = nil, _ sStop: SystemSoundID? = nil, _ onCompletion: @escaping () -> Void) {
+            guard state.alarmSound != "Silent" else { return }
+
+            if sStop != nil {
+                AudioServicesDisposeSystemSoundID(sStop!)
+                return
+            }
+            let path = "/System/Library/Audio/UISounds/" + (s ?? state.alarmSound)
+            var theSoundID = SystemSoundID(1336)
+            let soundURL = URL(string: path)
+            AudioServicesCreateSystemSoundID(soundURL! as CFURL, &theSoundID)
+            currentSoundID = theSoundID
+            AudioServicesPlaySystemSoundWithCompletion(theSoundID) {
+                AudioServicesDisposeSystemSoundID(theSoundID)
+                onCompletion()
+            }
+        }
+
+        private func cut(_ name: String) -> String {
+            name
+                .replacingOccurrences(of: ".caf", with: "")
+                .replacingOccurrences(of: "New/", with: "")
+                .replacingOccurrences(of: "Modern/", with: "")
+                .replacingOccurrences(of: "nano/", with: "")
+                .replacingOccurrences(of: "_", with: " ")
+        }
+
+        private func soundView(name: String) -> some View {
+            Image(systemName: "playpause.fill")
+                .foregroundStyle(.blue)
+                .onTapGesture {
+                    currentName = name
+                    if isPlay {
+                        playSound(name, currentSoundID) {
+                            isPlay = false
+                            currentName = ""
+                        }
+                    } else {
+                        playSound(name) {
+                            isPlay = false
+                            currentName = ""
+                        }
+                    }
+                    isPlay = true
+                }
+        }
+
+        private func buttonView(name: String) -> some View {
+            HStack(spacing: 20) {
+                soundView(name: name)
+                Text(cut(name))
+            }
+        }
+
+        private var silentView: some View {
+            Text("Silent").padding(.leading, 46)
         }
 
         var body: some View {
@@ -64,7 +131,7 @@ extension NotificationsConfig {
                     }
                 }
 
-                Section(header: Text("Other")) {
+                Section(header: Text("Carbs required")) {
                     HStack {
                         Text("Carbs Required Threshold")
                         Spacer()
@@ -73,11 +140,62 @@ extension NotificationsConfig {
                     }
                 }
 
+                Section(header: Text("Sounds")) {
+                    if !state.useAlarmSound {
+                        Text("Disabled").foregroundStyle(.secondary)
+                    } else {
+                        Picker(selection: $state.hypoSound, label: Text("Hypoglycemia")) {
+                            silentView.tag(silent)
+                            ForEach(soundManager.infos, id: \.self.name) { i in
+                                buttonView(name: i.name)
+                            }
+                        }.pickerStyle(.navigationLink)
+
+                        Picker(selection: $state.hyperSound, label: Text("Hyperglycemia")) {
+                            silentView.tag(silent)
+                            ForEach(soundManager.infos, id: \.self.name) { i in
+                                buttonView(name: i.name)
+                            }
+                        }.pickerStyle(.navigationLink)
+
+                        Picker(selection: $state.ascending, label: Text("Rapidly Ascending")) {
+                            silentView.tag(silent)
+                            ForEach(soundManager.infos, id: \.self.name) { i in
+                                buttonView(name: i.name)
+                            }
+                        }.pickerStyle(.navigationLink)
+
+                        Picker(selection: $state.descending, label: Text("Rapidly Descending")) {
+                            silentView.tag(silent)
+                            ForEach(soundManager.infos, id: \.self.name) { i in
+                                buttonView(name: i.name)
+                            }
+                        }.pickerStyle(.navigationLink)
+
+                        Picker(selection: $state.carbSound, label: Text("Carbs Required")) {
+                            silentView.tag(silent)
+                            ForEach(soundManager.infos, id: \.self.name) { i in
+                                buttonView(name: i.name)
+                            }
+                        }.pickerStyle(.navigationLink)
+
+                        Picker(selection: $state.bolusFailure, label: Text("Bolus Failure")) {
+                            silentView.tag(silent)
+                            ForEach(soundManager.infos, id: \.self.name) { i in
+                                buttonView(name: i.name)
+                            }
+                        }.pickerStyle(.navigationLink)
+
+                        Picker(selection: $state.missingLoops, label: Text("Missing Loops")) {
+                            silentView.tag(false)
+                            Text("iOS default sound").tag(true)
+                        }.pickerStyle(.navigationLink)
+                    }
+                }
+
                 Section(
                     header: Text("Live Activity"),
-                    footer: Text(
-                        liveActivityFooterText()
-                    ),
+                    footer: Text(liveActivityFooterText()),
                     content: {
                         if !systemLiveActivitySetting {
                             Button("Open Settings App") {
@@ -93,8 +211,7 @@ extension NotificationsConfig {
                             }
                         }
                     }
-                )
-                .onReceive(resolver.resolve(LiveActivityBridge.self)!.$systemEnabled, perform: {
+                ).onReceive(resolver.resolve(LiveActivityBridge.self)!.$systemEnabled, perform: {
                     self.systemLiveActivitySetting = $0
                 })
             }

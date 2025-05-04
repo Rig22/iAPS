@@ -8,6 +8,8 @@ enum DanaBarOption: String, CaseIterable, Identifiable {
     case max = "DanaBar Max"
     case icon = "DanaBar Icon"
     case min = "DanaBar Min"
+    case marquee = "DanaBar Marquee"
+    case simple = "DanaBar Einfach"
 
     var id: String { rawValue }
     var previewImageName: String {
@@ -15,6 +17,8 @@ enum DanaBarOption: String, CaseIterable, Identifiable {
         case .max: return "DanaBarMaxPreview"
         case .icon: return "DanaBarIconPreview"
         case .min: return "DanaBarMinPreview"
+        case .marquee: return "DanaBarMarqueePreview"
+        case .simple: return "DanaBarSimplePreview"
         }
     }
 }

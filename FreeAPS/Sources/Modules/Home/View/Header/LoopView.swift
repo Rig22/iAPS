@@ -38,7 +38,7 @@ class PieSegmentViewModel: ObservableObject {
 
     func updateProgress(to newValue: CGFloat, animate: Bool) {
         if animate {
-            withAnimation(.easeInOut(duration: 2.5)) { // Dauer der Animation anpassen
+            withAnimation(.easeInOut(duration: 2.5)) { // Dauer der Animation
                 self.progress = Double(newValue)
             }
         } else {
@@ -127,8 +127,8 @@ struct LoopView: View {
 
                 if isLooping {
                     Circle()
-                        .fill(Color.darkGray.opacity(0.5))
-                        .frame(width: 45, height: 45)
+                        .fill(Color.darkerGray.opacity(0.5))
+                        .frame(width: 50, height: 50)
                         .transition(.opacity)
                 }
 
@@ -161,7 +161,7 @@ struct LoopView: View {
                         angle: .degrees(gradientOffset)
                     )
                 )
-                .frame(width: 45, height: 45)
+                .frame(width: 50, height: 50)
                 .scaleEffect(scale)
                 .onAppear {
                     /* withAnimation(

@@ -222,13 +222,20 @@ struct addColouredBackground: View {
     }
 }
 
+/* struct ColouredBackground: View {
+     var body: some View {
+         RoundedRectangle(cornerRadius: 10)
+             .fill(Color.rig22Background)
+             // .fill(Color.darkGray.opacity(1.0))
+             .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
+             .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3)
+     }
+ } */
+
 struct ColouredBackground: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 10)
-            .fill(Color.rig22Background)
-            // .fill(Color.darkGray.opacity(1.0))
-            .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
-            .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3)
+            .fill(Color.black.opacity(0.3))
     }
 }
 
@@ -417,6 +424,33 @@ extension UnevenRoundedRectangle {
             bottomTrailingRadius: 50,
             topTrailingRadius: 50
         )
+}
+
+// BlinkingModifier
+struct BlinkingModifier: ViewModifier {
+    let shouldBlink: Bool
+    @State private var isBlinking = false
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(shouldBlink ? (isBlinking ? 0.3 : 1) : 1)
+            .onAppear { startAnimation() }
+            .onChange(of: shouldBlink) { // Neue iOS 17 Syntax
+                startAnimation()
+            }
+    }
+
+    private func startAnimation() {
+        isBlinking = false
+        guard shouldBlink else { return }
+
+        withAnimation(
+            Animation.easeInOut(duration: 0.8)
+                .repeatForever(autoreverses: true)
+        ) {
+            isBlinking = true
+        }
+    }
 }
 
 extension UIImage {
