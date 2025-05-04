@@ -2324,8 +2324,8 @@ extension Home {
                         }
                     }
                     .background(
-                        TimeEllipse(
-                            characters: 54,
+                        TimeEllipseBig(
+                            characters: 39,
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,

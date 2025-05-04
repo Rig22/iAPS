@@ -60,6 +60,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var liveActivityChartDynamicRange = true
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = false
+    // Sounds
     var hypoSound: String = "New/Anticipalte.caf"
     var hyperSound: String = "New/Anticipalte.caf"
     var ascending: String = "New/Anticipalte.caf"
@@ -67,6 +68,13 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var carbSound: String = "New/Anticipalte.caf"
     var bolusFailure = "Silent"
     var missingLoops = true
+    // Alerts
+    var lowAlert: Bool = true
+    var highAlert: Bool = true
+    var ascendingAlert: Bool = true
+    var descendingAlert: Bool = true
+    var carbsRequiredAlert: Bool = true
+    //
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
     var allowedRemoteBolusAmount: Decimal = 0.0
@@ -249,6 +257,11 @@ struct EncodableFreeAPSSettings: Encodable {
         case carbSound
         case bolusFailure
         case missingLoops
+        case lowAlert
+        case highAlert
+        case ascendingAlert
+        case descendingAlert
+        case carbsRequiredAlert
         case profilesOrTempTargets
         case allowBolusShortcut
         case allowedRemoteBolusAmount
@@ -405,6 +418,11 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.carbSound, forKey: .carbSound)
         try container.encode(settings.bolusFailure, forKey: .bolusFailure)
         try container.encode(settings.missingLoops, forKey: .missingLoops)
+        try container.encode(settings.lowAlert, forKey: .lowAlert)
+        try container.encode(settings.highAlert, forKey: .highAlert)
+        try container.encode(settings.ascendingAlert, forKey: .ascendingAlert)
+        try container.encode(settings.descendingAlert, forKey: .descendingAlert)
+        try container.encode(settings.carbsRequiredAlert, forKey: .carbsRequiredAlert)
         try container.encode(settings.alwaysUseColors, forKey: .alwaysUseColors)
         try container.encode(settings.profilesOrTempTargets, forKey: .profilesOrTempTargets)
         try container.encode(settings.allowBolusShortcut, forKey: .allowBolusShortcut)

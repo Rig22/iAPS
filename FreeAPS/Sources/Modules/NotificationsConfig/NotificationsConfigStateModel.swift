@@ -19,6 +19,11 @@ extension NotificationsConfig {
         @Published var carbSound: String = "New/Anticipalte.caf"
         @Published var bolusFailure: String = "Silent"
         @Published var missingLoops = true
+        @Published var lowAlert = true
+        @Published var highAlert = true
+        @Published var ascendingAlert = true
+        @Published var descendingAlert = true
+        @Published var carbsRequiredAlert = true
 
         @Published var alarmSound: String = "New/Anticipalte.caf"
 
@@ -65,6 +70,11 @@ extension NotificationsConfig {
             subscribeSetting(\.carbSound, on: $carbSound) { carbSound = $0 }
             subscribeSetting(\.bolusFailure, on: $bolusFailure) { bolusFailure = $0 }
             subscribeSetting(\.missingLoops, on: $missingLoops) { missingLoops = $0 }
+            subscribeSetting(\.lowAlert, on: $lowAlert) { lowAlert = $0 }
+            subscribeSetting(\.highAlert, on: $highAlert) { highAlert = $0 }
+            subscribeSetting(\.ascendingAlert, on: $ascendingAlert) { ascendingAlert = $0 }
+            subscribeSetting(\.descendingAlert, on: $descendingAlert) { descendingAlert = $0 }
+            subscribeSetting(\.carbsRequiredAlert, on: $carbsRequiredAlert) { carbsRequiredAlert = $0 }
         }
     }
 }
