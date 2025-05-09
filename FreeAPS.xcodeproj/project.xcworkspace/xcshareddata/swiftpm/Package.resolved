@@ -2,21 +2,12 @@
   "object": {
     "pins": [
       {
-        "package": "Alamofire",
-        "repositoryURL": "https://github.com/Alamofire/Alamofire",
+        "package": "SlideButton",
+        "repositoryURL": "https://github.com/no-comment/SlideButton",
         "state": {
-          "branch": null,
-          "revision": "f96b619bcb2383b43d898402283924b80e2c4bae",
-          "version": "5.4.3"
-        }
-      },
-      {
-        "package": "Disk",
-        "repositoryURL": "https://github.com/saoudrizwan/Disk",
-        "state": {
-          "branch": null,
-          "revision": "b0cb4fdf23e51849cc2460bdc6de795c3bcca99d",
-          "version": "0.6.4"
+          "branch": "main",
+          "revision": "5eacebba4d7deeb693592bc9a62ab2d2181e133b",
+          "version": null
         }
       },
       {
@@ -38,12 +29,30 @@
         }
       },
       {
+        "package": "SwiftCharts",
+        "repositoryURL": "https://github.com/ivanschuetz/SwiftCharts.git",
+        "state": {
+          "branch": "master",
+          "revision": "c354c1945bb35a1f01b665b22474f6db28cba4a2",
+          "version": null
+        }
+      },
+      {
         "package": "SwiftDate",
         "repositoryURL": "https://github.com/malcommac/SwiftDate",
         "state": {
           "branch": null,
           "revision": "6190d0cefff3013e77ed567e6b074f324e5c5bf5",
           "version": "6.3.1"
+        }
+      },
+      {
+        "package": "SwiftMessages",
+        "repositoryURL": "https://github.com/SwiftKickMobile/SwiftMessages",
+        "state": {
+          "branch": null,
+          "revision": "62e12e138fc3eedf88c7553dd5d98712aa119f40",
+          "version": "9.0.9"
         }
       },
       {

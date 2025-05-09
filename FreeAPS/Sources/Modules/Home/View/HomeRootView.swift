@@ -19,6 +19,7 @@ extension Home {
         @State var triggerUpdate = false
         @State var scrollOffset = CGFloat.zero
         @State var display = false
+        @State var displayGlucose = false
         @State var showBolusActiveAlert = false
         @State var displayAutoHistory = false
 
@@ -526,6 +527,7 @@ extension Home {
                     bolusProgress: doubleBolusProgress,
                     displayDelta: $state.displayDelta,
                     alwaysUseColors: $state.alwaysUseColors,
+                    scrolling: $displayGlucose,
                     displayExpiration: $state.displayExpiration, cgm: $state.cgm, sensordays: $state.sensorDays
                 )
                 .onTapGesture {
@@ -1623,42 +1625,52 @@ extension Home {
         }
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
+            let height: CGFloat = display ? 150 : 210
+
             LinearGradient(
                 gradient: Gradient(colors: [.clear, .clear, .clear]),
                 startPoint: .top,
                 endPoint: .bottom
             )
-            .frame(maxHeight: headerHeight(for: geo))
+            .frame(height: fontSize < .extraExtraLarge ? height + geo.safeAreaInsets.top : height + 10 + geo.safeAreaInsets.top)
             .overlay(alignment: .top) {
-                lightGlowOverlayContent()
-                VStack(spacing: 12) {
-                    HStack {
-                        Spacer()
-                        tempRateSensorAgeeventualBG
-                            .frame(height: 24)
-                            .padding(.trailing, 16)
+                VStack(spacing: 0) {
+                    // Oberste Reihe mit tempRate, SensorAge, Batterie und eventualBG
+                    if !display {
+                        HStack {
+                            Spacer()
+                            tempRateSensorAgeeventualBG
+                                .frame(height: 24)
+                                .padding(.trailing, 16)
+                        }
+                        .transition(.opacity)
                     }
+                    // Untere Reihe
+                    ZStack {
+                        VStack {
+                            if display {
+                                glucoseView
+                            } else {
+                                HStack {
+                                    stackedLeftTopView
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .padding(.leading, 32)
 
-                    // Drei Hauptkomponenten
-                    HStack(spacing: 0) {
-                        stackedLeftTopView
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(.leading, 32)
-                        bolusProgressViewSelector()
-                            .frame(maxWidth: .infinity)
-                        loopViewSelector()
-                            .frame(maxWidth: .infinity, alignment: .trailing)
-                            .padding(.trailing, 32)
+                                    bolusProgressViewSelector()
+                                        .frame(maxWidth: .infinity)
+
+                                    loopViewSelector()
+                                        .frame(maxWidth: .infinity, alignment: .trailing)
+                                        .padding(.trailing, 32)
+                                }
+                                .padding(.top, 10)
+                            }
+                        }
                     }
-                    .padding(.top, 10)
                 }
                 .padding(.top, geo.safeAreaInsets.top + 20)
+                .animation(.easeInOut(duration: 1.2), value: display) // Einblenddauer
             }
-        }
-
-        private func headerHeight(for geo: GeometryProxy) -> CGFloat {
-            let baseHeight: CGFloat = 205
-            return baseHeight + geo.safeAreaInsets.top
         }
 
         @ViewBuilder private func lightGlowOverlayContent() -> some View {
@@ -3615,22 +3627,23 @@ extension Home {
                                     chart.padding(.top, 10)
                                     DayView.padding(.bottom, 40).padding(.top, 30)
                                 }
-                                .background(GeometryReader { geo in
-                                    let offset = -geo.frame(in: .named(scrollSpace)).minY
-                                    backgroundColor
-                                        .preference(
-                                            key: ScrollViewOffsetPreferenceKey.self,
-                                            value: offset
-                                        )
-                                })
+                                .background(
+                                    GeometryReader { proxy in
+                                        let scrollPosition = proxy.frame(in: .named("HomeScrollView")).minY
+                                        Color.clear
+                                            .onChange(of: scrollPosition) { newValue in
+                                                let yThreshold: CGFloat = -550
+                                                if newValue < yThreshold {
+                                                    withAnimation(.easeOut(duration: 0.3)) { display = true }
+                                                } else {
+                                                    withAnimation(.easeOut(duration: 0.4)) { display = false }
+                                                }
+                                            }
+                                    }
+                                )
                             }
                         }
-                        .onPreferenceChange(ScrollViewOffsetPreferenceKey.self) { value in
-                            scrollOffset = value
-                            if !state.skipGlucoseChart, scrollOffset > scrollAmount {
-                                display.toggle()
-                            }
-                        }
+                        .coordinateSpace(name: "HomeScrollView")
                         buttonPanel(geo)
                             .frame(height: 60)
                     }

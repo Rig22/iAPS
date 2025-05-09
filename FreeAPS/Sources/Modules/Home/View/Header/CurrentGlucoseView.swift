@@ -11,7 +11,7 @@ struct CurrentGlucoseView: View {
     @Binding var bolusProgress: Double?
     @Binding var displayDelta: Bool
     @Binding var alwaysUseColors: Bool
-    // @Binding var scrolling: Bool
+    @Binding var scrolling: Bool
     @Binding var displayExpiration: Bool
     @Binding var cgm: CGMType
     @Binding var sensordays: Double
@@ -162,6 +162,7 @@ struct CurrentGlucoseView: View {
                 bumpEffect = 0
             }
         }
+        // .frame(width: !scrolling ? 140 : 80, height: !scrolling ? 140 : 80)
     }
 
     private var adjustments: (degree: Double, x: CGFloat, y: CGFloat) {
