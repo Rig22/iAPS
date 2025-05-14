@@ -1634,6 +1634,7 @@ extension Home {
             )
             .frame(height: fontSize < .extraExtraLarge ? height + geo.safeAreaInsets.top : height + 10 + geo.safeAreaInsets.top)
             .overlay(alignment: .top) {
+                lightGlowOverlayContent()
                 VStack(spacing: 0) {
                     // Oberste Reihe mit tempRate, SensorAge, Batterie und eventualBG
                     if !display {
