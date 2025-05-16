@@ -584,21 +584,6 @@ extension Home {
 
                 ZStack {
                     Circle()
-                        .stroke(lineWidth: 6)
-                        .opacity(0.3)
-                        .foregroundColor(Color.black)
-
-                    Circle()
-                        .stroke(lineWidth: 6)
-                        .opacity(0.3)
-                        .foregroundColor(Color.black)
-
-                    Circle()
-                        .stroke(lineWidth: 6)
-                        .opacity(0.3)
-                        .foregroundColor(Color.black)
-
-                    Circle()
                         .trim(from: 0.0, to: progress)
                         .stroke(
                             LinearGradient(
@@ -652,7 +637,7 @@ extension Home {
                                 startPoint: .top,
                                 endPoint: .bottom
                             ),
-                            lineWidth: 2
+                            lineWidth: 1
                         )
                         .frame(width: 118, height: 118)
                 } else {}
