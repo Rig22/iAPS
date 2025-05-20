@@ -579,7 +579,7 @@ extension Home {
 
         // Progressbar by Rig22
         public struct CircularProgressViewStyle: ProgressViewStyle {
-            public func makeBody(configuration: Configuration) -> some View {
+            public func makeBody(configuration: ProgressViewStyleConfiguration) -> some View {
                 let progress = CGFloat(configuration.fractionCompleted ?? 0)
 
                 ZStack {
