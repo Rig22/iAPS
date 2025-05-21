@@ -61,12 +61,12 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = false
     // Sounds
-    var hypoSound: String = "New/Anticipalte.caf"
-    var hyperSound: String = "New/Anticipalte.caf"
-    var ascending: String = "New/Anticipalte.caf"
-    var descending: String = "New/Anticipalte.caf"
-    var carbSound: String = "New/Anticipalte.caf"
-    var bolusFailure = "Silent"
+    var hypoSound: String = "Default"
+    var hyperSound: String = "Default"
+    var ascending: String = "Default"
+    var descending: String = "Default"
+    var carbSound: String = "Default"
+    var bolusFailure: String = "Silent"
     var missingLoops = true
     // Alerts
     var lowAlert: Bool = true
