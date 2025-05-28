@@ -3634,6 +3634,7 @@ extension Home {
                             .frame(height: 60)
                     }
                     .background(backgroundColor)
+                    //                        colorScheme == .light ? IAPSconfig.homeViewBackgorundLight : IAPSconfig.homeViewBackgorundDark
                     .ignoresSafeArea(edges: .vertical)
                     .onAppear {
                         startProgress()
