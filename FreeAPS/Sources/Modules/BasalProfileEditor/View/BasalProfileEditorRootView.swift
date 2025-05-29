@@ -10,11 +10,7 @@ extension BasalProfileEditor {
         @Environment(\.dismiss) var dismiss
 
         @FetchRequest(
-            entity: InsulinConcentration.entity(),
-            sortDescriptors: [NSSortDescriptor(
-                key: "date",
-                ascending: true
-            )]
+            entity: InsulinConcentration.entity(), sortDescriptors: [NSSortDescriptor(key: "date", ascending: true)]
         ) var concentration: FetchedResults<InsulinConcentration>
 
         let saveNewConcentration: Bool
@@ -80,7 +76,7 @@ extension BasalProfileEditor {
                                 ).tag(i)
                             }
                         }
-                        .onChange(of: state.items[index].rateIndex, perform: { _ in state.calcTotal() })
+                        .onChange(of: state.items[index].rateIndex) { state.calcTotal() }
                         .frame(maxWidth: geometry.size.width / 2)
                         .clipped()
 
@@ -95,7 +91,7 @@ extension BasalProfileEditor {
                                 ).tag(i)
                             }
                         }
-                        .onChange(of: state.items[index].timeIndex, perform: { _ in state.calcTotal() })
+                        .onChange(of: state.items[index].timeIndex) { state.calcTotal() }
                         .frame(maxWidth: geometry.size.width / 2)
                         .clipped()
                     }
@@ -156,9 +152,9 @@ extension BasalProfileEditor {
                             .bold()
                             .foregroundColor(.primary)
                         Spacer()
-                        Text(rateFormatter.string(from: state.total as NSNumber) ?? "0")
+                        Text((rateFormatter.string(from: state.total as NSNumber) ?? "0") + " ")
                             .foregroundColor(.primary) +
-                            Text(" U/day")
+                            Text("U/day")
                             .foregroundColor(.secondary)
                     }
                 }
@@ -216,7 +212,7 @@ extension BasalProfileEditor {
                             showAlert.toggle()
                         }
                         label: {
-                            Text(state.syncInProgress ? "Saving..." : "Save")
+                            Text(state.syncInProgress ? "Saving..." : "Save on Pump")
                                 .frame(maxWidth: .infinity, alignment: .center)
                         }
                         .disabled(
@@ -246,7 +242,7 @@ extension BasalProfileEditor {
                 }
             } message: {
                 Text("\n" + NSLocalizedString(
-                    "Please verify that you have selected the correct insulin concentration before saving your settings. The insulin vial or pen should indicate the concentration in units per milliliter (e.g., U100 indicates 100 units per milliliter, which is the standard concentration). Accurate selection is critical for proper dosing.",
+                    "Please verify that you have selected the correct insulin concentration before saving your settings.\n\nThe insulin vial or pen should indicate the concentration in units per milliliter (e.g., U100 indicates 100 units per milliliter, which is the standard concentration).\n\nAccurate selection is critical for proper dosing.",
                     comment: "Insulin alert message"
                 ))
             }

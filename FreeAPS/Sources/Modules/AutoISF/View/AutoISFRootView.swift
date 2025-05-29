@@ -159,10 +159,10 @@ extension AutoISF {
                         }
 
                         HStack {
-                            Text("ISF weight for higher BG's")
+                            Text("ISF weight for higher BG")
                                 .onTapGesture {
                                     info(
-                                        header: "ISF weight for higher BG's",
+                                        header: "ISF weight for higher BG",
                                         body: "Default value: 0.0 This is the weight applied to the polygon which adapts ISF if glucose is above target. With 0.0 the effect is effectively disabled.",
                                         useGraphics: nil
                                     )
@@ -187,10 +187,10 @@ extension AutoISF {
                         }
 
                         HStack {
-                            Text("ISF weight for lower BG's")
+                            Text("ISF weight for lower BG")
                                 .onTapGesture {
                                     info(
-                                        header: "ISF weight for lower BG's",
+                                        header: "ISF weight for lower BG",
                                         body: "Default value: 0.0 This is the weight applied to the polygon which adapts ISF if glucose is below target. With 0.0 the effect is effectively disabled.",
                                         useGraphics: nil
                                     )
@@ -311,7 +311,7 @@ extension AutoISF {
                                     .onTapGesture {
                                         info(
                                             header: "Upper BG limit",
-                                            body: "SMBs will be diabled when under this limit, while a B30 Basal rate is running. Default is 130 mg/dl (7.2 mmol/l).",
+                                            body: "SMBs will be disabled when under this limit, while a B30 Basal rate is running. Default is 130 mg/dl (7.2 mmol/l).",
                                             useGraphics: nil
                                         )
                                     }
@@ -329,7 +329,7 @@ extension AutoISF {
                                     .onTapGesture {
                                         info(
                                             header: "Upper Delta limit",
-                                            body: "SMBs will be diabled when under this limit, while a B30 Basal rate is running. Default is 8 mg/dl (0.5 mmol/l).",
+                                            body: "SMBs will be disabled when under this limit, while a B30 Basal rate is running. Default is 8 mg/dl (0.5 mmol/l).",
                                             useGraphics: nil
                                         )
                                     }
@@ -533,7 +533,7 @@ extension AutoISF {
             }
 
             .padding(.all, 20)
-            .foregroundStyle(colorScheme == .dark ? Color.white : Color.black)
+            .foregroundStyle(colorScheme == .dark ? IAPSconfig.previewBackgroundLight : IAPSconfig.previewBackgroundDark)
             .background(
                 RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill(colorScheme == .dark ? Color(.black).opacity(0.3) : Color(.white))

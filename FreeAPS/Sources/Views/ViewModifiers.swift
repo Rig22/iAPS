@@ -214,6 +214,17 @@ struct ColouredRoundedBackground: View {
     }
 }
 
+/* struct ColouredRoundedBackground: View {
+  @Environment(\.colorScheme) var colorScheme
+  var body: some View {
+      Rectangle()
+          .fill(
+              colorScheme == .dark ? IAPSconfig.previewBackgroundDark :
+                  IAPSconfig.previewBackgroundLight
+          )
+  }
+ } */
+
 struct addColouredBackground: View {
     var body: some View {
         RoundedRectangle(cornerRadius: 15)
@@ -238,6 +249,17 @@ struct ColouredBackground: View {
             .fill(Color.black.opacity(0.3))
     }
 }
+
+/* struct ColouredBackground: View {
+  @Environment(\.colorScheme) var colorScheme
+  var body: some View {
+      Rectangle()
+          .fill(
+              colorScheme == .dark ? IAPSconfig.chartBackgroundDark :
+                  IAPSconfig.chartBackgroundLight
+          )
+  }
+ } */
 
 struct ColouredBackground2: View {
     var body: some View {
@@ -275,6 +297,16 @@ struct HeaderBackground: View {
             .fill(Color.rig22Background)
     }
 }
+
+/* struct HeaderBackground: View {
+  @Environment(\.colorScheme) var colorScheme
+  var body: some View {
+      Rectangle()
+          .fill(
+              colorScheme == .light ? IAPSconfig.headerBackgroundLight : IAPSconfig.headerBackgroundDark
+          )
+  }
+ } */
 
 struct ClockOffset: View {
     let mdtPump: Bool

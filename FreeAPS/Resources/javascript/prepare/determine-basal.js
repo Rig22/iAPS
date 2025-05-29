@@ -65,7 +65,7 @@ function generate(iob, currenttemp, glucose, profile, autosens = null, meal = nu
         }
         
             //SMBs
-        if (disableSMBs(dynamicVariables)) {
+        if (disableSMBs(dynamicVariables, clock)) {
             microbolusAllowed = false;
             console.error("SMBs disabled by Override");
         }
@@ -86,16 +86,6 @@ function generate(iob, currenttemp, glucose, profile, autosens = null, meal = nu
     // Dynamic ISF
     if (profile.useNewFormula) {
         dynisf(profile, autosens_data, dynamicVariables, glucose);
-    }
-    
-    // If ignoring flat CGM errors, circumvent also the Oref0 error
-    if (dynamicVariables.disableCGMError) {
-        if (glucose.length > 1 && Math.abs(glucose[0].glucose - glucose[1].glucose) < 5) {
-            if (glucose[1].glucose >= glucose[0].glucose) {
-                glucose[1].glucose -= 5;
-            } else {glucose[1].glucose += 5; }
-            console.log("Flat CGM by-passed.");
-        }
     }
     
     var glucose_status = freeaps_glucoseGetLast(glucose)
@@ -269,20 +259,19 @@ function exercising(profile, dynamicVariables) {
     return false
 }
 
-function disableSMBs(dynamicVariables) {
+function disableSMBs(dynamicVariables, now) {
     if (dynamicVariables.smbIsOff) {
-        if (!dynamicVariables.smbIsAlwaysOff) {
-            return true;
-        }
-        const hour = new Date().getHours();
-        if (dynamicVariables.end < dynamicVariables.start && hour < 24 && hour > dynamicVariables.start) {
-            dynamicVariables.end += 24;
-        }
-        if (hour >= dynamicVariables.start && hour <= dynamicVariables.end) {
-            return true;
-        }
-        if (dynamicVariables.end < dynamicVariables.start && hour < dynamicVariables.end) {
-            return true;
+        // smbIsAlwaysOff=true means "SMB are scheduled, NOT always off"
+        if (!dynamicVariables.smbIsAlwaysOff) { return true; }
+
+        var start = dynamicVariables.start;
+        var end = dynamicVariables.end;
+        var hour = now.getHours();
+
+        if (start <= end) {
+            return hour >= start && hour <= end;
+        } else {
+            return hour >= start || hour <= end;
         }
     }
     return false
