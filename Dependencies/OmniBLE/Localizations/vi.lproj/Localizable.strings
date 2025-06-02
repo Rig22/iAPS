@@ -718,7 +718,7 @@
 "You will now begin the process of configuring your reminders, filling your Pod with insulin, pairing to your device and placing it on your body." = "Bạn bắt đầu quá trình cài đặt các lời nhắc, đổ đầy thuốc vào pod, ghép đôi thiết bị và gắn pod lên người.";
 
 /* Cancel button title */
-"Cancel" = "Hủy";
+"Cancel" = "Hủy bỏ";
 
 /* Text for continue button on PodSetupView */
 "Continue" = "Tiếp tục";
@@ -828,7 +828,7 @@
 /* Help text for Silence Pod view */
 "Silence Pod mode suppresses all Pod alert and confirmation reminder beeping." = "Chế độ Silence Pod sẽ chặn tất cả tiếng bíp và lời nhắc nhở.";
 
-/* navigation title for Silnce Pod */
+/* navigation title for Silence Pod */
 "Silence Pod" = "Pod im lặng";
 
 /* title for pod details page */

@@ -51,20 +51,30 @@ extension StatConfig {
                         DecimalTextField("0.2", value: $state.minimumSMB, formatter: insulinFormatter)
                         Text("U").foregroundColor(.secondary)
                     }
+                    Toggle("Display carb equivalents", isOn: $state.fpus)
+                    if state.fpus {
+                        Toggle("Display carb equivalent amount", isOn: $state.fpuAmounts)
+                    }
 
                 } header: { Text("Home Chart settings ") }
 
                 Section {
                     Toggle("Display Temp Targets Button", isOn: $state.useTargetButton)
+                    Toggle("Display Profile Override Button", isOn: $state.profileButton)
+                    Toggle("Display Meal Button", isOn: $state.carbButton)
                 } header: { Text("Home View Button Panel ") }
-                footer: { Text("In case you're using both profiles and temp targets") }
 
                 Section {
                     Toggle("Never display the small glucose chart when scrolling", isOn: $state.skipGlucoseChart)
                     Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
+                    Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)
                     Toggle("Display Glucose Delta", isOn: $state.displayDelta)
                     Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
                 } header: { Text("Header settings") }
+
+                Section {
+                    Toggle("Display Sensor Age, but not Time Remaining", isOn: $state.anubis)
+                } header: { Text("Anubis") }
 
                 Section {
                     HStack {

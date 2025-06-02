@@ -108,7 +108,8 @@ extension Home {
                 highGlucose: $state.data.highGlucose,
                 alwaysUseColors: $state.alwaysUseColors,
                 displayDelta: $state.displayDelta,
-                scrolling: $displayGlucose
+                scrolling: $displayGlucose,
+                displayExpiration: $state.displayExpiration, cgm: $state.cgm, sensordays: $state.sensorDays, anubis: $state.anubis
             )
             .onTapGesture {
                 if state.alarm == nil {
@@ -200,9 +201,6 @@ extension Home {
                                 .font(.statusFont).bold()
                                 .foregroundColor(.insulin)
                         }
-                        if state.closedLoop, state.maxIOB == 0 {
-                            Text("Check Max IOB Setting").font(.extraSmall).foregroundColor(.orange)
-                        }
                     }
                 }
                 .padding(.leading, 8)
@@ -267,25 +265,27 @@ extension Home {
                 VStack {
                     Divider()
                     HStack {
-                        Button { state.showModal(for: .addCarbs(editMode: false, override: false)) }
-                        label: {
-                            ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
-                                Image(systemName: "fork.knife")
-                                    .renderingMode(.template)
-                                    .font(.custom("Buttons", size: 24))
-                                    .foregroundColor(colorScheme == .dark ? .loopYellow : .orange)
-                                    .padding(8)
-                                    .foregroundColor(.loopYellow)
-                                if let carbsReq = state.carbsRequired {
-                                    Text(numberFormatter.string(from: carbsReq as NSNumber)!)
-                                        .font(.caption)
-                                        .foregroundColor(.white)
-                                        .padding(4)
-                                        .background(Capsule().fill(Color.red))
+                        if state.carbButton {
+                            Button { state.showModal(for: .addCarbs(editMode: false, override: false)) }
+                            label: {
+                                ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
+                                    Image(systemName: "fork.knife")
+                                        .renderingMode(.template)
+                                        .font(.custom("Buttons", size: 24))
+                                        .foregroundColor(colorScheme == .dark ? .loopYellow : .orange)
+                                        .padding(8)
+                                        .foregroundColor(.loopYellow)
+                                    if let carbsReq = state.carbsRequired {
+                                        Text(numberFormatter.string(from: carbsReq as NSNumber)!)
+                                            .font(.caption)
+                                            .foregroundColor(.white)
+                                            .padding(4)
+                                            .background(Capsule().fill(Color.red))
+                                    }
                                 }
-                            }
-                        }.buttonStyle(.borderless)
-                        Spacer()
+                            }.buttonStyle(.borderless)
+                            Spacer()
+                        }
                         Button {
                             (state.bolusProgress != nil) ? showBolusActiveAlert = true :
                                 state.showModal(for: .bolus(
@@ -312,27 +312,29 @@ extension Home {
                             .foregroundColor(.insulin)
                             Spacer()
                         }
-                        ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
-                            Image(systemName: isOverride ? "person.fill" : "person")
-                                .symbolRenderingMode(.palette)
-                                .font(.custom("Buttons", size: 28))
-                                .foregroundStyle(.purple)
-                                .padding(8)
-                                .background(isOverride ? .purple.opacity(0.15) : .clear)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                        }
-                        .onTapGesture {
-                            if isOverride {
-                                showCancelAlert.toggle()
-                            } else {
+                        if state.profileButton {
+                            ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
+                                Image(systemName: isOverride ? "person.fill" : "person")
+                                    .symbolRenderingMode(.palette)
+                                    .font(.custom("Buttons", size: 28))
+                                    .foregroundStyle(.purple)
+                                    .padding(8)
+                                    .background(isOverride ? .purple.opacity(0.15) : .clear)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .onTapGesture {
+                                if isOverride {
+                                    showCancelAlert.toggle()
+                                } else {
+                                    state.showModal(for: .overrideProfilesConfig)
+                                }
+                            }
+                            .onLongPressGesture {
                                 state.showModal(for: .overrideProfilesConfig)
                             }
-                        }
-                        .onLongPressGesture {
-                            state.showModal(for: .overrideProfilesConfig)
+                            Spacer()
                         }
                         if state.useTargetButton {
-                            Spacer()
                             Image(systemName: "target")
                                 .renderingMode(.template)
                                 .font(.custom("Buttons", size: 24))
@@ -350,8 +352,8 @@ extension Home {
                                 .onLongPressGesture {
                                     state.showModal(for: .addTempTarget)
                                 }
+                            Spacer()
                         }
-                        Spacer()
                         Button { state.showModal(for: .settings) }
                         label: {
                             Image(systemName: "gear")
@@ -361,7 +363,7 @@ extension Home {
                         .buttonStyle(.borderless)
                         .foregroundColor(.gray)
                     }
-                    .padding(.horizontal, state.allowManualTemp ? 5 : 24)
+                    .padding(.horizontal, state.allowManualTemp ? 10 : 24)
                     .padding(.bottom, geo.safeAreaInsets.bottom)
                 }
             }
@@ -581,28 +583,28 @@ extension Home {
 
         func bolusProgressView(progress: Decimal, amount: Decimal) -> some View {
             ZStack {
-                HStack {
-                    VStack {
-                        HStack {
-                            Text("Bolusing")
-                                .foregroundColor(.primary).font(.bolusProgressFont)
-                            let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
-
-                            Text(
-                                bolused + " " + NSLocalizedString("of", comment: "") + " " + amount
-                                    .formatted() + NSLocalizedString(" U", comment: "")
-                            ).font(.bolusProgressBarFont)
-                        }
-                        ProgressView(value: Double(progress))
-                            .progressViewStyle(BolusProgressViewStyle())
+                VStack {
+                    HStack {
+                        let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
+                        Text("Bolusing")
+                        Text(
+                            bolused + " " + NSLocalizedString("of", comment: "") + " " + amount
+                                .formatted() + NSLocalizedString(" U", comment: "")
+                        )
+                    }.frame(width: 250, height: 25).font(.bolusProgressBarFont)
+                    HStack(alignment: .bottom, spacing: 5) {
+                        ProgressView(value: Double(progress)).progressViewStyle(BolusProgressViewStyle())
+                            .overlay {
+                                Image(systemName: "pause.fill")
+                                    .symbolRenderingMode(.palette)
+                                    .foregroundStyle(.white, .blue)
+                                    .font(.bolusProgressStopFont)
+                            }
                     }
-                    Image(systemName: "xmark.square.fill")
-                        .symbolRenderingMode(.palette)
-                        .foregroundStyle(.white, .blue)
-                        .font(.bolusProgressStopFont)
-                        .onTapGesture { state.cancelBolus() }
-                        .offset(x: 10, y: 0)
+                    .onTapGesture { state.cancelBolus() }
                 }
+                .dynamicTypeSize(...DynamicTypeSize.large)
+                .padding(.bottom, 8)
             }
         }
 
@@ -773,7 +775,7 @@ extension Home {
                                 }
 
                                 // IOB Chart
-                                if state.iobs > 0 {
+                                if !state.iobData.isEmpty {
                                     activeIOBView
                                 }
 
@@ -807,12 +809,12 @@ extension Home {
                         if let progress = state.bolusProgress, let amount = state.bolusAmount {
                             ZStack {
                                 RoundedRectangle(cornerRadius: 15)
-                                    .fill(.gray.opacity(0.8))
-                                    .frame(width: 320, height: 60)
+                                    .fill(.gray.opacity(0.9))
+                                    .frame(maxWidth: 320, maxHeight: 90)
                                 bolusProgressView(progress: progress, amount: amount)
                             }
                             .frame(maxWidth: .infinity, alignment: .center)
-                            .offset(x: 0, y: -100)
+                            .offset(y: -100)
                         }
                     }
                 }
@@ -861,7 +863,7 @@ extension Home {
                     Text(suggestion.reasonConclusion.capitalizingFirstLetter()).font(.suggestionSmallParts)
                         .foregroundColor(.white)
                 } else {
-                    Text("No sugestion found").font(.suggestionHeadline).foregroundColor(.white)
+                    Text("No suggestion found").font(.suggestionHeadline).foregroundColor(.white)
                 }
                 if let errorMessage = state.errorMessage, let date = state.errorDate {
                     Text(NSLocalizedString("Status at", comment: "") + " " + dateFormatter.string(from: date))

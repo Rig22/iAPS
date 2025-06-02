@@ -157,6 +157,15 @@
 /* Add carbs header and button in Watch app. You can skip the last " " space. It's just for differentiation */
 "Add Carbs " = "Ввод углеводов";
 
+/* Home View */
+"Override" = "Переопределение";
+
+/* Home View Message if no pump is connected */
+"No Pump" = "Нет помпы";
+
+/* Home View Message if open loop is active */
+"Open" = "Открытая";
+
 /*  */
 "Amount Carbs" = "Кол-во углеводов";
 
@@ -261,6 +270,9 @@
 
 /*  */
 "Autotune" = "Автотюн";
+
+/* Debug option view Dynamic Variables */
+"Dynamic Variables" = "Динамические переменные";
 
 /*  */
 "Basal profile" = "Базальный профиль";
@@ -449,6 +461,9 @@ Enact a temp Basal or a temp target */
 /* Add Omnipod pump */
 "Add Omnipod" = "Добавить Omnipod";
 
+/* Add Dana-i/RS pump */
+"Add Dana-i/RS" = "Добавить Dana-i/RS";
+
 /* Add Simulator pump */
 "Add Simulator" = "Добавить Cимулятор";
 
@@ -604,6 +619,9 @@ Enact a temp Basal or a temp target */
 "Add devices" = "Добавить устройства";
 
 /* */
+"Profile Overrides Button / Temp Targets Button" = "Кнопка временные цели, вместо кнопки переопределить профиль";
+
+/* */
 "Glucose Target" = "Цель глюкозы";
 
 /* */
@@ -614,6 +632,9 @@ Enact a temp Basal or a temp target */
 
 /* */
 "ISF" = "ФЧИ (ISF)";
+
+/* */
+"% Override" = "% Переопределения";
 
 /* */
 "The app Garmin Connect must be installed to use for iAPS.\n Go to App Store to download it" = "Необходимо установить приложение Garmin Connect, для использования с iAPS.\n Перейдите в App Store для его загрузки";
@@ -687,8 +708,23 @@ Enact a temp Basal or a temp target */
 /* Treatments list */
 "Treatments" = "События";
 
+/* Add Insulin */
+"Add Insulin" = "Добавить инсулин";
+
+/* Add Glucose */
+"Add Glucose" = "Добавить глюкозу";
+
+/* New Glucose */
+"New Glucose" = "Новая глюкоза";
+
 /* Hypo Treatment Preset */
 "Treatment" = "Терапия";
+
+/* Hypo Treatment Default Value */
+"Default  📉" = "По умолчанию  📉";
+
+/* Hypo Treatment Default Value */
+"None" = "Не подан";
 
 /* " min" in Treatments list */
 " min" = " мин";
@@ -913,7 +949,10 @@ Enact a temp Basal or a temp target */
 "Sensor Info" = "Информация о сенсоре";
 
 /* */
-"Sensor Age" = "Возраст сенсора";
+"Sensor Life-Span" = "Сенсор работает";
+
+/* */
+"When using %@ iAPS doesn't know the type of sensor used or the sensor life-span." = "При использовании %@ iAPS не может определить тип датчика или срок жизни датчика.";
 
 /* */
 "Sensor Age Left" = "Осталось";
@@ -1214,6 +1253,54 @@ Enact a temp Basal or a temp target */
 "Carbs Required Threshold" = "Порог необходимых углеводов";
 
 /* */
+"Carbs Required" = "Требуются углеводы";
+
+/* */
+"Sounds" = "Звуки";
+
+/* Sound for Hypo alert */
+"Hypoglycemia" = "Гипогликемия";
+
+/* Sound for Hyper alert */
+"Hyperglycemia" = "Гипергликемия";
+
+/* Sound for ascending glucose */
+"Rapidly Ascending" = "Быстрое повышение";
+
+/* Sound for descending glucose */
+"Rapidly Descending" = "Быстрое снижение";
+
+/* Silent sound option */
+"Silent" = "Без звука";
+
+/* Option for no sound */
+"Silent" = "Без звука";
+
+/* The iOS default sound */
+"iOS default sound" = "Звук iOS по умолчанию";
+
+/* Alert for descending glucose */
+"RAPIDLY DESCENDING GLUCOSE!" = "БЫСТРОЕ СНИЖЕНИЕ ГЛЮКОЗЫ!";
+
+/* Alert for ascending glucose */
+"RAPIDLY ASCENDING GLUCOSE!" = "БЫСТРОЕ ПОВЫШЕНИЕ ГЛЮКОЗЫ!";
+
+/* Sound for bolus failure */
+"Bolus Failure" = "Болюс не состоялся";
+
+/* Sound for missing loops */
+"Missing Loops" = "Пропущенные циклы";
+
+/* Alert for ascending glucose */
+"Ascending" = "Восходящий";
+
+/* Alert for descending glucose */
+"Descending" = "Нисходящий";
+
+/* Thresholds for Alerts */
+"Thresholds" = "Пороги";
+
+/* */
 "Carbs required: %d g" = "Необходимы углеводы: %d г";
 
 /* */
@@ -1325,7 +1412,10 @@ Enact a temp Basal or a temp target */
 "Developer" = "Разработчик";
 
 /* Debug option view NS Upload Profile */
-"NS Upload Profile" = "Загрузка профиля в NS";
+"NS Upload Profile and Settings" = "NS Загрузить профиль и настройки";
+
+/* Debug option delete all NS overrides */
+"Delete All NS Overrides" = "Удалить все NS переопределения";
 
 /* Debug option view NS Uploaded Profile */
 "NS Uploaded Profile" = "Загруженный в NS профиль";
@@ -1348,8 +1438,11 @@ Enact a temp Basal or a temp target */
 /* Debug option view Pump History */
 "Pump History" = "История помпы";
 
+/* Debug option view Temp Basals */
+"Temp Basals" = "Временный базал";
+
 /* Debug option view Target Ranges */
-"Target ranges" = "Целевые диапазоны";
+"Targets ranges" = "Целевые диапазоны";
 
 /* Debug option view Temp targets */
 "Temp targets" = "Временные цели";
@@ -1371,6 +1464,9 @@ Enact a temp Basal or a temp target */
 
 /* Debug option view Enacted announcements announcements (from NS) */
 "Enacted announcements" = "Принятые оповещения";
+
+/* Debug option view Not Uploaded Overrides */
+"Overrides Not Uploaded" = "Переопределения не загружены";
 
 /* Debug option view Autotune */
 "Autotune" = "Автотюн";
@@ -1423,7 +1519,7 @@ Enact a temp Basal or a temp target */
 " -  Manual Basal ⚠️" = " -  Ручная ВБС ⚠️";
 
 /* Total AT / Scheduled basal insulin */
-" U/day" = " Ед/день";
+"U/day" = "Ед/день";
 
 /* Total AT / Scheduled basal insulin */
 "Total" = "Всего";
@@ -1472,6 +1568,9 @@ Enact a temp Basal or a temp target */
 /* Service Section */
 "Fat And Protein Conversion" = "Преобразование жиров и белков";
 
+/* Ignore flat CGM readings */
+"Ignore flat CGM readings" = "Игнорировать ровные показания CGM";
+
 /* Service Section */
 "Profile Override" = "Переопределение профиля";
 
@@ -1501,6 +1600,9 @@ Enact a temp Basal or a temp target */
 /* */
 "Disable SMBs" = "Отключить микроболюсы SMB";
 
+/* */
+"End the Override with next Meal" = "Завершить переопределение со следующим приемом пищи";
+
 /* Your normal Profile. Use a short string */
 "Normal Profile" = "Нормальный профиль";
 
@@ -1509,6 +1611,9 @@ Enact a temp Basal or a temp target */
 
 /* */
 "Profiles" = "Профили";
+
+/* */
+"Advanced Settings" = "Расширенные настройки";
 
 /* */
 "More options" = "Больше опций";
@@ -1530,6 +1635,9 @@ Enact a temp Basal or a temp target */
 
 /* */
 "UAM SMB Minutes" = "UAM SMB минуты";
+
+/* */
+"Override Max IOB" = "Переопределить Макс IOB";
 
 /* */
 "Start new Profile" = "Запустить новый профиль";
@@ -1643,6 +1751,9 @@ Enact a temp Basal or a temp target */
 
 /* */
 "Eventual Glucose" = "Возможная глюкоза";
+
+/* */
+"Minimum Predicted Glucose" = "Минимальная прогнозируемая глюкоза";
 
 /* */
 "Please wait" = "Подождите";
@@ -2268,6 +2379,11 @@ Enact a temp Basal or a temp target */
 /* Contact Image, settings, loop status (data to display) */
 "LoopStatusContactValue" = "Статус петли";
 
+/* --------------------------  Dana Pump  ---------------------- */
+/* Dana footer */
+
+"Dana pump does not allow editing of max basal and max bolus. Configure these in the doctor's settings of the pump. Saving the settings will fetch the lastest values from the pump" = "Помпа Dana не позволяет изменять значения максимального ВБС и максимального болюса. Настройте их в настройках помпы. При сохранении настроек будут получены последние значения из помпы";
+
 /* --------- Auto ISF --------- */
 /* */
 
@@ -2347,13 +2463,13 @@ Enact a temp Basal or a temp target */
 "Upper Delta limit" = "Верхний предел дельты";
 
 /* */
-"SMBs will be diabled when under this limit, while a B30 Basal rate is running. Default is 8 mg/dl (0.5 mmol/l)." = "Автоматические болюсы (SMB) будут отключены, если отрицательная дельта уровня глюкозы в крови опустится ниже этого значения во время действия ВБС B30. Стандартное значение – 0,5 ммоль/л. (8 мг/дл).";
+"SMBs will be disabled when under this limit, while a B30 Basal rate is running. Default is 8 mg/dl (0.5 mmol/l)." = "Автоматические болюсы (SMB) будут отключены, если отрицательная дельта уровня глюкозы в крови опустится ниже этого значения во время действия ВБС B30. Стандартное значение – 0,5 ммоль/л. (8 мг/дл).";
 
 /* */
 "Upper BG limit" = "Верхний предел глюкозы крови";
 
 /* */
-"SMBs will be diabled when under this limit, while a B30 Basal rate is running. Default is 130 mg/dl (7.2 mmol/l)." = "Автоматические болюсы (SMB) будут отключены, если уровень сахара в крови опустится ниже этого значения во время действия ВБС B30. Стандартное значение – 7,2 ммоль/л. (130 мг/дл).";
+"SMBs will be disabled when under this limit, while a B30 Basal rate is running. Default is 130 mg/dl (7.2 mmol/l)." = "Автоматические болюсы (SMB) будут отключены, если уровень сахара в крови опустится ниже этого значения во время действия ВБС B30. Стандартное значение – 7,2 ммоль/л. (130 мг/дл).";
 
 /* */
 "Target Level for B30 to be enacted" = "Целевое значение для активации B30";
@@ -2404,27 +2520,27 @@ Enact a temp Basal or a temp target */
 "Default value: 0.0 This is the weight applied to the polygon which adapts ISF higher deltas. With 0.0 the effect is effectively disabled." = "Значение по-умолчанию: 0,0. Это вес, применяемый к многоугольнику, который корректирует вашу чувствительность к инсулину при высокой дельте уровня глюкозы в крови (здесь дельта означает положительное отклонение от целевого значения). При значении 0,0 эта настройка отключена.";
 
 /* */
-"ISF weight for lower BG's" = "Поправка на низкий уровень глюкозы в крови";
+"ISF weight for lower BG" = "Поправка на низкий уровень глюкозы в крови";
 
 /* */
 "Default value: 0.0 This is the weight applied to the polygon which adapts ISF if glucose is below target. With 0.0 the effect is effectively disabled." = "Значение по умолчанию: 0,0. Это вес, примененный к многоугольнику, который регулирует чувствительность к инсулину при низком уровне сахара в крови. При значении 0,0 эта настройка отключена.";
 
 /* */
-"ISF weight for higher BG's" = "Поправка на высокий уровень глюкозы в крови";
+"ISF weight for higher BG" = "Поправка на высокий уровень глюкозы в крови";
 
 /* */
 "Default value: 0.0 This is the weight applied to the polygon which adapts ISF if glucose is above target. With 0.0 the effect is effectively disabled." = "Значение по умолчанию: 0,0. Это вес, примененный к многоугольнику, который регулирует чувствительность к инсулину при высоком уровне сахара в крови. При значении 0,0 эта настройка отключена.";
 
 /* */
-"Dura ISF Hourly Max Change" = "Максимальная регулировка ISF в час";
+"Duration Weight" = "Корректировка длительно повышенного уровня глюкозы";
 
 /* */
-"Rate at which ISF is reduced per hour assuming BG level remains at double target for that time. When value = 1.0, ISF is reduced to 50% after 1 hour of BG level at 2x target." = "Скорость, с которой снижается чувствительность к инсулину в час, при условии, что уровень сахара в крови в это время остается вдвое выше целевого значения. Если значение равно 1,0, чувствительность к инсулину снизится до 50% после того, как уровень глюкозы в крови в течение 1 часа превысит вдвое целевое значение.";
+"Weight for a prolonged high glucose. For every hour the glucose stays high this adjustment will lower your ISF more.\n\nThe formula for Dura ISF adjustment is:\n\nDura ISF = 1 + hours above target * weight / target * (average glucose - target glucose)" = "Вес, соответствующий длительно высокому уровню глюкозы в крови. С каждым часом, когда уровень глюкозы в крови остается слишком высоким, эта настройка будет снижать чувствительность к инсулину.\n\nФормула для Dura ISF корректировки такова:\n\nDura ISF = 1 + количество часов выше цели * вес / цель * (средняя глюкоза - целевая глюкоза)";
 
 /* */
 "SMB Delivery Ratio BG Range" = "Диапазон уровня глюкозы в крови для SMB";
 
-/* */
+/* SMB Delivery Ratio BG Range description */
 "Default value: 0, Sensible is between 40 mg/dL and 120 mg/dL. The linearly increasing SMB delivery ratio is mapped to the glucose range [target_bg, target_bg+bg_range]. At target_bg the SMB ratio is smb_delivery_ratio_min, at target_bg+bg_range it is smb_delivery_ratio_max. With 0 the linearly increasing SMB ratio is disabled and the fix smb_delivery_ratio is used." = "Значение по умолчанию: 0. Разумная настройка — от 2 до 6 ммоль/л. (40-120 мг/дл) Линейно увеличивающееся соотношение подачи SMB зависит от настройки диапазона уровня глюкозы в крови и минимальной/максимальной настройки вашего коэффициента SMB. При значении 0 - используется стандартное соотношение подачи SMB.";
 
 /* */
@@ -2461,6 +2577,9 @@ Enact a temp Basal or a temp target */
 "Enables the BG acceleration adaptions, adjusting ISF for accelerating/decelerating blood glucose." = "Включает настройку ускорения уровня глюкозы в крови. Регулирует ISF в случае ускорения/замедления уровня сахара в крови.";
 
 /* */
+"Override Auto ISF" = "Переопределить Авто ISF";
+
+/* */
 "Enable Auto ISF" = "Включить Авто ISF";
 
 /* */
@@ -2472,8 +2591,29 @@ Enact a temp Basal or a temp target */
 /* */
 "Max IOB Threshold Percent" = "Максимальный IOB порог";
 
+/* IOB Threshold Percent Description */
+"Percentage of the max IOB setting to use for SMBs while Auto ISF is enabled.\n\nWhile current IOB is below the threshold, the SMB amount can exceed the threshold by 30%, however never the max IOB setting.\n\nAt 100% this setting is disabled." = "Процент от максимального уровня IOB, используемый для SMB при включенном Auto ISF.\n\nПока текущий уровень IOB ниже установленного порога, количество SMB может превышать порог на 30%, но никогда не превысит максимальный уровень IOB.\n\nПри значении 100% эта настройка отключается.";
+
 /* */
 "Auto ISF" = "Авто ISF";
+
+/* Is true */
+" on" = " вкл.";
+
+/* Is false */
+" off" = " выкл.";
+
+/* Override adjustment of ISF, CR and Basal */
+"Adjust " = "Изменить ";
+
+/* History of the adjustments */
+"Final Ratio" = "Финальное соотношение";
+
+/* History of the adjustments */
+"Adjustments" = "Корректировки";
+
+/* History of the adjustments */
+"Insulin" = "Инсулин";
 
 /* ---------------------------------------------------------------------------------------------------------------
   Infotexts from openaps.docs and androidaps.docs
@@ -2801,6 +2941,18 @@ Enact a temp Basal or a temp target */
 "Use alternate Bolus Calculator" = "Альтернативный калькулятор болюса";
 
 /* Bolus Calculator Setting */
+"Use Bolus Calculator" = "Использовать калькулятор болюса";
+
+/* Bolus Calculator Setting */
+"Depending on your settings the Swift bolus calculator is using data from the OpenAPS glucose predictions and/or from IOB, COB, glucose trend, current gluccose and target glucose. At the end of the calculation a custom factor is applied (default 0.8).\n\nYou can also have the option in your bolus calculator to apply another (!) customizable factor at the end of the calculation which could be useful for fatty meals, e.g Pizza (default 0.7).\n\nThe bolus calculator is NOT using the OpenAPS variable \"insulinRequired\", made for SMBs." = "В зависимости от ваших настроек, Swift-калькулятор болюса использует данные из прогнозов глюкозы OpenAPS и/или из IOB (инсулин на борту), COB (углеводы на борту), тренда глюкозы, текущего уровня глюкозы и целевого уровня глюкозы. В конце расчета применяется пользовательский коэффициент (по умолчанию 0.8).\n\nУ вас также есть возможность в настройках болюс-калькулятора применить дополнительный настраиваемый коэффициент в конце расчета. Это может быть полезно для жирной пищи, например, пиццы (по умолчанию 0.7).\n\nБолюс-калькулятор НЕ использует переменную OpenAPS \"insulinRequired\", которая предназначена для SMB (супермикроболюсов).";
+
+/* Bolus Calculator Setting */
+"Adjustment" = "Корректирование";
+
+/* Bolus Calculator Setting */
+"Use OpenAPS glucose predictions" = "Использовать OpenAPS прогнозы глюкозы";
+
+/* Bolus Calculator Setting */
 "Fatty Meals" = "Жирная пища";
 
 /* Bolus Calculator Setting */
@@ -2808,6 +2960,9 @@ Enact a temp Basal or a temp target */
 
 /* Bolus Calculator Footer */
 "The new alternate bolus calculator is another approach to the default bolus calculator in iAPS. If the toggle is on you use this bolus calculator and not the original iAPS calculator. At the end of the calculation a custom factor is applied as it is supposed to be when using smbs (default 0.8).\n\nYou can also add the option in your bolus calculator to apply another (!) customizable factor at the end of the calculation which could be useful for fatty meals, e.g Pizza (default 0.7)." = "Альтернативный калькулятор болюса использует другой алгоритм расчета болюса. Для индивидуальной настройки вы можете изменить поправочный коэффициент (значение по умолчанию 0.8) в зависимости от того, хотите ли вы более высокие (выше 1) или меньшие (ниже 1) рекомендации по болюсу.\n\nДля особо жирных блюд, таких как пицца, существует возможность уменьшить рекомендуемый болюс еще на один коэффициент (стандартно 0.7).";
+
+/* Bolus Calculator Setting */
+"1. Use the OpenAPS eventual glucose prediction for computing the insulin recommended. This setting will enable the \"old\" calculator. On by default.\n\n2. Use the OpenAPS minPredBG prediction as a complementary safety guard rail, not allowing the glucose prediction to descend below your threshold. This setting can be used together with or without the eventual glucose. On by default" = "1. Использовать прогноз конечного уровня глюкозы (eventual glucose) от OpenAPS для расчета рекомендуемого инсулина. Этот параметр активирует \"старый\" калькулятор. Включен по умолчанию.\n\n2. Использовать прогноз minPredBG от OpenAPS в качестве дополнительной защитной меры, чтобы не допустить снижения прогнозируемого уровня глюкозы ниже вашего порогового значения. Этот параметр можно использовать как вместе с прогнозом eventual glucose, так и без него. Включен по умолчанию.";
 
 /* Settings Section */
 "Extra Features" = "Дополнительные функции";
@@ -2826,6 +2981,12 @@ Enact a temp Basal or a temp target */
 
 /* UI/UX option */
 "Display Temp Targets Button" = "Отображать кнопку временных целей";
+
+/* UI/UX option */
+"Display Profile Override Button" = "Отображать кнопку Переопределения Профиля";
+
+/* UI/UX option */
+"Display Meal Button" = "Отображать кнопку Питания";
 
 /* UI/UX option */
 "Home View Button Panel " = "Панель кнопок главного экрана ";
@@ -2866,6 +3027,9 @@ Enact a temp Basal or a temp target */
 "Display Glucose Delta" = "Отображать дельту глюкозы";
 
 /* UI/UX option */
+"Display Sensor Age" = "Отображать возраст датчика";
+
+/* UI/UX option */
 "Hide Concentration Badge" = "Скрыть значок концентрации";
 
 /* UI/UX option */
@@ -2873,6 +3037,24 @@ Enact a temp Basal or a temp target */
 
 /* UI/UX option */
 "Hide the bolus amount strings when amount is under" = "Скрыть строки объёма болюса, когда объём меньше";
+
+/* UI/UX option */
+"Display carb equivalents" = "Отображать эквиваленты углеводов";
+
+/* UI/UX option */
+"Display carb equivalent amount" = "Отображать эквиваленты углеводов";
+
+/* UI/UX option */
+"Display Sensor Time Remaining" = "Отображать оставшееся время датчика";
+
+/* UI/UX option */
+"Display Sensor Age, but not Time Remaining" = "Отображать возраст датчика, вместо оставшегося времени";
+
+/* UI/UX option */
+"Display Ratio and a History View button" = "Отображать соотношение и кнопку просмотра истории";
+
+/* UI/UX option */
+"Auto ISF Home View" = "Авто ISF на главном экране";
 
 /* Setting title */
 "Bolus Calculator" = "Калькулятор болюса";
@@ -2882,6 +3064,15 @@ Enact a temp Basal or a temp target */
 
 /* Notification option */
 "Live Activity" = "Эфир активности";
+
+/* Show Live Activity */
+"Show Live Activity" = "Отображать эфир активности";
+
+/* Display Chart */
+"Display Chart" = "Отобразить график";
+
+/* Show Predictions */
+"Show Predictions" = "Отображать прогнозы";
 
 /* Notification option */
 "Live activity displays blood glucose live on the lock screen and on the dynamic island (if available)" = "Эфир активности - в реальном времени отображает уровень глюкозы в крови на экране блокировки и на динамическом островке Dynamic Island (если доступно)";
@@ -2933,3 +3124,9 @@ Enact a temp Basal or a temp target */
 
 /* Headline "Adjustment Factor" */
 "Adjustment Factor" = "Коэффициент регулировки";
+
+/* Apple Watch Overrides */
+"Overrides" = "Переопределения";
+
+/* Apple Watch Overrides */
+"Cancel Override" = "Отменить переопределение";

@@ -55,7 +55,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var liveActivityChart = false
     var liveActivityChartShowPredictions = true
     var useTargetButton: Bool = false
-    var alwaysUseColors: Bool = true
+    var alwaysUseColors: Bool = false
     var timeSettings: Bool = true
     var profilesOrTempTargets: Bool = false
     var allowBolusShortcut: Bool = false
@@ -74,6 +74,13 @@ struct FreeAPSSettings: JSON, Equatable {
     var hideInsulinBadge: Bool = false
     var extended_overrides = false
     var extendHomeView = true
+    var displayExpiration = false
+    var sensorDays: Double = 10
+    var anubis: Bool = false
+    var fpus: Bool = true
+    var fpuAmounts: Bool = false
+    var carbButton: Bool = true
+    var profileButton: Bool = true
     // Auto ISF
     var autoisf: Bool = false
     var smbDeliveryRatioBGrange: Decimal = 0
@@ -144,6 +151,14 @@ extension FreeAPSSettings: Decodable {
             settings.debugOptions = debugOptions
         }
 
+        if let fpus = try? container.decode(Bool.self, forKey: .fpus) {
+            settings.fpus = fpus
+        }
+
+        if let fpuAmounts = try? container.decode(Bool.self, forKey: .fpuAmounts) {
+            settings.fpuAmounts = fpuAmounts
+        }
+
         if let insulinReqPercentage = try? container.decode(Decimal.self, forKey: .insulinReqPercentage) {
             settings.insulinReqPercentage = insulinReqPercentage
         }
@@ -194,6 +209,10 @@ extension FreeAPSSettings: Decodable {
             settings.useFPUconversion = useFPUconversion
         }
 
+        if let anubis = try? container.decode(Bool.self, forKey: .anubis) {
+            settings.anubis = anubis
+        }
+
         if let individualAdjustmentFactor = try? container.decode(Decimal.self, forKey: .individualAdjustmentFactor) {
             settings.individualAdjustmentFactor = individualAdjustmentFactor
         }
@@ -234,6 +253,14 @@ extension FreeAPSSettings: Decodable {
             settings.useAlarmSound = useAlarmSound
         }
 
+        if let carbButton = try? container.decode(Bool.self, forKey: .carbButton) {
+            settings.carbButton = carbButton
+        }
+
+        if let profileButton = try? container.decode(Bool.self, forKey: .profileButton) {
+            settings.profileButton = profileButton
+        }
+
         if let addSourceInfoToGlucoseNotifications = try? container.decode(
             Bool.self,
             forKey: .addSourceInfoToGlucoseNotifications
@@ -267,6 +294,10 @@ extension FreeAPSSettings: Decodable {
 
         if let high = try? container.decode(Decimal.self, forKey: .high) {
             settings.high = high
+        }
+
+        if let sensorDays = try? container.decode(Double.self, forKey: .sensorDays) {
+            settings.sensorDays = sensorDays
         }
 
         if let uploadStats = try? container.decode(Bool.self, forKey: .uploadStats) {
@@ -415,6 +446,10 @@ extension FreeAPSSettings: Decodable {
 
         if let extendHomeView = try? container.decode(Bool.self, forKey: .extendHomeView) {
             settings.extendHomeView = extendHomeView
+        }
+
+        if let displayExpiration = try? container.decode(Bool.self, forKey: .displayExpiration) {
+            settings.displayExpiration = displayExpiration
         }
         // AutoISF
         if let autoisf = try? container.decode(Bool.self, forKey: .autoisf) {
