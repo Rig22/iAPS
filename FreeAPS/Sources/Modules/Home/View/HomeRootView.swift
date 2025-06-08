@@ -1939,10 +1939,10 @@ extension Home {
                             HStack(spacing: 10) {
                                 cannulaAgeView
                             }
-                            HStack(spacing: 10) {
-                                batteryAgeView
-                            }
                             /*  HStack(spacing: 10) {
+                                 batteryAgeView
+                             }*/
+                            /* HStack(spacing: 10) {
                                  batteryView
                              }*/
                             HStack(spacing: 10) {
@@ -1967,17 +1967,20 @@ extension Home {
                     VStack(spacing: 20) {
                         HStack(spacing: 20) {
                             HStack(spacing: 10) {
+                                pumpIconView
+                            }
+                            HStack(spacing: 10) {
                                 reservoirView
                             }
                             HStack(spacing: 10) {
                                 cannulaAgeView
                             }
-                            HStack(spacing: 10) {
-                                pumpIconView
-                            }
-                            HStack(spacing: 10) {
-                                batteryAgeView
-                            }
+                            /* HStack(spacing: 10) {
+                                 pumpIconView
+                             }*/
+                            /* HStack(spacing: 10) {
+                                 batteryAgeView
+                             } */
                             /* HStack(spacing: 10) {
                                  batteryView
                              }*/
@@ -2134,9 +2137,9 @@ extension Home {
             }
 
             // Battery
-            if let batteryHours = state.batteryHours {
-                components.append("Battery: \(formatBatteryTime(batteryHours))")
-            }
+            /*     if let batteryHours = state.batteryHours {
+                 components.append("Battery: \(formatBatteryTime(batteryHours))")
+             }*/
 
             // Sensor
             if state.displayExpiration {
@@ -2321,16 +2324,16 @@ extension Home {
                             }
                         }
                     }
-                    .background(
-                        TimeEllipseBig(
-                            characters: 39,
-                            button3D: state.button3D,
-                            button3DBackground: state.button3DBackground,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
-                        )
-                    )
+                    /* .background(
+                         TimeEllipseBig(
+                             characters: 39,
+                             button3D: state.button3D,
+                             button3DBackground: state.button3DBackground,
+                             incidenceOfLight: state.incidenceOfLight,
+                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                                 .atriumview
+                         )
+                     )*/
                     .font(.system(size: 14, weight: .medium)) // Schrift für alle einheitlich
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
@@ -3409,7 +3412,12 @@ extension Home {
                                         Text(name).font(.system(size: 15)).foregroundStyle(Color.white)
                                     }
                                 }
-                            } else { Text("📉") }
+                            } // else { Text("📉") }
+                            else {
+                                Image(systemName: "chart.line.downtrend.xyaxis")
+                                    .foregroundColor(.red)
+                                    .offset(y: -1)
+                            }
                         } else if override.percentage != 100 {
                             Text(override.percentage.formatted() + " %").font(.statusFont).foregroundStyle(.secondary)
                         } else if override.smbIsOff, !override.smbIsAlwaysOff {

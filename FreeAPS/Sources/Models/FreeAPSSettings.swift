@@ -129,6 +129,10 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var batteryIconOption: Bool = false
     var carbButton: Bool = true
     var profileButton: Bool = true
+    var glucoseOverrideThreshold: Decimal = 100
+    var glucoseOverrideThresholdActive: Bool = false
+    var glucoseOverrideThresholdActiveDown: Bool = false
+    var glucoseOverrideThresholdDown: Decimal = 100
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false
@@ -316,6 +320,10 @@ struct EncodableFreeAPSSettings: Encodable {
         case batteryIconOption
         case carbButton
         case profileButton
+        case glucoseOverrideThreshold
+        case glucoseOverrideThresholdActive
+        case glucoseOverrideThresholdActiveDown
+        case glucoseOverrideThresholdDown
         // Dana Toggles
         // AutoISF
         case autoisf
@@ -476,6 +484,10 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.batteryIconOption, forKey: .batteryIconOption)
         try container.encode(settings.carbButton, forKey: .carbButton)
         try container.encode(settings.profileButton, forKey: .profileButton)
+        try container.encode(settings.glucoseOverrideThreshold, forKey: .glucoseOverrideThreshold)
+        try container.encode(settings.glucoseOverrideThresholdActive, forKey: .glucoseOverrideThresholdActive)
+        try container.encode(settings.glucoseOverrideThresholdActiveDown, forKey: .glucoseOverrideThresholdActiveDown)
+        try container.encode(settings.glucoseOverrideThresholdDown, forKey: .glucoseOverrideThresholdDown)
         // Dana Toggels
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)
