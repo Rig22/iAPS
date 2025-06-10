@@ -1939,9 +1939,9 @@ extension Home {
                             HStack(spacing: 10) {
                                 cannulaAgeView
                             }
-                            /*  HStack(spacing: 10) {
-                                 batteryAgeView
-                             }*/
+                            HStack(spacing: 10) {
+                                batteryAgeView
+                            }
                             /* HStack(spacing: 10) {
                                  batteryView
                              }*/
@@ -1966,21 +1966,21 @@ extension Home {
                 return AnyView(
                     VStack(spacing: 20) {
                         HStack(spacing: 20) {
-                            HStack(spacing: 10) {
-                                pumpIconView
-                            }
+                            /* HStack(spacing: 10) {
+                                 pumpIconView
+                             }*/
                             HStack(spacing: 10) {
                                 reservoirView
                             }
                             HStack(spacing: 10) {
                                 cannulaAgeView
                             }
-                            /* HStack(spacing: 10) {
-                                 pumpIconView
-                             }*/
-                            /* HStack(spacing: 10) {
-                                 batteryAgeView
-                             } */
+                            HStack(spacing: 10) {
+                                pumpIconView
+                            }
+                            HStack(spacing: 10) {
+                                batteryAgeView
+                            }
                             /* HStack(spacing: 10) {
                                  batteryView
                              }*/
@@ -3176,7 +3176,7 @@ extension Home {
                 .font(.timeSettingFont)
                 .background(
                     TimeEllipse(
-                        characters: 12,
+                        characters: 13,
                         button3D: state.button3D,
                         button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
@@ -3625,7 +3625,7 @@ extension Home {
                                     GeometryReader { proxy in
                                         let scrollPosition = proxy.frame(in: .named("HomeScrollView")).minY
                                         Color.clear
-                                            .onChange(of: scrollPosition) { newValue in
+                                            .onChange(of: scrollPosition) { _, newValue in
                                                 let yThreshold: CGFloat = -550
                                                 if newValue < yThreshold {
                                                     withAnimation(.easeOut(duration: 0.3)) { display = true }
@@ -3642,7 +3642,7 @@ extension Home {
                             .frame(height: 60)
                     }
                     .background(backgroundColor)
-                    //                        colorScheme == .light ? IAPSconfig.homeViewBackgorundLight : IAPSconfig.homeViewBackgorundDark
+                    // colorScheme == .light ? IAPSconfig.homeViewBackgorundLight : IAPSconfig.homeViewBackgorundDark
                     .ignoresSafeArea(edges: .vertical)
                     .onAppear {
                         startProgress()
