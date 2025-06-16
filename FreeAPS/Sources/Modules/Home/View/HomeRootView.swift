@@ -161,6 +161,17 @@ extension Home {
             return formatter
         }
 
+        var bolusProgressFormatter: NumberFormatter {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.minimum = 0
+            formatter.maximumFractionDigits = state.settingsManager.preferences.bolusIncrement > 0.05 ? 1 : 2
+            formatter.minimumFractionDigits = state.settingsManager.preferences.bolusIncrement > 0.05 ? 1 : 2
+            formatter.allowsFloats = true
+            formatter.roundingIncrement = Double(state.settingsManager.preferences.bolusIncrement) as NSNumber
+            return formatter
+        }
+
         let percentageFormatter: NumberFormatter = {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
@@ -642,7 +653,7 @@ extension Home {
                         .frame(width: 118, height: 118)
                 } else {}
 
-                let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
+                let bolused = bolusProgressFormatter.string(from: (amount * progress) as NSNumber) ?? ""
 
                 ProgressView(value: Double(truncating: progress as NSNumber))
                     .progressViewStyle(CircularProgressViewStyle())
@@ -680,7 +691,7 @@ extension Home {
         @ViewBuilder private func bolusProgressView2() -> some View {
             if let progress = state.bolusProgress, let amount = state.bolusAmount {
                 let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
-                let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
+                let bolused = bolusProgressFormatter.string(from: (amount * progress) as NSNumber) ?? ""
 
                 ZStack(alignment: .center) {
                     BigFillablePieSegment2(
@@ -2641,7 +2652,7 @@ extension Home {
                     .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     .frame(width: 60, height: 45)
 
-                    Image("vial")
+                    Image("insulinageview")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 40, height: 40)
@@ -2849,7 +2860,7 @@ extension Home {
                     )
                     .frame(width: 60, height: 45)
 
-                    Image("battery")
+                    Image("batteryageview")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 40, height: 40)
