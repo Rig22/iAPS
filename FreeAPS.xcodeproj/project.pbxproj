@@ -328,6 +328,9 @@
 		7987CE052D6A10D80045F6EA /* SensorAgeDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */; };
 		798BC9172D6F9C4700ADABFD /* TemporaryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798BC9162D6F9AAF00ADABFD /* TemporaryData.swift */; };
 		799A4F0C2DB0E616004B5834 /* DanaBarOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799A4F0B2DB0E605004B5834 /* DanaBarOption.swift */; };
+		799CEF892E043C4F00DD6224 /* MedtrumKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 799CEF882E043C4F00DD6224 /* MedtrumKit.framework */; };
+		799CEF8A2E043C7900DD6224 /* MedtrumKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 799CEF882E043C4F00DD6224 /* MedtrumKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		799CEF8E2E043F8100DD6224 /* MedtrumPumpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 799CEF8D2E043F6700DD6224 /* MedtrumPumpManager.swift */; };
 		79D4708E2CE483EE0095B89A /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D4708D2CE483DD0095B89A /* Token.swift */; };
 		79EEC25C2DDCC71D00BA2E8F /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EEC25B2DDCC70300BA2E8F /* Configuration.swift */; };
 		79FE39982D81E55A00BCD63B /* FunctionScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE39972D81E54200BCD63B /* FunctionScript.swift */; };
@@ -517,6 +520,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				799CEF8A2E043C7900DD6224 /* MedtrumKit.framework in Embed Frameworks */,
 				CEC751DB29D88280006E9D24 /* MinimedKit.framework in Embed Frameworks */,
 				CEC751DC29D88280006E9D24 /* MinimedKitUI.framework in Embed Frameworks */,
 				CEC751D929D8827A006E9D24 /* OmniKit.framework in Embed Frameworks */,
@@ -966,6 +970,8 @@
 		7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorAgeDays.swift; sourceTree = "<group>"; };
 		798BC9162D6F9AAF00ADABFD /* TemporaryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryData.swift; sourceTree = "<group>"; };
 		799A4F0B2DB0E605004B5834 /* DanaBarOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaBarOption.swift; sourceTree = "<group>"; };
+		799CEF882E043C4F00DD6224 /* MedtrumKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MedtrumKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		799CEF8D2E043F6700DD6224 /* MedtrumPumpManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedtrumPumpManager.swift; sourceTree = "<group>"; };
 		79BDA519C9B890FD9A5DFCF3 /* ISFEditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ISFEditorDataFlow.swift; sourceTree = "<group>"; };
 		79D4708D2CE483DD0095B89A /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		79EEC25B2DDCC70300BA2E8F /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
@@ -1117,6 +1123,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				799CEF892E043C4F00DD6224 /* MedtrumKit.framework in Frameworks */,
 				CEC751D829D88262006E9D24 /* MinimedKitUI.framework in Frameworks */,
 				D8DA5CD12B49EEF000C54E6C /* SlideButton in Frameworks */,
 				CEC751D629D88262006E9D24 /* MinimedKit.framework in Frameworks */,
@@ -1756,6 +1763,7 @@
 		3818AA48274C267000843DB3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				799CEF882E043C4F00DD6224 /* MedtrumKit.framework */,
 				CE51DD1B2A01970800F163F7 /* ConnectIQ 2.xcframework */,
 				CE94597929E9DF7B0047C9C6 /* ConnectIQ.framework */,
 				CEC751D529D88262006E9D24 /* MinimedKit.framework */,
@@ -2013,6 +2021,7 @@
 		38A504F625DDA0E200C5B9E8 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
+				799CEF8D2E043F6700DD6224 /* MedtrumPumpManager.swift */,
 				38A5049125DD9C4000C5B9E8 /* UserDefaultsExtensions.swift */,
 				38BF021625E7CBBC00579895 /* PumpManagerExtensions.swift */,
 				CEB434E628B9053300B70274 /* LoopUIColorPalette+Default.swift */,
@@ -3119,6 +3128,7 @@
 				3811DE2225C9D48300A708ED /* MainProvider.swift in Sources */,
 				3811DE0C25C9D32F00A708ED /* BaseProvider.swift in Sources */,
 				19F191E02BE4F98F00F6297E /* SharingStateModel.swift in Sources */,
+				799CEF8E2E043F8100DD6224 /* MedtrumPumpManager.swift in Sources */,
 				3811DE5C25C9D4D500A708ED /* Formatters.swift in Sources */,
 				3871F39F25ED895A0013ECB5 /* Decimal+Extensions.swift in Sources */,
 				3811DE3525C9D49500A708ED /* HomeRootView.swift in Sources */,
