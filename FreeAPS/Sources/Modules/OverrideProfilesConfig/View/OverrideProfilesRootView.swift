@@ -202,16 +202,11 @@ extension OverrideProfilesConfig {
                         }
 
                         HStack {
-                            Toggle(isOn: $state.endWIthNewCarbs) {
-                                Text("End the Override with next Meal")
-                            }
-                        }
-
-                        HStack {
                             Toggle(isOn: $state.isfAndCr) {
                                 Text("Change ISF and CR and Basal")
                             }
                         }
+
                         if !state.isfAndCr {
                             HStack {
                                 Toggle(isOn: $state.isf) {
@@ -268,6 +263,53 @@ extension OverrideProfilesConfig {
                                 Text("U").foregroundColor(.secondary)
                             }
                         }
+
+                        // Blank Divider()
+                        HStack {}
+
+                        HStack {
+                            Toggle(isOn: $state.endWIthNewCarbs) {
+                                Text("End the Override with next Meal")
+                            }
+                        }
+
+                        HStack {
+                            Toggle(isOn: $state.glucoseOverrideThresholdActive) {
+                                Text("End the Override when Glucose is Trending Up")
+                            }
+                        }
+
+                        if state.glucoseOverrideThresholdActive {
+                            HStack {
+                                Text("And when Glucose is higher than")
+                                BGTextField(
+                                    "0",
+                                    mgdlValue: $state.glucoseOverrideThreshold,
+                                    units: $state.units,
+                                    isDisabled: false,
+                                    liveEditing: true
+                                )
+                            }
+                        }
+
+                        HStack {
+                            Toggle(isOn: $state.glucoseOverrideThresholdActiveDown) {
+                                Text("End the Override when Glucose is Lower ...")
+                            }
+                        }
+
+                        if state.glucoseOverrideThresholdActiveDown {
+                            HStack {
+                                Text("... than")
+                                BGTextField(
+                                    "0",
+                                    mgdlValue: $state.glucoseOverrideThresholdDown,
+                                    units: $state.units,
+                                    isDisabled: false,
+                                    liveEditing: true
+                                )
+                            }
+                        }
                     }
                 } header: { Text("Advanced Settings") }
 
@@ -284,7 +326,7 @@ extension OverrideProfilesConfig {
 
                         if state.autoISFsettings.autoisf {
                             Toggle(isOn: $state.autoISFsettings.enableBGacceleration) {
-                                Text("Enable BG Acceleration")
+                                Text("Enable BG acceleration")
                             }
 
                             HStack {
@@ -339,7 +381,7 @@ extension OverrideProfilesConfig {
                             }
 
                             HStack {
-                                Text("Dura ISF Hourly Max Change")
+                                Text("Duration Weight")
                                 DecimalTextField(
                                     "0",
                                     value: $state.autoISFsettings.autoISFhourlyChange,
@@ -349,7 +391,7 @@ extension OverrideProfilesConfig {
                             }
 
                             HStack {
-                                Text("ISF Weight for higher BGs")
+                                Text("ISF weight for higher BG")
                                 DecimalTextField(
                                     "0",
                                     value: $state.autoISFsettings.higherISFrangeWeight,
@@ -359,7 +401,7 @@ extension OverrideProfilesConfig {
                             }
 
                             HStack {
-                                Text("ISF Weight for lower BGs")
+                                Text("ISF weight for lower BG")
                                 DecimalTextField(
                                     "0",
                                     value: $state.autoISFsettings.lowerISFrangeWeight,
@@ -369,7 +411,7 @@ extension OverrideProfilesConfig {
                             }
 
                             HStack {
-                                Text("ISF Weight for postprandial BG rise")
+                                Text("ISF weight for postprandial BG rise")
                                 DecimalTextField(
                                     "0",
                                     value: $state.autoISFsettings.postMealISFweight,
@@ -379,7 +421,7 @@ extension OverrideProfilesConfig {
                             }
 
                             HStack {
-                                Text("ISF Weight while BG accelerates")
+                                Text("ISF weight while BG accelerates")
                                 DecimalTextField(
                                     "0",
                                     value: $state.autoISFsettings.bgAccelISFweight,
@@ -389,7 +431,7 @@ extension OverrideProfilesConfig {
                             }
 
                             HStack {
-                                Text("ISF Weight while BG deccelerates")
+                                Text("ISF weight while BG decelerates")
                                 DecimalTextField(
                                     "0",
                                     value: $state.autoISFsettings.bgBrakeISFweight,
@@ -435,7 +477,7 @@ extension OverrideProfilesConfig {
                                 }
 
                                 HStack {
-                                    Text("Upper SMB limit")
+                                    Text("Upper BG limit")
                                     BGTextField(
                                         "0",
                                         mgdlValue: $state.autoISFsettings.b30upperLimit,
@@ -446,7 +488,7 @@ extension OverrideProfilesConfig {
                                 }
 
                                 HStack {
-                                    Text("Upper Delta SMB limit")
+                                    Text("Upper Delta limit")
                                     BGTextField(
                                         "0",
                                         mgdlValue: $state.autoISFsettings.b30upperdelta,
@@ -674,6 +716,10 @@ extension OverrideProfilesConfig {
                         if let aisf = autoisfSettings, preset.overrideAutoISF {
                             bool(bool: aisf.autoisf, setting: state.currentSettings.autoisf, label: "Auto ISF")
                         }
+
+                        if preset.glucoseOverrideThresholdActive || preset.glucoseOverrideThresholdActiveDown {
+                            Image(systemName: "drop.fill").foregroundStyle(.red)
+                        }
                     }
                     .font(.caption)
 
@@ -787,9 +833,10 @@ extension OverrideProfilesConfig {
             let smbMinutesUnchanged = state.smbMinutes == state.defaultSmbMinutes
             let uamMinutesUnchanged = state.uamMinutes == state.defaultUamMinutes
             let autoISFUnchanged = !state.overrideAutoISF
+            let glucoseOverrideUnchanged = !state.glucoseOverrideThresholdActive
 
             return percentUnchanged && targetUnchanged && smbUnchanged && maxIOBUnchanged && smbMinutesUnchanged &&
-                uamMinutesUnchanged && autoISFUnchanged
+                uamMinutesUnchanged && autoISFUnchanged && glucoseOverrideUnchanged
         }
 
         private func decimal(decimal: NSDecimalNumber?, setting: Decimal, label: String) -> Text? {
@@ -884,6 +931,17 @@ extension OverrideProfilesConfig {
             if state.overrideMaxIOB {
                 saveOverride.maxIOB = state.maxIOB as NSDecimalNumber
             }
+
+            saveOverride.glucoseOverrideThresholdActive = state.glucoseOverrideThresholdActive
+            if state.glucoseOverrideThresholdActive {
+                saveOverride.glucoseOverrideThreshold = state.glucoseOverrideThreshold as NSDecimalNumber
+            }
+
+            saveOverride.glucoseOverrideThresholdActiveDown = state.glucoseOverrideThresholdActiveDown
+            if state.glucoseOverrideThresholdActiveDown {
+                saveOverride.glucoseOverrideThresholdDown = state.glucoseOverrideThresholdDown as NSDecimalNumber
+            }
+
             saveOverride.date = Date.now
 
             if state.overrideAutoISF {

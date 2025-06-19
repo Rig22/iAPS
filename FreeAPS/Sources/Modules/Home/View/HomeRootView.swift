@@ -161,6 +161,17 @@ extension Home {
             return formatter
         }
 
+        var bolusProgressFormatter: NumberFormatter {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.minimum = 0
+            formatter.maximumFractionDigits = state.settingsManager.preferences.bolusIncrement > 0.05 ? 1 : 2
+            formatter.minimumFractionDigits = state.settingsManager.preferences.bolusIncrement > 0.05 ? 1 : 2
+            formatter.allowsFloats = true
+            formatter.roundingIncrement = Double(state.settingsManager.preferences.bolusIncrement) as NSNumber
+            return formatter
+        }
+
         let percentageFormatter: NumberFormatter = {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
@@ -642,7 +653,7 @@ extension Home {
                         .frame(width: 118, height: 118)
                 } else {}
 
-                let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
+                let bolused = bolusProgressFormatter.string(from: (amount * progress) as NSNumber) ?? ""
 
                 ProgressView(value: Double(truncating: progress as NSNumber))
                     .progressViewStyle(CircularProgressViewStyle())
@@ -680,7 +691,7 @@ extension Home {
         @ViewBuilder private func bolusProgressView2() -> some View {
             if let progress = state.bolusProgress, let amount = state.bolusAmount {
                 let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
-                let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
+                let bolused = bolusProgressFormatter.string(from: (amount * progress) as NSNumber) ?? ""
 
                 ZStack(alignment: .center) {
                     BigFillablePieSegment2(
@@ -1942,7 +1953,7 @@ extension Home {
                             HStack(spacing: 10) {
                                 batteryAgeView
                             }
-                            /*  HStack(spacing: 10) {
+                            /* HStack(spacing: 10) {
                                  batteryView
                              }*/
                             HStack(spacing: 10) {
@@ -1966,6 +1977,9 @@ extension Home {
                 return AnyView(
                     VStack(spacing: 20) {
                         HStack(spacing: 20) {
+                            /* HStack(spacing: 10) {
+                                 pumpIconView
+                             }*/
                             HStack(spacing: 10) {
                                 reservoirView
                             }
@@ -2134,9 +2148,9 @@ extension Home {
             }
 
             // Battery
-            if let batteryHours = state.batteryHours {
-                components.append("Battery: \(formatBatteryTime(batteryHours))")
-            }
+            /*     if let batteryHours = state.batteryHours {
+                 components.append("Battery: \(formatBatteryTime(batteryHours))")
+             }*/
 
             // Sensor
             if state.displayExpiration {
@@ -2321,16 +2335,16 @@ extension Home {
                             }
                         }
                     }
-                    .background(
-                        TimeEllipseBig(
-                            characters: 39,
-                            button3D: state.button3D,
-                            button3DBackground: state.button3DBackground,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
-                        )
-                    )
+                    /* .background(
+                         TimeEllipseBig(
+                             characters: 39,
+                             button3D: state.button3D,
+                             button3DBackground: state.button3DBackground,
+                             incidenceOfLight: state.incidenceOfLight,
+                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                                 .atriumview
+                         )
+                     )*/
                     .font(.system(size: 14, weight: .medium)) // Schrift für alle einheitlich
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
@@ -2638,7 +2652,7 @@ extension Home {
                     .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     .frame(width: 60, height: 45)
 
-                    Image("vial")
+                    Image("insulinageview")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 40, height: 40)
@@ -2846,7 +2860,7 @@ extension Home {
                     )
                     .frame(width: 60, height: 45)
 
-                    Image("battery")
+                    Image("batteryageview")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 40, height: 40)
@@ -3173,7 +3187,7 @@ extension Home {
                 .font(.timeSettingFont)
                 .background(
                     TimeEllipse(
-                        characters: 12,
+                        characters: 13,
                         button3D: state.button3D,
                         button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
@@ -3409,7 +3423,12 @@ extension Home {
                                         Text(name).font(.system(size: 15)).foregroundStyle(Color.white)
                                     }
                                 }
-                            } else { Text("📉") }
+                            } // else { Text("📉") }
+                            else {
+                                Image(systemName: "chart.line.downtrend.xyaxis")
+                                    .foregroundColor(.red)
+                                    .offset(y: -1)
+                            }
                         } else if override.percentage != 100 {
                             Text(override.percentage.formatted() + " %").font(.statusFont).foregroundStyle(.secondary)
                         } else if override.smbIsOff, !override.smbIsAlwaysOff {
@@ -3617,7 +3636,7 @@ extension Home {
                                     GeometryReader { proxy in
                                         let scrollPosition = proxy.frame(in: .named("HomeScrollView")).minY
                                         Color.clear
-                                            .onChange(of: scrollPosition) { newValue in
+                                            .onChange(of: scrollPosition) { _, newValue in
                                                 let yThreshold: CGFloat = -550
                                                 if newValue < yThreshold {
                                                     withAnimation(.easeOut(duration: 0.3)) { display = true }
@@ -3634,7 +3653,7 @@ extension Home {
                             .frame(height: 60)
                     }
                     .background(backgroundColor)
-                    //                        colorScheme == .light ? IAPSconfig.homeViewBackgorundLight : IAPSconfig.homeViewBackgorundDark
+                    // colorScheme == .light ? IAPSconfig.homeViewBackgorundLight : IAPSconfig.homeViewBackgorundDark
                     .ignoresSafeArea(edges: .vertical)
                     .onAppear {
                         startProgress()
