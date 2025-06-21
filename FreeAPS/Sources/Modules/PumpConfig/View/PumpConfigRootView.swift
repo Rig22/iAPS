@@ -15,7 +15,11 @@ extension PumpConfig {
                                 state.setupPump = true
                             } label: {
                                 HStack {
-                                    Image(uiImage: pumpState.image ?? UIImage()).padding()
+                                    Image(uiImage: pumpState.image ?? UIImage())
+                                        .resizable()
+                                        .scaledToFit()
+                                        .padding()
+                                        .frame(maxWidth: 100)
                                     Text(pumpState.name)
                                 }
                             }

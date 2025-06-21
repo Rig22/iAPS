@@ -315,7 +315,7 @@
 		7909A4AA2D5101E500975822 /* BarViewOptionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7909A4A92D5101D800975822 /* BarViewOptionConfiguration.swift */; };
 		791D86DC2D071A04001D2763 /* InsulinAgeOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */; };
 		7927D7162D082E8400385439 /* CannulaAgeOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7927D7152D082E7300385439 /* CannulaAgeOption.swift */; };
-		792E4EC32CF8C95800ADE3DC /* DanaIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */; };
+		792E4EC32CF8C95800ADE3DC /* PumpIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792E4EC22CF8C8EB00ADE3DC /* PumpIconOption.swift */; };
 		792F32F62CD9DCAF009E7F7A /* BackgroundColorOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */; };
 		7949F9012DC11A710058BF94 /* SystemSoundsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7949F9002DC11A550058BF94 /* SystemSoundsManager.swift */; };
 		795CBE122D3F60B20044854B /* BGTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE112D3F60A30044854B /* BGTextField.swift */; };
@@ -957,7 +957,7 @@
 		7909A4A92D5101D800975822 /* BarViewOptionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarViewOptionConfiguration.swift; sourceTree = "<group>"; };
 		791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinAgeOption.swift; sourceTree = "<group>"; };
 		7927D7152D082E7300385439 /* CannulaAgeOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CannulaAgeOption.swift; sourceTree = "<group>"; };
-		792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaIconOption.swift; sourceTree = "<group>"; };
+		792E4EC22CF8C8EB00ADE3DC /* PumpIconOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpIconOption.swift; sourceTree = "<group>"; };
 		792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundColorOption.swift; sourceTree = "<group>"; };
 		7949F9002DC11A550058BF94 /* SystemSoundsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemSoundsManager.swift; sourceTree = "<group>"; };
 		795CBE112D3F60A30044854B /* BGTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGTextField.swift; sourceTree = "<group>"; };
@@ -1592,7 +1592,7 @@
 				7974B64B2D3817C10077EF9F /* LoopViewOption.swift */,
 				7927D7152D082E7300385439 /* CannulaAgeOption.swift */,
 				791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */,
-				792E4EC22CF8C8EB00ADE3DC /* DanaIconOption.swift */,
+				792E4EC22CF8C8EB00ADE3DC /* PumpIconOption.swift */,
 				792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */,
 				7910CDA62CD53A0E001E77AC /* Chart */,
 				3811DE2E25C9D49500A708ED /* HomeRootView.swift */,
@@ -3330,7 +3330,7 @@
 				38E4453B274E411700EC9A94 /* Disk+VolumeInformation.swift in Sources */,
 				7BCFACB97C821041BA43A114 /* ManualTempBasalRootView.swift in Sources */,
 				38E44534274E411700EC9A94 /* Disk+InternalHelpers.swift in Sources */,
-				792E4EC32CF8C95800ADE3DC /* DanaIconOption.swift in Sources */,
+				792E4EC32CF8C95800ADE3DC /* PumpIconOption.swift in Sources */,
 				F2159A592BA78B7400A0B716 /* ContactTrickState.swift in Sources */,
 				38A00B2325FC2B55006BC0B0 /* LRUCache.swift in Sources */,
 				1924F72C2BA35AE5006644EE /* TotalDailyDose.swift in Sources */,

@@ -26,7 +26,7 @@ extension StatConfig {
         @Published var carbButton: Bool = true
         @Published var profileButton: Bool = true
         // Dana UI Toggels
-        @Published var danaIconRawValue: String = "ic_dana_rs"
+        @Published var pumpIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
         @Published var insulinBadge: Bool = false
         @Published var hideInsulinBadge: Bool = false
@@ -114,7 +114,7 @@ extension StatConfig {
             subscribeSetting(\.carbButton, on: $carbButton) { carbButton = $0 }
             subscribeSetting(\.profileButton, on: $profileButton) { profileButton = $0 }
             // Dana Toggels
-            subscribeSetting(\.danaIconRawValue, on: $danaIconRawValue) { danaIconRawValue = $0 }
+            subscribeSetting(\.pumpIconRawValue, on: $pumpIconRawValue) { pumpIconRawValue = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
             subscribeSetting(\.danaBarOption, on: $danaBarOption) { danaBarOption = $0 }
             subscribeSetting(\.insulinAgeOption, on: $insulinAgeOption) { insulinAgeOption = $0 }

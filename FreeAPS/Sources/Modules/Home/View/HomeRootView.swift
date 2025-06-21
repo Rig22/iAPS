@@ -2472,10 +2472,10 @@ extension Home {
                      .padding(.trailing, 5)*/
 
                     ZStack {
-                        Image(state.danaIconOption.rawValue)
+                        Image(state.pumpIconOption.rawValue)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 70)
+                            .frame(width: 60)
                     }
 
                     /*  Text("⇢")

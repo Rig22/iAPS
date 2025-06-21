@@ -101,7 +101,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var fpuAmounts: Bool = false
     // Dana-Toggles
     var timeSettings: Bool = false
-    var danaIconRawValue: String = "ic_dana_rs"
+    var pumpIconRawValue: String = "ic_dana_rs"
     var danaBar: Bool = false
     var legendsSwitch: Bool = false
     var tempTargetbar: Bool = false
@@ -176,12 +176,12 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     }
 
     // Computed property for Dana Icon
-    var danaIconOption: DanaIconOption {
+    var pumpIconOption: PumpIconOption {
         get {
-            DanaIconOption(rawValue: danaIconRawValue) ?? .danaRS
+            PumpIconOption(rawValue: pumpIconRawValue) ?? .danaRS
         }
         set {
-            danaIconRawValue = newValue.rawValue
+            pumpIconRawValue = newValue.rawValue
         }
     }
 }

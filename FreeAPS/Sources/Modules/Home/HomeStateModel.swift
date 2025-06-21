@@ -82,7 +82,7 @@ extension Home {
         @Published var carbButton: Bool = true
         @Published var profileButton: Bool = true
         // Dana UI Toggels
-        @Published var danaIconRawValue: String = "ic_dana_rs"
+        @Published var pumpIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
         @Published var insulinBadge: Bool = false
         @Published var insulinAgeOption: String = "Drei_Tage"
@@ -178,12 +178,12 @@ extension Home {
             return hours
         }
 
-        var danaIconOption: DanaIconOption {
+        var pumpIconOption: PumpIconOption {
             get {
-                DanaIconOption(rawValue: danaIconRawValue) ?? .danaRS // Standardwert, falls der Raw-Wert nicht gefunden wird
+                PumpIconOption(rawValue: pumpIconRawValue) ?? .danaRS // Standardwert, falls der Raw-Wert nicht gefunden wird
             }
             set {
-                danaIconRawValue = newValue.rawValue
+                pumpIconRawValue = newValue.rawValue
             }
         }
 
@@ -248,7 +248,7 @@ extension Home {
             carbButton = settingsManager.settings.carbButton
             profileButton = settingsManager.settings.profileButton
             // Dana UI Toggels
-            danaIconRawValue = settingsManager.settings.danaIconRawValue
+            pumpIconRawValue = settingsManager.settings.pumpIconRawValue
             danaBar = settingsManager.settings.danaBar
             insulinBadge = settingsManager.settings.insulinBadge
             legendsSwitch = settingsManager.settings.legendsSwitch
@@ -871,7 +871,7 @@ extension Home.StateModel:
         setupOverrideHistory()
         setupData()
         // Dana UI Toggels
-        danaIconRawValue = settingsManager.settings.danaIconRawValue
+        pumpIconRawValue = settingsManager.settings.pumpIconRawValue
         danaBar = settingsManager.settings.danaBar
         insulinAgeOption = settingsManager.settings.insulinAgeOption
         cannulaAgeOption = settingsManager.settings.cannulaAgeOption

@@ -124,10 +124,10 @@ extension StatConfig {
                             .fill(Color.darkerGray.opacity(1.0))
                             .frame(width: 20, height: 20)
                             .offset(x: -53, y: -55)
-                        Image(state.danaIconRawValue)
+                        Image("pump_generic")
                             .resizable()
-                            .frame(width: 20, height: 12)
-                            .offset(x: -53, y: -55)
+                            .frame(width: 22, height: 27)
+                            .offset(x: -54, y: -56)
                     }
                 }
                 .frame(width: 360, height: 280)
@@ -172,8 +172,8 @@ extension StatConfig {
                                         // DanaBar 2 spezifische Einstellungen
                                         if state.danaBarOption == DanaBarOption.icon.rawValue {
                                             if #available(iOS 18.0, *) {
-                                                Picker("Pump Icon", selection: $state.danaIconRawValue) {
-                                                    ForEach(DanaIconOption.allCases, id: \.rawValue) { option in
+                                                Picker("Pump Icon", selection: $state.pumpIconRawValue) {
+                                                    ForEach(PumpIconOption.allCases, id: \.rawValue) { option in
                                                         HStack {
                                                             Image(option.rawValue)
                                                                 .resizable()
