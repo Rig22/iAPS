@@ -98,8 +98,7 @@ extension StatConfig {
 
         private func getDescription(for option: DanaBarOption) -> String {
             switch option {
-            case .max: return "Vollständige Anzeige mit InsulinAlter"
-            case .icon: return "Mit Pumpen-Icon"
+            case .max: return "Dana Bar"
             case .min: return "Minimalistische Ansicht"
             case .marquee: return "Laufschrift"
             case .simple: return "Traditionelle Ansicht"
@@ -118,17 +117,6 @@ extension StatConfig {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 360, height: 280)
-
-                    if state.danaBar && state.danaBarOption == DanaBarOption.icon.rawValue {
-                        Circle()
-                            .fill(Color.darkerGray.opacity(1.0))
-                            .frame(width: 20, height: 20)
-                            .offset(x: -53, y: -55)
-                        Image("pump_generic")
-                            .resizable()
-                            .frame(width: 22, height: 27)
-                            .offset(x: -54, y: -56)
-                    }
                 }
                 .frame(width: 360, height: 280)
                 .padding(.top, 20)
@@ -138,112 +126,118 @@ extension StatConfig {
                 GeometryReader { geometry in
                     ScrollView {
                         Form {
+                            // New separate section for Pump Icon settings
                             Section(
-                                header: Text("Bar Selection"),
-                                footer: Text("Select the  desired bar view")
-                            )
-                                {
-                                    Toggle("Dana Bars", isOn: $state.danaBar)
+                                header: Text("Pump Icon"),
+                                footer: Text("Select and configure pump icon display")
+                            ) {
+                                Toggle("Show Pump Icon", isOn: $state.showPumpIcon)
 
-                                    if state.danaBar {
-                                        Picker("Wähle eine Ansicht", selection: $state.danaBarOption) {
-                                            ForEach(DanaBarOption.allCases) { option in
-                                                HStack(spacing: 12) {
-                                                    Image(option.previewImageName)
+                                if state.showPumpIcon {
+                                    if #available(iOS 18.0, *) {
+                                        Picker("Select Icon", selection: $state.pumpIconRawValue) {
+                                            ForEach(PumpIconOption.allCases, id: \.rawValue) { option in
+                                                HStack {
+                                                    Image(option.rawValue)
                                                         .resizable()
                                                         .scaledToFit()
                                                         .frame(width: 60, height: 40)
-                                                        .cornerRadius(6)
-                                                        .shadow(radius: 2)
-
-                                                    VStack(alignment: .leading) {
-                                                        Text(option.rawValue)
-                                                            .font(.subheadline)
-                                                        Text(getDescription(for: option))
-                                                            .font(.caption)
-                                                            .foregroundColor(.gray)
-                                                    }
+                                                    Text(option.displayName)
+                                                        .foregroundColor(.primary)
                                                 }
                                                 .tag(option.rawValue)
                                             }
                                         }
                                         .pickerStyle(NavigationLinkPickerStyle())
+                                    }
+                                }
+                            }
+                            Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
+                            Section(
+                                header: Text("Bar Selection"),
+                                footer: Text("Select the desired bar view")
+                            ) {
+                                Toggle("Top Bars", isOn: $state.danaBar)
 
-                                        // DanaBar 2 spezifische Einstellungen
-                                        if state.danaBarOption == DanaBarOption.icon.rawValue {
-                                            if #available(iOS 18.0, *) {
-                                                Picker("Pump Icon", selection: $state.pumpIconRawValue) {
-                                                    ForEach(PumpIconOption.allCases, id: \.rawValue) { option in
-                                                        HStack {
-                                                            Image(option.rawValue)
-                                                                .resizable()
-                                                                .scaledToFit()
-                                                                .frame(width: 60, height: 40)
-                                                            Text(option.displayName)
-                                                                .foregroundColor(.white)
-                                                        }
-                                                        .tag(option.rawValue)
-                                                    }
+                                if state.danaBar {
+                                    Picker("Choose a view", selection: $state.danaBarOption) {
+                                        ForEach(DanaBarOption.allCases) { option in
+                                            HStack(spacing: 12) {
+                                                Image(option.previewImageName)
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 60, height: 40)
+                                                    .cornerRadius(6)
+                                                    .shadow(radius: 2)
+
+                                                VStack(alignment: .leading) {
+                                                    Text(option.rawValue)
+                                                        .font(.subheadline)
+                                                    Text(getDescription(for: option))
+                                                        .font(.caption)
+                                                        .foregroundColor(.gray)
                                                 }
-                                                .pickerStyle(NavigationLinkPickerStyle())
                                             }
+                                            .tag(option.rawValue)
                                         }
+                                    }
+                                    .pickerStyle(NavigationLinkPickerStyle())
 
-                                        // DanaBar Max spezifische Einstellungen
-                                        if state.danaBarOption == DanaBarOption.max.rawValue {
-                                            Picker(
-                                                "Max Reservoir Insulin Age",
-                                                selection: $state.insulinAgeOption
-                                            ) {
-                                                Text("1 Day").tag("Ein_Tag")
-                                                Text("2 Days").tag("Zwei_Tage")
-                                                Text("3 Days").tag("Drei_Tage")
-                                                Text("4 Days").tag("Vier_Tage")
-                                                Text("5 Days").tag("Fuenf_Tage")
-                                                Text("6 Days").tag("Sechs_Tage")
-                                                Text("7 Days").tag("Sieben_Tage")
-                                                Text("8 Days").tag("Acht_Tage")
-                                                Text("9 Days").tag("Neun_Tage")
-                                                Text("10 Days").tag("Zehn_Tage")
-                                            }
-                                            .pickerStyle(NavigationLinkPickerStyle())
-                                        }
-
-                                        // DanaBar Simple spezifische Einstellungen
-                                        if state.danaBarOption == DanaBarOption.simple.rawValue {
-                                            Picker(
-                                                "Max Reservoir Insulin Age",
-                                                selection: $state.insulinAgeOption
-                                            ) {
-                                                Text("1 Day").tag("Ein_Tag")
-                                                Text("2 Days").tag("Zwei_Tage")
-                                                Text("3 Days").tag("Drei_Tage")
-                                                Text("4 Days").tag("Vier_Tage")
-                                                Text("5 Days").tag("Fuenf_Tage")
-                                                Text("6 Days").tag("Sechs_Tage")
-                                                Text("7 Days").tag("Sieben_Tage")
-                                                Text("8 Days").tag("Acht_Tage")
-                                                Text("9 Days").tag("Neun_Tage")
-                                                Text("10 Days").tag("Zehn_Tage")
-                                            }
-                                            .pickerStyle(NavigationLinkPickerStyle())
-                                        }
-
-                                        // Gemeinsame Einstellungen für alle Ansichten
-                                        Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
+                                    // DanaBar Max specific settings
+                                    if state.danaBarOption == DanaBarOption.max.rawValue {
+                                        Picker(
+                                            "Max Reservoir Insulin Age",
+                                            selection: $state.insulinAgeOption
+                                        ) {
                                             Text("1 Day").tag("Ein_Tag")
                                             Text("2 Days").tag("Zwei_Tage")
                                             Text("3 Days").tag("Drei_Tage")
                                             Text("4 Days").tag("Vier_Tage")
                                             Text("5 Days").tag("Fuenf_Tage")
+                                            Text("6 Days").tag("Sechs_Tage")
+                                            Text("7 Days").tag("Sieben_Tage")
+                                            Text("8 Days").tag("Acht_Tage")
+                                            Text("9 Days").tag("Neun_Tage")
+                                            Text("10 Days").tag("Zehn_Tage")
+                                            // ... rest of options
                                         }
                                         .pickerStyle(NavigationLinkPickerStyle())
-
-                                        Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
                                     }
-                                    Toggle("TT Bar", isOn: $state.tempTargetBar)
-                                    Toggle("Bottom Bar", isOn: $state.timeSettings)
+
+                                    // DanaBar Simple specific settings
+                                    if state.danaBarOption == DanaBarOption.simple.rawValue {
+                                        Picker(
+                                            "Max Reservoir Insulin Age",
+                                            selection: $state.insulinAgeOption
+                                        ) {
+                                            Text("1 Day").tag("Ein_Tag")
+                                            Text("2 Days").tag("Zwei_Tage")
+                                            Text("3 Days").tag("Drei_Tage")
+                                            Text("4 Days").tag("Vier_Tage")
+                                            Text("5 Days").tag("Fuenf_Tage")
+                                            Text("6 Days").tag("Sechs_Tage")
+                                            Text("7 Days").tag("Sieben_Tage")
+                                            Text("8 Days").tag("Acht_Tage")
+                                            Text("9 Days").tag("Neun_Tage")
+                                            Text("10 Days").tag("Zehn_Tage")
+                                            // ... rest of options
+                                        }
+                                        .pickerStyle(NavigationLinkPickerStyle())
+                                    }
+
+                                    // Common settings for all views
+                                    Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
+                                        Text("1 Day").tag("Ein_Tag")
+                                        Text("2 Days").tag("Zwei_Tage")
+                                        Text("3 Days").tag("Drei_Tage")
+                                        Text("4 Days").tag("Vier_Tage")
+                                        Text("5 Days").tag("Fuenf_Tage")
+                                    }
+                                    .pickerStyle(NavigationLinkPickerStyle())
                                 }
+                                Toggle("TT Bar", isOn: $state.tempTargetBar)
+                                Toggle("Bottom Bar", isOn: $state.timeSettings)
+                            }
 
                             Section(
                                 header: Text("Visual Options"),
@@ -318,7 +312,7 @@ extension StatConfig {
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
                                 }
-                                Toggle("Batterie Anzeige", isOn: $state.batteryIconOption)
+                                // Toggle("Batterie Anzeige", isOn: $state.batteryIconOption)
                             }
                             Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
 

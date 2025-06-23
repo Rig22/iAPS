@@ -88,7 +88,6 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var birthDate = Date.distantPast
     var sexSetting: Int = 3
     var disableHypoTreatment: Bool = false
-    var insulinBadge: Bool = false
     var hideInsulinBadge: Bool = false
     var allowDilution: Bool = false
     var displayDelta: Bool = false
@@ -133,6 +132,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var glucoseOverrideThresholdActive: Bool = false
     var glucoseOverrideThresholdActiveDown: Bool = false
     var glucoseOverrideThresholdDown: Decimal = 100
+    var showPumpIcon: Bool = false
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false
@@ -324,6 +324,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case glucoseOverrideThresholdActive
         case glucoseOverrideThresholdActiveDown
         case glucoseOverrideThresholdDown
+        case showPumpIcon
         // Dana Toggles
         // AutoISF
         case autoisf
@@ -455,7 +456,6 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.fpuAmounts, forKey: .fpuAmount)
         // Dana Toggels
         try container.encode(settings.danaBar, forKey: .danaBar)
-        try container.encode(settings.insulinBadge, forKey: .insulinBadge)
         try container.encode(settings.hideInsulinBadge, forKey: .hideInsulinBadge)
         try container.encode(settings.legendsSwitch, forKey: .legendsSwitch)
         try container.encode(settings.tempTargetbar, forKey: .tempTargetbar)
@@ -488,6 +488,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.glucoseOverrideThresholdActive, forKey: .glucoseOverrideThresholdActive)
         try container.encode(settings.glucoseOverrideThresholdActiveDown, forKey: .glucoseOverrideThresholdActiveDown)
         try container.encode(settings.glucoseOverrideThresholdDown, forKey: .glucoseOverrideThresholdDown)
+        try container.encode(settings.showPumpIcon, forKey: .showPumpIcon)
         // Dana Toggels
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)

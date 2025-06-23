@@ -30,6 +30,7 @@ extension Home {
 
         @Environment(\.managedObjectContext) var moc
         @Environment(\.sizeCategory) private var fontSize
+        @Environment(\.colorScheme) var colorScheme
 
         @FetchRequest(
             entity: Override.entity(),
@@ -475,6 +476,24 @@ extension Home {
             }
         }
 
+        // Test for medtrum and omnipod
+        var pumpView: some View {
+            PumpView(
+                reservoir: $state.reservoir,
+                battery: $state.battery,
+                name: $state.pumpName,
+                expiresAtDate: $state.pumpExpiresAtDate,
+                timerDate: $state.data.timerDate, timeZone: $state.timeZone,
+                state: state
+            )
+            .onTapGesture {
+                if state.pumpDisplayState != nil {
+                    state.setupPump = true
+                }
+            }
+            .offset(y: 1)
+        }
+
         var glucoseView: some View {
             let doubleBolusProgress = Binding<Double?> {
                 state.bolusProgress.map { Double(truncating: $0 as NSNumber) }
@@ -677,9 +696,9 @@ extension Home {
                             amount.formatted(.number.precision(.fractionLength(2))) +
                             NSLocalizedString(" U", comment: " ")
                     )
-                    .font(.system(size: 13))
+                    .font(.system(size: 14))
                     .foregroundStyle(Color.white)
-                    .offset(y: -78)
+                    .offset(y: -83)
                 }
             }
         }
@@ -723,9 +742,9 @@ extension Home {
                             amount.formatted(.number.precision(.fractionLength(2))) +
                             NSLocalizedString(" U", comment: " ")
                     )
-                    .font(.system(size: 13))
+                    .font(.system(size: 14))
                     .foregroundStyle(Color.white)
-                    .offset(y: -72)
+                    .offset(y: -83)
                 }
                 .frame(width: 110, height: 110)
             }
@@ -1398,6 +1417,21 @@ extension Home {
             }
         }
 
+        private var pumpTopView: some View {
+            HStack {
+                if state.showPumpIcon {
+                    pumpIconView
+                        .padding(.leading, 34)
+                        .padding(.top, 6)
+                }
+
+                Spacer() // Drückt alles nach rechts
+
+                pumpView
+                    .padding(.trailing, 30) // Abstand vom rechten Rand
+            }
+        }
+
         // HEADERVIEW Anfang
 
         // tempRateSensorAgeeventualBG Anfang
@@ -1425,12 +1459,12 @@ extension Home {
                     }
 
                     // Bluetooth-Symbol (überlagert)
-                    if state.isConnected {
-                        BluetoothConnectionView
-                            .foregroundColor(.white)
-                            .offset(y: -10)
-                            .animation(.easeInOut(duration: 0.3), value: state.isConnected)
-                    }
+                    /*    if state.isConnected {
+                         BluetoothConnectionView
+                             .foregroundColor(.white)
+                             .offset(y: -10)
+                             .animation(.easeInOut(duration: 0.3), value: state.isConnected)
+                     }*/
                 }
                 .frame(width: 70)
 
@@ -1493,40 +1527,6 @@ extension Home {
         }
 
         // Temp Basal Ende
-
-        private var BluetoothConnectionView: some View {
-            Group {
-                let connectionFraction: CGFloat = state.isConnected ? 1.0 : 0.0
-                let connectionColor: Color = state.isConnected ? .white.opacity(0.3) : .green.opacity(0.8)
-
-                HStack {
-                    ZStack {
-                        SmallFillablePieSegmentBluetooth(
-                            pieSegmentViewModel: connectionPieSegmentViewModel,
-                            fillFraction: connectionFraction,
-                            color: connectionColor,
-                            backgroundColor: .blue,
-                            displayText: " ",
-                            symbolSize: 0,
-                            symbol: "cross.vial",
-                            animateProgress: true,
-                            button3D: state.button3D,
-                            button3DBackground: state.button3DBackground,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
-                        )
-                        .frame(width: 30, height: 30)
-
-                        Image("bluetooth")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 40, height: 40)
-                            .offset(x: -1, y: -2)
-                    }
-                }
-            }
-        }
 
         var batteryView: some View {
             BatteryEllipse(
@@ -1621,8 +1621,8 @@ extension Home {
         }
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-            let height: CGFloat = display ? 150 : 210
-
+            // let height: CGFloat = display ? 140 : 210
+            let height: CGFloat = display ? 150 : 180
             LinearGradient(
                 gradient: Gradient(colors: [.clear, .clear, .clear]),
                 startPoint: .top,
@@ -1899,7 +1899,7 @@ extension Home {
 
         // Loop Views Ende
 
-        // DanaBars
+        // Top Bars
 
         @StateObject private var cannulaPieSegmentViewModel = PieSegmentViewModel()
         //   @StateObject private var batteryPieSegmentViewModel = PieSegmentViewModel()
@@ -1942,9 +1942,6 @@ extension Home {
                     VStack(spacing: 20) {
                         HStack(spacing: 20) {
                             HStack(spacing: 10) {
-                                reservoirView
-                            }
-                            HStack(spacing: 10) {
                                 insulinAgeView
                             }
                             HStack(spacing: 10) {
@@ -1953,17 +1950,14 @@ extension Home {
                             HStack(spacing: 10) {
                                 batteryAgeView
                             }
-                            /* HStack(spacing: 10) {
-                                 batteryView
-                             }*/
                             HStack(spacing: 10) {
                                 sensorAgeDays
                             }
+                            HStack(spacing: 10) {
+                                BluetoothConnectionView
+                            }
                         }
                     }
-                    .onChange(of: state.insulinConcentration) { _, newValue in
-                        if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {}
-                    }.dynamicTypeSize(...DynamicTypeSize.xxLarge)
                 )
             } else {
                 return AnyView(EmptyView())
@@ -1977,32 +1971,26 @@ extension Home {
                 return AnyView(
                     VStack(spacing: 20) {
                         HStack(spacing: 20) {
-                            /* HStack(spacing: 10) {
-                                 pumpIconView
-                             }*/
-                            HStack(spacing: 10) {
-                                reservoirView
-                            }
-                            HStack(spacing: 10) {
-                                cannulaAgeView
-                            }
                             HStack(spacing: 10) {
                                 pumpIconView
                             }
+                            /*  HStack(spacing: 10) {
+                                 reservoirView
+                             }*/
+                            /* HStack(spacing: 10) {
+                                 cannulaAgeView
+                             }*/
                             HStack(spacing: 10) {
                                 batteryAgeView
                             }
-                            /* HStack(spacing: 10) {
-                                 batteryView
-                             }*/
+                            HStack(spacing: 10) {
+                                BluetoothConnectionView
+                            }
                             HStack(spacing: 10) {
                                 sensorAgeDays
                             }
                         }
                     }
-                    .onChange(of: state.insulinConcentration) { _, newValue in
-                        if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {}
-                    }.dynamicTypeSize(...DynamicTypeSize.xxLarge)
                 )
             } else {
                 return AnyView(EmptyView())
@@ -2016,9 +2004,9 @@ extension Home {
                 return AnyView(
                     VStack(spacing: 20) {
                         HStack(spacing: 20) {
-                            HStack(spacing: 10) {
-                                reservoirView
-                            }
+                            /*   HStack(spacing: 10) {
+                                 reservoirView
+                             }*/
                             HStack(spacing: 10) {
                                 cannulaAgeView
                             }
@@ -2027,9 +2015,6 @@ extension Home {
                             }
                         }
                     }
-                    .onChange(of: state.insulinConcentration) { _, newValue in
-                        if newValue != 1.0, state.settingsManager?.settings.insulinBadge == true {}
-                    }.dynamicTypeSize(...DynamicTypeSize.xxLarge)
                 )
             } else {
                 return AnyView(EmptyView())
@@ -2115,28 +2100,28 @@ extension Home {
             var components = [String]()
 
             // Reservoir
-            if let reservoir = state.reservoirLevel {
-                if reservoir == 0 {
-                    components.append("Reservoir: --")
-                } else {
-                    let concentrationValue = concentration.last?.concentration ?? 1.0
-                    let adjustedReservoir = Double(reservoir) * concentrationValue
+            /*     if let reservoir = state.reservoirLevel {
+                 if reservoir == 0 {
+                     components.append("Reservoir: --")
+                 } else {
+                     let concentrationValue = concentration.last?.concentration ?? 1.0
+                     let adjustedReservoir = Double(reservoir) * concentrationValue
 
-                    let formatter = NumberFormatter()
-                    formatter.numberStyle = .decimal
-                    formatter.maximumFractionDigits = 0
-                    let formattedReservoir = formatter.string(from: NSNumber(value: adjustedReservoir)) ?? "\(adjustedReservoir)"
+                     let formatter = NumberFormatter()
+                     formatter.numberStyle = .decimal
+                     formatter.maximumFractionDigits = 0
+                     let formattedReservoir = formatter.string(from: NSNumber(value: adjustedReservoir)) ?? "\(adjustedReservoir)"
 
-                    components.append("Reservoir: \(formattedReservoir)U")
-                }
-            }
+                     components.append("Reservoir: \(formattedReservoir)U")
+                 }
+             }*/
 
             // Insulin Age
             if let insulinHours = state.insulinHours,
                let option = InsulinAgeOption(rawValue: state.insulinAgeOption)
             {
                 let remaining = option.maxInsulinAge - insulinHours
-                components.append("Insulin: \(formatHours(remaining))")
+                components.append("Insulin Age left: \(formatHours(remaining))")
             }
 
             // Cannula Age
@@ -2144,7 +2129,7 @@ extension Home {
                let option = CannulaAgeOption(rawValue: state.cannulaAgeOption)
             {
                 let remaining = option.maxCannulaAge - cannulaHours
-                components.append("Cannula: \(formatHours(remaining))")
+                components.append("Cannula Age left: \(formatHours(remaining))")
             }
 
             // Battery
@@ -2158,9 +2143,9 @@ extension Home {
                    let hours = state.remainingSensorHours,
                    let minutes = state.remainingSensorMinutes
                 {
-                    components.append("Sensor: \(formatSensorTime(days: days, hours: hours, minutes: minutes))")
+                    components.append("Sensor Age left: \(formatSensorTime(days: days, hours: hours, minutes: minutes))")
                 } else {
-                    components.append("Sensor: \(state.sensorAgeDays.asInt())d")
+                    components.append("Sensor Age left: \(state.sensorAgeDays.asInt())d")
                 }
             }
 
@@ -2200,14 +2185,14 @@ extension Home {
                 if state.danaBar {
                     HStack(spacing: 15) { // Haupt-HStack für alle Elemente
                         // Reservoir
-                        if let reservoir = state.reservoirLevel {
-                            HStack(spacing: 4) {
-                                Image(systemName: "cross.vial.fill")
-                                    .foregroundColor(reservoirColor(for: reservoir))
-                                Text(reservoirText(for: reservoir))
-                                    .foregroundColor(.white)
-                            }
-                        }
+                        /*     if let reservoir = state.reservoirLevel {
+                             HStack(spacing: 4) {
+                                 Image(systemName: "cross.vial.fill")
+                                     .foregroundColor(reservoirColor(for: reservoir))
+                                 Text(reservoirText(for: reservoir))
+                                     .foregroundColor(.white)
+                             }
+                         }*/
 
                         // Insulin Age
                         if let insulinHours = state.insulinHours,
@@ -2255,7 +2240,7 @@ extension Home {
                             }()
 
                             HStack(spacing: 4) {
-                                Image(systemName: "clock.arrow.circlepath")
+                                Image(systemName: "cross.vial.fill")
                                     .foregroundColor(insulinColor)
                                     .modifier(BlinkingModifier(shouldBlink: remainingHours <= 1))
                                 Text(displayText)
@@ -2304,7 +2289,10 @@ extension Home {
                                 }()
 
                                 HStack(spacing: 4) {
-                                    Image(systemName: "syringe.fill") // Alternativ: "ivfluid.bag.fill"
+                                    Image("infusion") // Alternativ: "ivfluid.bag.fill"
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 30, height: 30)
                                         .foregroundColor(cannulaColor)
                                         .modifier(BlinkingModifier(shouldBlink: remainingHours <= 1))
                                     Text(displayText)
@@ -2314,11 +2302,11 @@ extension Home {
                         }
 
                         // Battery
-                        HStack(spacing: 4) {
-                            Image(systemName: batterySymbol)
-                                .foregroundColor(batteryColor)
-                            Text(percentageText)
-                        }
+                        /*      HStack(spacing: 4) {
+                             Image(systemName: batterySymbol)
+                                 .foregroundColor(batteryColor)
+                             Text(percentageText)
+                         }*/
 
                         // Sensor
                         HStack(spacing: 4) {
@@ -2335,16 +2323,6 @@ extension Home {
                             }
                         }
                     }
-                    /* .background(
-                         TimeEllipseBig(
-                             characters: 39,
-                             button3D: state.button3D,
-                             button3DBackground: state.button3DBackground,
-                             incidenceOfLight: state.incidenceOfLight,
-                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                 .atriumview
-                         )
-                     )*/
                     .font(.system(size: 14, weight: .medium)) // Schrift für alle einheitlich
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
@@ -2354,6 +2332,40 @@ extension Home {
         }
 
         // MARK: - Hilfsfunktionen
+
+        private var BluetoothConnectionView: some View {
+            Group {
+                let connectionFraction: CGFloat = state.isConnected ? 1.0 : 0.0
+                let connectionColor: Color = state.isConnected ? .white.opacity(0.3) : .green.opacity(0.8)
+
+                HStack {
+                    ZStack {
+                        SmallFillablePieSegmentBluetooth(
+                            pieSegmentViewModel: connectionPieSegmentViewModel,
+                            fillFraction: connectionFraction,
+                            color: connectionColor,
+                            backgroundColor: .blue,
+                            displayText: " ",
+                            symbolSize: 0,
+                            symbol: "cross.vial",
+                            animateProgress: true,
+                            button3D: state.button3D,
+                            button3DBackground: state.button3DBackground,
+                            incidenceOfLight: state.incidenceOfLight,
+                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                                .atriumview
+                        )
+                        .frame(width: 30, height: 30)
+
+                        Image("bluetooth")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40, height: 40)
+                            .offset(x: -1, y: -2)
+                    }
+                }
+            }
+        }
 
         // RESERVOIR
         private func reservoirText(for reservoir: Double) -> String {
@@ -2475,10 +2487,10 @@ extension Home {
                         Image(state.pumpIconOption.rawValue)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 60)
+                            .frame(width: 52)
                     }
 
-                    /*  Text("⇢")
+                    /* Text("⇢")
                      .font(.system(size: 20))
                      .foregroundStyle(Color.white)*/
                 }
@@ -2545,7 +2557,7 @@ extension Home {
                             .frame(width: 40, height: 40)
                             .modifier(BlinkingModifier(shouldBlink: shouldBlink))
 
-                        if state.settingsManager?.settings.insulinBadge == true {
+                        if state.settingsManager?.settings.hideInsulinBadge == true {
                             if concentration.last?.concentration == 1 {
                                 NonStandardInsulin(concentration: 1)
                             } else {
@@ -3000,15 +3012,15 @@ extension Home {
         var chart: some View {
             VStack(spacing: 0) {
                 Group {
+                    pumpTopView
+                        .padding(.top, -15)
+                        .padding(.bottom, 15)
                     switch DanaBarOption(rawValue: state.danaBarOption) ?? .max {
                     case .max:
                         danaBarMax
                             .padding(.vertical, 10)
                     case .min:
                         danaBarMin
-                            .padding(.vertical, 10)
-                    case .icon:
-                        danaBarIcon
                             .padding(.vertical, 10)
                     case .marquee:
                         danaBarMarquee
@@ -3024,7 +3036,7 @@ extension Home {
                         .frame(width: UIScreen.main.bounds.width)
                 }
             }
-            .frame(minHeight: UIScreen.main.bounds.height / 1.62) // Je größer der Wert, desto kleiner der Chart
+            .frame(minHeight: UIScreen.main.bounds.height / 1.58) // Je größer der Wert, desto kleiner der Chart
         }
 
         var tempTargetbar: some View {
