@@ -22,13 +22,23 @@ FASTLANE_KEY = ENV["FASTLANE_KEY"]
 DEVICE_NAME = ENV["DEVICE_NAME"]
 DEVICE_ID = ENV["DEVICE_ID"]
 ENV["FASTLANE_XCODEBUILD_SETTINGS_TIMEOUT"] = "120"
-APP_IDENTIFIER = "ru.artpancreas.#{TEAMID}..FreeAPS"
+
+BUILD_GROUP = ENV.fetch('BUILD_GROUP') { "" }
+APP_IDENTIFIER = ENV.fetch('APP_IDENTIFIER') { "ru.artpancreas.#{TEAMID}.FreeAPS" }
+
+if #{BUILD_GROUP} != ""
+  File.write('../ConfigOverride.xcconfig', "COPYRIGHT_NOTICE = #{BUILD_GROUP}", mode: 'a')
+end
+
+if #{APP_IDENTIFIER} != "ru.artpancreas.#{TEAMID}.FreeAPS"
+  File.write('../ConfigOverride.xcconfig', "BUNDLE_IDENTIFIER = #{APP_IDENTIFIER}", mode: 'a')
+end
 
 platform :ios do
   desc "Build iAPS"
   lane :build_iAPS do
     setup_ci if ENV['CI']
-    
+
     update_project_team(
       path: "#{GITHUB_WORKSPACE}/FreeAPS.xcodeproj",
       teamid: "#{TEAMID}"
@@ -50,7 +60,7 @@ platform :ios do
     increment_build_number(
       xcodeproj: "#{GITHUB_WORKSPACE}/FreeAPS.xcodeproj",
       build_number: current_build_number
-    )      
+    )
     
     match(
       type: "appstore",

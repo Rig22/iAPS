@@ -22,6 +22,7 @@ extension Home {
         @State var displayGlucose = false
         @State var showBolusActiveAlert = false
         @State var displayAutoHistory = false
+        @State var displayDynamicHistory = false
 
         @Namespace var scrollSpace
 
@@ -3158,6 +3159,8 @@ extension Home {
                     .onTapGesture {
                         if state.autoisf {
                             displayAutoHistory.toggle()
+                        } else {
+                            displayDynamicHistory.toggle()
                         }
                     }
                 }
@@ -3313,10 +3316,9 @@ extension Home {
                     )
                     .frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal, 5) // Geringerer horizontaler Padding, da Buttons den Raum ausfüllen
+                .padding(.horizontal, 5)
                 .padding(.bottom, 15)
             }
-            // Rest des Codes bleibt unverändert
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .confirmationDialog("Cancel Profile Override", isPresented: $showCancelAlert) {
                 Button("Cancel Profile Override", role: .destructive) {
@@ -3679,6 +3681,10 @@ extension Home {
                     .ignoresSafeArea(.keyboard)
                     .sheet(isPresented: $displayAutoHistory) {
                         AutoISFHistoryView(units: state.data.units)
+                    }
+                    .sheet(isPresented: $displayDynamicHistory) {
+                        DynamicHistoryView(units: state.data.units)
+                            .environment(\.colorScheme, colorScheme)
                     }
                     .popup(isPresented: state.isStatusPopupPresented, alignment: .center, direction: .bottom) {
                         popup
