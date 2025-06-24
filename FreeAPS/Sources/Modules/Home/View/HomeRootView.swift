@@ -2293,7 +2293,7 @@ extension Home {
                                     Image("infusion") // Alternativ: "ivfluid.bag.fill"
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 30, height: 30)
+                                        .frame(width: 32, height: 32)
                                         .foregroundColor(cannulaColor)
                                         .modifier(BlinkingModifier(shouldBlink: remainingHours <= 1))
                                     Text(displayText)
@@ -2324,7 +2324,7 @@ extension Home {
                             }
                         }
                     }
-                    .font(.system(size: 14, weight: .medium)) // Schrift für alle einheitlich
+                    .font(.system(size: 16, weight: .light, design: .default)) // Schrift für alle einheitlich
                     .foregroundColor(.white)
                     .padding(.horizontal, 12)
                     .dynamicTypeSize(...DynamicTypeSize.xxLarge)
