@@ -1,16 +1,9 @@
-//
-//  PatchPrimingView.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 05/04/2025.
-//
-
-import SwiftUI
 import LoopKitUI
+import SwiftUI
 
 struct PatchPrimingView: View {
     @ObservedObject var viewModel: PatchPrimingViewModel
-    
+
     var body: some View {
         VStack {
             List {
@@ -24,7 +17,7 @@ struct PatchPrimingView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                
+
                 Section {
                     supportImage("fill_reservoir")
                     VStack(alignment: .leading) {
@@ -38,26 +31,35 @@ struct PatchPrimingView: View {
                         HStack(alignment: .top) {
                             Text("3.")
                                 .foregroundStyle(.primary)
-                            Text(LocalizedString("Place the syringe in the patch and pull out 1 to 2 dashes of air.", comment: "Label for prime step 2.3"))
+                            Text(LocalizedString(
+                                "Place the syringe in the patch and pull out 1 to 2 dashes of air.",
+                                comment: "Label for prime step 2.3"
+                            ))
                                 .foregroundStyle(.primary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                         HStack(alignment: .top) {
                             Text("4.")
                                 .foregroundStyle(.primary)
-                            Text(LocalizedString("Fill the patch with insulin. NOTE: A minimum of 70U is required for activation.", comment: "Label for prime step 2.4"))
+                            Text(LocalizedString(
+                                "Fill the patch with insulin. NOTE: A minimum of 70U is required for activation.",
+                                comment: "Label for prime step 2.4"
+                            ))
                                 .foregroundStyle(.primary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                 }
-                
+
                 Section {
                     supportImage("half_press_needle_button")
                     HStack(alignment: .top) {
                         Text("5.")
                             .foregroundStyle(.primary)
-                        Text(LocalizedString("Press the needle button and start the priming process.", comment: "Label for pressing needle button step 2.5"))
+                        Text(LocalizedString(
+                            "Press the needle button and start the priming process.",
+                            comment: "Label for pressing needle button step 2.5"
+                        ))
                             .foregroundStyle(.primary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -74,6 +76,14 @@ struct PatchPrimingView: View {
                 ProgressView(progress: viewModel.primeProgress)
                     .padding(.horizontal)
             }
+
+            Button(action: { viewModel.previousStep() }) {
+                Text(LocalizedString("Go back to pump base", comment: "label for go to pump base patch"))
+            }
+            .buttonStyle(ActionButtonStyle(.secondary))
+            .disabled(viewModel.isPriming)
+            .padding(.horizontal)
+
             Button(action: { viewModel.startPrime() }) {
                 if viewModel.isPriming {
                     ActivityIndicator(isAnimating: .constant(true), style: .medium)
@@ -87,11 +97,11 @@ struct PatchPrimingView: View {
         }
         .listStyle(InsetGroupedListStyle())
         .edgesIgnoringSafeArea(.bottom)
+        .navigationBarBackButtonHidden(viewModel.isPriming)
         .navigationTitle(LocalizedString("Patch priming", comment: "Priming header"))
     }
-    
-    @ViewBuilder
-    func supportImage(_ imageName: String) -> some View {
+
+    @ViewBuilder func supportImage(_ imageName: String) -> some View {
         HStack {
             Spacer()
             Image(uiImage: UIImage(named: imageName, in: Bundle(for: MedtrumKitHUDProvider.self), compatibleWith: nil)!)

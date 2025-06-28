@@ -1,51 +1,46 @@
-//
-//  InsulinTypeSelector.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 27/03/2025.
-//
-
-import SwiftUI
 import LoopKit
 import LoopKitUI
+import SwiftUI
 
 struct InsulinTypeSelector: View {
     @Environment(\.dismissAction) private var dismiss
-    
+
     @State private var insulinType: InsulinType?
     private var supportedInsulinTypes: [InsulinType]
     private var didConfirm: (InsulinType) -> Void
-    
+
     init(initialValue: InsulinType, supportedInsulinTypes: [InsulinType], didConfirm: @escaping (InsulinType) -> Void) {
-        self._insulinType = State(initialValue: initialValue)
+        _insulinType = State(initialValue: initialValue)
         self.supportedInsulinTypes = supportedInsulinTypes
         self.didConfirm = didConfirm
     }
-    
+
     func continueWithType(_ insulinType: InsulinType?) {
         guard let insulinType = insulinType else {
             return
         }
-        
+
         didConfirm(insulinType)
     }
-    
+
     var body: some View {
         VStack(alignment: .leading) {
             List {
                 Section {
-                    Text(LocalizedString("Select the type of insulin that you will be using", comment: "Title text for insulin type confirmation page"))
-                    
+                    Text(LocalizedString(
+                        "Select the type of insulin that you will be using",
+                        comment: "Title text for insulin type confirmation page"
+                    ))
+
                     ScrollView {
                         InsulinTypeChooser(insulinType: $insulinType, supportedInsulinTypes: supportedInsulinTypes)
                             .padding(.horizontal)
                     }
                 }
             }
-            
-            
+
             Spacer()
-            
+
             Button(action: { self.continueWithType(insulinType) }) {
                 Text(LocalizedString("Continue", comment: "Continue"))
             }

@@ -1,29 +1,25 @@
-//
-//  PatchDeactivationView.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 04/04/2025.
-//
-
-import SwiftUI
 import LoopKitUI
+import SwiftUI
 
 struct PatchDeactivationView: View {
     @ObservedObject var viewModel: DeactivatePatchViewModel
-    
+
     var body: some View {
         VStack {
             List {
                 Section {
                     PumpImage(is300u: viewModel.is300u)
-                    Text(LocalizedString("When clicking on the button, you will get a Biometrics prompt. Once completed, the patch will be deactivated and you will be prompted to pair a new patch.", comment: "Instructions for deactivate patch"))
+                    Text(LocalizedString(
+                        "When clicking on the button, you will get a Biometrics prompt. Once completed, the patch will be deactivated and you will be prompted to pair a new patch.",
+                        comment: "Instructions for deactivate patch"
+                    ))
                 }
             }
             Spacer()
-            
+
             Text(viewModel.deactivationError)
                 .foregroundStyle(.red)
-            
+
             Button(action: { viewModel.deactivate() }) {
                 if viewModel.isDeactivating {
                     ActivityIndicator(isAnimating: .constant(true), style: .medium)

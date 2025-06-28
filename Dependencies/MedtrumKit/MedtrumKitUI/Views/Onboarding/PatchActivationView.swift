@@ -1,16 +1,9 @@
-//
-//  PatchActivationView.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 05/04/2025.
-//
-
-import SwiftUI
 import LoopKitUI
+import SwiftUI
 
 struct PatchActivationView: View {
     @ObservedObject var viewModel: PatchActivationViewModel
-    
+
     var body: some View {
         VStack {
             List {
@@ -19,12 +12,15 @@ struct PatchActivationView: View {
                     HStack(alignment: .top) {
                         Text("6.")
                             .foregroundStyle(.primary)
-                        Text(LocalizedString("Remove the safety cover from the patch.", comment: "Label for inserting needle step 1"))
+                        Text(LocalizedString(
+                            "Remove the safety cover from the patch.",
+                            comment: "Label for inserting needle step 1"
+                        ))
                             .foregroundStyle(.primary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                
+
                 Section {
                     supportImage("attach_body")
                     HStack(alignment: .top) {
@@ -35,13 +31,16 @@ struct PatchActivationView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
                 }
-                
+
                 Section {
                     supportImage("needle_insert")
                     HStack(alignment: .top) {
                         Text("8.")
                             .foregroundStyle(.primary)
-                        Text(LocalizedString("Press the needle button to insert the needle. Click on \"Activate\" to complete the activation process.", comment: "Label for inserting needle step 3"))
+                        Text(LocalizedString(
+                            "Press the needle button to insert the needle. Click on \"Activate\" to complete the activation process.",
+                            comment: "Label for inserting needle step 3"
+                        ))
                             .foregroundStyle(.primary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -52,6 +51,14 @@ struct PatchActivationView: View {
                 Text(viewModel.activationError)
                     .foregroundStyle(.red)
             }
+
+            Button(action: { viewModel.previousStep() }) {
+                Text(LocalizedString("Go back to priming", comment: "label for go to prime patch"))
+            }
+            .buttonStyle(ActionButtonStyle(.secondary))
+            .disabled(viewModel.isActivating)
+            .padding(.horizontal)
+
             Button(action: { viewModel.activate() }) {
                 if viewModel.isActivating {
                     ActivityIndicator(isAnimating: .constant(true), style: .medium)
@@ -67,9 +74,8 @@ struct PatchActivationView: View {
         .edgesIgnoringSafeArea(.bottom)
         .navigationTitle(LocalizedString("Patch activation", comment: "Patch activation header"))
     }
-    
-    @ViewBuilder
-    func supportImage(_ imageName: String) -> some View {
+
+    @ViewBuilder func supportImage(_ imageName: String) -> some View {
         HStack {
             Spacer()
             Image(uiImage: UIImage(named: imageName, in: Bundle(for: MedtrumKitHUDProvider.self), compatibleWith: nil)!)

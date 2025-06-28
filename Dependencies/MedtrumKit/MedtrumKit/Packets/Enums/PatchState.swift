@@ -1,10 +1,3 @@
-//
-//  PatchState.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 11/03/2025.
-//
-
 public enum PatchState: UInt8, Codable {
     case none = 0
     case idle = 1
@@ -31,7 +24,7 @@ public enum PatchState: UInt8, Codable {
     case batteryOut = 102
     case noCalibration = 103
     case stopped = 128
-    
+
     var description: String {
         switch self {
         case .none:
@@ -48,9 +41,11 @@ public enum PatchState: UInt8, Codable {
             return LocalizedString("Ejecting", comment: "Patch state for ejecting")
         case .ejected:
             return LocalizedString("Ejected", comment: "Patch state for ejected")
-        case .active, .active_alt:
+        case .active,
+             .active_alt:
             return LocalizedString("Active", comment: "Patch state for active, active_alt")
-        case .lowBgSuspended, .lowBgSuspended2:
+        case .lowBgSuspended,
+             .lowBgSuspended2:
             return LocalizedString("Suspended - Low BG", comment: "Patch state for lowBgSuspended, lowBgSuspended2")
         case .autoSuspended:
             return LocalizedString("Suspended - Auto", comment: "Patch state for autoSuspended")
@@ -68,7 +63,9 @@ public enum PatchState: UInt8, Codable {
             return LocalizedString("Expired", comment: "Patch state for expired")
         case .reservoirEmpty:
             return LocalizedString("Reservoir empty", comment: "Patch state for reservoirEmpty")
-        case .patchFault, .patchFaultd2, .baseFault:
+        case .baseFault,
+             .patchFault,
+             .patchFaultd2:
             return LocalizedString("Fault", comment: "Patch state for patchFault, patchFaultd2, baseFault")
         case .batteryOut:
             return LocalizedString("Battery empty", comment: "Patch state for batteryOut")

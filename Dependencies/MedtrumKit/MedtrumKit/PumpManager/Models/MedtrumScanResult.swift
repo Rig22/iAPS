@@ -1,10 +1,3 @@
-//
-//  ScanResult.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 25/02/2025.
-//
-
 import CoreBluetooth
 
 public enum MedtrumScanResult {
@@ -14,12 +7,15 @@ public enum MedtrumScanResult {
 
 public enum MedtrumScanError: LocalizedError {
     case invalidBluetoothState(state: CBManagerState)
+    case noSerialNumberAvailable
     case alreadyScanning
-    
+
     public var errorDescription: String? {
         switch self {
-        case .invalidBluetoothState(state: let state):
+        case let .invalidBluetoothState(state: state):
             return "Invalid Bluetooth state: \(state)"
+        case .noSerialNumberAvailable:
+            return "No Serial number setup. Please complete activation flow..."
         case .alreadyScanning:
             return "Already scanning"
         }

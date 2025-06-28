@@ -1,10 +1,3 @@
-//
-//  ReservoirView.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 23/03/2025.
-//
-
 import LoopKit
 import SwiftUI
 
@@ -23,11 +16,13 @@ struct ReservoirView: View {
         if frameAspectRatio > reservoirAspectRatio {
             return CGSize(
                 width: frame.height * reservoirAspectRatio,
-                height: frame.height)
+                height: frame.height
+            )
         } else {
             return CGSize(
                 width: frame.width,
-                height: frame.width / reservoirAspectRatio)
+                height: frame.width / reservoirAspectRatio
+            )
         }
     }
 
@@ -45,14 +40,24 @@ struct ReservoirView: View {
                 Rectangle()
                     .fill(fillColor)
                     .mask(
-                        Image(uiImage: UIImage(named: "\(reservoirName)_mask", in: Bundle(for: MedtrumKitHUDProvider.self), compatibleWith: nil)!)
+                        Image(uiImage: UIImage(
+                            named: "\(reservoirName)_mask",
+                            in: Bundle(for: MedtrumKitHUDProvider.self),
+                            compatibleWith: nil
+                        )!)
                             .resizable()
                             .scaledToFit()
                             .frame(height: maskHeight)
-                            .position(x:frameCenterX, y:frameCenterY+maskOffset)
+                            .position(x: frameCenterX, y: frameCenterY + maskOffset)
                     )
                     .mask(
-                        Rectangle().path(in: CGRect(x:0, y: frameCenterY+maskHeight/2 - fillHeight + maskOffset, width: geometry.size.width, height: fillHeight))
+                        Rectangle()
+                            .path(in: CGRect(
+                                x: 0,
+                                y: frameCenterY + maskHeight / 2 - fillHeight + maskOffset,
+                                width: geometry.size.width,
+                                height: fillHeight
+                            ))
                     )
             }
             Image(uiImage: UIImage(named: reservoirName, in: Bundle(for: MedtrumKitHUDProvider.self), compatibleWith: nil)!)

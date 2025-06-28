@@ -82,7 +82,11 @@ extension MedtrumPumpManager: PumpManagerUI {
     }
 
     public var smallImage: UIImage? {
-        UIImage(named: self.state.pumpName.contains("300u") ? "nano300" : "nano200", in: Bundle(for: MedtrumKitHUDProvider.self), compatibleWith: nil)
+        UIImage(
+            named: state.pumpName.contains("300u") ? "nano300" : "nano200",
+            in: Bundle(for: MedtrumKitHUDProvider.self),
+            compatibleWith: nil
+        )
     }
 
     public var pumpStatusHighlight: DeviceStatusHighlight? {
@@ -90,19 +94,28 @@ extension MedtrumPumpManager: PumpManagerUI {
             return PumpStatusHighlight(
                 localizedMessage: LocalizedString("No Insulin", comment: "Status highlight that a pump is out of insulin."),
                 imageName: "exclamationmark.circle.fill",
-                state: .critical)
-        } else if self.state.basalState == .suspended {
+                state: .critical
+            )
+        } else if state.basalState == .suspended {
             return PumpStatusHighlight(
-                localizedMessage: LocalizedString("Insulin Suspended", comment: "Status highlight that insulin delivery was suspended."),
+                localizedMessage: LocalizedString(
+                    "Insulin Suspended",
+                    comment: "Status highlight that insulin delivery was suspended."
+                ),
                 imageName: "pause.circle.fill",
-                state: .warning)
+                state: .warning
+            )
         } else if Date.now.timeIntervalSince(state.lastSync) > .minutes(12) {
             return PumpStatusHighlight(
-                localizedMessage: LocalizedString("Signal Loss", comment: "Status highlight when communications with the patch haven't happened recently."),
+                localizedMessage: LocalizedString(
+                    "Signal Loss",
+                    comment: "Status highlight when communications with the patch haven't happened recently."
+                ),
                 imageName: "exclamationmark.circle.fill",
-                state: .critical)
+                state: .critical
+            )
         }
-        
+
         return nil
     }
 

@@ -1,10 +1,3 @@
-//
-//  NotificationPacket.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 13/04/2025.
-//
-
 struct SynchronizePacketResponse: Codable {
     let state: PatchState
     var suspendTime: Date?
@@ -62,27 +55,26 @@ let MASK_UNUSED_COMMAND_CONFIRM: UInt16 = 0x2000
 let MASK_UNUSED_AUTO_STATUS: UInt16 = 0x4000
 let MASK_UNUSED_LEGACY: UInt16 = 0x8000
 
-class NotificationPacket : MedtrumBasePacket, MedtrumBasePacketProtocol {
-    
+class NotificationPacket: MedtrumBasePacket, MedtrumBasePacketProtocol {
     typealias T = SynchronizePacketResponse
-    
+
     let commandType: UInt8 = CommandType.SYNCHRONIZE
-    
+
     func getRequestBytes() -> Data {
-        return Data()
+        Data()
     }
-    
+
     func parseResponse() -> SynchronizePacketResponse {
-        return handle(
+        handle(
             state: PatchState(rawValue: totalData[0]) ?? .none,
-            fieldMask: UInt16(totalData.subdata(in: 1..<3).toUInt64()),
-            syncData: totalData.subdata(in: 3..<totalData.count)
+            fieldMask: UInt16(totalData.subdata(in: 1 ..< 3).toUInt64()),
+            syncData: Data(totalData.dropFirst(3))
         )
     }
-    
+
     public func handle(state: PatchState, fieldMask: UInt16, syncData: Data) -> SynchronizePacketResponse {
         var offset = 0
-        
+
         var output = SynchronizePacketResponse(
             state: state,
             suspendTime: nil,
@@ -97,113 +89,112 @@ class NotificationPacket : MedtrumBasePacket, MedtrumBasePacketProtocol {
             patchAge: nil,
             magnetoPlacement: nil
         )
-        
+
         // Proces masks
         for (mask, handler) in maskHandlers.sorted(by: { $0.key < $1.key }) {
             if fieldMask & mask != 0 {
                 offset = handler(syncData, offset, &output)
             }
         }
-        
+
         return output
     }
-    
-    private let maskHandlers: Dictionary<UInt16, (Data, Int, inout SynchronizePacketResponse) -> Int> = [
-        MASK_SUSPEND: { (data, offset, output) in
-            output.suspendTime = Date.fromMedtrumSeconds(data.subdata(in: offset..<offset+4).toUInt64())
+
+    private let maskHandlers: [UInt16: (Data, Int, inout SynchronizePacketResponse) -> Int] = [
+        MASK_SUSPEND: { data, offset, output in
+            output.suspendTime = Date.fromMedtrumSeconds(data.subdata(in: offset ..< offset + 4).toUInt64())
             return offset + 4
         },
-        MASK_NORMAL_BOLUS: { (data, offset, output) in
+        MASK_NORMAL_BOLUS: { data, offset, output in
             output.bolus = BolusData(
                 type: data[offset] & 0x7F,
                 completed: data[offset] & 0x80 != 0,
-                delivered: data.subdata(in: offset+1..<offset+3).toDouble()*0.05
+                delivered: data.subdata(in: offset + 1 ..< offset + 3).toDouble() * 0.05
             )
             return offset + 3
         },
-        MASK_EXTENDED_BOLUS: { (data, offset, output) in
+        MASK_EXTENDED_BOLUS: { _, offset, _ in
             // Just ignore this flag
-                return offset + 3
+            offset + 3
         },
-        MASK_BASAL: { (data, offset, output) in
-            let rateDelivery = UInt32(data.subdata(in: offset+9..<offset+12).toDouble())
+        MASK_BASAL: { data, offset, output in
+            let rateDelivery = UInt32(data.subdata(in: offset + 9 ..< offset + 12).toDouble())
             let delivery = rateDelivery >> 12
             let rate = rateDelivery & 0x0FFF
-            
+
             output.basal = BasalData(
                 type: BasalType(rawValue: data[offset]) ?? .NONE,
-                sequence: data.subdata(in: offset+1..<offset+3).toDouble(),
-                patchId: data.subdata(in: offset+3..<offset+5).toDouble(),
-                startTime: Date.fromMedtrumSeconds(data.subdata(in: offset+5..<offset+9).toUInt64()),
+                sequence: data.subdata(in: offset + 1 ..< offset + 3).toDouble(),
+                patchId: data.subdata(in: offset + 3 ..< offset + 5).toDouble(),
+                startTime: Date.fromMedtrumSeconds(data.subdata(in: offset + 5 ..< offset + 9).toUInt64()),
                 rate: Double(rate) * 0.05,
                 delivery: Double(delivery) * 0.05
             )
-            
+
             return offset + 12
         },
-        MASK_SETUP: { (data, offset, output) in
+        MASK_SETUP: { data, offset, output in
             output.primeProgress = data[offset]
             return offset + 1
         },
-        MASK_RESERVOIR:{ (data, offset, output) in
-            output.reservoir = data.subdata(in: offset..<offset+2).toDouble() * 0.05
+        MASK_RESERVOIR: { data, offset, output in
+            output.reservoir = data.subdata(in: offset ..< offset + 2).toDouble() * 0.05
             return offset + 2
         },
-        MASK_START_TIME: { (data, offset, output) in
-            output.startTime = Date.fromMedtrumSeconds(data.subdata(in: offset..<offset+4).toUInt64())
+        MASK_START_TIME: { data, offset, output in
+            output.startTime = Date.fromMedtrumSeconds(data.subdata(in: offset ..< offset + 4).toUInt64())
             return offset + 4
         },
-        MASK_BATTERY: { (data, offset, output) in
-            let value = UInt32(data.subdata(in: offset..<offset+3).toUInt64())
-            
+        MASK_BATTERY: { data, offset, output in
+            let value = UInt32(data.subdata(in: offset ..< offset + 3).toUInt64())
+
             output.battery = BatteryData(
                 voltageA: Double(value & 0x0FFF) / 512,
                 voltageB: Double(value >> 12) / 512
             )
             return offset + 3
         },
-        MASK_STORAGE: { (data, offset, output) in
+        MASK_STORAGE: { data, offset, output in
             output.storage = StorageData(
-                sequence: data.subdata(in: offset..<offset+2).toDouble(),
-                patchId: data.subdata(in: offset+2..<offset+4).toDouble()
+                sequence: data.subdata(in: offset ..< offset + 2).toDouble(),
+                patchId: data.subdata(in: offset + 2 ..< offset + 4).toDouble()
             )
             return offset + 4
         },
-        MASK_ALARM: { (data, offset, output) in
-            let flags = UInt16(data.subdata(in: offset..<offset+2).toUInt64())
+        MASK_ALARM: { data, offset, output in
+            let flags = UInt16(data.subdata(in: offset ..< offset + 2).toUInt64())
             if flags != AlarmState.None.rawValue {
                 // Alarms list available, only need to check the first 3
-                for i in 0..<3 {
+                for i in 0 ..< 3 {
                     if flags & (1 << i) != 0, let alarmState = AlarmState(rawValue: 1 << i) {
                         output.activeAlarms.append(alarmState)
                     }
-                    
                 }
             }
-            
+
             // Unused parameter
-            let _parameter = data.subdata(in: offset+2..<offset+4)
+            let _parameter = data.subdata(in: offset + 2 ..< offset + 4)
             return offset + 4
         },
-        MASK_AGE: { (data, offset, output) in
-            output.patchAge = data.subdata(in: offset..<offset+4).toUInt64()
+        MASK_AGE: { data, offset, output in
+            output.patchAge = data.subdata(in: offset ..< offset + 4).toUInt64()
             return offset + 4
         },
-        MASK_MAGNETO_PLACE: { (data, offset, output) in
-            output.magnetoPlacement = data.subdata(in: offset..<offset+2).toDouble()
+        MASK_MAGNETO_PLACE: { data, offset, output in
+            output.magnetoPlacement = data.subdata(in: offset ..< offset + 2).toDouble()
             return offset + 2
         },
-        MASK_UNUSED_CGM: { (data, offset, output) in
-            return offset + 5
+        MASK_UNUSED_CGM: { _, offset, _ in
+            offset + 5
         },
-        MASK_UNUSED_COMMAND_CONFIRM: { (data, offset, output) in
-            return offset + 2
+        MASK_UNUSED_COMMAND_CONFIRM: { _, offset, _ in
+            offset + 2
         },
-        MASK_UNUSED_AUTO_STATUS: { (data, offset, output) in
-            return offset + 2
+        MASK_UNUSED_AUTO_STATUS: { _, offset, _ in
+            offset + 2
         },
-        MASK_UNUSED_LEGACY: { (data, offset, output) in
-            return offset + 2
-        },
+        MASK_UNUSED_LEGACY: { _, offset, _ in
+            offset + 2
+        }
     ]
 }

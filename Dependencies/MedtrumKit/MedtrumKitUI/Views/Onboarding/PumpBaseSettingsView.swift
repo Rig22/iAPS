@@ -1,16 +1,12 @@
-//
-//  PumpBaseSettingsView.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 05/04/2025.
-//
-
-import SwiftUI
 import LoopKitUI
+import SwiftUI
 
 struct PumpBaseSettingsView: View {
+    @State private var isShowingDeleteConfirmation: Bool = false
     @ObservedObject var viewModel: PumpBaseSettingsViewModel
-    
+
+    @Environment(\.guidanceColors) private var guidanceColors
+
     var body: some View {
         VStack {
             List {
@@ -24,7 +20,10 @@ struct PumpBaseSettingsView: View {
                             TextField("1234ABCD", text: $viewModel.serialNumber)
                                 .multilineTextAlignment(.trailing)
                         }
-                        Text(LocalizedString("Make sure the Serial Number is correct before connecting it to the patch.", comment: "Label for checking SN"))
+                        Text(LocalizedString(
+                            "Make sure the Serial Number is correct before connecting it to the patch.",
+                            comment: "Label for checking SN"
+                        ))
                             .padding(.top, 10)
                             .foregroundStyle(.primary)
                     }
@@ -35,6 +34,7 @@ struct PumpBaseSettingsView: View {
                 Text(viewModel.errorMessage)
                     .foregroundStyle(.red)
             }
+
             Button(action: { viewModel.saveAndContinue() }) {
                 Text(LocalizedString("Save and continue", comment: "save and continue"))
             }
@@ -45,5 +45,18 @@ struct PumpBaseSettingsView: View {
         .listStyle(InsetGroupedListStyle())
         .edgesIgnoringSafeArea(.bottom)
         .navigationTitle(LocalizedString("Pump base settings", comment: "Pump base settings header"))
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: {
+                    isShowingDeleteConfirmation = true
+                }) {
+                    Text(LocalizedString("Delete Pump", comment: "Label for PumpManager deletion button"))
+                        .foregroundStyle(guidanceColors.critical)
+                }
+                .actionSheet(isPresented: $isShowingDeleteConfirmation) {
+                    removePumpManagerActionSheet(deleteAction: viewModel.pumpRemovalAction)
+                }
+            }
+        }
     }
 }

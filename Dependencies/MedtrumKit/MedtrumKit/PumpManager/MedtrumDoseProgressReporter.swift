@@ -1,18 +1,11 @@
-//
-//  MedtrumDoseProgressReporter.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 17/03/2025.
-//
-
 import Foundation
 import LoopKit
 
 class MedtrumDoseProgressReporter: DoseProgressReporter {
     var progress: DoseProgress {
-        return DoseProgress(deliveredUnits: self.deliveredUnits, percentComplete: self.deliveredUnits / self.total)
+        DoseProgress(deliveredUnits: deliveredUnits, percentComplete: deliveredUnits / total)
     }
-    
+
     private var observers = WeakSet<DoseProgressObserver>()
 
     private let total: Double
@@ -32,7 +25,7 @@ class MedtrumDoseProgressReporter: DoseProgressReporter {
 
     public func notify(deliveredUnits: Double) {
         self.deliveredUnits = deliveredUnits
-        
+
         DispatchQueue.main.async {
             for observer in self.observers {
                 observer.doseProgressReporterDidUpdate(self)

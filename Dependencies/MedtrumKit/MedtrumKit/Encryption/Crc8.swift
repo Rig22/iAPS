@@ -1,21 +1,14 @@
-//
-//  Crc8.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 27/02/2025.
-//
-
-class Crc8 {
+enum Crc8 {
     public static func calculate(_ data: Data) -> Data {
         var crc8: UInt8 = 0
-        for i in 0..<data.count {
+        for i in 0 ..< data.count {
             let tableIndex = Int(data[i] ^ crc8)
             crc8 = lookupTable[tableIndex]
         }
-        
+
         return Data([crc8])
     }
-    
+
     private static let lookupTable: [UInt8] = [
         0,
         155,

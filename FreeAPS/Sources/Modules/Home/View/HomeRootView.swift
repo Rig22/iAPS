@@ -1801,7 +1801,7 @@ extension Home {
                     if state.button3DBackground {
                         Circle()
                             .fill(Color.black.opacity(0.2))
-                            .frame(width: 40, height: 40)
+                            .frame(width: 50, height: 50)
                             .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
                     }
 
@@ -1820,11 +1820,11 @@ extension Home {
                             ),
                             lineWidth: 1
                         )
-                        .frame(width: 40, height: 40)
+                        .frame(width: 50, height: 50)
                 } else {
                     Circle()
                         .fill(Color.black.opacity(0.2))
-                        .frame(width: 40, height: 40)
+                        .frame(width: 50, height: 50)
                         .overlay(
                             Circle()
                                 .stroke(Color.white, lineWidth: 0)

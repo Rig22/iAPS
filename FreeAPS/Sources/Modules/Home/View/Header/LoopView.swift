@@ -51,12 +51,12 @@ struct FillablePieSegment: View {
     @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
     var fillFraction: CGFloat
-    // var color: Color
+    var color: Color
     var backgroundColor: Color
     var displayText: String
     var animateProgress: Bool
 
-    let color = Color(
+    let color2 = Color(
         red: 110 / 255,
         green: 97 / 255,
         blue: 232 / 255,
@@ -71,7 +71,7 @@ struct FillablePieSegment: View {
                     endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                 )
                 .fill(color)
-                .frame(width: 40, height: 40)
+                .frame(width: 50, height: 50)
                 .opacity(1.0)
             }
 
@@ -121,12 +121,23 @@ struct LoopView: View {
                 FillablePieSegment(
                     pieSegmentViewModel: pieSegmentViewModel,
                     fillFraction: min(CGFloat(minutesAgo) / 5.0, 1.0),
-                    // color: pieColor,
+                    color: pieColor,
                     backgroundColor: .clear,
                     // displayText: minutesAgo == 0 ? "< 1 min" : "\(minutesAgo) min",
                     displayText: "\(minutesAgo)min",
                     animateProgress: true
                 )
+
+                Circle()
+                    .fill(
+                        Color(
+                            red: 110 / 255,
+                            green: 97 / 255,
+                            blue: 232 / 255
+                        )
+                    )
+                    .frame(width: 35, height: 35)
+
                 Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
                     .font(.system(size: 14))
                     .foregroundColor(.white)
@@ -138,7 +149,7 @@ struct LoopView: View {
                 if isLooping {
                     Circle()
                         .fill(Color.darkerGray.opacity(0.5))
-                        .frame(width: 44, height: 44)
+                        .frame(width: 50, height: 50)
                         .transition(.opacity)
                 }
 
@@ -171,7 +182,7 @@ struct LoopView: View {
                         angle: .degrees(gradientOffset)
                     )
                 )
-                .frame(width: 40, height: 40)
+                .frame(width: 50, height: 50)
                 .scaleEffect(scale)
                 .onAppear {
                     /* withAnimation(
@@ -215,17 +226,30 @@ struct LoopView: View {
         return Int(elapsedSeconds / 60) // Wechselt bei exakt 60 Sekunden auf 1 Minute
     }
 
+    /*   private var pieColor: Color {
+         let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
+
+         if delta < 1.minutes.timeInterval {
+             return .clear // unter 1 Minute
+         } else if delta <= 6.minutes.timeInterval {
+             return .clear // grün für 1-5 Minuten
+         } else if delta < 10.minutes.timeInterval {
+             return .clear // Gelb für 6-9 Minuten
+         } else {
+             return .clear // Rot ab Minute 10
+         }
+     }*/
     private var pieColor: Color {
         let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
 
         if delta < 1.minutes.timeInterval {
-            return .clear // unter 1 Minute
+            return .white.opacity(0.4) // unter 1 Minute
         } else if delta <= 6.minutes.timeInterval {
-            return .clear // grün für 1-5 Minuten
+            return .white.opacity(0.4) // grün für 1-5 Minuten
         } else if delta < 10.minutes.timeInterval {
-            return .clear // Gelb für 6-9 Minuten
+            return .white.opacity(0.4) // Gelb für 6-9 Minuten
         } else {
-            return .clear // Rot ab Minute 10
+            return .white.opacity(0.4) // Rot ab Minute 10
         }
     }
 

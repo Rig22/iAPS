@@ -1,10 +1,3 @@
-//
-//  MedtrumActivatePatchResult.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 21/03/2025.
-//
-
 public enum MedtrumDeactivatePatchResult {
     case success
     case failure(error: MedtrumDeactivatePatchError)

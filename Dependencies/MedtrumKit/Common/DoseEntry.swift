@@ -1,18 +1,18 @@
-//
-//  DoseEntry.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 17/03/2025.
-//
-
 import Foundation
 import LoopKit
 
-extension DoseEntry {
-    public static func bolus(units: Double, deliveredUnits: Double, duration: TimeInterval, activationType: BolusActivationType, insulinType: InsulinType, startDate: Date = Date.now) -> DoseEntry {
+public extension DoseEntry {
+    static func bolus(
+        units: Double,
+        deliveredUnits: Double,
+        duration: TimeInterval,
+        activationType: BolusActivationType,
+        insulinType: InsulinType,
+        startDate: Date = Date.now
+    ) -> DoseEntry {
         var endTime = Date.now
         endTime.addTimeInterval(duration)
-        
+
         return DoseEntry(
             type: .bolus,
             startDate: startDate,
@@ -26,9 +26,14 @@ extension DoseEntry {
             isMutable: false
         )
     }
-    
-    public static func tempBasal(absoluteUnit: Double, duration: TimeInterval, insulinType: InsulinType, startDate: Date = Date.now) -> DoseEntry {
-        return DoseEntry(
+
+    static func tempBasal(
+        absoluteUnit: Double,
+        duration: TimeInterval,
+        insulinType: InsulinType,
+        startDate: Date = Date.now
+    ) -> DoseEntry {
+        DoseEntry(
             type: .tempBasal,
             startDate: startDate,
             endDate: startDate + duration,
@@ -37,9 +42,9 @@ extension DoseEntry {
             insulinType: insulinType
         )
     }
-    
-    public static func basal(rate: Double, insulinType: InsulinType, startDate: Date = Date.now) -> DoseEntry {
-        return DoseEntry(
+
+    static func basal(rate: Double, insulinType: InsulinType, startDate: Date = Date.now) -> DoseEntry {
+        DoseEntry(
             type: .basal,
             startDate: startDate,
             value: rate,
@@ -47,15 +52,15 @@ extension DoseEntry {
             insulinType: insulinType
         )
     }
-    
-    public static func resume(insulinType: InsulinType, resumeDate: Date = Date.now) -> DoseEntry {
-        return DoseEntry(
+
+    static func resume(insulinType: InsulinType, resumeDate: Date = Date.now) -> DoseEntry {
+        DoseEntry(
             resumeDate: resumeDate,
             insulinType: insulinType
         )
     }
-    
-    public static func suspend(suspendDate: Date = Date.now) -> DoseEntry {
-        return DoseEntry(suspendDate: suspendDate)
+
+    static func suspend(suspendDate: Date = Date.now) -> DoseEntry {
+        DoseEntry(suspendDate: suspendDate)
     }
 }

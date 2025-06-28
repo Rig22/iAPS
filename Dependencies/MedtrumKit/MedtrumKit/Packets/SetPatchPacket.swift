@@ -1,16 +1,9 @@
-//
-//  SetPatchPacket.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 11/03/2025.
-//
-
 struct SetPatchResponse {}
 
-class SetPatchPacket : MedtrumBasePacket, MedtrumBasePacketProtocol {
+class SetPatchPacket: MedtrumBasePacket, MedtrumBasePacketProtocol {
     typealias T = SetPatchResponse
     let commandType: UInt8 = CommandType.SET_PATCH
-    
+
     let alarmSettings: AlarmSettings
     let hourlyMaxInsulin: Double
     let dailyMaxInsulin: Double
@@ -20,14 +13,14 @@ class SetPatchPacket : MedtrumBasePacket, MedtrumBasePacketProtocol {
     let lowSuspend: UInt8 = 0
     let predictiveLowSuspend: UInt8 = 0
     let predictiveLowSuspendRange: UInt8 = 30
-    
+
     init(alarmSettings: AlarmSettings, hourlyMaxInsulin: Double, dailyMaxInsulin: Double, expirationTimer: UInt8) {
         self.alarmSettings = alarmSettings
         self.hourlyMaxInsulin = hourlyMaxInsulin
         self.dailyMaxInsulin = dailyMaxInsulin
         self.expirationTimer = expirationTimer
     }
-    
+
     func getRequestBytes() -> Data {
         var base = Data([
             alarmSettings.rawValue
@@ -37,13 +30,13 @@ class SetPatchPacket : MedtrumBasePacket, MedtrumBasePacketProtocol {
             UInt8(calcHourlyInsulin & 0xFF),
             UInt8(calcHourlyInsulin >> 8)
         ]))
-        
+
         let calcDailyMaxInsulin = UInt16(round(dailyMaxInsulin / 0.05))
         base.append(Data([
             UInt8(calcDailyMaxInsulin & 0xFF),
             UInt8(calcDailyMaxInsulin >> 8)
         ]))
-        
+
         base.append(Data([
             expirationTimer,
             autoSuspendEnable,
@@ -52,11 +45,11 @@ class SetPatchPacket : MedtrumBasePacket, MedtrumBasePacketProtocol {
             predictiveLowSuspend,
             predictiveLowSuspendRange
         ]))
-        
+
         return base
     }
-    
+
     func parseResponse() -> SetPatchResponse {
-        return SetPatchResponse()
+        SetPatchResponse()
     }
 }

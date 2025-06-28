@@ -1,11 +1,4 @@
-//
-//  BasalType.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 02/03/2025.
-//
-
-enum BasalType : UInt8, Codable {
+enum BasalType: UInt8, Codable {
     case NONE
     case STANDARD
     case EXERCISE
@@ -48,22 +41,35 @@ enum BasalType : UInt8, Codable {
     case AUTO_MODE_SNACK
     case AUTO_MODE_EXERCISE_START
     case AUTO_MODE_EXERCISE_EXIT
-    
+
     func isTempBasal() -> Bool {
         switch self {
-        case .ABSOLUTE_TEMP, .RELATIVE_TEMP:
+        case .ABSOLUTE_TEMP,
+             .RELATIVE_TEMP:
             return true
         default:
             return false
         }
     }
-    
+
     func isSuspendedByPump() -> Bool {
         switch self {
-        case .SUSPEND_LOW_GLUCOSE, .SUSPEND_PREDICT_LOW_GLUCOSE, .SUSPEND_AUTO, .SUSPEND_MORE_THAN_MAX_PER_HOUR,
-                .SUSPEND_MORE_THAN_MAX_PER_DAY, .SUSPEND_MANUAL, .SUSPEND_KEY_LOST, .STOP_OCCLUSION, .STOP_EXPIRED,
-                .STOP_EMPTY, .STOP_PATCH_FAULT, .STOP_PATCH_FAULT2, .STOP_BASE_FAULT, .STOP_DISCARD, .STOP_BATTERY_EMPTY,
-                .STOP:
+        case .STOP,
+             .STOP_BASE_FAULT,
+             .STOP_BATTERY_EMPTY,
+             .STOP_DISCARD,
+             .STOP_EMPTY,
+             .STOP_EXPIRED,
+             .STOP_OCCLUSION,
+             .STOP_PATCH_FAULT,
+             .STOP_PATCH_FAULT2,
+             .SUSPEND_AUTO,
+             .SUSPEND_KEY_LOST,
+             .SUSPEND_LOW_GLUCOSE,
+             .SUSPEND_MANUAL,
+             .SUSPEND_MORE_THAN_MAX_PER_DAY,
+             .SUSPEND_MORE_THAN_MAX_PER_HOUR,
+             .SUSPEND_PREDICT_LOW_GLUCOSE:
             return true
         default:
             return false

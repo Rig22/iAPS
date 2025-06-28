@@ -1,11 +1,4 @@
-//
-//  OpCodes.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 26/02/2025.
-//
-
-struct CommandType {
+enum CommandType {
     static let SYNCHRONIZE: UInt8 = 3
     static let SUBSCRIBE: UInt8 = 4
     static let AUTH_REQ: UInt8 = 5

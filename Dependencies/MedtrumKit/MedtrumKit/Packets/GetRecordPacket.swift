@@ -1,10 +1,3 @@
-//
-//  GetRecordPacket.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 06/03/2025.
-//
-
 struct GetRecordPacketResponse {
     let header: UInt8
     let unknown: UInt8
@@ -18,31 +11,31 @@ struct GetRecordPacketResponse {
 class GetRecordPacket: MedtrumBasePacket, MedtrumBasePacketProtocol {
     typealias T = GetRecordPacketResponse
     let commandType: UInt8 = CommandType.GET_RECORD
-    
+
     let recordIndex: UInt16
     let patchId: Data
-    
+
     init(recordIndex: UInt16, patchId: Data) {
         self.recordIndex = recordIndex
         self.patchId = patchId
     }
-    
+
     func getRequestBytes() -> Data {
-        return Data([
+        Data([
             UInt8(recordIndex & 0xFF),
             UInt8(recordIndex >> 8)
         ]) + patchId
     }
-    
+
     func parseResponse() -> GetRecordPacketResponse {
-        return GetRecordPacketResponse(
+        GetRecordPacketResponse(
             header: totalData[6],
             unknown: totalData[7],
             type: totalData[8],
             unknown1: totalData[9],
-            serial: totalData.subdata(in: 10..<14),
-            patchId: totalData.subdata(in: 14..<16),
-            sequence: UInt16(totalData.subdata(in: 16..<18).toUInt64())
+            serial: totalData.subdata(in: 10 ..< 14),
+            patchId: totalData.subdata(in: 14 ..< 16),
+            sequence: UInt16(totalData.subdata(in: 16 ..< 18).toUInt64())
         )
     }
 }

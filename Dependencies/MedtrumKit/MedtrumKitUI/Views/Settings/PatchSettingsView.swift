@@ -1,12 +1,5 @@
-//
-//  PatchSettingsView.swift
-//  MedtrumKit
-//
-//  Created by Bastiaan Verhaar on 27/03/2025.
-//
-
-import SwiftUI
 import LoopKitUI
+import SwiftUI
 
 struct PatchSettingsView: View {
     @ObservedObject var viewModel: PatchSettingsViewModel
@@ -15,12 +8,12 @@ struct PatchSettingsView: View {
     @State var isEditingAlarmSetting = false
     @State var isEditingExpirationTimer = false
     @State var isEditingNotificationAfterActivation = false
-    
+
     var doDirtyCheck = true
-    
+
     let unitText = LocalizedString("U", comment: "Insulin unit")
     let hourText = LocalizedString("h", comment: "Hour unit")
-    
+
     var body: some View {
         VStack {
             List {
@@ -29,8 +22,8 @@ struct PatchSettingsView: View {
                         title: LocalizedString("Max hourly insulin", comment: "Label for maximum hourly insulin delivery"),
                         isEditing: isEditingMaxHourly,
                         value: $viewModel.maxHourlyInsulin,
-                        valueRange: (viewModel.is300u ? Array(0...12) : Array(0...8)).map({ Double($0) * 5 }),
-                        formatter: { value in "\(String(format: "%.0f", value)) \(self.unitText)"}
+                        valueRange: (viewModel.is300u ? Array(0 ... 12) : Array(0 ... 8)).map({ Double($0) * 5 }),
+                        formatter: { value in "\(String(format: "%.0f", value)) \(self.unitText)" }
                     )
                     .onTapGesture {
                         withAnimation {
@@ -41,13 +34,13 @@ struct PatchSettingsView: View {
                             self.isEditingNotificationAfterActivation = false
                         }
                     }
-                    
+
                     sectionItem(
                         title: LocalizedString("Max daily insulin", comment: "Label for maximum daily insulin delivery"),
                         isEditing: isEditingMaxDaily,
                         value: $viewModel.maxDailyInsulin,
-                        valueRange: (viewModel.is300u ? Array(0...54) : Array(0...36)).map({ Double($0) * 5 }),
-                        formatter: { value in "\(String(format: "%.0f", value)) \(self.unitText)"}
+                        valueRange: (viewModel.is300u ? Array(0 ... 54) : Array(0 ... 36)).map({ Double($0) * 5 }),
+                        formatter: { value in "\(String(format: "%.0f", value)) \(self.unitText)" }
                     )
                     .onTapGesture {
                         withAnimation {
@@ -58,16 +51,19 @@ struct PatchSettingsView: View {
                             self.isEditingNotificationAfterActivation = false
                         }
                     }
-                    
+
                     sectionItem(
                         title: LocalizedString("Alarm setting", comment: "Label for alarm settings"),
                         isEditing: isEditingAlarmSetting,
                         value: $viewModel.alarmSettings,
                         valueRange: viewModel.alarmOptions,
                         formatter: { value in
-                            switch(value) {
+                            switch value {
                             case 0:
-                                return LocalizedString("Light, vibrate and, beep", comment: "Label for alarm options: light, vibrate and beep")
+                                return LocalizedString(
+                                    "Light, vibrate and, beep",
+                                    comment: "Label for alarm options: light, vibrate and beep"
+                                )
                             case 1:
                                 return LocalizedString("Light and vibrate", comment: "Label for alarm options: light and vibrate")
                             case 2:
@@ -94,16 +90,19 @@ struct PatchSettingsView: View {
                             self.isEditingNotificationAfterActivation = false
                         }
                     }
-                    
+
                     sectionItem(
                         title: LocalizedString("Patch lifetime", comment: "Label for expiration alarm"),
                         isEditing: isEditingExpirationTimer,
                         value: $viewModel.expirationTimer,
-                        valueRange: Array(0...1).map({ Double($0) }),
+                        valueRange: Array(0 ... 1).map({ Double($0) }),
                         formatter: { value in
-                            switch(value) {
+                            switch value {
                             case 0:
-                                return LocalizedString("Use extended lifetime (continue till battery empty)", comment: "Label for extended lifetime")
+                                return LocalizedString(
+                                    "Use extended lifetime (continue till battery empty)",
+                                    comment: "Label for extended lifetime"
+                                )
                             default:
                                 return LocalizedString("Use normal lifetime (3d 8h)", comment: "Label for normal patch lifetime")
                             }
@@ -118,14 +117,17 @@ struct PatchSettingsView: View {
                             self.isEditingNotificationAfterActivation = false
                         }
                     }
-                    
+
                     if viewModel.expirationTimer == 1 {
                         sectionItem(
-                            title: LocalizedString("Notification for expirate patch", comment: "Label for expired patch notification"),
+                            title: LocalizedString(
+                                "Notification for expirate patch",
+                                comment: "Label for expired patch notification"
+                            ),
                             isEditing: isEditingNotificationAfterActivation,
                             value: $viewModel.notificationAfterActivation,
-                            valueRange: Array(60...78).map({ Double($0) }),
-                            formatter: { value in "\(String(format: "%.0f", value)) \(self.hourText)"}
+                            valueRange: Array(60 ... 78).map({ Double($0) }),
+                            formatter: { value in "\(String(format: "%.0f", value)) \(self.hourText)" }
                         )
                         .onTapGesture {
                             withAnimation {
@@ -160,20 +162,26 @@ struct PatchSettingsView: View {
         .edgesIgnoringSafeArea(.bottom)
         .navigationBarTitle(LocalizedString("Patch settings", comment: "Text for patch settings view"))
     }
-    
-    @ViewBuilder
-    func sectionItem(title: String, isEditing: Bool, value: Binding<Double>, valueRange: [Double], formatter: @escaping (Double) -> String) -> some View {
+
+    @ViewBuilder func sectionItem(
+        title: String,
+        isEditing: Bool,
+        value: Binding<Double>,
+        valueRange: [Double],
+        formatter: @escaping (Double) -> String
+    ) -> some View {
         HStack {
             Text(title)
             Spacer()
             Text(formatter(value.wrappedValue))
         }
         .foregroundColor(isEditing ? Color.blue : Color.primary)
-        
+
         if isEditing {
-            ResizeablePicker(selection: value,
-                             data: valueRange,
-                             formatter: { value in formatter(value) }
+            ResizeablePicker(
+                selection: value,
+                data: valueRange,
+                formatter: { value in formatter(value) }
             )
             .padding(.horizontal)
         }
