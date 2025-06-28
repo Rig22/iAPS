@@ -475,7 +475,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.button3D, forKey: .button3D)
         try container.encode(settings.sensorAgeDays, forKey: .sensorAgeDays)
         try container.encodeIfPresent(settings.sensorStartTime, forKey: .sensorStartTime)
-        try container.encode(settings.bolusProgressViewOption, forKey: .bolusProgressViewOption)
+        // try container.encode(settings.bolusProgressViewOption, forKey: .bolusProgressViewOption)
         try container.encode(settings.sensorStartTimeDefault, forKey: .sensorStartTimeDefault)
         try container.encode(settings.incidenceOfLight, forKey: .incidenceOfLight)
         try container.encode(settings.lightGlowOverlaySelector, forKey: .lightGlowOverlaySelector)

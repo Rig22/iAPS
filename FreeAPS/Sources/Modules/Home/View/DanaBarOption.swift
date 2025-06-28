@@ -5,18 +5,16 @@
 //  Created by Richard on 22.06.25.
 //
 enum DanaBarOption: String, CaseIterable, Identifiable {
-    case max = "Dana Bar"
-    case min = "Min"
+    case standard = "Standard"
     case marquee = "Marquee"
-    case simple = "Simple"
+    case max = "Dana Bar"
 
     var id: String { rawValue }
     var previewImageName: String {
         switch self {
-        case .max: return "BarMaxPreview"
-        case .min: return "BarMinPreview"
+        case .standard: return "BarStandardPreview"
         case .marquee: return "BarMarqueePreview"
-        case .simple: return "BarSimplePreview"
+        case .max: return "BarMaxPreview"
         }
     }
 }

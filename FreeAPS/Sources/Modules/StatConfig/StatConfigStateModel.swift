@@ -137,7 +137,7 @@ extension StatConfig {
             subscribeSetting(\.button3D, on: $button3D) { button3D = $0 }
             subscribeSetting(\.sensorAgeDays, on: $sensorAgeDays) { sensorAgeDays = $0 }
             subscribeSetting(\.sensorStartTime, on: $sensorStartTime) { sensorStartTime = $0 }
-            subscribeSetting(\.bolusProgressViewOption, on: $bolusProgressViewOption) { bolusProgressViewOption = $0 }
+            // subscribeSetting(\.bolusProgressViewOption, on: $bolusProgressViewOption) { bolusProgressViewOption = $0 }
             subscribeSetting(\.sensorStartTimeDefault, on: $sensorStartTimeDefault) { sensorStartTimeDefault = $0 }
             subscribeSetting(\.incidenceOfLight, on: $incidenceOfLight) { incidenceOfLight = $0 }
             subscribeSetting(\.lightGlowOverlaySelector, on: $lightGlowOverlaySelector) { lightGlowOverlaySelector = $0 }

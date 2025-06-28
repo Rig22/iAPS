@@ -3079,7 +3079,7 @@ Enact a temp Basal or a temp target */
 "Display Sensor Age" = "Sensoralter anzeigen";
 
 /* UI/UX option */
-"Hide Concentration Badge" = "Insulinkonzentrations ausblenden";
+"Hide Concentration Badge" = "Insulinkonzentration ausblenden";
 
 /* UI/UX option */
 "Use insulin bars" = "Insulinbalken verwenden";

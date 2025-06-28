@@ -98,10 +98,9 @@ extension StatConfig {
 
         private func getDescription(for option: DanaBarOption) -> String {
             switch option {
-            case .max: return "Dana Bar"
-            case .min: return "Minimalistische Ansicht"
-            case .marquee: return "Laufschrift"
-            case .simple: return "Traditionelle Ansicht"
+            case .standard: return "Standard"
+            case .marquee: return "Running Text"
+            case .max: return "For Dana User"
             }
         }
 
@@ -117,6 +116,13 @@ extension StatConfig {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 360, height: 280)
+
+                    if state.showPumpIcon {
+                        Image(state.pumpIconRawValue)
+                            .resizable()
+                            .frame(width: 15, height: 15)
+                            .offset(x: -55, y: -122)
+                    }
                 }
                 .frame(width: 360, height: 280)
                 .padding(.top, 20)
@@ -126,7 +132,6 @@ extension StatConfig {
                 GeometryReader { geometry in
                     ScrollView {
                         Form {
-                            // New separate section for Pump Icon settings
                             Section(
                                 header: Text("Pump Icon"),
                                 footer: Text("Select and configure pump icon display")
@@ -199,13 +204,12 @@ extension StatConfig {
                                             Text("8 Days").tag("Acht_Tage")
                                             Text("9 Days").tag("Neun_Tage")
                                             Text("10 Days").tag("Zehn_Tage")
-                                            // ... rest of options
                                         }
                                         .pickerStyle(NavigationLinkPickerStyle())
                                     }
 
                                     // DanaBar Simple specific settings
-                                    if state.danaBarOption == DanaBarOption.simple.rawValue {
+                                    if state.danaBarOption == DanaBarOption.standard.rawValue {
                                         Picker(
                                             "Max Reservoir Insulin Age",
                                             selection: $state.insulinAgeOption
@@ -220,7 +224,6 @@ extension StatConfig {
                                             Text("8 Days").tag("Acht_Tage")
                                             Text("9 Days").tag("Neun_Tage")
                                             Text("10 Days").tag("Zehn_Tage")
-                                            // ... rest of options
                                         }
                                         .pickerStyle(NavigationLinkPickerStyle())
                                     }
@@ -243,35 +246,35 @@ extension StatConfig {
                                 header: Text("Visual Options"),
                                 footer: Text("According to your taste")
                             ) {
-                                Picker("Select Loop View", selection: $state.loopViewOption) {
-                                    ForEach(LoopViewOption.allCases) { option in
-                                        HStack {
-                                            Image(option == .view1 ? "LoopView1" : "LoopView2")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 30, height: 30)
-                                            Text(option.rawValue)
-                                                .font(.caption)
-                                        }
-                                        .tag(option)
-                                    }
-                                }
-                                .pickerStyle(NavigationLinkPickerStyle())
+                                /* Picker("Select Loop View", selection: $state.loopViewOption) {
+                                     ForEach(LoopViewOption.allCases) { option in
+                                         HStack {
+                                             Image(option == .view1 ? "LoopView1" : "LoopView2")
+                                                 .resizable()
+                                                 .scaledToFit()
+                                                 .frame(width: 30, height: 30)
+                                             Text(option.rawValue)
+                                                 .font(.caption)
+                                         }
+                                         .tag(option)
+                                     }
+                                 }
+                                 .pickerStyle(NavigationLinkPickerStyle())*/
 
-                                Picker("Select Bolus Progress View", selection: $state.bolusProgressViewOption) {
-                                    ForEach(BolusProgressViewOption.allCases) { option in
-                                        HStack {
-                                            Image(option == .bolusview1 ? "BolusView1" : "BolusView2")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 30, height: 30)
-                                            Text(option.rawValue)
-                                                .font(.caption)
-                                        }
-                                        .tag(option)
-                                    }
-                                }
-                                .pickerStyle(NavigationLinkPickerStyle())
+                                /*   Picker("Select Bolus Progress View", selection: $state.bolusProgressViewOption) {
+                                     ForEach(BolusProgressViewOption.allCases) { option in
+                                         HStack {
+                                             Image(option == .bolusview1 ? "BolusView1" : "BolusView2")
+                                                 .resizable()
+                                                 .scaledToFit()
+                                                 .frame(width: 30, height: 30)
+                                             Text(option.rawValue)
+                                                 .font(.caption)
+                                         }
+                                         .tag(option)
+                                     }
+                                 }
+                                 .pickerStyle(NavigationLinkPickerStyle())*/
 
                                 Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
                                     ForEach(BackgroundColorOption.allCases) { option in
@@ -354,11 +357,10 @@ extension StatConfig {
                                                 LongPressGesture(minimumDuration: 1.0) // 1 Sekunde halten
                                                     .onEnded { _ in
                                                         let newStartTime = state
-                                                            .sensorStartTimeDefault // Jetzt wird das gewählte Datum genommen
+                                                            .sensorStartTimeDefault
                                                         state.sensorStartTime = newStartTime
                                                         state.settingsManager.settings.sensorStartTime = newStartTime
 
-                                                        // Formatieren und Speichern der Startzeit
                                                         displayedStartTime = formatDate(newStartTime)
                                                         saveSensorStartTime(newStartTime)
 

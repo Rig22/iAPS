@@ -141,9 +141,9 @@ struct PumpView: View {
                 Image(systemName: "battery.\(percent)")
                     .resizable()
                     .rotationEffect(.degrees(-90))
-                    .frame(maxWidth: 32, maxHeight: 12)
+                    .frame(maxWidth: 32, maxHeight: 16)
                     .foregroundColor(batteryColor)
-                    .offset(y: -3)
+                    .offset(y: -2)
             }
         }
         .offset(x: 0, y: 5)
