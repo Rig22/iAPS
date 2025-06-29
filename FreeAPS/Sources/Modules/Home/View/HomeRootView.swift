@@ -993,16 +993,19 @@ extension Home {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
             var fillFraction: CGFloat
-            var color: Color
-            var backgroundColor: Color
             var displayText: String
-            var symbolSize: CGFloat
-            var symbol: String
             var animateProgress: Bool
             var button3D: Bool
             var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
+
+            let color = Color(
+                red: 110 / 255,
+                green: 97 / 255,
+                blue: 232 / 255,
+                opacity: 1.0
+            )
 
             let angularGradient = AngularGradient(
                 gradient: Gradient(colors: [
@@ -1061,12 +1064,6 @@ extension Home {
                         .fill(color)
                         .frame(width: 40, height: 40)
                         .opacity(0.6)
-
-                        Image(systemName: symbol)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: symbolSize, height: symbolSize)
-                            .foregroundColor(.white)
                     }
 
                     Text(displayText)
@@ -1468,16 +1465,16 @@ extension Home {
                 // Zentrale Gruppe (PumpIcon/Battery)
                 ZStack {
                     // BatteryView (unsichtbar bei PumpIcon)
-                    if state.batteryIconOption {
-                        batteryView
-                            .frame(width: 70, height: 25)
-                            .opacity(state.isConnected ? 0 : 1)
-                    }
+                    /*    if state.batteryIconOption {
+                         batteryView
+                             .frame(width: 70, height: 25)
+                             .opacity(state.isConnected ? 0 : 1)
+                     }*/
                     if state.showPumpIcon {
                         pumpIconView
                             .padding(.leading, 5)
-                            .padding(.top, -27)
-                            .frame(width: 16, height: 16)
+                            .padding(.top, -40)
+                            .frame(width: 70, height: 70)
                     }
                 }
                 .frame(width: 70)
@@ -2042,7 +2039,7 @@ extension Home {
                             Image(state.pumpIconOption.rawValue)
                                 .resizable()
                                 .scaledToFit()
-                                .frame(width: 27)
+                                .frame(width: 40)
                         }
                     }
                 }
@@ -2514,18 +2511,13 @@ extension Home {
         private var BluetoothConnectionView: some View {
             Group {
                 let connectionFraction: CGFloat = state.isConnected ? 1.0 : 0.0
-                let connectionColor: Color = state.isConnected ? .white.opacity(0.3) : .green.opacity(0.8)
 
                 HStack {
                     ZStack {
                         SmallFillablePieSegmentBluetooth(
                             pieSegmentViewModel: connectionPieSegmentViewModel,
                             fillFraction: connectionFraction,
-                            color: connectionColor,
-                            backgroundColor: .blue,
                             displayText: " ",
-                            symbolSize: 0,
-                            symbol: "cross.vial",
                             animateProgress: true,
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
@@ -2687,7 +2679,7 @@ extension Home {
 
         // Helper for danaBar Marquee End
 
-        // danaBarClassic
+        // danaBarStandard
 
         var danaBarStandard: some View {
             Group {
@@ -2780,7 +2772,6 @@ extension Home {
                                         BigVialView(color: insulinColor)
                                     } else {
                                         NormalVialView(color: insulinColor)
-                                            .modifier(BlinkingModifier(shouldBlink: remainingHours <= 12))
                                     }
                                 }
                                 .frame(width: 40, height: 40)
@@ -2813,13 +2804,12 @@ extension Home {
                             let cannulaColor: Color = {
                                 if cannulaHours >= maxHours { return .red }
 
-                                // Umrechnung Stunden in Minuten (präziser)
                                 let remainingMinutes = remainingHours * 60
 
                                 switch remainingMinutes {
-                                case ...120: // ≤ 2 Stunden (120 Minuten)
+                                case ...120:
                                     return .red
-                                case 121 ... 720: // 2.01h bis 12h (121-720 Minuten)
+                                case 121 ... 720:
                                     return .white
                                 default: // > 12 Stunden
                                     return .white
@@ -2878,7 +2868,6 @@ extension Home {
                                         BigFluidBagView(color: cannulaColor)
                                     } else {
                                         NormalFluidBagView(color: cannulaColor)
-                                            .modifier(BlinkingModifier(shouldBlink: remainingHours <= 12))
                                     }
                                 }
                                 .frame(width: 40, height: 40)
@@ -2895,7 +2884,6 @@ extension Home {
 
                             HStack(spacing: 4) {
                                 ZStack {
-                                    // 3D-Effekte nur bei aktiviertem button3D
                                     if state.button3D {
                                         let glowColor1 = incidenceOfLight
                                             ? lightGlowOverlaySelector.highlightColor
@@ -3050,7 +3038,7 @@ extension Home {
                     .background(
                         Circle()
                             .fill(Color.zt.opacity(1.0))
-                            .frame(width: 0, height: 50)
+                            .frame(width: 0, height: 0)
                     )
             }
         }
@@ -3097,7 +3085,7 @@ extension Home {
         }
 
         // SENSOR
-        private var shouldBlink: Bool {
+        private var shouldBlink: Bool { // Dient nur noch zur Steuerung des Icons in der SensorView
             guard state.displayExpiration,
                   let days = state.remainingSensorDays,
                   let hours = state.remainingSensorHours,
@@ -3106,7 +3094,7 @@ extension Home {
 
             // Gesamtrestzeit in Stunden
             let totalRemaining = Double(days * 24 + hours) + Double(minutes) / 60.0
-            return totalRemaining <= 12.0 // Blinkt nur bei ≤12h
+            return totalRemaining <= 6.0 // Stellschraube wann er zum großen Icon wechselt
         }
 
         private var sensorRemainingTime: String {
@@ -3126,49 +3114,19 @@ extension Home {
                       let minutes = state.remainingSensorMinutes
                 else { return .white }
 
-                let totalHours = Double(days * 24 + hours) + Double(minutes) / 60.0
+                // Gesamtverbleibende Zeit in Minuten berechnen
+                let totalMinutes = (days * 24 * 60) + (hours * 60) + minutes
 
-                switch totalHours {
-                case ...1.0: return .red // ≤1h (Blinkt)
-                case 1.01 ... 2.0: return .red // 1-2h (Rot)
-                case 2.01 ... 12.0: return .white // 2-48h (Gelb)
-                default: return .white // >48h (Weiß)
+                switch totalMinutes {
+                case ...120: // ≤ 2 Stunden (0-120 Minuten)
+                    return .red
+                case 121 ... 720:
+                    return .yellow
+                default: // > 12 Stunden
+                    return .white
                 }
             } else {
                 return state.sensorAgeDays.asInt() > 13 ? .yellow : .white
-            }
-        }
-
-        private struct BlinkingModifier: ViewModifier {
-            let shouldBlink: Bool
-            @State private var opacity: Double = 1.0
-
-            func body(content: Content) -> some View {
-                content
-                    .opacity(opacity)
-                    .onChange(of: shouldBlink) { _, newValue in
-                        guard newValue else {
-                            opacity = 1.0
-                            return
-                        }
-                        // Animation manuell triggern
-                        withAnimation(
-                            Animation.easeInOut(duration: 0.8)
-                                .repeatForever(autoreverses: true)
-                        ) {
-                            opacity = 0.5
-                        }
-                    }
-                    .onAppear {
-                        if shouldBlink {
-                            withAnimation(
-                                Animation.easeInOut(duration: 0.8)
-                                    .repeatForever(autoreverses: true)
-                            ) {
-                                opacity = 0.5
-                            }
-                        }
-                    }
             }
         }
 

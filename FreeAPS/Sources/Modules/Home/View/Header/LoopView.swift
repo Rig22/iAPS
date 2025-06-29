@@ -54,6 +54,8 @@ struct FillablePieSegment: View {
     var color: Color
     var backgroundColor: Color
     var displayText: String
+    var textColor: Color
+
     var animateProgress: Bool
 
     let color2 = Color(
@@ -65,32 +67,34 @@ struct FillablePieSegment: View {
 
     var body: some View {
         VStack {
-            ZStack {
-                PieSliceView(
-                    startAngle: .degrees(-90),
-                    endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                )
-                .fill(color)
-                .frame(width: 50, height: 50)
-                .opacity(1.0)
-            }
-
-            /*  Text(displayText)
-             .font(.system(size: 14))
-             .foregroundColor(.white)
-             .padding(.top, 0)*/
+            PieSliceView(
+                startAngle: .degrees(-90),
+                endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+            )
+            .fill(color)
+            .frame(width: 50, height: 50)
+            .opacity(1.0)
         }
-        Text(displayText)
-            .font(.system(size: 14))
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity, alignment: .trailing)
-            .offset(x: 9)
-            .onAppear {
-                pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-            }
-            .onChange(of: fillFraction) { _, newValue in
-                pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-            }
+        ZStack {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.black.opacity(0.2))
+                .frame(
+                    width: max(CGFloat(displayText.count) * 8.5, 42),
+                    height: 22
+                )
+
+            Text(displayText)
+                .font(.system(size: 14))
+                .foregroundStyle(textColor)
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .offset(x: 9)
+        .onAppear {
+            pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+        }
+        .onChange(of: fillFraction) { _, newValue in
+            pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+        }
     }
 }
 
@@ -117,6 +121,26 @@ struct LoopView: View {
 
     var body: some View {
         VStack {
+            var textColor: Color { // Neue Berechnung für Textfarbe
+                guard actualSuggestion?.timestamp != nil else {
+                    return .white
+                }
+                guard manualTempBasal == false else {
+                    return .loopManualTemp
+                }
+                let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
+
+                if delta <= 6.minutes.timeInterval {
+                    guard actualSuggestion?.deliverAt != nil else {
+                        return .white
+                    }
+                    return .white
+                } else if delta <= 9.minutes.timeInterval {
+                    return .yellow
+                } else {
+                    return .red
+                }
+            }
             ZStack {
                 FillablePieSegment(
                     pieSegmentViewModel: pieSegmentViewModel,
@@ -125,6 +149,7 @@ struct LoopView: View {
                     backgroundColor: .clear,
                     // displayText: minutesAgo == 0 ? "< 1 min" : "\(minutesAgo) min",
                     displayText: "\(minutesAgo)min",
+                    textColor: textColor,
                     animateProgress: true
                 )
 
@@ -211,9 +236,9 @@ struct LoopView: View {
 
         if delta <= 6.minutes.timeInterval {
             guard actualSuggestion?.deliverAt != nil else {
-                return .white.opacity(0.8)
+                return .white
             }
-            return .white.opacity(0.8)
+            return .white
         } else if delta <= 9.minutes.timeInterval {
             return .yellow
         } else {
