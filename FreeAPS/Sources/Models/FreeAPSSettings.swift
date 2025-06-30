@@ -60,6 +60,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var liveActivityChartDynamicRange = true
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = false
+    var disable15MinTrend: Bool = false
     // Sounds
     var hypoSound: String = "Default"
     var hyperSound: String = "Default"
@@ -99,7 +100,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var fpus: Bool = true
     var fpuAmounts: Bool = false
     // Dana-Toggles
-    var timeSettings: Bool = false
+    var timeSettings: Bool = true
     var pumpIconRawValue: String = "ic_dana_rs"
     var danaBar: Bool = false
     var legendsSwitch: Bool = false
@@ -288,6 +289,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case sensorDays
         case fpus
         case fpuAmount
+        case disable15MinTrend
         // Dana Toggles
         case danaIconRawValue
         case danaBar
@@ -454,6 +456,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.sensorDays, forKey: .sensorDays)
         try container.encode(settings.fpus, forKey: .fpus)
         try container.encode(settings.fpuAmounts, forKey: .fpuAmount)
+        try container.encode(settings.disable15MinTrend, forKey: .disable15MinTrend)
         // Dana Toggels
         try container.encode(settings.danaBar, forKey: .danaBar)
         try container.encode(settings.hideInsulinBadge, forKey: .hideInsulinBadge)

@@ -2977,13 +2977,14 @@ extension Home {
             var color: Color
             var body: some View {
                 Image(systemName: "alarm.fill")
-                    .font(.system(size: 50))
+                    .font(.system(size: 45))
                     .foregroundColor(color)
                     .background(
                         Circle()
                             .fill(Color.zt.opacity(1.0))
                             .frame(width: 0, height: 0)
                     )
+                    .offset(y: -2.5)
             }
         }
 
@@ -3005,13 +3006,14 @@ extension Home {
             var color: Color
             var body: some View {
                 Image(systemName: "alarm.fill")
-                    .font(.system(size: 50))
+                    .font(.system(size: 45))
                     .foregroundColor(color)
                     .background(
                         Circle()
                             .fill(Color.zt.opacity(1.0))
                             .frame(width: 0, height: 0)
                     )
+                    .offset(y: -2.5)
             }
         }
 
@@ -3033,13 +3035,14 @@ extension Home {
             var color: Color
             var body: some View {
                 Image(systemName: "alarm.fill")
-                    .font(.system(size: 50))
+                    .font(.system(size: 45))
                     .foregroundColor(color)
                     .background(
                         Circle()
                             .fill(Color.zt.opacity(1.0))
                             .frame(width: 0, height: 0)
                     )
+                    .offset(y: -2.5)
             }
         }
 
