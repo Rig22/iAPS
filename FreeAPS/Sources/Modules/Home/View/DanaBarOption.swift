@@ -2,23 +2,19 @@
 //  DanaBarOption.swift
 //  FreeAPS
 //
-//  Created by Richard on 17.04.25.
+//  Created by Richard on 22.06.25.
 //
 enum DanaBarOption: String, CaseIterable, Identifiable {
-    case max = "DanaBar Max"
-    case icon = "DanaBar Icon"
-    case min = "DanaBar Min"
-    case marquee = "DanaBar Marquee"
-    case simple = "DanaBar Einfach"
+    case standard = "Standard"
+    case marquee = "Marquee"
+    case max = "Dana Bar"
 
     var id: String { rawValue }
     var previewImageName: String {
         switch self {
-        case .max: return "DanaBarMaxPreview"
-        case .icon: return "DanaBarIconPreview"
-        case .min: return "DanaBarMinPreview"
-        case .marquee: return "DanaBarMarqueePreview"
-        case .simple: return "DanaBarSimplePreview"
+        case .standard: return "BarStandardPreview"
+        case .marquee: return "BarMarqueePreview"
+        case .max: return "BarMaxPreview"
         }
     }
 }

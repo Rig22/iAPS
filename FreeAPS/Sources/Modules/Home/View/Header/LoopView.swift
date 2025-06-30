@@ -54,36 +54,47 @@ struct FillablePieSegment: View {
     var color: Color
     var backgroundColor: Color
     var displayText: String
+    var textColor: Color
+
     var animateProgress: Bool
+
+    let color2 = Color(
+        red: 110 / 255,
+        green: 97 / 255,
+        blue: 232 / 255,
+        opacity: 1.0
+    )
 
     var body: some View {
         VStack {
-            ZStack {
-                PieSliceView(
-                    startAngle: .degrees(-90),
-                    endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                )
-                .fill(.white.opacity(0.5))
-                .frame(width: 50, height: 50)
-                .opacity(0.4)
-            }
-
-            /*  Text(displayText)
-             .font(.system(size: 14))
-             .foregroundColor(.white)
-             .padding(.top, 0)*/
+            PieSliceView(
+                startAngle: .degrees(-90),
+                endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+            )
+            .fill(color)
+            .frame(width: 50, height: 50)
+            .opacity(1.0)
         }
-        Text(displayText)
-            .font(.system(size: 14))
-            .foregroundColor(.white)
-            .frame(maxWidth: .infinity, alignment: .trailing)
-            .offset(x: 9)
-            .onAppear {
-                pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-            }
-            .onChange(of: fillFraction) { _, newValue in
-                pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-            }
+        ZStack {
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color.black.opacity(0.2))
+                .frame(
+                    width: max(CGFloat(displayText.count) * 8.5, 42),
+                    height: 22
+                )
+
+            Text(displayText)
+                .font(.system(size: 14))
+                .foregroundStyle(textColor)
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+        .offset(x: 9)
+        .onAppear {
+            pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+        }
+        .onChange(of: fillFraction) { _, newValue in
+            pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+        }
     }
 }
 
@@ -110,6 +121,26 @@ struct LoopView: View {
 
     var body: some View {
         VStack {
+            var textColor: Color { // Neue Berechnung für Textfarbe
+                guard actualSuggestion?.timestamp != nil else {
+                    return .white
+                }
+                guard manualTempBasal == false else {
+                    return .loopManualTemp
+                }
+                let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
+
+                if delta <= 6.minutes.timeInterval {
+                    guard actualSuggestion?.deliverAt != nil else {
+                        return .white
+                    }
+                    return .white
+                } else if delta <= 9.minutes.timeInterval {
+                    return .yellow
+                } else {
+                    return .red
+                }
+            }
             ZStack {
                 FillablePieSegment(
                     pieSegmentViewModel: pieSegmentViewModel,
@@ -118,12 +149,27 @@ struct LoopView: View {
                     backgroundColor: .clear,
                     // displayText: minutesAgo == 0 ? "< 1 min" : "\(minutesAgo) min",
                     displayText: "\(minutesAgo)min",
+                    textColor: textColor,
                     animateProgress: true
                 )
 
                 Circle()
-                    .fill(color)
-                    .frame(width: 7, height: 7)
+                    .fill(
+                        Color(
+                            red: 110 / 255,
+                            green: 97 / 255,
+                            blue: 232 / 255
+                        )
+                    )
+                    .frame(width: 35, height: 35)
+
+                Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
+                    .font(.system(size: 14))
+                    .foregroundColor(.white)
+
+                /*  Circle()
+                 .fill(color)
+                 .frame(width: 7, height: 7)*/
 
                 if isLooping {
                     Circle()
@@ -154,8 +200,8 @@ struct LoopView: View {
                 .fill(
                     AngularGradient(
                         gradient: Gradient(colors: [
-                            Color(red: 81 / 255, green: 81 / 255, blue: 81 / 255, opacity: 0.5),
-                            Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255, opacity: 0.5)
+                            Color(red: 81 / 255, green: 81 / 255, blue: 81 / 255, opacity: 1.0),
+                            Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255, opacity: 1.0)
                         ]),
                         center: .center,
                         angle: .degrees(gradientOffset)
@@ -190,9 +236,9 @@ struct LoopView: View {
 
         if delta <= 6.minutes.timeInterval {
             guard actualSuggestion?.deliverAt != nil else {
-                return .white.opacity(0.8)
+                return .white
             }
-            return .white.opacity(0.8)
+            return .white
         } else if delta <= 9.minutes.timeInterval {
             return .yellow
         } else {
@@ -205,17 +251,30 @@ struct LoopView: View {
         return Int(elapsedSeconds / 60) // Wechselt bei exakt 60 Sekunden auf 1 Minute
     }
 
+    /*   private var pieColor: Color {
+         let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
+
+         if delta < 1.minutes.timeInterval {
+             return .clear // unter 1 Minute
+         } else if delta <= 6.minutes.timeInterval {
+             return .clear // grün für 1-5 Minuten
+         } else if delta < 10.minutes.timeInterval {
+             return .clear // Gelb für 6-9 Minuten
+         } else {
+             return .clear // Rot ab Minute 10
+         }
+     }*/
     private var pieColor: Color {
         let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
 
         if delta < 1.minutes.timeInterval {
-            return .clear // unter 1 Minute
+            return .white.opacity(0.4) // unter 1 Minute
         } else if delta <= 6.minutes.timeInterval {
-            return .white.opacity(0.5) // grün für 1-5 Minuten
+            return .white.opacity(0.4) // grün für 1-5 Minuten
         } else if delta < 10.minutes.timeInterval {
-            return .white.opacity(0.5) // Gelb für 6-9 Minuten
+            return .white.opacity(0.4) // Gelb für 6-9 Minuten
         } else {
-            return .white.opacity(0.5) // Rot ab Minute 10
+            return .white.opacity(0.4) // Rot ab Minute 10
         }
     }
 

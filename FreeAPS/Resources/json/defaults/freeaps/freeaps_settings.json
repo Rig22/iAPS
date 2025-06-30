@@ -88,6 +88,7 @@
   "sensorDays": 10.0,
   "fpus": true,
   "fpuAmounts": false,
+  "lightMode": LightMode.auto,
   "timeSettings": false,
   "danaIconRawValue": "ic_dana_rs",
   "danaBar": false,
@@ -107,7 +108,7 @@
   "button3D": false,
   "sensorAgeDays": "Fuenfzehn_Tage",
   "sensorStartTime": "distantPast",
-  "bolusProgressViewOption": "bolusview2",
+  "bolusProgressViewOption": "bolusview1",
   "lightGlowOverlaySelector": "atriumview1",
   "sensorStartTimeDefault": "distantPast",
   "incidenceOfLight": "false"

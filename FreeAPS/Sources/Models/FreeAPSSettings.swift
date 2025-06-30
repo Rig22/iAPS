@@ -60,6 +60,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var liveActivityChartDynamicRange = true
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = false
+    var disable15MinTrend: Bool = false
     // Sounds
     var hypoSound: String = "Default"
     var hyperSound: String = "Default"
@@ -88,7 +89,6 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var birthDate = Date.distantPast
     var sexSetting: Int = 3
     var disableHypoTreatment: Bool = false
-    var insulinBadge: Bool = false
     var hideInsulinBadge: Bool = false
     var allowDilution: Bool = false
     var displayDelta: Bool = false
@@ -100,8 +100,8 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var fpus: Bool = true
     var fpuAmounts: Bool = false
     // Dana-Toggles
-    var timeSettings: Bool = false
-    var danaIconRawValue: String = "ic_dana_rs"
+    var timeSettings: Bool = true
+    var pumpIconRawValue: String = "ic_dana_rs"
     var danaBar: Bool = false
     var legendsSwitch: Bool = false
     var tempTargetbar: Bool = false
@@ -133,6 +133,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var glucoseOverrideThresholdActive: Bool = false
     var glucoseOverrideThresholdActiveDown: Bool = false
     var glucoseOverrideThresholdDown: Decimal = 100
+    var showPumpIcon: Bool = false
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false
@@ -176,12 +177,12 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     }
 
     // Computed property for Dana Icon
-    var danaIconOption: DanaIconOption {
+    var pumpIconOption: PumpIconOption {
         get {
-            DanaIconOption(rawValue: danaIconRawValue) ?? .danaRS
+            PumpIconOption(rawValue: pumpIconRawValue) ?? .danaRS
         }
         set {
-            danaIconRawValue = newValue.rawValue
+            pumpIconRawValue = newValue.rawValue
         }
     }
 }
@@ -288,6 +289,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case sensorDays
         case fpus
         case fpuAmount
+        case disable15MinTrend
         // Dana Toggles
         case danaIconRawValue
         case danaBar
@@ -324,6 +326,7 @@ struct EncodableFreeAPSSettings: Encodable {
         case glucoseOverrideThresholdActive
         case glucoseOverrideThresholdActiveDown
         case glucoseOverrideThresholdDown
+        case showPumpIcon
         // Dana Toggles
         // AutoISF
         case autoisf
@@ -453,9 +456,9 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.sensorDays, forKey: .sensorDays)
         try container.encode(settings.fpus, forKey: .fpus)
         try container.encode(settings.fpuAmounts, forKey: .fpuAmount)
+        try container.encode(settings.disable15MinTrend, forKey: .disable15MinTrend)
         // Dana Toggels
         try container.encode(settings.danaBar, forKey: .danaBar)
-        try container.encode(settings.insulinBadge, forKey: .insulinBadge)
         try container.encode(settings.hideInsulinBadge, forKey: .hideInsulinBadge)
         try container.encode(settings.legendsSwitch, forKey: .legendsSwitch)
         try container.encode(settings.tempTargetbar, forKey: .tempTargetbar)
@@ -475,7 +478,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.button3D, forKey: .button3D)
         try container.encode(settings.sensorAgeDays, forKey: .sensorAgeDays)
         try container.encodeIfPresent(settings.sensorStartTime, forKey: .sensorStartTime)
-        try container.encode(settings.bolusProgressViewOption, forKey: .bolusProgressViewOption)
+        // try container.encode(settings.bolusProgressViewOption, forKey: .bolusProgressViewOption)
         try container.encode(settings.sensorStartTimeDefault, forKey: .sensorStartTimeDefault)
         try container.encode(settings.incidenceOfLight, forKey: .incidenceOfLight)
         try container.encode(settings.lightGlowOverlaySelector, forKey: .lightGlowOverlaySelector)
@@ -488,6 +491,7 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.glucoseOverrideThresholdActive, forKey: .glucoseOverrideThresholdActive)
         try container.encode(settings.glucoseOverrideThresholdActiveDown, forKey: .glucoseOverrideThresholdActiveDown)
         try container.encode(settings.glucoseOverrideThresholdDown, forKey: .glucoseOverrideThresholdDown)
+        try container.encode(settings.showPumpIcon, forKey: .showPumpIcon)
         // Dana Toggels
         // AutoISF
         try container.encode(settings.autoisf, forKey: .autoisf)

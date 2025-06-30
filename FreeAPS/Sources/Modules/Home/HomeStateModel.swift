@@ -81,10 +81,10 @@ extension Home {
         @Published var sensorDays: Double = 10
         @Published var carbButton: Bool = true
         @Published var profileButton: Bool = true
+        @Published var hideInsulinBadge: Bool = true
         // Dana UI Toggels
-        @Published var danaIconRawValue: String = "ic_dana_rs"
+        @Published var pumpIconRawValue: String = "ic_dana_rs"
         @Published var danaBar: Bool = false
-        @Published var insulinBadge: Bool = false
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
         @Published var legendsSwitch: Bool = false
@@ -111,6 +111,7 @@ extension Home {
         @Published var batteryAge: String = "--"
         @Published var button3DBackground: Bool = false
         @Published var batteryIconOption: Bool = false
+        @Published var showPumpIcon: Bool = false
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -178,12 +179,12 @@ extension Home {
             return hours
         }
 
-        var danaIconOption: DanaIconOption {
+        var pumpIconOption: PumpIconOption {
             get {
-                DanaIconOption(rawValue: danaIconRawValue) ?? .danaRS // Standardwert, falls der Raw-Wert nicht gefunden wird
+                PumpIconOption(rawValue: pumpIconRawValue) ?? .danaRS // Standardwert, falls der Raw-Wert nicht gefunden wird
             }
             set {
-                danaIconRawValue = newValue.rawValue
+                pumpIconRawValue = newValue.rawValue
             }
         }
 
@@ -248,9 +249,9 @@ extension Home {
             carbButton = settingsManager.settings.carbButton
             profileButton = settingsManager.settings.profileButton
             // Dana UI Toggels
-            danaIconRawValue = settingsManager.settings.danaIconRawValue
+            pumpIconRawValue = settingsManager.settings.pumpIconRawValue
             danaBar = settingsManager.settings.danaBar
-            insulinBadge = settingsManager.settings.insulinBadge
+            hideInsulinBadge = settingsManager.settings.hideInsulinBadge
             legendsSwitch = settingsManager.settings.legendsSwitch
             tempTargetbar = settingsManager.settings.tempTargetbar
             timeSettings = settingsManager.settings.timeSettings
@@ -269,6 +270,7 @@ extension Home {
             lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
             button3DBackground = settingsManager.settings.button3DBackground
             batteryIconOption = settingsManager.settings.batteryIconOption
+            showPumpIcon = settingsManager.settings.showPumpIcon
             // Dana UI Toggels
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -867,11 +869,12 @@ extension Home.StateModel:
         sensorDays = settingsManager.settings.sensorDays
         carbButton = settingsManager.settings.carbButton
         profileButton = settingsManager.settings.profileButton
+        hideInsulinBadge = settingsManager.settings.hideInsulinBadge
         setupGlucose()
         setupOverrideHistory()
         setupData()
         // Dana UI Toggels
-        danaIconRawValue = settingsManager.settings.danaIconRawValue
+        pumpIconRawValue = settingsManager.settings.pumpIconRawValue
         danaBar = settingsManager.settings.danaBar
         insulinAgeOption = settingsManager.settings.insulinAgeOption
         cannulaAgeOption = settingsManager.settings.cannulaAgeOption
@@ -892,6 +895,7 @@ extension Home.StateModel:
         lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
         button3DBackground = settingsManager.settings.button3DBackground
         batteryIconOption = settingsManager.settings.batteryIconOption
+        showPumpIcon = settingsManager.settings.showPumpIcon
         // Dana UI Toggels
     }
 

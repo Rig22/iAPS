@@ -98,11 +98,9 @@ extension StatConfig {
 
         private func getDescription(for option: DanaBarOption) -> String {
             switch option {
-            case .max: return "Vollständige Anzeige mit InsulinAlter"
-            case .icon: return "Mit Pumpen-Icon"
-            case .min: return "Minimalistische Ansicht"
-            case .marquee: return "Laufschrift"
-            case .simple: return "Traditionelle Ansicht"
+            case .standard: return "Standard"
+            case .marquee: return "Running Text"
+            case .max: return "For Dana User"
             }
         }
 
@@ -119,15 +117,11 @@ extension StatConfig {
                         .scaledToFit()
                         .frame(width: 360, height: 280)
 
-                    if state.danaBar && state.danaBarOption == DanaBarOption.icon.rawValue {
-                        Circle()
-                            .fill(Color.darkerGray.opacity(1.0))
-                            .frame(width: 20, height: 20)
-                            .offset(x: -53, y: -55)
-                        Image(state.danaIconRawValue)
+                    if state.showPumpIcon {
+                        Image(state.pumpIconRawValue)
                             .resizable()
-                            .frame(width: 20, height: 12)
-                            .offset(x: -53, y: -55)
+                            .frame(width: 15, height: 15)
+                            .offset(x: -55, y: -122)
                     }
                 }
                 .frame(width: 360, height: 280)
@@ -139,145 +133,148 @@ extension StatConfig {
                     ScrollView {
                         Form {
                             Section(
-                                header: Text("Bar Selection"),
-                                footer: Text("Select the  desired bar view")
-                            )
-                                {
-                                    Toggle("Dana Bars", isOn: $state.danaBar)
+                                header: Text("Pump Icon"),
+                                footer: Text("Select and configure pump icon display")
+                            ) {
+                                Toggle("Show Pump Icon", isOn: $state.showPumpIcon)
 
-                                    if state.danaBar {
-                                        Picker("Wähle eine Ansicht", selection: $state.danaBarOption) {
-                                            ForEach(DanaBarOption.allCases) { option in
-                                                HStack(spacing: 12) {
-                                                    Image(option.previewImageName)
+                                if state.showPumpIcon {
+                                    if #available(iOS 18.0, *) {
+                                        Picker("Select Icon", selection: $state.pumpIconRawValue) {
+                                            ForEach(PumpIconOption.allCases, id: \.rawValue) { option in
+                                                HStack {
+                                                    Image(option.rawValue)
                                                         .resizable()
                                                         .scaledToFit()
                                                         .frame(width: 60, height: 40)
-                                                        .cornerRadius(6)
-                                                        .shadow(radius: 2)
-
-                                                    VStack(alignment: .leading) {
-                                                        Text(option.rawValue)
-                                                            .font(.subheadline)
-                                                        Text(getDescription(for: option))
-                                                            .font(.caption)
-                                                            .foregroundColor(.gray)
-                                                    }
+                                                    Text(option.displayName)
+                                                        .foregroundColor(.primary)
                                                 }
                                                 .tag(option.rawValue)
                                             }
                                         }
                                         .pickerStyle(NavigationLinkPickerStyle())
+                                    }
+                                }
+                            }
+                            Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
+                            Section(
+                                header: Text("Bar Selection"),
+                                footer: Text("Select the desired bar view")
+                            ) {
+                                Toggle("Top Bars", isOn: $state.danaBar)
 
-                                        // DanaBar 2 spezifische Einstellungen
-                                        if state.danaBarOption == DanaBarOption.icon.rawValue {
-                                            if #available(iOS 18.0, *) {
-                                                Picker("Pump Icon", selection: $state.danaIconRawValue) {
-                                                    ForEach(DanaIconOption.allCases, id: \.rawValue) { option in
-                                                        HStack {
-                                                            Image(option.rawValue)
-                                                                .resizable()
-                                                                .scaledToFit()
-                                                                .frame(width: 60, height: 40)
-                                                            Text(option.displayName)
-                                                                .foregroundColor(.white)
-                                                        }
-                                                        .tag(option.rawValue)
-                                                    }
+                                if state.danaBar {
+                                    Picker("Choose a view", selection: $state.danaBarOption) {
+                                        ForEach(DanaBarOption.allCases) { option in
+                                            HStack(spacing: 12) {
+                                                Image(option.previewImageName)
+                                                    .resizable()
+                                                    .scaledToFit()
+                                                    .frame(width: 60, height: 40)
+                                                    .cornerRadius(6)
+                                                    .shadow(radius: 2)
+
+                                                VStack(alignment: .leading) {
+                                                    Text(option.rawValue)
+                                                        .font(.subheadline)
+                                                    Text(getDescription(for: option))
+                                                        .font(.caption)
+                                                        .foregroundColor(.gray)
                                                 }
-                                                .pickerStyle(NavigationLinkPickerStyle())
                                             }
+                                            .tag(option.rawValue)
                                         }
+                                    }
+                                    .pickerStyle(NavigationLinkPickerStyle())
 
-                                        // DanaBar Max spezifische Einstellungen
-                                        if state.danaBarOption == DanaBarOption.max.rawValue {
-                                            Picker(
-                                                "Max Reservoir Insulin Age",
-                                                selection: $state.insulinAgeOption
-                                            ) {
-                                                Text("1 Day").tag("Ein_Tag")
-                                                Text("2 Days").tag("Zwei_Tage")
-                                                Text("3 Days").tag("Drei_Tage")
-                                                Text("4 Days").tag("Vier_Tage")
-                                                Text("5 Days").tag("Fuenf_Tage")
-                                                Text("6 Days").tag("Sechs_Tage")
-                                                Text("7 Days").tag("Sieben_Tage")
-                                                Text("8 Days").tag("Acht_Tage")
-                                                Text("9 Days").tag("Neun_Tage")
-                                                Text("10 Days").tag("Zehn_Tage")
-                                            }
-                                            .pickerStyle(NavigationLinkPickerStyle())
-                                        }
-
-                                        // DanaBar Simple spezifische Einstellungen
-                                        if state.danaBarOption == DanaBarOption.simple.rawValue {
-                                            Picker(
-                                                "Max Reservoir Insulin Age",
-                                                selection: $state.insulinAgeOption
-                                            ) {
-                                                Text("1 Day").tag("Ein_Tag")
-                                                Text("2 Days").tag("Zwei_Tage")
-                                                Text("3 Days").tag("Drei_Tage")
-                                                Text("4 Days").tag("Vier_Tage")
-                                                Text("5 Days").tag("Fuenf_Tage")
-                                                Text("6 Days").tag("Sechs_Tage")
-                                                Text("7 Days").tag("Sieben_Tage")
-                                                Text("8 Days").tag("Acht_Tage")
-                                                Text("9 Days").tag("Neun_Tage")
-                                                Text("10 Days").tag("Zehn_Tage")
-                                            }
-                                            .pickerStyle(NavigationLinkPickerStyle())
-                                        }
-
-                                        // Gemeinsame Einstellungen für alle Ansichten
-                                        Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
+                                    // DanaBar Max specific settings
+                                    if state.danaBarOption == DanaBarOption.max.rawValue {
+                                        Picker(
+                                            "Max Reservoir Insulin Age",
+                                            selection: $state.insulinAgeOption
+                                        ) {
                                             Text("1 Day").tag("Ein_Tag")
                                             Text("2 Days").tag("Zwei_Tage")
                                             Text("3 Days").tag("Drei_Tage")
                                             Text("4 Days").tag("Vier_Tage")
                                             Text("5 Days").tag("Fuenf_Tage")
+                                            Text("6 Days").tag("Sechs_Tage")
+                                            Text("7 Days").tag("Sieben_Tage")
+                                            Text("8 Days").tag("Acht_Tage")
+                                            Text("9 Days").tag("Neun_Tage")
+                                            Text("10 Days").tag("Zehn_Tage")
                                         }
                                         .pickerStyle(NavigationLinkPickerStyle())
-
-                                        Toggle("Insulin Concentration Badge", isOn: $state.insulinBadge)
                                     }
-                                    Toggle("TT Bar", isOn: $state.tempTargetBar)
-                                    Toggle("Bottom Bar", isOn: $state.timeSettings)
+
+                                    // DanaBar Simple specific settings
+                                    if state.danaBarOption == DanaBarOption.standard.rawValue {
+                                        Picker(
+                                            "Max Reservoir Insulin Age",
+                                            selection: $state.insulinAgeOption
+                                        ) {
+                                            Text("1 Day").tag("Ein_Tag")
+                                            Text("2 Days").tag("Zwei_Tage")
+                                            Text("3 Days").tag("Drei_Tage")
+                                            Text("4 Days").tag("Vier_Tage")
+                                            Text("5 Days").tag("Fuenf_Tage")
+                                            Text("6 Days").tag("Sechs_Tage")
+                                            Text("7 Days").tag("Sieben_Tage")
+                                            Text("8 Days").tag("Acht_Tage")
+                                            Text("9 Days").tag("Neun_Tage")
+                                            Text("10 Days").tag("Zehn_Tage")
+                                        }
+                                        .pickerStyle(NavigationLinkPickerStyle())
+                                    }
+
+                                    // Common settings for all views
+                                    Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
+                                        Text("1 Day").tag("Ein_Tag")
+                                        Text("2 Days").tag("Zwei_Tage")
+                                        Text("3 Days").tag("Drei_Tage")
+                                        Text("4 Days").tag("Vier_Tage")
+                                        Text("5 Days").tag("Fuenf_Tage")
+                                    }
+                                    .pickerStyle(NavigationLinkPickerStyle())
                                 }
+                                Toggle("TT Bar", isOn: $state.tempTargetBar)
+                                Toggle("Bottom Bar", isOn: $state.timeSettings)
+                            }
 
                             Section(
                                 header: Text("Visual Options"),
                                 footer: Text("According to your taste")
                             ) {
-                                Picker("Select Loop View", selection: $state.loopViewOption) {
-                                    ForEach(LoopViewOption.allCases) { option in
-                                        HStack {
-                                            Image(option == .view1 ? "LoopView1" : "LoopView2")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 30, height: 30)
-                                            Text(option.rawValue)
-                                                .font(.caption)
-                                        }
-                                        .tag(option)
-                                    }
-                                }
-                                .pickerStyle(NavigationLinkPickerStyle())
+                                /* Picker("Select Loop View", selection: $state.loopViewOption) {
+                                     ForEach(LoopViewOption.allCases) { option in
+                                         HStack {
+                                             Image(option == .view1 ? "LoopView1" : "LoopView2")
+                                                 .resizable()
+                                                 .scaledToFit()
+                                                 .frame(width: 30, height: 30)
+                                             Text(option.rawValue)
+                                                 .font(.caption)
+                                         }
+                                         .tag(option)
+                                     }
+                                 }
+                                 .pickerStyle(NavigationLinkPickerStyle())*/
 
-                                Picker("Select Bolus Progress View", selection: $state.bolusProgressViewOption) {
-                                    ForEach(BolusProgressViewOption.allCases) { option in
-                                        HStack {
-                                            Image(option == .bolusview1 ? "BolusView1" : "BolusView2")
-                                                .resizable()
-                                                .scaledToFit()
-                                                .frame(width: 30, height: 30)
-                                            Text(option.rawValue)
-                                                .font(.caption)
-                                        }
-                                        .tag(option)
-                                    }
-                                }
-                                .pickerStyle(NavigationLinkPickerStyle())
+                                /*   Picker("Select Bolus Progress View", selection: $state.bolusProgressViewOption) {
+                                     ForEach(BolusProgressViewOption.allCases) { option in
+                                         HStack {
+                                             Image(option == .bolusview1 ? "BolusView1" : "BolusView2")
+                                                 .resizable()
+                                                 .scaledToFit()
+                                                 .frame(width: 30, height: 30)
+                                             Text(option.rawValue)
+                                                 .font(.caption)
+                                         }
+                                         .tag(option)
+                                     }
+                                 }
+                                 .pickerStyle(NavigationLinkPickerStyle())*/
 
                                 Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
                                     ForEach(BackgroundColorOption.allCases) { option in
@@ -318,7 +315,7 @@ extension StatConfig {
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
                                 }
-                                Toggle("Batterie Anzeige", isOn: $state.batteryIconOption)
+                                // Toggle("Batterie Anzeige", isOn: $state.batteryIconOption)
                             }
                             Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
 
@@ -360,11 +357,10 @@ extension StatConfig {
                                                 LongPressGesture(minimumDuration: 1.0) // 1 Sekunde halten
                                                     .onEnded { _ in
                                                         let newStartTime = state
-                                                            .sensorStartTimeDefault // Jetzt wird das gewählte Datum genommen
+                                                            .sensorStartTimeDefault
                                                         state.sensorStartTime = newStartTime
                                                         state.settingsManager.settings.sensorStartTime = newStartTime
 
-                                                        // Formatieren und Speichern der Startzeit
                                                         displayedStartTime = formatDate(newStartTime)
                                                         saveSensorStartTime(newStartTime)
 
