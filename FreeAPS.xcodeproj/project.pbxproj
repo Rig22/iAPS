@@ -324,8 +324,6 @@
 		795CBE122D3F60B20044854B /* BGTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE112D3F60A30044854B /* BGTextField.swift */; };
 		795CBE142D3F943A0044854B /* AutoISFsettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE132D3F942B0044854B /* AutoISFsettings.swift */; };
 		795CBE162D3F949D0044854B /* ChartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE152D3F94900044854B /* ChartModel.swift */; };
-		7974B64C2D3817C10077EF9F /* LoopViewOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7974B64B2D3817C10077EF9F /* LoopViewOption.swift */; };
-		7974B64E2D3818030077EF9F /* LoopView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7974B64D2D3818030077EF9F /* LoopView2.swift */; };
 		797A852E2D97E8EF00DAB622 /* LightGlowOverlaySelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */; };
 		7984214F2E0818E2003A7410 /* DanaBarOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7984214E2E081851003A7410 /* DanaBarOption.swift */; };
 		798421512E082FCF003A7410 /* PumpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798421502E082FC8003A7410 /* PumpView.swift */; };
@@ -969,8 +967,6 @@
 		795CBE112D3F60A30044854B /* BGTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGTextField.swift; sourceTree = "<group>"; };
 		795CBE132D3F942B0044854B /* AutoISFsettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoISFsettings.swift; sourceTree = "<group>"; };
 		795CBE152D3F94900044854B /* ChartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartModel.swift; sourceTree = "<group>"; };
-		7974B64B2D3817C10077EF9F /* LoopViewOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopViewOption.swift; sourceTree = "<group>"; };
-		7974B64D2D3818030077EF9F /* LoopView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopView2.swift; sourceTree = "<group>"; };
 		797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightGlowOverlaySelector.swift; sourceTree = "<group>"; };
 		7984214E2E081851003A7410 /* DanaBarOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaBarOption.swift; sourceTree = "<group>"; };
 		798421502E082FC8003A7410 /* PumpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpView.swift; sourceTree = "<group>"; };
@@ -1595,7 +1591,6 @@
 				797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */,
 				7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */,
 				7909A4A92D5101D800975822 /* BarViewOptionConfiguration.swift */,
-				7974B64B2D3817C10077EF9F /* LoopViewOption.swift */,
 				7927D7152D082E7300385439 /* CannulaAgeOption.swift */,
 				791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */,
 				792E4EC22CF8C8EB00ADE3DC /* PumpIconOption.swift */,
@@ -1812,7 +1807,6 @@
 			isa = PBXGroup;
 			children = (
 				798421502E082FC8003A7410 /* PumpView.swift */,
-				7974B64D2D3818030077EF9F /* LoopView2.swift */,
 				383420D525FFE38C002D46C1 /* LoopView.swift */,
 				38AAF85425FFF846004AF583 /* CurrentGlucoseView.swift */,
 			);
@@ -3239,7 +3233,6 @@
 				389ECDFE2601061500D86C4F /* View+Snapshot.swift in Sources */,
 				38FEF3FE2738083E00574A46 /* CGMProvider.swift in Sources */,
 				38E98A3725F5509500C0CED0 /* String+Extensions.swift in Sources */,
-				7974B64E2D3818030077EF9F /* LoopView2.swift in Sources */,
 				F90692D1274B99B60037068D /* HealthKitProvider.swift in Sources */,
 				19F95FF729F10FEE00314DDC /* StatStateModel.swift in Sources */,
 				385CEAC125F2EA52002D6D5B /* Announcement.swift in Sources */,
@@ -3281,7 +3274,6 @@
 				98641AF4F92123DA668AB931 /* CREditorRootView.swift in Sources */,
 				38E4453D274E411700EC9A94 /* Disk+Errors.swift in Sources */,
 				38E98A2325F52C9300C0CED0 /* Signpost.swift in Sources */,
-				7974B64C2D3817C10077EF9F /* LoopViewOption.swift in Sources */,
 				CE7CA3542A064973004BE681 /* TempPresetsIntentRequest.swift in Sources */,
 				F5F7E6C1B7F098F59EB67EC5 /* TargetsEditorDataFlow.swift in Sources */,
 				5075C1608E6249A51495C422 /* TargetsEditorProvider.swift in Sources */,

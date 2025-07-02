@@ -90,9 +90,8 @@ extension Home {
         @Published var legendsSwitch: Bool = false
         @Published var tempTargetbar: Bool = false
         @Published var timeSettings: Bool = false
-        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.teal.rawValue
-        @Published var danaBarOption: String = DanaBarOption.max.rawValue
-        @Published var loopViewOption: String = LoopViewOption.view1.rawValue
+        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
+        @Published var danaBarOption: String = DanaBarOption.standard.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = false
         @Published var button3D: Bool = false
@@ -258,7 +257,6 @@ extension Home {
             danaBarOption = settingsManager.settings.danaBarOption
             insulinAgeOption = settingsManager.settings.insulinAgeOption
             cannulaAgeOption = settingsManager.settings.cannulaAgeOption
-            loopViewOption = settingsManager.settings.loopViewOption
             chartBackgroundColored = settingsManager.settings.chartBackgroundColored
             carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
             button3D = settingsManager.settings.button3D
@@ -881,7 +879,6 @@ extension Home.StateModel:
         timeSettings = settingsManager.settings.timeSettings
         backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
         danaBarOption = settingsManager.settings.danaBarOption
-        loopViewOption = settingsManager.settings.loopViewOption
         chartBackgroundColored = settingsManager.settings.chartBackgroundColored
         carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
         button3D = settingsManager.settings.button3D

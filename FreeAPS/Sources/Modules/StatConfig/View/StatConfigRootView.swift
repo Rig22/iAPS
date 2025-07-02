@@ -247,21 +247,6 @@ extension StatConfig {
                                 header: Text("Visual Options"),
                                 footer: Text("According to your taste")
                             ) {
-                                /* Picker("Select Loop View", selection: $state.loopViewOption) {
-                                     ForEach(LoopViewOption.allCases) { option in
-                                         HStack {
-                                             Image(option == .view1 ? "LoopView1" : "LoopView2")
-                                                 .resizable()
-                                                 .scaledToFit()
-                                                 .frame(width: 30, height: 30)
-                                             Text(option.rawValue)
-                                                 .font(.caption)
-                                         }
-                                         .tag(option)
-                                     }
-                                 }
-                                 .pickerStyle(NavigationLinkPickerStyle())*/
-
                                 Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
                                     ForEach(BackgroundColorOption.allCases) { option in
                                         HStack {

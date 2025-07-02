@@ -590,14 +590,6 @@ extension Home {
             }
         }
 
-        @ViewBuilder private func bolusProgressViewSelector() -> some View {
-            if let progress = state.bolusProgress, progress > 0 {
-                bolusProgressView()
-            } else {
-                glucoseAndLoopView()
-            }
-        }
-
         // Progressbar by Rig22
         public struct CircularProgressViewStyle: ProgressViewStyle {
             public func makeBody(configuration: ProgressViewStyleConfiguration) -> some View {
@@ -1061,24 +1053,6 @@ extension Home {
             }
         }
 
-        @ViewBuilder private func loopViewSelector() -> some View {
-            if let loopOption = LoopViewOption(rawValue: state.loopViewOption) {
-                switch loopOption {
-                case .view1:
-                    loopView
-                        .frame(maxHeight: .infinity)
-                        .offset(y: -3)
-                case .view2:
-                    loopView2
-                        .frame(maxHeight: .infinity)
-                        .offset(x: -20, y: 10)
-                }
-            } else {
-                Text("Ungültige Ansichtsauswahl")
-                    .foregroundColor(.red)
-            }
-        }
-
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             let height: CGFloat = display ? 150 : 180
             LinearGradient(
@@ -1110,9 +1084,12 @@ extension Home {
                                     stackedLeftTopView
                                         .frame(maxWidth: .infinity, alignment: .leading)
                                         .padding(.leading, 32)
-
-                                    bolusProgressViewSelector()
-                                    loopViewSelector()
+                                    if let progress = state.bolusProgress, progress > 0 {
+                                        bolusProgressView()
+                                    } else {
+                                        glucoseAndLoopView()
+                                    }
+                                    loopView
                                         .frame(maxWidth: .infinity, alignment: .trailing)
                                         .padding(.trailing, 32)
                                 }
@@ -1226,9 +1203,11 @@ extension Home {
                             Circle()
                                 .fill(Color.zt.opacity(1.0))
                                 .frame(width: 34, height: 34)
+                                .offset(y: -1.5)
 
                             Image(systemName: "syringe")
                                 .font(.system(size: 20))
+                                .offset(y: -1.5)
                         }
                     }
                     .onTapGesture {
@@ -1316,60 +1295,60 @@ extension Home {
 
         // Ring Loop
 
-        var loopView2: some View {
-            ZStack {
-                let incidenceOfLight = state.incidenceOfLight
-                let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                    .atriumview
+        /*   var loopView2: some View {
+             ZStack {
+                 let incidenceOfLight = state.incidenceOfLight
+                 let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                     .atriumview
 
-                if state.button3D {
-                    let glowColor1 = incidenceOfLight
-                        ? lightGlowOverlaySelector.highlightColor
-                        : Color.white.opacity(0.9)
+                 if state.button3D {
+                     let glowColor1 = incidenceOfLight
+                         ? lightGlowOverlaySelector.highlightColor
+                         : Color.white.opacity(0.9)
 
-                    let glowColor2 = incidenceOfLight
-                        ?lightGlowOverlaySelector.highlightColor
-                        : Color.white.opacity(0.4)
+                     let glowColor2 = incidenceOfLight
+                         ?lightGlowOverlaySelector.highlightColor
+                         : Color.white.opacity(0.4)
 
-                    Circle()
-                        .stroke(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    glowColor1.opacity(0.8),
-                                    glowColor2.opacity(0.6),
-                                    Color.clear,
-                                    Color.black.opacity(0.3),
-                                    Color.black.opacity(0.6)
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            ),
-                            lineWidth: 1
-                        )
-                        .frame(width: 45, height: 45)
-                        .offset(y: -12)
+                     Circle()
+                         .stroke(
+                             LinearGradient(
+                                 gradient: Gradient(colors: [
+                                     glowColor1.opacity(0.8),
+                                     glowColor2.opacity(0.6),
+                                     Color.clear,
+                                     Color.black.opacity(0.3),
+                                     Color.black.opacity(0.6)
+                                 ]),
+                                 startPoint: .top,
+                                 endPoint: .bottom
+                             ),
+                             lineWidth: 1
+                         )
+                         .frame(width: 45, height: 45)
+                         .offset(y: -12)
 
-                } else {}
+                 } else {}
 
-                LoopView2(
-                    suggestion: $state.data.suggestion,
-                    enactedSuggestion: $state.enactedSuggestion,
-                    closedLoop: $state.closedLoop,
-                    timerDate: $state.data.timerDate,
-                    isLooping: $state.isLooping,
-                    lastLoopDate: $state.lastLoopDate,
-                    manualTempBasal: $state.manualTempBasal,
-                    button3DBackground: $state.button3DBackground
-                )
-                .onTapGesture {
-                    state.isStatusPopupPresented.toggle()
-                }.onLongPressGesture {
-                    let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                    impactHeavy.impactOccurred()
-                    state.runLoop()
-                }
-            }
-        }
+                 LoopView2(
+                     suggestion: $state.data.suggestion,
+                     enactedSuggestion: $state.enactedSuggestion,
+                     closedLoop: $state.closedLoop,
+                     timerDate: $state.data.timerDate,
+                     isLooping: $state.isLooping,
+                     lastLoopDate: $state.lastLoopDate,
+                     manualTempBasal: $state.manualTempBasal,
+                     button3DBackground: $state.button3DBackground
+                 )
+                 .onTapGesture {
+                     state.isStatusPopupPresented.toggle()
+                 }.onLongPressGesture {
+                     let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                     impactHeavy.impactOccurred()
+                     state.runLoop()
+                 }
+             }
+         }*/
 
         // LoopView 2 Ende
 

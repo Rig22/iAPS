@@ -109,7 +109,6 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var danaBarOption: String = DanaBarOption.max.rawValue
     var insulinAgeOption: String = "Drei_Tage"
     var cannulaAgeOption: String = "Drei_Tage"
-    var loopViewOption: String = LoopViewOption.view1.rawValue
     var chartBackgroundColored: Bool = false
     var carbInsulinLoopViewOption: Bool = false
     var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.none.rawValue
@@ -301,7 +300,6 @@ struct EncodableFreeAPSSettings: Encodable {
         case danaBarOption
         case insulinAgeOption
         case cannulaAgeOption
-        case loopViewOption
         case chartBackgroundColored
         case carbInsulinLoopViewOption
         case topBarActive
@@ -465,7 +463,6 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.danaBarOption, forKey: .danaBarOption)
         try container.encode(settings.insulinAgeOption, forKey: .insulinAgeOption)
         try container.encode(settings.cannulaAgeOption, forKey: .cannulaAgeOption)
-        try container.encode(settings.loopViewOption, forKey: .loopViewOption)
         try container.encode(settings.chartBackgroundColored, forKey: .chartBackgroundColored)
         try container.encode(settings.carbInsulinLoopViewOption, forKey: .carbInsulinLoopViewOption)
         try container.encode(settings.topBarActive, forKey: .topBarActive)

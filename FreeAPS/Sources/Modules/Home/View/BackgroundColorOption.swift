@@ -8,7 +8,6 @@ import SwiftUICore
 
 enum BackgroundColorOption: String, CaseIterable, Identifiable, Encodable {
     case darkBlue
-    case deepSkyBlue3
     case darkSlateGray4
     case teal
     case darkGreen
@@ -20,7 +19,6 @@ enum BackgroundColorOption: String, CaseIterable, Identifiable, Encodable {
     case indianRed4
     case burntOrange
     case autumnLeaf
-    case sienna3
     case goldenRod4
     case navajoWhite4
 
@@ -30,8 +28,6 @@ enum BackgroundColorOption: String, CaseIterable, Identifiable, Encodable {
         switch self {
         case .darkBlue:
             return Color(red: 0.08, green: 0.15, blue: 0.20)
-        case .deepSkyBlue3:
-            return Color(red: 0.00, green: 0.60, blue: 0.80)
         case .darkSlateGray4:
             return Color(red: 0.32, green: 0.55, blue: 0.55)
         case .teal:
@@ -54,8 +50,6 @@ enum BackgroundColorOption: String, CaseIterable, Identifiable, Encodable {
             return Color(red: 0.45, green: 0.22, blue: 0.12)
         case .autumnLeaf:
             return Color(red: 0.58, green: 0.33, blue: 0.09)
-        case .sienna3:
-            return Color(red: 0.80, green: 0.41, blue: 0.22)
         case .goldenRod4:
             return Color(red: 0.55, green: 0.41, blue: 0.08)
         case .navajoWhite4:

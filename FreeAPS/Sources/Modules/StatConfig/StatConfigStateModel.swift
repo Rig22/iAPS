@@ -36,7 +36,6 @@ extension StatConfig {
         @Published var danaBarOption: String = DanaBarOption.max.rawValue
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
-        @Published var loopViewOption: String = LoopViewOption.view1.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = true
         @Published var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.all.rawValue
@@ -118,7 +117,6 @@ extension StatConfig {
             subscribeSetting(\.danaBarOption, on: $danaBarOption) { danaBarOption = $0 }
             subscribeSetting(\.insulinAgeOption, on: $insulinAgeOption) { insulinAgeOption = $0 }
             subscribeSetting(\.cannulaAgeOption, on: $cannulaAgeOption) { cannulaAgeOption = $0 }
-            subscribeSetting(\.loopViewOption, on: $loopViewOption) { loopViewOption = $0 }
             subscribeSetting(\.hideInsulinBadge, on: $hideInsulinBadge) { hideInsulinBadge = $0 }
             subscribeSetting(\.legendsSwitch, on: $legendsSwitch) { legendsSwitch = $0 }
             subscribeSetting(\.tempTargetbar, on: $tempTargetBar) { tempTargetBar = $0 }
