@@ -120,7 +120,6 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var button3D: Bool = false
     var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
     var sensorStartTime: Date?
-    var bolusProgressViewOption: String = BolusProgressViewOption.bolusview2.rawValue
     var sensorStartTimeDefault = Date.distantPast
     var incidenceOfLight = false
     var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
@@ -313,7 +312,6 @@ struct EncodableFreeAPSSettings: Encodable {
         case button3D
         case sensorAgeDays
         case sensorStartTime
-        case bolusProgressViewOption
         case sensorStartTimeDefault
         case incidenceOfLight
         case lightGlowOverlaySelector
@@ -478,7 +476,6 @@ struct EncodableFreeAPSSettings: Encodable {
         try container.encode(settings.button3D, forKey: .button3D)
         try container.encode(settings.sensorAgeDays, forKey: .sensorAgeDays)
         try container.encodeIfPresent(settings.sensorStartTime, forKey: .sensorStartTime)
-        // try container.encode(settings.bolusProgressViewOption, forKey: .bolusProgressViewOption)
         try container.encode(settings.sensorStartTimeDefault, forKey: .sensorStartTimeDefault)
         try container.encode(settings.incidenceOfLight, forKey: .incidenceOfLight)
         try container.encode(settings.lightGlowOverlaySelector, forKey: .lightGlowOverlaySelector)

@@ -327,7 +327,6 @@
 		7974B64C2D3817C10077EF9F /* LoopViewOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7974B64B2D3817C10077EF9F /* LoopViewOption.swift */; };
 		7974B64E2D3818030077EF9F /* LoopView2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7974B64D2D3818030077EF9F /* LoopView2.swift */; };
 		797A852E2D97E8EF00DAB622 /* LightGlowOverlaySelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */; };
-		797CA82B2D85AD69009D5ACC /* BolusProgressViewOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797CA82A2D85AD4B009D5ACC /* BolusProgressViewOption.swift */; };
 		7984214F2E0818E2003A7410 /* DanaBarOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7984214E2E081851003A7410 /* DanaBarOption.swift */; };
 		798421512E082FCF003A7410 /* PumpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798421502E082FC8003A7410 /* PumpView.swift */; };
 		7987CE052D6A10D80045F6EA /* SensorAgeDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */; };
@@ -973,7 +972,6 @@
 		7974B64B2D3817C10077EF9F /* LoopViewOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopViewOption.swift; sourceTree = "<group>"; };
 		7974B64D2D3818030077EF9F /* LoopView2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopView2.swift; sourceTree = "<group>"; };
 		797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightGlowOverlaySelector.swift; sourceTree = "<group>"; };
-		797CA82A2D85AD4B009D5ACC /* BolusProgressViewOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BolusProgressViewOption.swift; sourceTree = "<group>"; };
 		7984214E2E081851003A7410 /* DanaBarOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaBarOption.swift; sourceTree = "<group>"; };
 		798421502E082FC8003A7410 /* PumpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpView.swift; sourceTree = "<group>"; };
 		7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorAgeDays.swift; sourceTree = "<group>"; };
@@ -1595,7 +1593,6 @@
 			children = (
 				7984214E2E081851003A7410 /* DanaBarOption.swift */,
 				797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */,
-				797CA82A2D85AD4B009D5ACC /* BolusProgressViewOption.swift */,
 				7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */,
 				7909A4A92D5101D800975822 /* BarViewOptionConfiguration.swift */,
 				7974B64B2D3817C10077EF9F /* LoopViewOption.swift */,
@@ -3064,7 +3061,6 @@
 				3870FF4725EC187A0088248F /* BloodGlucose.swift in Sources */,
 				38A0364225ED069400FCBB52 /* TempBasal.swift in Sources */,
 				7984214F2E0818E2003A7410 /* DanaBarOption.swift in Sources */,
-				797CA82B2D85AD69009D5ACC /* BolusProgressViewOption.swift in Sources */,
 				7914D3342E118E02009C408E /* NSUserDefaults.swift in Sources */,
 				7949F9012DC11A710058BF94 /* SystemSoundsManager.swift in Sources */,
 				3811DE1725C9D40400A708ED /* Screen.swift in Sources */,

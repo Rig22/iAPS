@@ -108,7 +108,6 @@
   "button3D": false,
   "sensorAgeDays": "Fuenfzehn_Tage",
   "sensorStartTime": "distantPast",
-  "bolusProgressViewOption": "bolusview1",
   "lightGlowOverlaySelector": "atriumview1",
   "sensorStartTimeDefault": "distantPast",
   "incidenceOfLight": "false"

@@ -102,7 +102,6 @@ extension Home {
         @Published var remainingSensorHours: Int?
         @Published var remainingSensorMinutes: Int?
         @Published var elapsedMinutes: Int = 0
-        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview2.rawValue
         @Published var incidenceOfLight: Bool = false
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
         @Published var insulinHours: Double?
@@ -265,7 +264,6 @@ extension Home {
             button3D = settingsManager.settings.button3D
             sensorAgeDays = settingsManager.settings.sensorAgeDays
             sensorStartTime = settingsManager.settings.sensorStartTime
-            bolusProgressViewOption = settingsManager.settings.bolusProgressViewOption
             incidenceOfLight = settingsManager.settings.incidenceOfLight
             lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
             button3DBackground = settingsManager.settings.button3DBackground
@@ -890,7 +888,6 @@ extension Home.StateModel:
         sensorAgeDays = settingsManager.settings.sensorAgeDays
         sensorStartTime = settingsManager.settings.sensorStartTime
         updateRemainingSensorDays()
-        bolusProgressViewOption = settingsManager.settings.bolusProgressViewOption
         incidenceOfLight = settingsManager.settings.incidenceOfLight
         lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
         button3DBackground = settingsManager.settings.button3DBackground

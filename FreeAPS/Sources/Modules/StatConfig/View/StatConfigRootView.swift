@@ -99,6 +99,7 @@ extension StatConfig {
         private func getDescription(for option: DanaBarOption) -> String {
             switch option {
             case .standard: return "Standard"
+            case .standard2: return "Standard 2"
             case .marquee: return "Running Text"
             case .max: return "For Dana User"
             }
@@ -250,21 +251,6 @@ extension StatConfig {
                                      ForEach(LoopViewOption.allCases) { option in
                                          HStack {
                                              Image(option == .view1 ? "LoopView1" : "LoopView2")
-                                                 .resizable()
-                                                 .scaledToFit()
-                                                 .frame(width: 30, height: 30)
-                                             Text(option.rawValue)
-                                                 .font(.caption)
-                                         }
-                                         .tag(option)
-                                     }
-                                 }
-                                 .pickerStyle(NavigationLinkPickerStyle())*/
-
-                                /*   Picker("Select Bolus Progress View", selection: $state.bolusProgressViewOption) {
-                                     ForEach(BolusProgressViewOption.allCases) { option in
-                                         HStack {
-                                             Image(option == .bolusview1 ? "BolusView1" : "BolusView2")
                                                  .resizable()
                                                  .scaledToFit()
                                                  .frame(width: 30, height: 30)

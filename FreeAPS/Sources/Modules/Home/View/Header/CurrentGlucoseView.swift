@@ -133,7 +133,7 @@ struct CurrentGlucoseView: View {
                 }
             }
         }
-        .onChange(of: recentGlucose?.direction) { newDirection in
+        .onChange(of: recentGlucose?.direction) { _, newDirection in
             switch newDirection {
             case .doubleUp,
                  .singleUp,
