@@ -141,7 +141,7 @@ struct PumpView: View {
                 Image(systemName: "battery.\(percent)")
                     .resizable()
                     .rotationEffect(.degrees(-90))
-                    .frame(maxWidth: 30, maxHeight: 13)
+                    .frame(maxWidth: 29, maxHeight: 13)
                     .foregroundColor(batteryColor)
                     .offset(y: -3)
             }
@@ -262,11 +262,11 @@ struct PumpView: View {
             UIImage(imageLiteralResourceName: pump)
                 .fillImageUpToPortion(color: .insulin.opacity(0.8), portion: max(portion, 0.3))
                 .resizable()
-                .frame(maxWidth: 17, maxHeight: 36)
+                .frame(maxWidth: 17, maxHeight: 34)
                 .symbolRenderingMode(.palette)
                 .shadow(radius: 1, x: 2, y: 2)
                 .foregroundStyle(.white)
-                .padding(.bottom, 5)
+                .padding(.bottom, 4)
         }
     }
 }

@@ -1008,57 +1008,6 @@ extension Home {
             }
         }
 
-        /*  @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-             let height: CGFloat = display ? 200 : 230
-             LinearGradient(
-                 gradient: Gradient(colors: [.clear, .clear, .clear]),
-                 startPoint: .top,
-                 endPoint: .bottom
-             )
-             .frame(height: fontSize < .extraExtraLarge ? height + geo.safeAreaInsets.top : height + 10 + geo.safeAreaInsets.top)
-             .overlay(alignment: .top) {
-                 lightGlowOverlayContent()
-
-                 // Horizontale Hauptcontainer
-                 HStack(spacing: 0) {
-                     // Linker Teil (nur im nicht-Display-Modus sichtbar)
-                     if !display {
-                         stackedLeftTopView
-                             .transition(.opacity)
-                             .frame(maxWidth: .infinity, alignment: .leading)
-                             .padding(.leading, 20)
-                     }
-
-                     // Mittlerer Teil (dynamischer Inhalt)
-                     VStack {
-                         Group {
-                             if display {
-                                 glucoseView
-                             } else {
-                                 if let progress = state.bolusProgress, progress > 0 {
-                                     bolusProgressView()
-                                 } else {
-                                     glucoseAndLoopView()
-                                 }
-                             }
-                         }
-                         pumpView
-                             .frame(maxWidth: .infinity)
-                     }
-
-                     // Rechter Teil (nur im nicht-Display-Modus sichtbar)
-                     if !display {
-                         stackedRightTopView
-                             .transition(.opacity)
-                             .frame(maxWidth: .infinity, alignment: .trailing)
-                             .padding(.trailing, 20)
-                     }
-                 }
-                 .padding(.top, geo.safeAreaInsets.top + 20)
-                 .animation(.easeInOut(duration: 1.2), value: display)
-             }
-         }*/
-
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             let height: CGFloat = display ? 200 : 230
             LinearGradient(
@@ -1091,8 +1040,10 @@ extension Home {
                                 }
                             }
                         }
-                        pumpView
-                            .frame(maxWidth: .infinity)
+                        if !display {
+                            pumpView
+                                .frame(maxWidth: .infinity)
+                        }
                     }
                     .frame(maxWidth: .infinity) // Wichtig: Nimmt verfügbaren Platz ein
 

@@ -165,11 +165,13 @@ struct LoopView: View {
 
                     Circle()
                         .fill(Color(iconbackgroundColor))
-                        .frame(width: 35, height: 35)
+                        .frame(width: 41, height: 41)
+                        .offset(y: -1.5)
 
                     Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
                         .font(.system(size: 14))
                         .foregroundColor(.white)
+                        .offset(y: -1.5)
 
                     if isLooping {
                         Circle()
