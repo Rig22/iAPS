@@ -51,7 +51,7 @@ extension StatConfig {
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
         @Published var button3DBackground: Bool = false
         @Published var batteryIconOption: Bool = false
-        @Published var showPumpIcon: Bool = true
+        @Published var iconColorOptionRawValue: String = IconColorOption.clear.rawValue
         // Dana UI Toggels
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
@@ -112,7 +112,6 @@ extension StatConfig {
             subscribeSetting(\.carbButton, on: $carbButton) { carbButton = $0 }
             subscribeSetting(\.profileButton, on: $profileButton) { profileButton = $0 }
             // Dana Toggels
-            subscribeSetting(\.pumpIconRawValue, on: $pumpIconRawValue) { pumpIconRawValue = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
             subscribeSetting(\.danaBarOption, on: $danaBarOption) { danaBarOption = $0 }
             subscribeSetting(\.insulinAgeOption, on: $insulinAgeOption) { insulinAgeOption = $0 }
@@ -139,7 +138,8 @@ extension StatConfig {
             subscribeSetting(\.lightGlowOverlaySelector, on: $lightGlowOverlaySelector) { lightGlowOverlaySelector = $0 }
             subscribeSetting(\.button3DBackground, on: $button3DBackground) { button3DBackground = $0 }
             subscribeSetting(\.batteryIconOption, on: $batteryIconOption) { batteryIconOption = $0 }
-            subscribeSetting(\.showPumpIcon, on: $showPumpIcon) { showPumpIcon = $0 }
+            subscribeSetting(\.iconColorOptionRawValue, on: $iconColorOptionRawValue) {
+                self.iconColorOptionRawValue = $0 }
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {

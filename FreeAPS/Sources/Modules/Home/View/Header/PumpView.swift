@@ -133,17 +133,17 @@ struct PumpView: View {
                     .offset(x: 0, y: -4)
             }
 
-            // MDT, Dana and Medtrum
-            if let battery = battery, !state.pumpName.contains("Omni"), !state.pumpName.contains("Medtrum") {
+            // MDT and Dana
+            if let battery = battery, !state.pumpName.contains("Omni") {
                 let percent = (battery.percent ?? 100) > 80 ? 100 : (battery.percent ?? 100) < 81 &&
                     (battery.percent ?? 100) >
                     60 ? 75 : (battery.percent ?? 100) < 61 && (battery.percent ?? 100) > 40 ? 50 : 25
                 Image(systemName: "battery.\(percent)")
                     .resizable()
                     .rotationEffect(.degrees(-90))
-                    .frame(maxWidth: 32, maxHeight: 16)
+                    .frame(maxWidth: 30, maxHeight: 13)
                     .foregroundColor(batteryColor)
-                    .offset(y: -2)
+                    .offset(y: -3)
             }
         }
         .offset(x: 0, y: 5)

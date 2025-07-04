@@ -117,13 +117,6 @@ extension StatConfig {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 360, height: 280)
-
-                    if state.showPumpIcon {
-                        Image(state.pumpIconRawValue)
-                            .resizable()
-                            .frame(width: 15, height: 15)
-                            .offset(x: -55, y: -122)
-                    }
                 }
                 .frame(width: 360, height: 280)
                 .padding(.top, 20)
@@ -134,31 +127,12 @@ extension StatConfig {
                     ScrollView {
                         Form {
                             Section(
-                                header: Text("Pump Icon"),
-                                footer: Text("Select and configure pump icon display")
+                                header: Text("Pump Settings"),
+                                footer: Text("Configure pump display options")
                             ) {
-                                Toggle("Show Pump Icon", isOn: $state.showPumpIcon)
-
-                                if state.showPumpIcon {
-                                    if #available(iOS 18.0, *) {
-                                        Picker("Select Icon", selection: $state.pumpIconRawValue) {
-                                            ForEach(PumpIconOption.allCases, id: \.rawValue) { option in
-                                                HStack {
-                                                    Image(option.rawValue)
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .frame(width: 60, height: 40)
-                                                    Text(option.displayName)
-                                                        .foregroundColor(.primary)
-                                                }
-                                                .tag(option.rawValue)
-                                            }
-                                        }
-                                        .pickerStyle(NavigationLinkPickerStyle())
-                                    }
-                                }
+                                Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
                             }
-                            Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
+
                             Section(
                                 header: Text("Bar Selection"),
                                 footer: Text("Select the desired bar view")
@@ -249,6 +223,21 @@ extension StatConfig {
                             ) {
                                 Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
                                     ForEach(BackgroundColorOption.allCases) { option in
+                                        HStack {
+                                            Rectangle()
+                                                .fill(option.color)
+                                                .frame(width: 25, height: 25)
+                                                .cornerRadius(4)
+                                            Text(option.rawValue)
+                                                .font(.caption)
+                                        }
+                                        .tag(option.rawValue)
+                                    }
+                                }
+                                .pickerStyle(NavigationLinkPickerStyle())
+
+                                Picker("Icon Background Color", selection: $state.iconColorOptionRawValue) {
+                                    ForEach(IconColorOption.allCases) { option in
                                         HStack {
                                             Rectangle()
                                                 .fill(option.color)

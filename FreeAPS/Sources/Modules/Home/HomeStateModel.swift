@@ -109,7 +109,7 @@ extension Home {
         @Published var batteryAge: String = "--"
         @Published var button3DBackground: Bool = false
         @Published var batteryIconOption: Bool = false
-        @Published var showPumpIcon: Bool = false
+        @Published var iconColorOptionRawValue: String = IconColorOption.clear.rawValue
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -177,15 +177,6 @@ extension Home {
             return hours
         }
 
-        var pumpIconOption: PumpIconOption {
-            get {
-                PumpIconOption(rawValue: pumpIconRawValue) ?? .danaRS // Standardwert, falls der Raw-Wert nicht gefunden wird
-            }
-            set {
-                pumpIconRawValue = newValue.rawValue
-            }
-        }
-
         override func subscribe() {
             setupGlucose()
             setupBasals()
@@ -247,7 +238,6 @@ extension Home {
             carbButton = settingsManager.settings.carbButton
             profileButton = settingsManager.settings.profileButton
             // Dana UI Toggels
-            pumpIconRawValue = settingsManager.settings.pumpIconRawValue
             danaBar = settingsManager.settings.danaBar
             hideInsulinBadge = settingsManager.settings.hideInsulinBadge
             legendsSwitch = settingsManager.settings.legendsSwitch
@@ -266,7 +256,7 @@ extension Home {
             lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
             button3DBackground = settingsManager.settings.button3DBackground
             batteryIconOption = settingsManager.settings.batteryIconOption
-            showPumpIcon = settingsManager.settings.showPumpIcon
+            iconColorOptionRawValue = settingsManager.settings.iconColorOptionRawValue
             // Dana UI Toggels
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -870,7 +860,6 @@ extension Home.StateModel:
         setupOverrideHistory()
         setupData()
         // Dana UI Toggels
-        pumpIconRawValue = settingsManager.settings.pumpIconRawValue
         danaBar = settingsManager.settings.danaBar
         insulinAgeOption = settingsManager.settings.insulinAgeOption
         cannulaAgeOption = settingsManager.settings.cannulaAgeOption
@@ -889,7 +878,7 @@ extension Home.StateModel:
         lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
         button3DBackground = settingsManager.settings.button3DBackground
         batteryIconOption = settingsManager.settings.batteryIconOption
-        showPumpIcon = settingsManager.settings.showPumpIcon
+        iconColorOptionRawValue = settingsManager.settings.iconColorOptionRawValue
         // Dana UI Toggels
     }
 
