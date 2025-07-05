@@ -80,7 +80,7 @@ struct FillablePieSegment: View {
                 )
                 .fill(color)
                 .frame(width: 50, height: 50)
-                .opacity(0.6)
+                .opacity(0.5)
 
                 Image(systemName: symbol)
                     .resizable()
@@ -149,7 +149,7 @@ struct LoopView: View {
             }
 
             // VStack für Kreis + Text
-            VStack(spacing: 4) { // Abstand zwischen Kreis und Text
+            VStack(spacing: 0) { // Abstand zwischen Kreis und Text
                 // ZStack mit Kreis-Elementen
                 ZStack {
                     FillablePieSegment(
@@ -165,7 +165,7 @@ struct LoopView: View {
 
                     Circle()
                         .fill(Color(iconbackgroundColor))
-                        .frame(width: 41, height: 41)
+                        .frame(width: 40, height: 40)
                         .offset(y: -1.5)
 
                     Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")

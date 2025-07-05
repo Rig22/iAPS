@@ -658,7 +658,7 @@ extension Home {
                             amount.formatted(.number.precision(.fractionLength(2))) +
                             NSLocalizedString(" U", comment: " ")
                     )
-                    .font(.system(size: 15))
+                    .font(.system(size: 14))
                     .foregroundStyle(Color.white)
                     .offset(y: -80)
                 }
@@ -715,7 +715,7 @@ extension Home {
         struct FillablePieSegment: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
-            var fillFraction: CGFloat
+            // var fillFraction: CGFloat
             var color: Color
             var backgroundColor: Color
             var displayText: String
@@ -726,6 +726,7 @@ extension Home {
             var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
+            var fillFraction: CGFloat
 
             let angularGradient = AngularGradient(
                 gradient: Gradient(colors: [
@@ -783,7 +784,7 @@ extension Home {
                         )
                         .fill(color)
                         .frame(width: 50, height: 50)
-                        .opacity(0.6)
+                        .opacity(0.5)
 
                         Image(systemName: symbol)
                             .resizable()
@@ -868,7 +869,7 @@ extension Home {
         // HEADERVIEW Anfang
 
         private var stackedLeftTopView: some View {
-            VStack(spacing: 25) {
+            VStack(spacing: 10) {
                 tempRateView
                 carbsView
                 insulinView
@@ -876,7 +877,7 @@ extension Home {
         }
 
         private var stackedRightTopView: some View {
-            VStack(spacing: 120) {
+            VStack(spacing: 90) {
                 eventualBGView
                 loopView
                 // pumpView
@@ -1009,7 +1010,7 @@ extension Home {
         }
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-            let height: CGFloat = display ? 200 : 230
+            let height: CGFloat = display ? 150 : 230
             LinearGradient(
                 gradient: Gradient(colors: [.clear, .clear, .clear]),
                 startPoint: .top,
@@ -1093,7 +1094,7 @@ extension Home {
 
                             FillablePieSegment(
                                 pieSegmentViewModel: carbsPieSegmentViewModel,
-                                fillFraction: fill,
+                                // fillFraction: fill,
                                 color: .white.opacity(0.5),
                                 backgroundColor: .clear,
                                 displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
@@ -1104,7 +1105,8 @@ extension Home {
                                 button3DBackground: state.button3DBackground,
                                 incidenceOfLight: state.incidenceOfLight,
                                 lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                    .atriumview
+                                    .atriumview,
+                                fillFraction: fill
                             )
                             Circle()
                                 .fill(iconbackgroundColor.opacity(1.0))
@@ -1113,6 +1115,7 @@ extension Home {
 
                             Image(systemName: "fork.knife")
                                 .font(.system(size: 20))
+                                .foregroundStyle(Color(.white))
                                 .offset(y: -1.5)
                         }
                     }
@@ -1145,7 +1148,7 @@ extension Home {
                             FillablePieSegment(
                                 pieSegmentViewModel:
                                 insulinPieSegmentViewModel,
-                                fillFraction: fill,
+                                // fillFraction: fill,
                                 color: pieColor,
                                 backgroundColor: .clear,
                                 displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
@@ -1156,7 +1159,8 @@ extension Home {
                                 button3DBackground: state.button3DBackground,
                                 incidenceOfLight: state.incidenceOfLight,
                                 lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                    .atriumview
+                                    .atriumview,
+                                fillFraction: fill
                             )
                             Circle()
                                 .fill(iconbackgroundColor.opacity(1.0))
@@ -1165,6 +1169,7 @@ extension Home {
 
                             Image(systemName: "syringe")
                                 .font(.system(size: 20))
+                                .foregroundStyle(Color(.white))
                                 .offset(y: -1.5)
                         }
                     }
@@ -1201,6 +1206,7 @@ extension Home {
                             .fill(Color.black.opacity(0.2))
                             .frame(width: 50, height: 50)
                             .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            .offset(y: -2.5)
                     }
 
                     Circle()
@@ -1219,10 +1225,12 @@ extension Home {
                             lineWidth: 1
                         )
                         .frame(width: 50, height: 50)
+                        .offset(y: -2.5)
                 } else {
                     Circle()
                         .fill(Color.black.opacity(0.2))
                         .frame(width: 50, height: 50)
+                        .offset(y: -1.5)
                         .overlay(
                             Circle()
                                 .stroke(Color.white, lineWidth: 0)
@@ -1348,7 +1356,7 @@ extension Home {
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: reservoirPieSegmentViewModel,
-                            fillFraction: fill,
+                            // fillFraction: fill,
                             color: reservoirColor,
                             backgroundColor: .clear,
                             displayText: displayText,
@@ -1359,10 +1367,10 @@ extension Home {
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
+                                .atriumview,
+                            fillFraction: fill
                         )
                         .frame(width: 60, height: 60)
-                        .modifier(BlinkingModifier(shouldBlink: shouldBlink))
 
                         Circle()
                             .fill(iconbackgroundColor.opacity(1.0))
@@ -1371,6 +1379,7 @@ extension Home {
 
                         Image(systemName: "cross.vial.fill")
                             .font(.system(size: 20))
+                            .foregroundStyle(Color(.white))
                             .offset(y: -1.5)
                             .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     }
@@ -1457,7 +1466,7 @@ extension Home {
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: insulinAgePieSegmentViewModel,
-                        fillFraction: insulinFraction,
+                        // fillFraction: insulinFraction,
                         color: shouldBlink ? .red : insulinColor,
                         backgroundColor: .clear,
                         displayText: insulinDisplayText,
@@ -1468,9 +1477,9 @@ extension Home {
                         button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                            .atriumview
+                            .atriumview,
+                        fillFraction: insulinFraction
                     )
-                    .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     .frame(width: 60, height: 60)
 
                     Circle()
@@ -1480,6 +1489,7 @@ extension Home {
 
                     Image(systemName: "cross.vial")
                         .font(.system(size: 20))
+                        .foregroundStyle(Color(.white))
                         .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                         .offset(y: -1.5)
                 }
@@ -1509,19 +1519,16 @@ extension Home {
         struct InsulinCatheterSymbol: View {
             var body: some View {
                 ZStack {
-                    // Pencil und Spitze (als Katheter/Nadel)
-                    Image(systemName: "pencil")
+                    Image(systemName: "hockey.puck")
                         .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(width: 15, height: 15)
-                        .symbolRenderingMode(.monochrome)
-                        .font(.system(size: 17, weight: .bold))
-                        .offset(x: 7, y: -8)
+                        // .rotationEffect(.degrees(-50))
+                        .foregroundStyle(Color(.white))
+                        .frame(width: 22, height: 12)
+                        .offset(x: 0, y: -1)
 
-                    // Insulin-Tropfen
-                    Image(systemName: "drop.fill")
-                        .resizable()
-                        .frame(width: 8, height: 10)
+                    Rectangle()
+                        .frame(width: 2, height: 7)
+                        .foregroundStyle(Color(.white))
                         .offset(x: 0, y: 8)
                 }
                 .frame(width: 40, height: 40)
@@ -1615,7 +1622,7 @@ extension Home {
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: cannulaPieSegmentViewModel,
-                        fillFraction: cannulaFraction,
+                        // fillFraction: cannulaFraction,
                         color: cannulaColor,
                         backgroundColor: .clear,
                         displayText: cannulaDisplayText,
@@ -1626,10 +1633,10 @@ extension Home {
                         button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                            .atriumview
+                            .atriumview,
+                        fillFraction: cannulaFraction
                     )
                     .frame(width: 60, height: 60)
-                    .modifier(BlinkingModifier(shouldBlink: shouldBlink))
 
                     Circle()
                         .fill(iconbackgroundColor.opacity(1.0))
@@ -1695,7 +1702,7 @@ extension Home {
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: batteryAgePieSegmentViewModel,
-                        fillFraction: 1.0, // Volle Kreis-Anzeige (kein Füllstand)
+                        // fillFraction: 1.0, // Volle Kreis-Anzeige (kein Füllstand)
                         color: batteryAgeColor,
                         backgroundColor: .clear,
                         displayText: batteryAgeText,
@@ -1707,7 +1714,8 @@ extension Home {
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(
                             rawValue: state.lightGlowOverlaySelector
-                        ) ?? .atriumview
+                        ) ?? .atriumview,
+                        fillFraction: 1.0, // Volle Kreis-Anzeige (kein Füllstand)
                     )
                     .frame(width: 60, height: 60)
 
@@ -1716,9 +1724,10 @@ extension Home {
                         .frame(width: 41, height: 41)
                         .offset(y: -1.5)
 
-                    Image(systemName: "battery.0percent")
+                    Image(systemName: "battery.50percent")
                         .resizable()
                         .rotationEffect(.degrees(-90))
+                        .foregroundStyle(Color(.white))
                         .frame(maxWidth: 22, maxHeight: 12)
                         .offset(y: -1.5)
                 }
@@ -1766,7 +1775,7 @@ extension Home {
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: sensorAgeSegmentViewModel,
-                            fillFraction: fillFraction,
+                            // fillFraction: fillFraction,
                             color: shouldBlink ? .red : sensorColor,
                             backgroundColor: .clear,
                             displayText: sensorAgeText,
@@ -1777,9 +1786,9 @@ extension Home {
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
+                                .atriumview,
+                            fillFraction: fillFraction
                         )
-                        .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                         .frame(width: 60, height: 60)
 
                         Circle()
@@ -1789,6 +1798,7 @@ extension Home {
 
                         Image(systemName: "sensor.tag.radiowaves.forward")
                             .font(.system(size: 20))
+                            .foregroundStyle(Color(.white))
                             .offset(y: -1.5)
                             .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     }
@@ -1826,7 +1836,7 @@ extension Home {
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: connectionPieSegmentViewModel,
-                            fillFraction: connectionFraction,
+                            // fillFraction: connectionFraction,
                             color: Color.white.opacity(0.5),
                             backgroundColor: .clear,
                             displayText: displayText,
@@ -1837,7 +1847,8 @@ extension Home {
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
+                                .atriumview,
+                            fillFraction: connectionFraction,
                         )
                         .frame(width: 60, height: 60)
 
@@ -1848,6 +1859,7 @@ extension Home {
 
                         Image(systemName: "dot.radiowaves.left.and.right")
                             .font(.system(size: 20))
+                            .foregroundStyle(Color(.white))
                             .offset(y: -1.5)
                     }
                     .offset(y: -2)
@@ -2797,7 +2809,7 @@ extension Home {
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {
                 backgroundColor
-                    .frame(height: 50 + geo.safeAreaInsets.bottom)
+                    .frame(height: 60 + geo.safeAreaInsets.bottom)
 
                 let isOverride = fetchedPercent.first?.enabled ?? false
                 let isTarget = (state.tempTarget != nil)
@@ -3232,7 +3244,27 @@ extension Home {
                             .frame(height: 60)
                     }
                     .background(backgroundColor)
-                    // colorScheme == .light ? IAPSconfig.homeViewBackgorundLight : IAPSconfig.homeViewBackgorundDark
+                    /*  .background(
+                     LinearGradient(
+                     gradient: Gradient(
+                     stops: colorScheme == .light
+                     ? [
+                     .init(color: Color.cyan.opacity(0.2), location: 0.0),
+                     .init(color: Color.white, location: 0.3),
+                     .init(color: Color.white, location: 0.8),
+                     .init(color: Color.cyan.opacity(0.2), location: 1.0)
+                     ]
+                     : [
+                     .init(color: Color.cyan.opacity(0.3), location: 0.0),
+                     .init(color: Color.black, location: 0.3),
+                     .init(color: Color.black, location: 0.8),
+                     .init(color: Color.cyan.opacity(0.3), location: 1.0)
+                     ]
+                     ),
+                     startPoint: .top,
+                     endPoint: .bottom
+                     )*/
+
                     .ignoresSafeArea(edges: .vertical)
                     .onAppear {
                         startProgress()
@@ -3274,6 +3306,7 @@ extension Home {
                         }
                         configureView()
                     }
+                    // )
                 }
             }
         }
