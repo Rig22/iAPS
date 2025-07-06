@@ -4,6 +4,8 @@ import UIKit
 
 // Pie Animation
 
+var backgroundColor: Color = .clear
+
 struct PieSliceView: Shape {
     var startAngle: Angle
     var endAngle: Angle
@@ -54,41 +56,51 @@ struct FillablePieSegment: View {
     var color: Color
     var backgroundColor: Color
     var displayText: String
-    var textColor: Color
-
+    var symbolSize: CGFloat
+    var symbol: String
     var animateProgress: Bool
+    var symbolBackgroundColor: Color = .clear
+    var symbolColor: Color = .clear
 
-    let color2 = Color(
-        red: 110 / 255,
-        green: 97 / 255,
-        blue: 232 / 255,
-        opacity: 1.0
+    let angularGradient = AngularGradient(
+        gradient: Gradient(colors: [
+            Color.gray.opacity(0.3)
+        ]),
+        center: .center,
+        startAngle: .degrees(0),
+        endAngle: .degrees(360)
     )
 
     var body: some View {
         VStack {
-            PieSliceView(
-                startAngle: .degrees(-90),
-                endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-            )
-            .fill(color)
-            .frame(width: 50, height: 50)
-            .opacity(1.0)
-        }
-        ZStack {
-            RoundedRectangle(cornerRadius: 6)
-                .fill(Color.black.opacity(0.2))
-                .frame(
-                    width: max(CGFloat(displayText.count) * 8.5, 42),
-                    height: 22
+            ZStack {
+                PieSliceView(
+                    startAngle: .degrees(-90),
+                    endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                 )
+                .fill(color)
+                .frame(width: 50, height: 50)
+                .opacity(0.5)
+
+                // Symbol-Hintergrund (NEU, 40x40)
+                if symbolBackgroundColor != .clear {
+                    Circle()
+                        .fill(symbolBackgroundColor)
+                        .frame(width: 40, height: 40)
+                }
+
+                Image(systemName: symbol)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: symbolSize, height: symbolSize)
+                    .foregroundColor(symbolColor)
+            }
 
             Text(displayText)
-                .font(.system(size: 14))
-                .foregroundStyle(textColor)
+                .font(.system(size: 15))
+                .foregroundColor(.white)
         }
-        .frame(maxWidth: .infinity, alignment: .trailing)
-        .offset(x: 9)
+        .offset(y: 10)
         .onAppear {
             pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
         }
@@ -110,6 +122,7 @@ struct LoopView: View {
     @Binding var isLooping: Bool
     @Binding var lastLoopDate: Date
     @Binding var manualTempBasal: Bool
+    var backgroundColor: Color
 
     @StateObject private var pieSegmentViewModel = PieSegmentViewModel()
 
@@ -141,45 +154,31 @@ struct LoopView: View {
                     return .red
                 }
             }
-            ZStack {
-                FillablePieSegment(
-                    pieSegmentViewModel: pieSegmentViewModel,
-                    fillFraction: min(CGFloat(minutesAgo) / 5.0, 1.0),
-                    color: pieColor,
-                    backgroundColor: .clear,
-                    // displayText: minutesAgo == 0 ? "< 1 min" : "\(minutesAgo) min",
-                    displayText: "\(minutesAgo)min",
-                    textColor: textColor,
-                    animateProgress: true
-                )
 
-                Circle()
-                    .fill(
-                        Color(
-                            red: 110 / 255,
-                            green: 97 / 255,
-                            blue: 232 / 255
-                        )
+            VStack(spacing: 0) {
+                ZStack {
+                    FillablePieSegment(
+                        pieSegmentViewModel: pieSegmentViewModel,
+                        fillFraction: min(CGFloat(minutesAgo) / 5.0, 1.0),
+                        color: pieColor,
+                        backgroundColor: .clear,
+                        displayText: "\(minutesAgo)min",
+                        symbolSize: 20,
+                        symbol: "arrow.trianglehead.2.clockwise.rotate.90",
+                        animateProgress: true,
+                        symbolBackgroundColor: backgroundColor,
+                        symbolColor: color
                     )
-                    .frame(width: 35, height: 35)
 
-                Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
-                    .font(.system(size: 14))
-                    .foregroundColor(.white)
+                    if isLooping {
+                        Circle()
+                            .fill(backgroundColor)
+                            .frame(width: 40, height: 40)
+                    }
 
-                /*  Circle()
-                 .fill(color)
-                 .frame(width: 7, height: 7)*/
-
-                if isLooping {
-                    Circle()
-                        .fill(Color.darkerGray.opacity(0.5))
-                        .frame(width: 50, height: 50)
-                        .transition(.opacity)
-                }
-
-                if isLooping {
-                    PulsatingCircle()
+                    if isLooping {
+                        RotatingArrow(color: color)
+                    }
                 }
             }
         }
@@ -191,39 +190,61 @@ struct LoopView: View {
         }
     }
 
-    struct PulsatingCircle: View {
-        @State private var scale: CGFloat = 1.0
-        @State private var gradientOffset: Double = 0.0
+    struct RotatingArrow: View {
+        var color: Color
+        @State private var rotation: Double = 0
 
         var body: some View {
-            Circle()
-                .fill(
-                    AngularGradient(
-                        gradient: Gradient(colors: [
-                            Color(red: 81 / 255, green: 81 / 255, blue: 81 / 255, opacity: 1.0),
-                            Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255, opacity: 1.0)
-                        ]),
-                        center: .center,
-                        angle: .degrees(gradientOffset)
-                    )
-                )
-                .frame(width: 50, height: 50)
-                .scaleEffect(scale)
+            Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 20, height: 20)
+                .foregroundColor(color)
+                .rotationEffect(.degrees(rotation))
                 .onAppear {
-                    /* withAnimation(
-                         Animation.easeInOut(duration: 1).repeatForever(autoreverses: true)
-                     ) {
-                         scale = 1.2
-                     }*/ // Pulsierend
-
                     withAnimation(
-                        Animation.linear(duration: 2).repeatForever(autoreverses: false)
+                        Animation.linear(duration: 1.0)
+                            .repeatForever(autoreverses: false)
                     ) {
-                        gradientOffset = 360
-                    } // Drehen
+                        rotation = 360
+                    }
                 }
         }
     }
+
+    /*   struct PulsatingCircle: View {
+         @State private var scale: CGFloat = 1.0
+         @State private var gradientOffset: Double = 0.0
+
+         var body: some View {
+             Circle()
+                 .fill(
+                     AngularGradient(
+                         gradient: Gradient(colors: [
+                             Color(red: 81 / 255, green: 81 / 255, blue: 81 / 255, opacity: 1.0),
+                             Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255, opacity: 1.0)
+                         ]),
+                         center: .center,
+                         angle: .degrees(gradientOffset)
+                     )
+                 )
+                 .frame(width: 50, height: 50)
+                 .scaleEffect(scale)
+                 .onAppear {
+                     /* withAnimation(
+                          Animation.easeInOut(duration: 1).repeatForever(autoreverses: true)
+                      ) {
+                          scale = 1.2
+                      }*/ // Pulsierend
+
+                     withAnimation(
+                         Animation.linear(duration: 2).repeatForever(autoreverses: false)
+                     ) {
+                         gradientOffset = 360
+                     } // Drehen
+                 }
+         }
+     }*/
 
     private var color: Color {
         guard actualSuggestion?.timestamp != nil else {
@@ -251,30 +272,17 @@ struct LoopView: View {
         return Int(elapsedSeconds / 60) // Wechselt bei exakt 60 Sekunden auf 1 Minute
     }
 
-    /*   private var pieColor: Color {
-         let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
-
-         if delta < 1.minutes.timeInterval {
-             return .clear // unter 1 Minute
-         } else if delta <= 6.minutes.timeInterval {
-             return .clear // grün für 1-5 Minuten
-         } else if delta < 10.minutes.timeInterval {
-             return .clear // Gelb für 6-9 Minuten
-         } else {
-             return .clear // Rot ab Minute 10
-         }
-     }*/
     private var pieColor: Color {
         let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
 
         if delta < 1.minutes.timeInterval {
-            return .white.opacity(0.4) // unter 1 Minute
+            return .white.opacity(0.5) // unter 1 Minute
         } else if delta <= 6.minutes.timeInterval {
-            return .white.opacity(0.4) // grün für 1-5 Minuten
+            return .white.opacity(0.5) // grün für 1-5 Minuten
         } else if delta < 10.minutes.timeInterval {
-            return .white.opacity(0.4) // Gelb für 6-9 Minuten
+            return .white.opacity(0.5) // Gelb für 6-9 Minuten
         } else {
-            return .white.opacity(0.4) // Rot ab Minute 10
+            return .white.opacity(0.5) // Rot ab Minute 10
         }
     }
 

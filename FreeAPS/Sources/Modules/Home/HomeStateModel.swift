@@ -90,9 +90,8 @@ extension Home {
         @Published var legendsSwitch: Bool = false
         @Published var tempTargetbar: Bool = false
         @Published var timeSettings: Bool = false
-        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.teal.rawValue
-        @Published var danaBarOption: String = DanaBarOption.max.rawValue
-        @Published var loopViewOption: String = LoopViewOption.view1.rawValue
+        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
+        @Published var danaBarOption: String = DanaBarOption.standard.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = false
         @Published var button3D: Bool = false
@@ -102,7 +101,6 @@ extension Home {
         @Published var remainingSensorHours: Int?
         @Published var remainingSensorMinutes: Int?
         @Published var elapsedMinutes: Int = 0
-        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview2.rawValue
         @Published var incidenceOfLight: Bool = false
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
         @Published var insulinHours: Double?
@@ -111,7 +109,6 @@ extension Home {
         @Published var batteryAge: String = "--"
         @Published var button3DBackground: Bool = false
         @Published var batteryIconOption: Bool = false
-        @Published var showPumpIcon: Bool = false
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -179,15 +176,6 @@ extension Home {
             return hours
         }
 
-        var pumpIconOption: PumpIconOption {
-            get {
-                PumpIconOption(rawValue: pumpIconRawValue) ?? .danaRS // Standardwert, falls der Raw-Wert nicht gefunden wird
-            }
-            set {
-                pumpIconRawValue = newValue.rawValue
-            }
-        }
-
         override func subscribe() {
             setupGlucose()
             setupBasals()
@@ -249,7 +237,6 @@ extension Home {
             carbButton = settingsManager.settings.carbButton
             profileButton = settingsManager.settings.profileButton
             // Dana UI Toggels
-            pumpIconRawValue = settingsManager.settings.pumpIconRawValue
             danaBar = settingsManager.settings.danaBar
             hideInsulinBadge = settingsManager.settings.hideInsulinBadge
             legendsSwitch = settingsManager.settings.legendsSwitch
@@ -259,18 +246,15 @@ extension Home {
             danaBarOption = settingsManager.settings.danaBarOption
             insulinAgeOption = settingsManager.settings.insulinAgeOption
             cannulaAgeOption = settingsManager.settings.cannulaAgeOption
-            loopViewOption = settingsManager.settings.loopViewOption
             chartBackgroundColored = settingsManager.settings.chartBackgroundColored
             carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
             button3D = settingsManager.settings.button3D
             sensorAgeDays = settingsManager.settings.sensorAgeDays
             sensorStartTime = settingsManager.settings.sensorStartTime
-            bolusProgressViewOption = settingsManager.settings.bolusProgressViewOption
             incidenceOfLight = settingsManager.settings.incidenceOfLight
             lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
             button3DBackground = settingsManager.settings.button3DBackground
             batteryIconOption = settingsManager.settings.batteryIconOption
-            showPumpIcon = settingsManager.settings.showPumpIcon
             // Dana UI Toggels
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -874,7 +858,6 @@ extension Home.StateModel:
         setupOverrideHistory()
         setupData()
         // Dana UI Toggels
-        pumpIconRawValue = settingsManager.settings.pumpIconRawValue
         danaBar = settingsManager.settings.danaBar
         insulinAgeOption = settingsManager.settings.insulinAgeOption
         cannulaAgeOption = settingsManager.settings.cannulaAgeOption
@@ -883,19 +866,16 @@ extension Home.StateModel:
         timeSettings = settingsManager.settings.timeSettings
         backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
         danaBarOption = settingsManager.settings.danaBarOption
-        loopViewOption = settingsManager.settings.loopViewOption
         chartBackgroundColored = settingsManager.settings.chartBackgroundColored
         carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
         button3D = settingsManager.settings.button3D
         sensorAgeDays = settingsManager.settings.sensorAgeDays
         sensorStartTime = settingsManager.settings.sensorStartTime
         updateRemainingSensorDays()
-        bolusProgressViewOption = settingsManager.settings.bolusProgressViewOption
         incidenceOfLight = settingsManager.settings.incidenceOfLight
         lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
         button3DBackground = settingsManager.settings.button3DBackground
         batteryIconOption = settingsManager.settings.batteryIconOption
-        showPumpIcon = settingsManager.settings.showPumpIcon
         // Dana UI Toggels
     }
 

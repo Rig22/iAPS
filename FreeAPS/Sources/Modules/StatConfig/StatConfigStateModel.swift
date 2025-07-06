@@ -36,7 +36,6 @@ extension StatConfig {
         @Published var danaBarOption: String = DanaBarOption.max.rawValue
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
-        @Published var loopViewOption: String = LoopViewOption.view1.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = true
         @Published var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.all.rawValue
@@ -47,13 +46,11 @@ extension StatConfig {
         @Published var button3D: Bool = false
         @Published var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
         @Published var sensorStartTime: Date?
-        @Published var bolusProgressViewOption: String = BolusProgressViewOption.bolusview2.rawValue
         @Published var sensorStartTimeDefault = Date.distantPast
         @Published var incidenceOfLight: Bool = false
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
         @Published var button3DBackground: Bool = false
         @Published var batteryIconOption: Bool = false
-        @Published var showPumpIcon: Bool = true
         // Dana UI Toggels
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
@@ -114,12 +111,10 @@ extension StatConfig {
             subscribeSetting(\.carbButton, on: $carbButton) { carbButton = $0 }
             subscribeSetting(\.profileButton, on: $profileButton) { profileButton = $0 }
             // Dana Toggels
-            subscribeSetting(\.pumpIconRawValue, on: $pumpIconRawValue) { pumpIconRawValue = $0 }
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
             subscribeSetting(\.danaBarOption, on: $danaBarOption) { danaBarOption = $0 }
             subscribeSetting(\.insulinAgeOption, on: $insulinAgeOption) { insulinAgeOption = $0 }
             subscribeSetting(\.cannulaAgeOption, on: $cannulaAgeOption) { cannulaAgeOption = $0 }
-            subscribeSetting(\.loopViewOption, on: $loopViewOption) { loopViewOption = $0 }
             subscribeSetting(\.hideInsulinBadge, on: $hideInsulinBadge) { hideInsulinBadge = $0 }
             subscribeSetting(\.legendsSwitch, on: $legendsSwitch) { legendsSwitch = $0 }
             subscribeSetting(\.tempTargetbar, on: $tempTargetBar) { tempTargetBar = $0 }
@@ -137,13 +132,11 @@ extension StatConfig {
             subscribeSetting(\.button3D, on: $button3D) { button3D = $0 }
             subscribeSetting(\.sensorAgeDays, on: $sensorAgeDays) { sensorAgeDays = $0 }
             subscribeSetting(\.sensorStartTime, on: $sensorStartTime) { sensorStartTime = $0 }
-            // subscribeSetting(\.bolusProgressViewOption, on: $bolusProgressViewOption) { bolusProgressViewOption = $0 }
             subscribeSetting(\.sensorStartTimeDefault, on: $sensorStartTimeDefault) { sensorStartTimeDefault = $0 }
             subscribeSetting(\.incidenceOfLight, on: $incidenceOfLight) { incidenceOfLight = $0 }
             subscribeSetting(\.lightGlowOverlaySelector, on: $lightGlowOverlaySelector) { lightGlowOverlaySelector = $0 }
             subscribeSetting(\.button3DBackground, on: $button3DBackground) { button3DBackground = $0 }
             subscribeSetting(\.batteryIconOption, on: $batteryIconOption) { batteryIconOption = $0 }
-            subscribeSetting(\.showPumpIcon, on: $showPumpIcon) { showPumpIcon = $0 }
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {
