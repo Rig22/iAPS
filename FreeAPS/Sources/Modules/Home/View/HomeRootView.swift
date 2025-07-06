@@ -640,6 +640,10 @@ extension Home {
                         .frame(width: 110, height: 110)
 
                     Circle()
+                        .fill(backgroundColor.opacity(1.0))
+                        .frame(width: 80, height: 80)
+
+                    Circle()
                         .fill(Color.clear)
                         .frame(width: 25, height: 25)
                         .overlay(
