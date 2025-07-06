@@ -4,6 +4,8 @@ import UIKit
 
 // Pie Animation
 
+var backgroundColor: Color = .clear
+
 struct PieSliceView: Shape {
     var startAngle: Angle
     var endAngle: Angle
@@ -57,10 +59,8 @@ struct FillablePieSegment: View {
     var symbolSize: CGFloat
     var symbol: String
     var animateProgress: Bool
-    // var button3D: Bool
-    // var button3DBackground: Bool
-    // var incidenceOfLight: Bool
-    // var lightGlowOverlaySelector: LightGlowOverlaySelector
+    var symbolBackgroundColor: Color = .clear
+    var symbolColor: Color = .clear
 
     let angularGradient = AngularGradient(
         gradient: Gradient(colors: [
@@ -82,11 +82,18 @@ struct FillablePieSegment: View {
                 .frame(width: 50, height: 50)
                 .opacity(0.5)
 
+                // Symbol-Hintergrund (NEU, 40x40)
+                if symbolBackgroundColor != .clear {
+                    Circle()
+                        .fill(symbolBackgroundColor)
+                        .frame(width: 40, height: 40)
+                }
+
                 Image(systemName: symbol)
                     .resizable()
                     .scaledToFit()
                     .frame(width: symbolSize, height: symbolSize)
-                    .foregroundColor(.white)
+                    .foregroundColor(symbolColor)
             }
 
             Text(displayText)
@@ -115,7 +122,7 @@ struct LoopView: View {
     @Binding var isLooping: Bool
     @Binding var lastLoopDate: Date
     @Binding var manualTempBasal: Bool
-    var iconbackgroundColor: Color
+    var backgroundColor: Color
 
     @StateObject private var pieSegmentViewModel = PieSegmentViewModel()
 
@@ -148,9 +155,7 @@ struct LoopView: View {
                 }
             }
 
-            // VStack für Kreis + Text
-            VStack(spacing: 0) { // Abstand zwischen Kreis und Text
-                // ZStack mit Kreis-Elementen
+            VStack(spacing: 0) {
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: pieSegmentViewModel,
@@ -158,29 +163,21 @@ struct LoopView: View {
                         color: pieColor,
                         backgroundColor: .clear,
                         displayText: "\(minutesAgo)min",
-                        symbolSize: 0,
-                        symbol: "cross.vial",
-                        animateProgress: true
+                        symbolSize: 20,
+                        symbol: "arrow.trianglehead.2.clockwise.rotate.90",
+                        animateProgress: true,
+                        symbolBackgroundColor: backgroundColor,
+                        symbolColor: color
                     )
-
-                    Circle()
-                        .fill(Color(iconbackgroundColor))
-                        .frame(width: 40, height: 40)
-                        .offset(y: -1.5)
-
-                    Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
-                        .font(.system(size: 14))
-                        .foregroundColor(.white)
-                        .offset(y: -1.5)
 
                     if isLooping {
                         Circle()
-                            .fill(Color.darkerGray.opacity(0.5))
-                            .frame(width: 50, height: 50)
+                            .fill(backgroundColor)
+                            .frame(width: 40, height: 40)
                     }
 
                     if isLooping {
-                        PulsatingCircle()
+                        RotatingArrow(color: color)
                     }
                 }
             }
@@ -193,39 +190,61 @@ struct LoopView: View {
         }
     }
 
-    struct PulsatingCircle: View {
-        @State private var scale: CGFloat = 1.0
-        @State private var gradientOffset: Double = 0.0
+    struct RotatingArrow: View {
+        var color: Color
+        @State private var rotation: Double = 0
 
         var body: some View {
-            Circle()
-                .fill(
-                    AngularGradient(
-                        gradient: Gradient(colors: [
-                            Color(red: 81 / 255, green: 81 / 255, blue: 81 / 255, opacity: 1.0),
-                            Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255, opacity: 1.0)
-                        ]),
-                        center: .center,
-                        angle: .degrees(gradientOffset)
-                    )
-                )
-                .frame(width: 50, height: 50)
-                .scaleEffect(scale)
+            Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
+                .resizable()
+                .scaledToFit()
+                .frame(width: 20, height: 20)
+                .foregroundColor(color)
+                .rotationEffect(.degrees(rotation))
                 .onAppear {
-                    /* withAnimation(
-                         Animation.easeInOut(duration: 1).repeatForever(autoreverses: true)
-                     ) {
-                         scale = 1.2
-                     }*/ // Pulsierend
-
                     withAnimation(
-                        Animation.linear(duration: 2).repeatForever(autoreverses: false)
+                        Animation.linear(duration: 1.0)
+                            .repeatForever(autoreverses: false)
                     ) {
-                        gradientOffset = 360
-                    } // Drehen
+                        rotation = 360
+                    }
                 }
         }
     }
+
+    /*   struct PulsatingCircle: View {
+         @State private var scale: CGFloat = 1.0
+         @State private var gradientOffset: Double = 0.0
+
+         var body: some View {
+             Circle()
+                 .fill(
+                     AngularGradient(
+                         gradient: Gradient(colors: [
+                             Color(red: 81 / 255, green: 81 / 255, blue: 81 / 255, opacity: 1.0),
+                             Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255, opacity: 1.0)
+                         ]),
+                         center: .center,
+                         angle: .degrees(gradientOffset)
+                     )
+                 )
+                 .frame(width: 50, height: 50)
+                 .scaleEffect(scale)
+                 .onAppear {
+                     /* withAnimation(
+                          Animation.easeInOut(duration: 1).repeatForever(autoreverses: true)
+                      ) {
+                          scale = 1.2
+                      }*/ // Pulsierend
+
+                     withAnimation(
+                         Animation.linear(duration: 2).repeatForever(autoreverses: false)
+                     ) {
+                         gradientOffset = 360
+                     } // Drehen
+                 }
+         }
+     }*/
 
     private var color: Color {
         guard actualSuggestion?.timestamp != nil else {

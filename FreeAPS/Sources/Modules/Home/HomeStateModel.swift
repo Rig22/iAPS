@@ -109,7 +109,6 @@ extension Home {
         @Published var batteryAge: String = "--"
         @Published var button3DBackground: Bool = false
         @Published var batteryIconOption: Bool = false
-        @Published var iconColorOptionRawValue: String = IconColorOption.clear.rawValue
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -256,7 +255,6 @@ extension Home {
             lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
             button3DBackground = settingsManager.settings.button3DBackground
             batteryIconOption = settingsManager.settings.batteryIconOption
-            iconColorOptionRawValue = settingsManager.settings.iconColorOptionRawValue
             // Dana UI Toggels
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -878,7 +876,6 @@ extension Home.StateModel:
         lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
         button3DBackground = settingsManager.settings.button3DBackground
         batteryIconOption = settingsManager.settings.batteryIconOption
-        iconColorOptionRawValue = settingsManager.settings.iconColorOptionRawValue
         // Dana UI Toggels
     }
 

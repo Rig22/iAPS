@@ -640,10 +640,6 @@ extension Home {
                         .frame(width: 110, height: 110)
 
                     Circle()
-                        .fill(iconbackgroundColor.opacity(1.0))
-                        .frame(width: 80, height: 80)
-
-                    Circle()
                         .fill(Color.clear)
                         .frame(width: 25, height: 25)
                         .overlay(
@@ -727,6 +723,8 @@ extension Home {
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
             var fillFraction: CGFloat
+            var symbolRotation: Double = 0
+            var symbolBackgroundColor: Color = .clear
 
             let angularGradient = AngularGradient(
                 gradient: Gradient(colors: [
@@ -786,11 +784,19 @@ extension Home {
                         .frame(width: 50, height: 50)
                         .opacity(0.5)
 
+                        // Symbol-Hintergrund (NEU, 40x40)
+                        if symbolBackgroundColor != .clear {
+                            Circle()
+                                .fill(symbolBackgroundColor)
+                                .frame(width: 40, height: 40)
+                        }
+
                         Image(systemName: symbol)
                             .resizable()
                             .scaledToFit()
                             .frame(width: symbolSize, height: symbolSize)
                             .foregroundColor(.white)
+                            .rotationEffect(.degrees(symbolRotation))
                     }
 
                     Text(displayText)
@@ -869,7 +875,7 @@ extension Home {
         // HEADERVIEW Anfang
 
         private var stackedLeftTopView: some View {
-            VStack(spacing: 10) {
+            VStack(spacing: 25) {
                 tempRateView
                 carbsView
                 insulinView
@@ -877,7 +883,7 @@ extension Home {
         }
 
         private var stackedRightTopView: some View {
-            VStack(spacing: 90) {
+            VStack(spacing: 120) {
                 eventualBGView
                 loopView
                 // pumpView
@@ -1095,28 +1101,21 @@ extension Home {
                             FillablePieSegment(
                                 pieSegmentViewModel: carbsPieSegmentViewModel,
                                 // fillFraction: fill,
-                                color: .white.opacity(0.5),
+                                // color: .white.opacity(0.5),
+                                color: .orange,
                                 backgroundColor: .clear,
                                 displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
-                                symbolSize: 0,
-                                symbol: "cross.vial",
+                                symbolSize: 20,
+                                symbol: "fork.knife",
                                 animateProgress: true,
                                 button3D: state.button3D,
                                 button3DBackground: state.button3DBackground,
                                 incidenceOfLight: state.incidenceOfLight,
                                 lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                     .atriumview,
-                                fillFraction: fill
+                                fillFraction: fill,
+                                symbolBackgroundColor: backgroundColor
                             )
-                            Circle()
-                                .fill(iconbackgroundColor.opacity(1.0))
-                                .frame(width: 38, height: 38)
-                                .offset(y: -1.5)
-
-                            Image(systemName: "fork.knife")
-                                .font(.system(size: 20))
-                                .foregroundStyle(Color(.white))
-                                .offset(y: -1.5)
                         }
                     }
                 }
@@ -1141,7 +1140,8 @@ extension Home {
                             let fill = min(fraction, 1.0)
 
                             let isNegative = substance < 0
-                            let pieColor: Color = isNegative ? .red : .white.opacity(0.5)
+                            // let pieColor: Color = isNegative ? .red : .white.opacity(0.5)
+                            let pieColor: Color = isNegative ? .red : .blue
 
                             let _: Double = isNegative ? 90 : -90
 
@@ -1152,25 +1152,17 @@ extension Home {
                                 color: pieColor,
                                 backgroundColor: .clear,
                                 displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
-                                symbolSize: 0,
-                                symbol: "cross.vial",
+                                symbolSize: 20,
+                                symbol: "syringe",
                                 animateProgress: true,
                                 button3D: state.button3D,
                                 button3DBackground: state.button3DBackground,
                                 incidenceOfLight: state.incidenceOfLight,
                                 lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                     .atriumview,
-                                fillFraction: fill
+                                fillFraction: fill,
+                                symbolBackgroundColor: backgroundColor
                             )
-                            Circle()
-                                .fill(iconbackgroundColor.opacity(1.0))
-                                .frame(width: 38, height: 38)
-                                .offset(y: -1.5)
-
-                            Image(systemName: "syringe")
-                                .font(.system(size: 20))
-                                .foregroundStyle(Color(.white))
-                                .offset(y: -1.5)
                         }
                     }
                     .onTapGesture {
@@ -1245,7 +1237,7 @@ extension Home {
                     isLooping: $state.isLooping,
                     lastLoopDate: $state.lastLoopDate,
                     manualTempBasal: $state.manualTempBasal,
-                    iconbackgroundColor: iconbackgroundColor
+                    backgroundColor: backgroundColor,
                 )
                 .onTapGesture {
                     state.isStatusPopupPresented.toggle()
@@ -1360,8 +1352,8 @@ extension Home {
                             color: reservoirColor,
                             backgroundColor: .clear,
                             displayText: displayText,
-                            symbolSize: 0,
-                            symbol: "cross.vial",
+                            symbolSize: 25,
+                            symbol: "cross.vial.fill",
                             animateProgress: true,
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
@@ -1371,17 +1363,7 @@ extension Home {
                             fillFraction: fill
                         )
                         .frame(width: 60, height: 60)
-
-                        Circle()
-                            .fill(iconbackgroundColor.opacity(1.0))
-                            .frame(width: 41, height: 41)
-                            .offset(y: -1.5)
-
-                        Image(systemName: "cross.vial.fill")
-                            .font(.system(size: 20))
-                            .foregroundStyle(Color(.white))
-                            .offset(y: -1.5)
-                            .modifier(BlinkingModifier(shouldBlink: shouldBlink))
+                        .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     }
                 }
             }
@@ -1470,7 +1452,7 @@ extension Home {
                         color: shouldBlink ? .red : insulinColor,
                         backgroundColor: .clear,
                         displayText: insulinDisplayText,
-                        symbolSize: 0,
+                        symbolSize: 25,
                         symbol: "cross.vial",
                         animateProgress: true,
                         button3D: state.button3D,
@@ -1478,20 +1460,10 @@ extension Home {
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview,
-                        fillFraction: insulinFraction
+                        fillFraction: insulinFraction,
+                        symbolBackgroundColor: backgroundColor
                     )
                     .frame(width: 60, height: 60)
-
-                    Circle()
-                        .fill(iconbackgroundColor.opacity(1.0))
-                        .frame(width: 41, height: 41)
-                        .offset(y: -1.5)
-
-                    Image(systemName: "cross.vial")
-                        .font(.system(size: 20))
-                        .foregroundStyle(Color(.white))
-                        .modifier(BlinkingModifier(shouldBlink: shouldBlink))
-                        .offset(y: -1.5)
                 }
                 .onAppear {
                     startInsulinBlinkAnimationIfNeeded()
@@ -1626,22 +1598,18 @@ extension Home {
                         color: cannulaColor,
                         backgroundColor: .clear,
                         displayText: cannulaDisplayText,
-                        symbolSize: 0,
-                        symbol: "cross.vial",
+                        symbolSize: 20,
+                        symbol: "InsulinCatheterSymbol",
                         animateProgress: true,
                         button3D: state.button3D,
                         button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview,
-                        fillFraction: cannulaFraction
+                        fillFraction: cannulaFraction,
+                        symbolBackgroundColor: backgroundColor
                     )
                     .frame(width: 60, height: 60)
-
-                    Circle()
-                        .fill(iconbackgroundColor.opacity(1.0))
-                        .frame(width: 41, height: 41)
-                        .offset(y: -1.5)
 
                     InsulinCatheterSymbol()
                         .offset(y: -1.5)
@@ -1706,8 +1674,8 @@ extension Home {
                         color: batteryAgeColor,
                         backgroundColor: .clear,
                         displayText: batteryAgeText,
-                        symbolSize: 0,
-                        symbol: "cross.vial",
+                        symbolSize: 25,
+                        symbol: "battery.50percent",
                         animateProgress: false,
                         button3D: state.button3D,
                         button3DBackground: state.button3DBackground,
@@ -1715,21 +1683,11 @@ extension Home {
                         lightGlowOverlaySelector: LightGlowOverlaySelector(
                             rawValue: state.lightGlowOverlaySelector
                         ) ?? .atriumview,
-                        fillFraction: 1.0, // Volle Kreis-Anzeige (kein Füllstand)
+                        fillFraction: 1.0,
+                        symbolRotation: -90,
+                        symbolBackgroundColor: backgroundColor
                     )
                     .frame(width: 60, height: 60)
-
-                    Circle()
-                        .fill(iconbackgroundColor.opacity(1.0))
-                        .frame(width: 41, height: 41)
-                        .offset(y: -1.5)
-
-                    Image(systemName: "battery.50percent")
-                        .resizable()
-                        .rotationEffect(.degrees(-90))
-                        .foregroundStyle(Color(.white))
-                        .frame(maxWidth: 22, maxHeight: 12)
-                        .offset(y: -1.5)
                 }
             }
         }
@@ -1779,28 +1737,18 @@ extension Home {
                             color: shouldBlink ? .red : sensorColor,
                             backgroundColor: .clear,
                             displayText: sensorAgeText,
-                            symbolSize: 0,
-                            symbol: "cross.vial",
+                            symbolSize: 25,
+                            symbol: "sensor.tag.radiowaves.forward",
                             animateProgress: true,
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
-                            fillFraction: fillFraction
+                            fillFraction: fillFraction,
+                            symbolBackgroundColor: backgroundColor
                         )
                         .frame(width: 60, height: 60)
-
-                        Circle()
-                            .fill(iconbackgroundColor.opacity(1.0))
-                            .frame(width: 41, height: 41)
-                            .offset(y: -1.5)
-
-                        Image(systemName: "sensor.tag.radiowaves.forward")
-                            .font(.system(size: 20))
-                            .foregroundStyle(Color(.white))
-                            .offset(y: -1.5)
-                            .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     }
                     .onAppear {
                         state.settingsDidChange(state.settingsManager.settings)
@@ -1840,8 +1788,8 @@ extension Home {
                             color: Color.white.opacity(0.5),
                             backgroundColor: .clear,
                             displayText: displayText,
-                            symbolSize: 0,
-                            symbol: "cross.vial",
+                            symbolSize: 25,
+                            symbol: "dot.radiowaves.left.and.right",
                             animateProgress: true,
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
@@ -1849,18 +1797,9 @@ extension Home {
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
                             fillFraction: connectionFraction,
+                            symbolBackgroundColor: backgroundColor
                         )
                         .frame(width: 60, height: 60)
-
-                        Circle()
-                            .fill(iconbackgroundColor.opacity(1.0))
-                            .frame(width: 41, height: 41)
-                            .offset(y: -1.5)
-
-                        Image(systemName: "dot.radiowaves.left.and.right")
-                            .font(.system(size: 20))
-                            .foregroundStyle(Color(.white))
-                            .offset(y: -1.5)
                     }
                     .offset(y: -2)
                 }
@@ -2093,9 +2032,19 @@ extension Home {
                                     }
 
                                     if remainingHours <= 0 {
-                                        BigVialView(color: insulinColor, iconbackgroundColor: iconbackgroundColor)
+                                        BigVialView(color: insulinColor)
                                     } else {
-                                        NormalVialView(color: insulinColor, iconbackgroundColor: iconbackgroundColor)
+                                        NormalVialView(
+                                            color: insulinColor,
+                                            button3D: state.button3D,
+                                            button3DBackground: state.button3DBackground,
+                                            incidenceOfLight: state.incidenceOfLight,
+                                            lightGlowOverlaySelector: LightGlowOverlaySelector(
+                                                rawValue: state
+                                                    .lightGlowOverlaySelector
+                                            ) ??
+                                                .atriumview
+                                        )
                                     }
                                 }
                                 .frame(width: 40, height: 40)
@@ -2179,9 +2128,19 @@ extension Home {
                                     }
 
                                     if remainingHours <= 0 {
-                                        BigFluidBagView(color: cannulaColor, iconbackgroundColor: iconbackgroundColor)
+                                        BigFluidBagView(color: cannulaColor)
                                     } else {
-                                        NormalFluidBagView(color: cannulaColor, iconbackgroundColor: iconbackgroundColor)
+                                        NormalFluidBagView(
+                                            color: cannulaColor,
+                                            button3D: state.button3D,
+                                            button3DBackground: state.button3DBackground,
+                                            incidenceOfLight: state.incidenceOfLight,
+                                            lightGlowOverlaySelector: LightGlowOverlaySelector(
+                                                rawValue: state
+                                                    .lightGlowOverlaySelector
+                                            ) ??
+                                                .atriumview
+                                        )
                                     }
                                 }
                                 .frame(width: 40, height: 40)
@@ -2245,9 +2204,22 @@ extension Home {
                                     }
 
                                     if shouldBlink {
-                                        BigSensorView(color: sensorColor, iconbackgroundColor: iconbackgroundColor)
+                                        BigSensorView(
+                                            color: sensorColor
+                                        )
+
                                     } else {
-                                        NormalSensorView(color: sensorColor, iconbackgroundColor: iconbackgroundColor)
+                                        NormalSensorView(
+                                            color: sensorColor,
+                                            button3D: state.button3D,
+                                            button3DBackground: state.button3DBackground,
+                                            incidenceOfLight: state.incidenceOfLight,
+                                            lightGlowOverlaySelector: LightGlowOverlaySelector(
+                                                rawValue: state
+                                                    .lightGlowOverlaySelector
+                                            ) ??
+                                                .atriumview
+                                        )
                                     }
                                 }
                                 .frame(width: 40, height: 40)
@@ -2269,94 +2241,71 @@ extension Home {
 
         struct BigVialView: View {
             var color: Color
-            var iconbackgroundColor: Color
             var body: some View {
                 Image(systemName: "alarm.fill")
                     .font(.system(size: 45))
                     .foregroundColor(color)
-                    .background(
-                        Circle()
-                            .fill(iconbackgroundColor.opacity(1.0))
-                            .frame(width: 0, height: 0)
-                    )
                     .offset(y: -2.5)
             }
         }
 
         struct NormalVialView: View {
             var color: Color
-            var iconbackgroundColor: Color
+            var button3D: Bool
+            var button3DBackground: Bool
+            var incidenceOfLight: Bool
+            var lightGlowOverlaySelector: LightGlowOverlaySelector
             var body: some View {
                 Image(systemName: "cross.vial")
                     .font(.system(size: 20))
                     .foregroundColor(color)
-                    .background(
-                        Circle()
-                            .fill(iconbackgroundColor.opacity(1.0))
-                            .frame(width: 41, height: 41)
-                    )
             }
         }
 
         private struct BigFluidBagView: View {
             var color: Color
-            var iconbackgroundColor: Color
             var body: some View {
                 Image(systemName: "alarm.fill")
                     .font(.system(size: 45))
                     .foregroundColor(color)
-                    .background(
-                        Circle()
-                            .fill(iconbackgroundColor.opacity(1.0))
-                            .frame(width: 0, height: 0)
-                    )
                     .offset(y: -2.5)
             }
         }
 
         private struct NormalFluidBagView: View {
             var color: Color
-            var iconbackgroundColor: Color
+            var button3D: Bool
+            var button3DBackground: Bool
+            var incidenceOfLight: Bool
+            var lightGlowOverlaySelector: LightGlowOverlaySelector
             var body: some View {
                 Image(systemName: "drop.fill")
                     .font(.system(size: 20))
                     .foregroundColor(color)
-                    .background(
-                        Circle()
-                            .fill(iconbackgroundColor.opacity(1.0))
-                            .frame(width: 41, height: 41)
-                    )
             }
         }
 
         private struct BigSensorView: View {
             var color: Color
-            var iconbackgroundColor: Color
             var body: some View {
                 Image(systemName: "alarm.fill")
                     .font(.system(size: 45))
                     .foregroundColor(color)
-                    .background(
-                        Circle()
-                            .fill(iconbackgroundColor.opacity(1.0))
-                            .frame(width: 0, height: 0)
-                    )
                     .offset(y: -2.5)
             }
         }
 
         private struct NormalSensorView: View {
             var color: Color
-            var iconbackgroundColor: Color
+            var button3D: Bool
+            var button3DBackground: Bool
+            var incidenceOfLight: Bool
+            var lightGlowOverlaySelector: LightGlowOverlaySelector
+
             var body: some View {
                 Image(systemName: "sensor.tag.radiowaves.forward")
                     .font(.system(size: 20))
                     .foregroundColor(color)
-                    .background(
-                        Circle()
-                            .fill(iconbackgroundColor.opacity(1.0))
-                            .frame(width: 41, height: 41)
-                    )
             }
         }
 
@@ -2752,19 +2701,34 @@ extension Home {
                             .overlay(Circle().stroke(Color.white, lineWidth: 0))
                     }
 
-                    // Spezielles Styling für Spritze
+                    // Spezielles Styling für fork.knife
+                    if iconName == "fork.knife.custom" {
+                        ZStack {
+                            Circle()
+                                .fill(Color.clear)
+                                .frame(width: 30, height: 30)
+
+                            Image(systemName: "fork.knife")
+                                .symbolRenderingMode(.hierarchical)
+                                .foregroundStyle(.orange)
+                                .font(.system(size: 20))
+                        }
+                        .font(.system(size: 20))
+                    }
+
+                    // Spezielles Styling für Syringe
                     if iconName == "syringe.custom" {
                         ZStack {
                             Circle()
-                                .fill(Color.zt)
+                                .fill(Color.clear)
                                 .frame(width: 30, height: 30)
 
                             Image(systemName: "syringe")
                                 .symbolRenderingMode(.hierarchical)
-                                .foregroundStyle(.white)
-                                .font(.system(size: 15))
+                                .foregroundStyle(.blue)
+                                .font(.system(size: 20))
                         }
-                        .font(.system(size: 25))
+                        .font(.system(size: 20))
                     }
 
                     // SF Symbol Darstellung mit direkter Farbanwendung
@@ -2819,9 +2783,9 @@ extension Home {
                     if state.carbButton {
                         ZStack {
                             buttonWithCircle(
-                                iconName: "fork.knife.circle.fill",
+                                iconName: "fork.knife.custom",
                                 symbolRenderingMode: .palette,
-                                colors: [.white, .zt],
+                                colors: [.orange, .clear],
                                 circleColor: Color.black.opacity(1.0)
                             ) {
                                 state.showModal(for: .addCarbs(editMode: false, override: false))
@@ -2842,7 +2806,7 @@ extension Home {
                     // IOB Button
                     buttonWithCircle(
                         iconName: "syringe.custom",
-                        colors: [.blue, .black], // [Kreisfarbe, Spritzenfarbe]
+                        colors: [.blue, .clear], // [Spritzenfarbe, Kreisfarbe]
                         circleColor: Color.black.opacity(1.0)
                     ) {
                         (state.bolusProgress != nil) ? showBolusActiveAlert = true :
@@ -3197,17 +3161,6 @@ extension Home {
 
         var backgroundColor: Color {
             BackgroundColorOption(rawValue: state.backgroundColorOptionRawValue)?.color ?? .black
-        }
-
-        var iconbackgroundColor: Color {
-            if let iconOption = IconColorOption(rawValue: state.iconColorOptionRawValue) {
-                if iconOption == .clear {
-                    return BackgroundColorOption(rawValue: state.backgroundColorOptionRawValue)?.color ?? .zt
-                } else {
-                    return iconOption.color
-                }
-            }
-            return .zt // Fallback
         }
 
         var body: some View {

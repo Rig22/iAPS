@@ -51,7 +51,6 @@ extension StatConfig {
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
         @Published var button3DBackground: Bool = false
         @Published var batteryIconOption: Bool = false
-        @Published var iconColorOptionRawValue: String = IconColorOption.clear.rawValue
         // Dana UI Toggels
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
@@ -138,8 +137,6 @@ extension StatConfig {
             subscribeSetting(\.lightGlowOverlaySelector, on: $lightGlowOverlaySelector) { lightGlowOverlaySelector = $0 }
             subscribeSetting(\.button3DBackground, on: $button3DBackground) { button3DBackground = $0 }
             subscribeSetting(\.batteryIconOption, on: $batteryIconOption) { batteryIconOption = $0 }
-            subscribeSetting(\.iconColorOptionRawValue, on: $iconColorOptionRawValue) {
-                self.iconColorOptionRawValue = $0 }
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {

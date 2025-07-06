@@ -274,21 +274,6 @@ extension StatConfig {
                                 }
                                 .pickerStyle(NavigationLinkPickerStyle())
 
-                                Picker("Icon Background Color", selection: $state.iconColorOptionRawValue) {
-                                    ForEach(IconColorOption.allCases) { option in
-                                        HStack {
-                                            Rectangle()
-                                                .fill(option.color)
-                                                .frame(width: 25, height: 25)
-                                                .cornerRadius(4)
-                                            Text(option.rawValue)
-                                                .font(.caption)
-                                        }
-                                        .tag(option.rawValue)
-                                    }
-                                }
-                                .pickerStyle(NavigationLinkPickerStyle())
-
                                 Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
                                 Toggle("3D Look", isOn: $state.button3D)
                                 if state.button3D {

@@ -313,7 +313,6 @@
 		711C0CB42CAABE788916BC9D /* ManualTempBasalDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96653287EDB276A111288305 /* ManualTempBasalDataFlow.swift */; };
 		72F1BD388F42FCA6C52E4500 /* ConfigEditorProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44080E4709E3AE4B73054563 /* ConfigEditorProvider.swift */; };
 		7909A4AA2D5101E500975822 /* BarViewOptionConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7909A4A92D5101D800975822 /* BarViewOptionConfiguration.swift */; };
-		791125142E15AA43005279F2 /* IconColorOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791125132E15AA28005279F2 /* IconColorOption.swift */; };
 		7914D3342E118E02009C408E /* NSUserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7914D3332E118DF0009C408E /* NSUserDefaults.swift */; };
 		791D86DC2D071A04001D2763 /* InsulinAgeOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */; };
 		7927B9132E09A82700C46026 /* MedtrumPumpManagerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7927B9122E09A81600C46026 /* MedtrumPumpManagerExtensions.swift */; };
@@ -956,7 +955,6 @@
 		6F8BA8533F56BC55748CA877 /* PreferencesEditorProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PreferencesEditorProvider.swift; sourceTree = "<group>"; };
 		72778B68C3004F71F6E79BDC /* PumpSettingsEditorStateModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PumpSettingsEditorStateModel.swift; sourceTree = "<group>"; };
 		7909A4A92D5101D800975822 /* BarViewOptionConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BarViewOptionConfiguration.swift; sourceTree = "<group>"; };
-		791125132E15AA28005279F2 /* IconColorOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IconColorOption.swift; sourceTree = "<group>"; };
 		7914D3332E118DF0009C408E /* NSUserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NSUserDefaults.swift; sourceTree = "<group>"; };
 		791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinAgeOption.swift; sourceTree = "<group>"; };
 		7927B9122E09A81600C46026 /* MedtrumPumpManagerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedtrumPumpManagerExtensions.swift; sourceTree = "<group>"; };
@@ -1587,7 +1585,6 @@
 		3811DE2C25C9D49500A708ED /* View */ = {
 			isa = PBXGroup;
 			children = (
-				791125132E15AA28005279F2 /* IconColorOption.swift */,
 				7984214E2E081851003A7410 /* DanaBarOption.swift */,
 				797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */,
 				7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */,
@@ -3044,7 +3041,6 @@
 				386A124F271707F000DDC61C /* DexcomSourceG6.swift in Sources */,
 				CE94598429E9E3E60047C9C6 /* WatchConfigStateModel.swift in Sources */,
 				38DF1786276A73D400B3528F /* TagCloudView.swift in Sources */,
-				791125142E15AA43005279F2 /* IconColorOption.swift in Sources */,
 				38B4F3CD25E5031100E76A18 /* Broadcaster.swift in Sources */,
 				383420D925FFEB3F002D46C1 /* Popup.swift in Sources */,
 				3811DE3025C9D49500A708ED /* HomeStateModel.swift in Sources */,

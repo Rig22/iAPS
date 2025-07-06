@@ -130,7 +130,6 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var glucoseOverrideThresholdActive: Bool = false
     var glucoseOverrideThresholdActiveDown: Bool = false
     var glucoseOverrideThresholdDown: Decimal = 100
-    var iconColorOptionRawValue: String = IconColorOption.clear.rawValue
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false
@@ -310,7 +309,6 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
             case glucoseOverrideThresholdActive
             case glucoseOverrideThresholdActiveDown
             case glucoseOverrideThresholdDown
-            case iconcolorOptionRawValue
             // Dana Toggles
             // AutoISF
             case autoisf
@@ -473,7 +471,6 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
             try container.encode(settings.glucoseOverrideThresholdActive, forKey: .glucoseOverrideThresholdActive)
             try container.encode(settings.glucoseOverrideThresholdActiveDown, forKey: .glucoseOverrideThresholdActiveDown)
             try container.encode(settings.glucoseOverrideThresholdDown, forKey: .glucoseOverrideThresholdDown)
-            try container.encode(settings.iconColorOptionRawValue, forKey: .iconcolorOptionRawValue)
             // Dana Toggels
             // AutoISF
             try container.encode(settings.autoisf, forKey: .autoisf)
