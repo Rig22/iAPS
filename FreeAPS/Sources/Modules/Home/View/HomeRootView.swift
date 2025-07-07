@@ -1691,7 +1691,13 @@ extension Home {
                         symbolRotation: -90,
                         symbolBackgroundColor: backgroundColor
                     )
-                    .frame(width: 60, height: 60)
+                    Image(systemName: "timer.circle.fill")
+                        .resizable()
+                        // .rotationEffect(.degrees(-50))
+                        .foregroundStyle(Color(.white))
+                        .frame(width: 15, height: 15)
+                        .offset(x: 13, y: -17)
+                        .frame(width: 60, height: 60)
                 }
             }
         }

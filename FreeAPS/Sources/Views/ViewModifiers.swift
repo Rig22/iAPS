@@ -137,32 +137,6 @@ struct FrostedGlass: View {
     }
 }
 
-struct NonStandardInsulin: View {
-    let concentration: Double
-    let pod: Bool
-
-    private var formatter: NumberFormatter {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 0
-        return formatter
-    }
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 15)
-                .fill(.red)
-                .frame(width: 33, height: 15)
-                .overlay {
-                    Text("U" + (formatter.string(from: concentration * 100 as NSNumber) ?? ""))
-                        .font(.system(size: 9))
-                        .foregroundStyle(.white)
-                }
-        }
-        .offset(x: pod ? -15 : -5, y: pod ? -24 : 7)
-    }
-}
-
 struct TooOldValue: View {
     var body: some View {
         ZStack {

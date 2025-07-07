@@ -1,3 +1,4 @@
+// import SwiftUI
 import SwiftUI
 
 enum PumpType {
@@ -58,9 +59,12 @@ struct PumpView: View {
         }
     }
 
-    // Helper to determine if we should use pod layout
     private var usePodLayout: Bool {
         pumpType == .omnipod || pumpType == .medtrum
+    }
+
+    private var showInsulinBadge: Bool {
+        (concentration.last?.concentration ?? 1) != 1 && !state.settingsManager.settings.hideInsulinBadge
     }
 
     var body: some View {
@@ -74,17 +78,14 @@ struct PumpView: View {
                         let amountFraction = 1.0 - (Double(insulin + 10) * 1.2 / 200)
                         if insulin == 0xDEAD_BEEF {
                             podInsulinAmount(portion: amountFraction)
-                                .padding(.leading, (concentration.last?.concentration ?? 1) != 1 ? 7 : 0)
+                                .padding(.leading, showInsulinBadge ? 7 : 0)
                                 .overlay {
                                     if let timeZone = timeZone,
                                        timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
                                     {
                                         ClockOffset(mdtPump: false)
                                     }
-                                    if (concentration.last?.concentration ?? 1) != 1,
-                                       !state.settingsManager.settings
-                                       .hideInsulinBadge
-                                    {
+                                    if showInsulinBadge {
                                         NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
                                     }
                                 }
@@ -100,16 +101,14 @@ struct PumpView: View {
                             }
                             .offset(x: 6, y: 0) // Horizontal adjustment
                             podInsulinAmount(portion: amountFraction)
-                                .padding(.leading, (concentration.last?.concentration ?? 1) != 1 ? 7 : 0)
+                                .padding(.leading, showInsulinBadge ? 7 : 0)
                                 .overlay {
                                     if let timeZone = timeZone,
                                        timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
                                     {
                                         ClockOffset(mdtPump: false)
                                     }
-                                    if (concentration.last?.concentration ?? 1) != 1,
-                                       !state.settingsManager.settings.hideInsulinBadge
-                                    {
+                                    if showInsulinBadge {
                                         NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
                                     }
                                 }
@@ -121,10 +120,10 @@ struct PumpView: View {
                         remainingTime(time: date.timeIntervalSince(timerDate))
                             .font(.pumpFont)
 
-                        // Battery icon for pods
-                        if battery != nil {
-                            batteryIcon(for: pumpType)
-                                .offset(y: -6) // Fine-tuning for pod battery
+                        // Battery only for Medtrum
+                        if pumpType == .medtrum, battery != nil {
+                            batteryIcon(for: .medtrum)
+                                .offset(y: -1) // Fine-tuning for pod battery
                         }
                     }
                     .offset(x: -5, y: -2) // Vertical adjustment for time+battery row
@@ -138,16 +137,16 @@ struct PumpView: View {
             // MDT/Dana layout
             else {
                 if let reservoir = reservoir {
-                    if (concentration.last?.concentration ?? 1) != 1, !state.settingsManager.settings.hideInsulinBadge {
-                        NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: false)
-                    }
                     let amountFraction = 1.0 - (Double(reservoir + 10) * 1.2 / 200)
                     if reservoir == 0xDEAD_BEEF {
                         pumpInsulinAmount(portion: amountFraction)
-                            .padding(.leading, (concentration.last?.concentration ?? 1) != 1 ? 7 : 0)
+                            .padding(.leading, showInsulinBadge ? 7 : 0)
                             .overlay {
                                 if let timeZone = timeZone, timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT() {
                                     ClockOffset(mdtPump: true)
+                                }
+                                if showInsulinBadge {
+                                    NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: false)
                                 }
                             }
                             .offset(y: expiresAtDate == nil ? -4 : 0)
@@ -161,10 +160,13 @@ struct PumpView: View {
                         }
                         .offset(y: 7)
                         pumpInsulinAmount(portion: amountFraction)
-                            .padding(.leading, (concentration.last?.concentration ?? 1) != 1 ? 7 : 0)
+                            .padding(.leading, showInsulinBadge ? 7 : 0)
                             .overlay {
                                 if let timeZone = timeZone, timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT() {
                                     ClockOffset(mdtPump: false)
+                                }
+                                if showInsulinBadge {
+                                    NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: false)
                                 }
                             }
                             .offset(y: -1) // Slight vertical adjustment
@@ -180,7 +182,7 @@ struct PumpView: View {
                 }
             }
         }
-        .offset(x: 0, y: 5) // Overall vertical adjustment
+        .offset(x: 0, y: 15) // Overall vertical adjustment
     }
 
     private func remainingTime(time: TimeInterval) -> some View {
@@ -299,19 +301,17 @@ struct PumpView: View {
                 .symbolRenderingMode(.palette)
                 .shadow(radius: 1, x: 2, y: 2)
                 .foregroundStyle(.white)
-                .padding(.bottom, 4)
         }
     }
 
-    // Neue View für Batterie-Icons mit typspezifischem Offset
     @ViewBuilder private func batteryIcon(for type: PumpType) -> some View {
         if let battery = battery {
             let percent = batteryLevel(for: battery.percent ?? 100)
             let offsetY: CGFloat = {
                 switch type {
-                case .medtrum: return -2 // Offset y für Medtrum
-                case .mdtDana: return -3 // Standard-Offset y für MDT/Dana
-                default: return -1 // Leichter Offset für Omnipod
+                case .medtrum: return -8 // Kein Offset für Medtrum
+                case .mdtDana: return -1 // Standard-Offset für MDT/Dana
+                default: return -1 // Leichter Offset für Omnipod (wird im Moment nicht verwendet)
                 }
             }()
 
@@ -332,5 +332,31 @@ struct PumpView: View {
         case ...80: return 75
         default: return 100
         }
+    }
+}
+
+struct NonStandardInsulin: View {
+    let concentration: Double
+    let pod: Bool
+
+    private var formatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 0
+        return formatter
+    }
+
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 15)
+                .fill(.red)
+                .frame(width: 33, height: 15)
+                .overlay {
+                    Text("U" + (formatter.string(from: concentration * 100 as NSNumber) ?? ""))
+                        .font(.system(size: 9))
+                        .foregroundStyle(.white)
+                }
+        }
+        .offset(x: pod ? -15 : -15, y: pod ? -24 : -22) // Gleicher Offset für alle Pumpentypen
     }
 }
