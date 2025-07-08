@@ -32,7 +32,8 @@ https://loopkit.github.io/loopdocs/gh-actions/gh-overview/
 # Pumps
 
 - Omnipod EROS  
-- Omnipod DASH  
+- Omnipod DASH
+- Medtrum TouchCare Nano
 - Medtronic 515 or 715 (any firmware)  
 - Medtronic 522 or 722 (any firmware)  
 - Medtronic 523 or 723 (firmware 2.4 or lower)  
@@ -48,7 +49,7 @@ https://loopkit.github.io/loopdocs/gh-actions/gh-overview/
 - Dexcom ONE
 - Dexcom ONE +   
 - Dexcom G7   
-- Libre 1   
+- Libre
 - Libre 2 (European)   
 - Medtronic Enlite
 - Nightscout as CGM
