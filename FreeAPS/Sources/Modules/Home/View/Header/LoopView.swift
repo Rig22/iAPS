@@ -174,6 +174,7 @@ struct LoopView: View {
                         Circle()
                             .fill(backgroundColor)
                             .frame(width: 40, height: 40)
+                            .offset(y: -1.5)
                     }
 
                     if isLooping {
@@ -201,6 +202,7 @@ struct LoopView: View {
                 .frame(width: 20, height: 20)
                 .foregroundColor(color)
                 .rotationEffect(.degrees(rotation))
+                .offset(y: -1.5)
                 .onAppear {
                     withAnimation(
                         Animation.linear(duration: 1.0)
@@ -211,40 +213,6 @@ struct LoopView: View {
                 }
         }
     }
-
-    /*   struct PulsatingCircle: View {
-         @State private var scale: CGFloat = 1.0
-         @State private var gradientOffset: Double = 0.0
-
-         var body: some View {
-             Circle()
-                 .fill(
-                     AngularGradient(
-                         gradient: Gradient(colors: [
-                             Color(red: 81 / 255, green: 81 / 255, blue: 81 / 255, opacity: 1.0),
-                             Color(red: 255 / 255, green: 255 / 255, blue: 255 / 255, opacity: 1.0)
-                         ]),
-                         center: .center,
-                         angle: .degrees(gradientOffset)
-                     )
-                 )
-                 .frame(width: 50, height: 50)
-                 .scaleEffect(scale)
-                 .onAppear {
-                     /* withAnimation(
-                          Animation.easeInOut(duration: 1).repeatForever(autoreverses: true)
-                      ) {
-                          scale = 1.2
-                      }*/ // Pulsierend
-
-                     withAnimation(
-                         Animation.linear(duration: 2).repeatForever(autoreverses: false)
-                     ) {
-                         gradientOffset = 360
-                     } // Drehen
-                 }
-         }
-     }*/
 
     private var color: Color {
         guard actualSuggestion?.timestamp != nil else {
