@@ -298,119 +298,6 @@ extension Home {
             }
         }
 
-        struct BatteryEllipse: View {
-            var battery: Battery?
-            var button3D: Bool
-            var button3DBackground: Bool
-            var incidenceOfLight: Bool
-            var lightGlowOverlaySelector: LightGlowOverlaySelector
-            @State private var isLowBatteryBlinking = false
-
-            private var shouldBlink: Bool {
-                guard let percent = battery?.percent else { return false }
-                return percent <= 50
-            }
-
-            private var batteryColor: Color {
-                guard let percent = battery?.percent else { return .gray }
-                switch percent {
-                case ...25: return .red
-                case ...50: return .yellow
-                default: return .green
-                }
-            }
-
-            private var batterySymbol: String {
-                guard let percent = battery?.percent else { return "battery.0" }
-                switch percent {
-                case 81 ... 100: return "battery.100"
-                case 61 ... 80: return "battery.75"
-                case 41 ... 60: return "battery.50"
-                case 21 ... 40: return "battery.25"
-                default: return "battery.0"
-                }
-            }
-
-            private var percentageText: String {
-                if let percent = battery?.percent {
-                    return "\(percent)%"
-                } else {
-                    return "--"
-                }
-            }
-
-            var body: some View {
-                ZStack {
-                    if button3D {
-                        let glowColor1 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.9)
-
-                        let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.4)
-
-                        if button3DBackground {
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color.black.opacity(0.2))
-                                .frame(width: 74, height: 25) // Feste Breite für Batterie
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                        }
-
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        glowColor1.opacity(0.9),
-                                        glowColor2.opacity(0.6),
-                                        Color.clear,
-                                        Color.black.opacity(0.3),
-                                        Color.black.opacity(0.6)
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                ),
-                                lineWidth: 1
-                            )
-                            .frame(width: 74, height: 25)
-                    } else {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.black.opacity(0.2))
-                            .frame(width: 74, height: 25)
-                    }
-
-                    HStack(spacing: 6) {
-                        Image(systemName: batterySymbol)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(batteryColor)
-                            .opacity(shouldBlink ? (isLowBatteryBlinking ? 0.5 : 1) : 1)
-
-                        Text(percentageText)
-                            .font(.system(size: 12))
-                            .foregroundColor(.white)
-                    }
-                    .padding(.horizontal, 8)
-                }
-                .onAppear { startBlinkAnimationIfNeeded() }
-                .onChange(of: battery?.percent) {
-                    startBlinkAnimationIfNeeded()
-                } }
-
-            private func startBlinkAnimationIfNeeded() {
-                isLowBatteryBlinking = false
-                guard shouldBlink else { return }
-
-                withAnimation(
-                    Animation.easeInOut(duration: 0.8)
-                        .repeatForever(autoreverses: true)
-                ) {
-                    isLowBatteryBlinking = true
-                }
-            }
-        }
-
         struct LightGlowOverlay: View {
             var body: some View {
                 RadialGradient(gradient: Gradient(colors: [
@@ -715,7 +602,6 @@ extension Home {
         struct FillablePieSegment: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
-            // var fillFraction: CGFloat
             var color: Color
             var backgroundColor: Color
             var displayText: String
@@ -771,7 +657,7 @@ extension Home {
                                         startPoint: .top,
                                         endPoint: .bottom
                                     ),
-                                    lineWidth: 1
+                                    lineWidth: 2
                                 )
                                 .frame(width: 50, height: 50)
                         } else {
@@ -878,6 +764,43 @@ extension Home {
 
         // HEADERVIEW Anfang
 
+        private var pumpIconView: some View {
+            state.showPumpIcon ? AnyView(pumpIconContent) : AnyView(EmptyView())
+        }
+
+        @ViewBuilder private var pumpIconContent: some View {
+            ZStack {
+                FillablePieSegment(
+                    pieSegmentViewModel: connectionPieSegmentViewModel,
+                    color: Color.white.opacity(0.5),
+                    backgroundColor: .clear,
+                    displayText: "",
+                    symbolSize: 25,
+                    symbol: "",
+                    animateProgress: false,
+                    button3D: state.button3D,
+                    button3DBackground: state.button3DBackground,
+                    incidenceOfLight: state.incidenceOfLight,
+                    lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview,
+                    fillFraction: 0.0,
+                    symbolBackgroundColor: backgroundColor
+                )
+                .frame(width: 60, height: 60)
+
+                Image(state.pumpIconRawValue)
+                    .resizable()
+                    .frame(width: 30, height: 30)
+                    .offset(y: 3)
+                    .loopingGradientMask(isActive: state.isLooping)
+
+                    .onTapGesture {
+                        if state.pumpDisplayState != nil {
+                            state.setupPump = true
+                        }
+                    }
+            }
+        }
+
         private var stackedLeftTopView: some View {
             VStack(spacing: 25) {
                 tempRateView
@@ -887,10 +810,18 @@ extension Home {
         }
 
         private var stackedRightTopView: some View {
-            VStack(spacing: 120) {
+            VStack(spacing: 0) {
                 eventualBGView
+
+                if state.showPumpIcon {
+                    Spacer().frame(height: 32)
+                    pumpIconContent
+                    Spacer().frame(height: 32)
+                } else {
+                    Spacer().frame(height: 122)
+                }
+
                 loopView
-                // pumpView
             }
         }
 
@@ -944,17 +875,6 @@ extension Home {
         }
 
         // Temp Basal Ende
-
-        var batteryView: some View {
-            BatteryEllipse(
-                battery: state.battery,
-                button3D: state.button3D,
-                button3DBackground: state.button3DBackground,
-                incidenceOfLight: state.incidenceOfLight,
-                lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
-            )
-            .offset(y: 0)
-        }
 
         // eventualBG Anfang
 
@@ -1218,7 +1138,7 @@ extension Home {
                                 startPoint: .top,
                                 endPoint: .bottom
                             ),
-                            lineWidth: 1
+                            lineWidth: 2
                         )
                         .frame(width: 50, height: 50)
                         .offset(y: -2.5)
@@ -1317,7 +1237,7 @@ extension Home {
             }
         }
 
-        // DanaBar Modules Start
+        // Top Bar Modules Start
 
         private var reservoirView: some View {
             Group {
@@ -1347,12 +1267,11 @@ extension Home {
                         }
                     }()
 
-                    let shouldBlink = reservoir < 20
+                    let shouldBlink = reservoirColor == .red
 
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: reservoirPieSegmentViewModel,
-                            // fillFraction: fill,
                             color: reservoirColor,
                             backgroundColor: .clear,
                             displayText: displayText,
@@ -1423,36 +1342,16 @@ extension Home {
                     }
 
                     let maxInsulinAge = insulinAgeOption.maxInsulinAge
-                    let warningThreshold = maxInsulinAge * 0.75
-                    let dangerThreshold = maxInsulinAge * 0.85
+                    let remainingHours = maxInsulinAge - CGFloat(insulinHours)
 
-                    if insulinHours >= maxInsulinAge {
-                        return .red
-                    }
-
-                    switch insulinHours {
-                    case dangerThreshold...:
-                        return .red
-                    case warningThreshold ..< dangerThreshold:
-                        return .yellow
-                    default:
-                        return .white.opacity(0.5)
-                    }
+                    return colorForRemainingHours(remainingHours)
                 }()
 
-                let shouldBlink: Bool = {
-                    guard let insulinHours = state.insulinHours,
-                          let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption)
-                    else {
-                        return false
-                    }
-                    return (insulinAgeOption.maxInsulinAge - insulinHours) <= 1
-                }()
+                let shouldBlink = insulinColor == .red
 
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: insulinAgePieSegmentViewModel,
-                        // fillFraction: insulinFraction,
                         color: shouldBlink ? .red : insulinColor,
                         backgroundColor: .clear,
                         displayText: insulinDisplayText,
@@ -1468,27 +1367,8 @@ extension Home {
                         symbolBackgroundColor: backgroundColor
                     )
                     .frame(width: 60, height: 60)
+                    .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                 }
-                .onAppear {
-                    startInsulinBlinkAnimationIfNeeded()
-                }
-                .onChange(of: state.insulinHours) {
-                    startInsulinBlinkAnimationIfNeeded()
-                }
-            }
-        }
-
-        // State-Variable in der Haupt-View hinzugefügt
-        @State private var isInsulinBlinking = false
-
-        private func startInsulinBlinkAnimationIfNeeded() {
-            isInsulinBlinking = false
-            guard let insulinHours = state.insulinHours,
-                  let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption),
-                  (insulinAgeOption.maxInsulinAge - insulinHours) <= 1 else { return }
-
-            withAnimation(.easeInOut(duration: 0.8).repeatForever()) {
-                isInsulinBlinking = true
             }
         }
 
@@ -1508,6 +1388,27 @@ extension Home {
                         .offset(x: 0, y: 8)
                 }
                 .frame(width: 40, height: 40)
+            }
+        }
+
+        struct InsulinCatheterSymbol2: View {
+            var color: Color // Farbe von außen übergeben
+            var baseSize: CGFloat = 40 // Basisgröße
+
+            var body: some View {
+                ZStack {
+                    Image(systemName: "hockey.puck")
+                        .resizable()
+                        .foregroundStyle(color)
+                        .frame(width: 22, height: 12)
+                        .offset(x: 0, y: -1)
+
+                    Rectangle()
+                        .frame(width: 2, height: 7)
+                        .foregroundStyle(color)
+                        .offset(x: 0, y: 8)
+                }
+                .frame(width: baseSize, height: baseSize)
             }
         }
 
@@ -1559,46 +1460,22 @@ extension Home {
 
                 let cannulaColor: Color = {
                     if let cannulaHours = state.cannulaHours,
-                       let cannulaAgeOption = CannulaAgeOption(
-                           rawValue: state
-                               .cannulaAgeOption
-                       )
+                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
                     {
                         let maxCannulaAge = cannulaAgeOption.maxCannulaAge
-                        let warningThreshold = maxCannulaAge * 0.75
-                        let dangerThreshold = maxCannulaAge * 0.85
-
-                        if cannulaHours >= maxCannulaAge {
-                            return .red
-                        }
-
-                        switch CGFloat(cannulaHours) {
-                        case dangerThreshold...:
-                            return .red
-                        case warningThreshold ..< dangerThreshold:
-                            return .yellow
-                        default:
-                            return .white.opacity(0.5)
-                        }
+                        let remainingHours = maxCannulaAge - CGFloat(cannulaHours)
+                        return colorForRemainingHours(remainingHours)
                     } else {
                         return .clear
                     }
+
                 }()
 
-                let shouldBlink: Bool = {
-                    guard let cannulaHours = state.cannulaHours,
-                          let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
-                    else {
-                        return false
-                    }
-                    let remainingHours = cannulaAgeOption.maxCannulaAge - cannulaHours
-                    return remainingHours <= 1
-                }()
+                let shouldBlink = cannulaColor == .red
 
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: cannulaPieSegmentViewModel,
-                        // fillFraction: cannulaFraction,
                         color: cannulaColor,
                         backgroundColor: .clear,
                         displayText: cannulaDisplayText,
@@ -1618,24 +1495,6 @@ extension Home {
                     InsulinCatheterSymbol()
                         .offset(y: -1.5)
                         .modifier(BlinkingModifier(shouldBlink: shouldBlink)) }
-
-                    .onAppear { startCannulaBlinkAnimationIfNeeded() }
-                    .onChange(of: state.cannulaHours) {
-                        startCannulaBlinkAnimationIfNeeded()
-                    }
-            }
-        }
-
-        @State private var isCannulaBlinking = false
-
-        private func startCannulaBlinkAnimationIfNeeded() {
-            isCannulaBlinking = false
-            guard let cannulaHours = state.cannulaHours,
-                  let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption),
-                  (cannulaAgeOption.maxCannulaAge - cannulaHours) <= 1 else { return }
-
-            withAnimation(.easeInOut(duration: 0.8).repeatForever()) {
-                isCannulaBlinking = true
             }
         }
 
@@ -1674,7 +1533,6 @@ extension Home {
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: batteryAgePieSegmentViewModel,
-                        // fillFraction: 1.0, // Volle Kreis-Anzeige (kein Füllstand)
                         color: batteryAgeColor,
                         backgroundColor: .clear,
                         displayText: batteryAgeText,
@@ -1714,10 +1572,9 @@ extension Home {
 
                     let sensorColor: Color = {
                         switch remainingHours {
-                        case ...1: return .red // Blinkt
-                        case ...24: return .red // Rot aber kein Blinken
-                        case ...48: return .yellow // Gelb
-                        default: return .white.opacity(0.5)
+                        case ...2: return .red
+                        case ...6: return .yellow
+                        default: return .white
                         }
                     }()
 
@@ -1738,13 +1595,13 @@ extension Home {
                         }
                     }()
 
-                    let shouldBlink = remainingHours < 24
+                    let shouldBlink = sensorColor == .red
 
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: sensorAgeSegmentViewModel,
                             // fillFraction: fillFraction,
-                            color: shouldBlink ? .red : sensorColor,
+                            color: sensorColor,
                             backgroundColor: .clear,
                             displayText: sensorAgeText,
                             symbolSize: 25,
@@ -1759,14 +1616,7 @@ extension Home {
                             symbolBackgroundColor: backgroundColor
                         )
                         .frame(width: 60, height: 60)
-                    }
-                    .onAppear {
-                        state.settingsDidChange(state.settingsManager.settings)
-                        state.sensorAgeDays = state.settingsManager.settings.sensorAgeDays
-                        startSensorBlinkAnimationIfNeeded()
-                    }
-                    .onChange(of: state.elapsedHours) {
-                        startSensorBlinkAnimationIfNeeded()
+                        .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     }
                 }
             }
@@ -1794,8 +1644,8 @@ extension Home {
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: connectionPieSegmentViewModel,
-                            // fillFraction: connectionFraction,
-                            color: Color.white.opacity(0.5),
+                            // color: Color.white.opacity(0.5),
+                            color: Color.blue,
                             backgroundColor: .clear,
                             displayText: displayText,
                             symbolSize: 25,
@@ -1820,7 +1670,88 @@ extension Home {
         // State-Variable in der Haupt-View hinzugefügt
         @State private var isSensorBlinking = false
 
-        // danaBar Max Modules Ende
+        // TopBar Max Modules Ende
+
+        // MARK: - Helper-Views for Standard 1 und DanaBar Anfang
+
+        private func formatTime(_ hours: Double) -> String {
+            let totalMinutes = Int(hours * 60)
+            let days = totalMinutes / (24 * 60)
+            let hours = (totalMinutes % (24 * 60)) / 60
+            let minutes = totalMinutes % 60
+
+            if days >= 1 {
+                return "\(days)d\(hours)h"
+            } else if hours >= 1 {
+                return "\(hours)h"
+            } else {
+                return "\(minutes)m"
+            }
+        }
+
+        private func formatSensorTime() -> String {
+            guard let days = state.remainingSensorDays,
+                  let hours = state.remainingSensorHours,
+                  let minutes = state.remainingSensorMinutes
+            else {
+                return "--"
+            }
+
+            let totalHours = Double(days * 24 + hours) + Double(minutes) / 60.0
+            return formatTime(totalHours)
+        }
+
+        private var sensorRemainingTime: String {
+            guard let days = state.remainingSensorDays,
+                  let hours = state.remainingSensorHours,
+                  let minutes = state.remainingSensorMinutes
+            else {
+                return "--"
+            }
+            return formatSensorTime(days: days, hours: hours, minutes: minutes)
+        }
+
+        private var sensorColor: Color {
+            if state.displayExpiration {
+                guard let days = state.remainingSensorDays,
+                      let hours = state.remainingSensorHours,
+                      let minutes = state.remainingSensorMinutes
+                else { return .white }
+
+                // Gesamtverbleibende Zeit in Minuten berechnen
+                let totalMinutes = (days * 24 * 60) + (hours * 60) + minutes
+                switch totalMinutes {
+                case ...120: // ≤ 2 Stunden (0-120 Minuten)
+                    return .red
+                case 121 ... 400:
+                    return .yellow
+                default: // > 12 Stunden
+                    return .white
+                }
+            } else {
+                return state.sensorAgeDays.asInt() > 13 ? .yellow : .white
+            }
+        }
+
+        @State private var timerInterval: TimeInterval = 2 // Startet nach 2 Sekunden
+        @State private var timer: Timer? = nil
+
+        func startTimer() {
+            timer?.invalidate() // Falls ein vorheriger Timer existiert, wird er gestoppt
+            timer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: true) { _ in
+                state.specialDanaKitFunction()
+                state.updateRemainingSensorDays()
+                // Nach 15 Sekunden auf 60 Sekunden Intervall wechseln
+                if timerInterval == 2 {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
+                        timerInterval = 60
+                        startTimer()
+                    }
+                }
+            }
+        }
+
+        // MARK: - Helper-Views for Standard 1 und DanaBar Ende
 
         //  TopBar Marquee
 
@@ -1840,7 +1771,7 @@ extension Home {
             }
         }
 
-        // Helper for danaBar Marquee Start
+        // MARK: - Helper-Views for Marquee Anfang
 
         struct MarqueeText: View {
             var text: String
@@ -1960,9 +1891,9 @@ extension Home {
             }
         }
 
-        // Helper for danaBar Marquee End
+        // MARK: - Helper-Views for Marquee Ende
 
-        // danaBarStandard 2
+        // TopBar Standard 2
 
         var danaBarStandard2: some View {
             Group {
@@ -1981,17 +1912,9 @@ extension Home {
 
                             let insulinColor: Color = {
                                 if insulinHours >= maxInsulinAge { return .red }
-                                // Umrechnung Stunden in Minuten (präziser)
-                                let remainingMinutes = remainingHours * 60
 
-                                switch remainingMinutes {
-                                case ...120: // ≤ 2 Stunden (120 Minuten)
-                                    return .red
-                                case 121 ... 720: // 2.01h bis 12h (121-720 Minuten)
-                                    return .white
-                                default: // > 12 Stunden
-                                    return .white
-                                }
+                                let remainingMinutes = remainingHours * 60
+                                return colorForRemainingMinutes(remainingMinutes)
                             }()
 
                             HStack(spacing: 4) {
@@ -2078,15 +2001,7 @@ extension Home {
                                 if cannulaHours >= maxHours { return .red }
 
                                 let remainingMinutes = remainingHours * 60
-
-                                switch remainingMinutes {
-                                case ...120:
-                                    return .red
-                                case 121 ... 720:
-                                    return .white
-                                default: // > 12 Stunden
-                                    return .white
-                                }
+                                return colorForRemainingMinutes(remainingMinutes)
                             }()
 
                             HStack(spacing: 4) {
@@ -2213,7 +2128,7 @@ extension Home {
                                         }
                                     }
 
-                                    if shouldBlink {
+                                    if useBigSensorView {
                                         BigSensorView(
                                             color: sensorColor
                                         )
@@ -2246,8 +2161,6 @@ extension Home {
                 }
             }
         }
-
-        // MARK: - Helper-Views for danaBarClassic Anfang
 
         struct BigVialView: View {
             var color: Color
@@ -2288,10 +2201,11 @@ extension Home {
             var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
+
             var body: some View {
-                Image(systemName: "drop.fill")
-                    .font(.system(size: 20))
-                    .foregroundColor(color)
+                InsulinCatheterSymbol2(color: color) // Farbe übergeben
+                    .scaleEffect(1.0) // Skaliert auf 100% der Basisgröße (20x20)
+                    .offset(y: -1.5)
             }
         }
 
@@ -2319,35 +2233,7 @@ extension Home {
             }
         }
 
-        private func formatTime(_ hours: Double) -> String {
-            let totalMinutes = Int(hours * 60)
-            let days = totalMinutes / (24 * 60)
-            let hours = (totalMinutes % (24 * 60)) / 60
-            let minutes = totalMinutes % 60
-
-            if days >= 1 {
-                return "\(days)d\(hours)h"
-            } else if hours >= 1 {
-                return "\(hours)h"
-            } else {
-                return "\(minutes)m"
-            }
-        }
-
-        private func formatSensorTime() -> String {
-            guard let days = state.remainingSensorDays,
-                  let hours = state.remainingSensorHours,
-                  let minutes = state.remainingSensorMinutes
-            else {
-                return "--"
-            }
-
-            let totalHours = Double(days * 24 + hours) + Double(minutes) / 60.0
-            return formatTime(totalHours)
-        }
-
-        // SENSOR
-        private var shouldBlink: Bool { // Dient nur noch zur Steuerung des Icons in der SensorView
+        private var useBigSensorView: Bool {
             guard state.displayExpiration,
                   let days = state.remainingSensorDays,
                   let hours = state.remainingSensorHours,
@@ -2357,59 +2243,6 @@ extension Home {
             // Gesamtrestzeit in Stunden
             let totalRemaining = Double(days * 24 + hours) + Double(minutes) / 60.0
             return totalRemaining <= 6.0 // Stellschraube wann er zum großen Icon wechselt
-        }
-
-        private var sensorRemainingTime: String {
-            guard let days = state.remainingSensorDays,
-                  let hours = state.remainingSensorHours,
-                  let minutes = state.remainingSensorMinutes
-            else {
-                return "--"
-            }
-            return formatSensorTime(days: days, hours: hours, minutes: minutes)
-        }
-
-        private var sensorColor: Color {
-            if state.displayExpiration {
-                guard let days = state.remainingSensorDays,
-                      let hours = state.remainingSensorHours,
-                      let minutes = state.remainingSensorMinutes
-                else { return .white }
-
-                // Gesamtverbleibende Zeit in Minuten berechnen
-                let totalMinutes = (days * 24 * 60) + (hours * 60) + minutes
-
-                switch totalMinutes {
-                case ...120: // ≤ 2 Stunden (0-120 Minuten)
-                    return .red
-                case 121 ... 720:
-                    return .yellow
-                default: // > 12 Stunden
-                    return .white
-                }
-            } else {
-                return state.sensorAgeDays.asInt() > 13 ? .yellow : .white
-            }
-        }
-
-        // MARK: - Helper-Views for danaBarClassic Ende
-
-        @State private var timerInterval: TimeInterval = 2 // Startet nach 2 Sekunden
-        @State private var timer: Timer? = nil
-
-        func startTimer() {
-            timer?.invalidate() // Falls ein vorheriger Timer existiert, wird er gestoppt
-            timer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: true) { _ in
-                state.specialDanaKitFunction()
-                state.updateRemainingSensorDays()
-                // Nach 15 Sekunden auf 60 Sekunden Intervall wechseln
-                if timerInterval == 2 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
-                        timerInterval = 60
-                        startTimer()
-                    }
-                }
-            }
         }
 
         // TopBars Ende
@@ -2701,7 +2534,7 @@ extension Home {
                                     startPoint: .top,
                                     endPoint: .bottom
                                 ),
-                                lineWidth: 1
+                                lineWidth: 2
                             )
                             .frame(width: 50, height: 50)
                     } else {
@@ -2876,21 +2709,9 @@ extension Home {
 
                     // UI/UX Button
                     buttonWithCircle(
-                        /* iconName: "uiwindow.split.2x1",
-                         symbolRenderingMode: .hierarchical,
-                         colors: [.indigo],*/
-
                         iconName: "square.3.layers.3d",
                         symbolRenderingMode: .palette,
                         colors: [.purple, .blue],
-
-                        /*  iconName: "paintpalette.fill",
-                            symbolRenderingMode: .palette,
-                            colors: [.teal, .mint],*/
-
-                        /*  iconName: "slider.horizontal.3",
-                            symbolRenderingMode: .palette,
-                            colors: [.gray, .blue],*/
                         circleColor: Color.black.opacity(1.0)
                     ) {
                         state.showModal(for: .statisticsConfig)
@@ -3193,9 +3014,9 @@ extension Home {
                                             .onChange(of: scrollPosition) { _, newValue in
                                                 let yThreshold: CGFloat = -550
                                                 if newValue < yThreshold {
-                                                    withAnimation(.easeOut(duration: 0.3)) { display = true }
+                                                    withAnimation(.easeOut(duration: 0.1)) { display = true }
                                                 } else {
-                                                    withAnimation(.easeOut(duration: 0.4)) { display = false }
+                                                    withAnimation(.easeOut(duration: 0.1)) { display = false }
                                                 }
                                             }
                                     }
@@ -3206,28 +3027,7 @@ extension Home {
                         buttonPanel(geo)
                             .frame(height: 60)
                     }
-                    .background(backgroundColor)
-                    /*  .background(
-                     LinearGradient(
-                     gradient: Gradient(
-                     stops: colorScheme == .light
-                     ? [
-                     .init(color: Color.cyan.opacity(0.2), location: 0.0),
-                     .init(color: Color.white, location: 0.3),
-                     .init(color: Color.white, location: 0.8),
-                     .init(color: Color.cyan.opacity(0.2), location: 1.0)
-                     ]
-                     : [
-                     .init(color: Color.cyan.opacity(0.3), location: 0.0),
-                     .init(color: Color.black, location: 0.3),
-                     .init(color: Color.black, location: 0.8),
-                     .init(color: Color.cyan.opacity(0.3), location: 1.0)
-                     ]
-                     ),
-                     startPoint: .top,
-                     endPoint: .bottom
-                     )*/
-
+                    .background(backgroundColor) // Kompletter Homeview BG
                     .ignoresSafeArea(edges: .vertical)
                     .onAppear {
                         startProgress()
@@ -3269,7 +3069,6 @@ extension Home {
                         }
                         configureView()
                     }
-                    // )
                 }
             }
         }
@@ -3301,7 +3100,7 @@ extension Home {
                 }
             }
             .padding()
-            .background(backgroundColor) // Für das Popup mit den Loop Informationen
+            .background(backgroundColor)
             .cornerRadius(10)
             .shadow(radius: 2)
         }

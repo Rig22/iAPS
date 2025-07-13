@@ -473,3 +473,55 @@ extension UIImage {
         return Image(uiImage: image)
     }
 }
+
+func colorForRemainingHours(_ remainingHours: CGFloat) -> Color {
+    switch remainingHours {
+    case ..<2:
+        return .red
+    case ..<6:
+        return .yellow
+    default:
+        return .white
+    }
+}
+
+func colorForRemainingMinutes(_ remainingMinutes: CGFloat) -> Color {
+    switch remainingMinutes {
+    case ..<120:
+        return .red
+    case ..<360:
+        return .yellow
+    default:
+        return .white
+    }
+}
+
+struct GradientMaskAnimationModifier: ViewModifier {
+    let isActive: Bool
+    @State private var animate = false
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                if isActive {
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color.clear, Color.blue]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    .frame(width: 60)
+                    .offset(x: animate ? -60 : 60)
+                    .animation(.linear(duration: 1.2).repeatForever(autoreverses: false), value: animate)
+                    .mask(content)
+                    .onAppear { animate = true }
+                    .onDisappear { animate = false }
+                }
+            }
+    }
+}
+
+extension View {
+    func loopingGradientMask(isActive: Bool) -> some View {
+        modifier(GradientMaskAnimationModifier(isActive: isActive))
+    }
+}

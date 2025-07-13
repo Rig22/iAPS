@@ -1,4 +1,3 @@
-//
 //  DanaBarOption.swift
 //  FreeAPS
 //
@@ -6,7 +5,7 @@
 //
 enum DanaBarOption: String, CaseIterable, Identifiable {
     case standard = "Standard"
-    case standard2 = "Standard 2"
+    case standard2 = "Classic"
     case marquee = "Marquee"
     case max = "Dana Bar"
 

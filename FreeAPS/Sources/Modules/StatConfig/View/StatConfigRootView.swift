@@ -117,6 +117,18 @@ extension StatConfig {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 360, height: 280)
+
+                    if state.showPumpIcon {
+                        Circle()
+                            .fill(Color(.darkGray))
+                            .frame(width: 20, height: 20)
+                            .offset(x: -10, y: -96)
+
+                        Image(state.pumpIconRawValue)
+                            .resizable()
+                            .frame(width: 15, height: 15)
+                            .offset(x: -10, y: -96)
+                    }
                 }
                 .frame(width: 360, height: 280)
                 .padding(.top, 20)
@@ -130,6 +142,26 @@ extension StatConfig {
                                 header: Text("Pump Settings"),
                                 footer: Text("Configure pump display options")
                             ) {
+                                Toggle("Show Pump Icon", isOn: $state.showPumpIcon)
+
+                                if state.showPumpIcon {
+                                    if #available(iOS 18.0, *) {
+                                        Picker("Select Icon", selection: $state.pumpIconRawValue) {
+                                            ForEach(PumpIconOption.allCases, id: \.rawValue) { option in
+                                                HStack {
+                                                    Image(option.rawValue)
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 60, height: 40)
+                                                    Text(option.displayName)
+                                                        .foregroundColor(.primary)
+                                                }
+                                                .tag(option.rawValue)
+                                            }
+                                        }
+                                        .pickerStyle(NavigationLinkPickerStyle())
+                                    }
+                                }
                                 Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
                             }
 
@@ -183,7 +215,6 @@ extension StatConfig {
                                         .pickerStyle(NavigationLinkPickerStyle())
                                     }
 
-                                    // DanaBar Simple specific settings
                                     if state.danaBarOption == DanaBarOption.standard.rawValue {
                                         Picker(
                                             "Max Reservoir Insulin Age",
@@ -203,7 +234,6 @@ extension StatConfig {
                                         .pickerStyle(NavigationLinkPickerStyle())
                                     }
 
-                                    // Common settings for all views
                                     if state.danaBarOption == DanaBarOption.standard2.rawValue {
                                         Picker(
                                             "Max Reservoir Insulin Age",
@@ -276,6 +306,10 @@ extension StatConfig {
 
                                 Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
                                 Toggle("3D Look", isOn: $state.button3D)
+                                /*   Toggle(
+                                     "Icons Backgrounds ⇢ Dark",
+                                     isOn: $state.button3DBackground
+                                 )*/
                                 if state.button3D {
                                     Toggle(
                                         "Icons Backgrounds ⇢ Dark",

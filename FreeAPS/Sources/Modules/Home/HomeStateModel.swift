@@ -83,7 +83,8 @@ extension Home {
         @Published var profileButton: Bool = true
         @Published var hideInsulinBadge: Bool = true
         // Dana UI Toggels
-        @Published var pumpIconRawValue: String = "ic_dana_rs"
+        @Published var showPumpIcon: Bool = false
+        @Published var pumpIconRawValue: String = "Nano200"
         @Published var danaBar: Bool = false
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
@@ -167,6 +168,16 @@ extension Home {
             }
         }
 
+        var pumpIconOption: PumpIconOption {
+            get {
+                PumpIconOption(rawValue: pumpIconRawValue) ??
+                    .nano200 // Standardwert, falls der Raw-Wert nicht gefunden wird
+            }
+            set {
+                pumpIconRawValue = newValue.rawValue
+            }
+        }
+
         var elapsedHours: Int {
             guard let startTime = sensorStartTime else {
                 return 0
@@ -238,6 +249,8 @@ extension Home {
             profileButton = settingsManager.settings.profileButton
             // Dana UI Toggels
             danaBar = settingsManager.settings.danaBar
+            showPumpIcon = settingsManager.settings.showPumpIcon
+            pumpIconRawValue = settingsManager.settings.pumpIconRawValue
             hideInsulinBadge = settingsManager.settings.hideInsulinBadge
             legendsSwitch = settingsManager.settings.legendsSwitch
             tempTargetbar = settingsManager.settings.tempTargetbar
@@ -859,6 +872,8 @@ extension Home.StateModel:
         setupData()
         // Dana UI Toggels
         danaBar = settingsManager.settings.danaBar
+        showPumpIcon = settingsManager.settings.showPumpIcon
+        pumpIconRawValue = settingsManager.settings.pumpIconRawValue
         insulinAgeOption = settingsManager.settings.insulinAgeOption
         cannulaAgeOption = settingsManager.settings.cannulaAgeOption
         legendsSwitch = settingsManager.settings.legendsSwitch

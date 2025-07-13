@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 900 900" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <g id="DanaRS" transform="matrix(0.995084,0,0,1.03165,2.30024,-14.2736)">
+        <path d="M751.409,238.672L751.409,663.348L0,663.348L0,238.672L751.409,238.672ZM727.708,261.776L22.453,261.776L22.453,642.424L727.708,642.424L727.708,261.776Z" style="fill:white;"/>
+        <g transform="matrix(1,0,0,0.996355,-1.13687e-13,42.4515)">
+            <rect x="119.355" y="366.635" width="330.645" height="156.27" style="fill:white;fill-opacity:0.8;"/>
+        </g>
+        <g transform="matrix(-1.36571e-16,0.86248,-1.1225,-1.78203e-16,1059.72,-221.48)">
+            <path d="M709.834,274.661L710.291,276.098L563.209,276.098L563.666,274.661L533.522,274.661L582.532,142.286L680.55,142.286L729.559,274.661L709.834,274.661ZM600.236,160.435L668.302,160.435L668.028,159.501L600.509,159.501L600.236,160.435Z" style="fill:rgb(235,235,235);"/>
+        </g>
+    </g>
+</svg>

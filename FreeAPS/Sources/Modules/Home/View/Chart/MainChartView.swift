@@ -365,10 +365,10 @@ struct MainChartView: View {
                 path.move(to: CGPoint(x: x, y: 0))
                 path.addLine(to: CGPoint(x: x, y: fullSize.height - 20))
             }
-            .stroke(
-                colorScheme == .dark ? IAPSconfig.chartBackgroundLight : IAPSconfig.chartBackgroundDark,
-                style: StrokeStyle(lineWidth: 0.5, dash: [5])
-            )
+            .stroke(Color.white, style: StrokeStyle(lineWidth: 0.5, dash: [2]))
+            /* colorScheme == .dark ? IAPSconfig.chartBackgroundLight : IAPSconfig.chartBackgroundDark,
+             style: StrokeStyle(lineWidth: 0.5, dash: [5]) */
+            // )
         }
     }
 

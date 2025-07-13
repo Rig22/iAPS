@@ -94,7 +94,7 @@ struct PumpView: View {
                 // 120 % due to being non rectangular. +10 because of bottom inserter
                 let amountFraction = 1.0 - (Double(insulin + 10) * 1.2 / 200)
                 if insulin == 0xDEAD_BEEF {
-                    podInsulinAmount(portion: amountFraction)
+                    medtrumInsulinAmount(portion: amountFraction)
                         .padding(.leading, showInsulinBadge ? 7 : 0)
                         .overlay {
                             if let timeZone = timeZone,
@@ -116,8 +116,8 @@ struct PumpView: View {
                         )
                         Text("U").foregroundStyle(.white)
                     }
-                    .offset(x: 6, y: 0) // Horizontal adjustment
-                    podInsulinAmount(portion: amountFraction)
+                    .offset(x: 2, y: 0) // Horizontal adjustment
+                    medtrumInsulinAmount(portion: amountFraction)
                         .padding(.leading, showInsulinBadge ? 7 : 0)
                         .overlay {
                             if let timeZone = timeZone,
@@ -215,7 +215,7 @@ struct PumpView: View {
     // MDT/Dana-spezifischer Content
     @ViewBuilder private func mdtDanaContent() -> some View {
         if let reservoir = reservoir {
-            let amountFraction = 1.0 - (Double(reservoir + 10) * 1.2 / 200)
+            let amountFraction = 1.0 - (Double(reservoir + 10) * 1.2 / 300)
             if reservoir == 0xDEAD_BEEF {
                 pumpInsulinAmount(portion: amountFraction)
                     .padding(.leading, showInsulinBadge ? 7 : 0)
@@ -280,7 +280,7 @@ struct PumpView: View {
                     }
                 } else if hours >= 1 {
                     HStack(spacing: 0) {
-                        Text(" \(hours)")
+                        Text("\(hours)")
                         Text(NSLocalizedString("h", comment: "abbreviation for hours"))
                             .foregroundStyle(time < 4 * 60 * 60 ? .red : .white)
                     }
@@ -373,6 +373,19 @@ struct PumpView: View {
                 .fillImageUpToPortion(color: .insulin.opacity(0.8), portion: max(portion, 0.3))
                 .resizable()
                 .frame(maxWidth: 17, maxHeight: 34)
+                .symbolRenderingMode(.palette)
+                .shadow(radius: 1, x: 2, y: 2)
+                .foregroundStyle(.white)
+        }
+    }
+
+    private func medtrumInsulinAmount(portion: Double) -> some View {
+        ZStack {
+            let pump = colorScheme == .dark ? "nano200pumpview" : "nano200pumpview"
+            UIImage(imageLiteralResourceName: pump)
+                .fillImageUpToPortion(color: .insulin.opacity(0.8), portion: max(portion, 0.3))
+                .resizable()
+                .frame(maxWidth: 20, maxHeight: 28)
                 .symbolRenderingMode(.palette)
                 .shadow(radius: 1, x: 2, y: 2)
                 .foregroundStyle(.white)

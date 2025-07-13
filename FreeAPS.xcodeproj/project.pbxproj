@@ -324,14 +324,15 @@
 		795CBE142D3F943A0044854B /* AutoISFsettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE132D3F942B0044854B /* AutoISFsettings.swift */; };
 		795CBE162D3F949D0044854B /* ChartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE152D3F94900044854B /* ChartModel.swift */; };
 		797A852E2D97E8EF00DAB622 /* LightGlowOverlaySelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */; };
-		7984214F2E0818E2003A7410 /* DanaBarOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7984214E2E081851003A7410 /* DanaBarOption.swift */; };
 		798421512E082FCF003A7410 /* PumpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798421502E082FC8003A7410 /* PumpView.swift */; };
 		7987CE052D6A10D80045F6EA /* SensorAgeDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */; };
 		798BC9172D6F9C4700ADABFD /* TemporaryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798BC9162D6F9AAF00ADABFD /* TemporaryData.swift */; };
 		799A13D22E11B06100669334 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 799A13D12E11B06100669334 /* Settings.bundle */; };
 		799CEF892E043C4F00DD6224 /* MedtrumKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 799CEF882E043C4F00DD6224 /* MedtrumKit.framework */; };
 		799CEF8A2E043C7900DD6224 /* MedtrumKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 799CEF882E043C4F00DD6224 /* MedtrumKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		79A256022E1F680600F4C7FC /* PumpIconOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A256012E1F67F300F4C7FC /* PumpIconOption.swift */; };
 		79D4708E2CE483EE0095B89A /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79D4708D2CE483DD0095B89A /* Token.swift */; };
+		79E4DE0C2E23FF430059CA58 /* DanaBarOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E4DE0B2E23FF330059CA58 /* DanaBarOption.swift */; };
 		79EEC25C2DDCC71D00BA2E8F /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79EEC25B2DDCC70300BA2E8F /* Configuration.swift */; };
 		79FE39982D81E55A00BCD63B /* FunctionScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE39972D81E54200BCD63B /* FunctionScript.swift */; };
 		79FE399A2D81E5BE00BCD63B /* WebViewScriptExecutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79FE39992D81E5AB00BCD63B /* WebViewScriptExecutor.swift */; };
@@ -966,14 +967,15 @@
 		795CBE132D3F942B0044854B /* AutoISFsettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoISFsettings.swift; sourceTree = "<group>"; };
 		795CBE152D3F94900044854B /* ChartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartModel.swift; sourceTree = "<group>"; };
 		797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightGlowOverlaySelector.swift; sourceTree = "<group>"; };
-		7984214E2E081851003A7410 /* DanaBarOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaBarOption.swift; sourceTree = "<group>"; };
 		798421502E082FC8003A7410 /* PumpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpView.swift; sourceTree = "<group>"; };
 		7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorAgeDays.swift; sourceTree = "<group>"; };
 		798BC9162D6F9AAF00ADABFD /* TemporaryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryData.swift; sourceTree = "<group>"; };
 		799A13D12E11B06100669334 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
 		799CEF882E043C4F00DD6224 /* MedtrumKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = MedtrumKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		79A256012E1F67F300F4C7FC /* PumpIconOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpIconOption.swift; sourceTree = "<group>"; };
 		79BDA519C9B890FD9A5DFCF3 /* ISFEditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ISFEditorDataFlow.swift; sourceTree = "<group>"; };
 		79D4708D2CE483DD0095B89A /* Token.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
+		79E4DE0B2E23FF330059CA58 /* DanaBarOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DanaBarOption.swift; sourceTree = "<group>"; };
 		79EEC25B2DDCC70300BA2E8F /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		79FE39972D81E54200BCD63B /* FunctionScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FunctionScript.swift; sourceTree = "<group>"; };
 		79FE39992D81E5AB00BCD63B /* WebViewScriptExecutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewScriptExecutor.swift; sourceTree = "<group>"; };
@@ -1585,7 +1587,8 @@
 		3811DE2C25C9D49500A708ED /* View */ = {
 			isa = PBXGroup;
 			children = (
-				7984214E2E081851003A7410 /* DanaBarOption.swift */,
+				79E4DE0B2E23FF330059CA58 /* DanaBarOption.swift */,
+				79A256012E1F67F300F4C7FC /* PumpIconOption.swift */,
 				797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */,
 				7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */,
 				7909A4A92D5101D800975822 /* BarViewOptionConfiguration.swift */,
@@ -3049,9 +3052,9 @@
 				38F3B2EF25ED8E2A005C48AA /* TempTargetsStorage.swift in Sources */,
 				19B0EF2128F6D66200069496 /* Statistics.swift in Sources */,
 				3811DF1025CAAAE200A708ED /* APSManager.swift in Sources */,
+				79E4DE0C2E23FF430059CA58 /* DanaBarOption.swift in Sources */,
 				3870FF4725EC187A0088248F /* BloodGlucose.swift in Sources */,
 				38A0364225ED069400FCBB52 /* TempBasal.swift in Sources */,
-				7984214F2E0818E2003A7410 /* DanaBarOption.swift in Sources */,
 				7914D3342E118E02009C408E /* NSUserDefaults.swift in Sources */,
 				7949F9012DC11A710058BF94 /* SystemSoundsManager.swift in Sources */,
 				3811DE1725C9D40400A708ED /* Screen.swift in Sources */,
@@ -3345,6 +3348,7 @@
 				0D9A5E34A899219C5C4CDFAF /* DataTableStateModel.swift in Sources */,
 				79FE399A2D81E5BE00BCD63B /* WebViewScriptExecutor.swift in Sources */,
 				6BCF84DD2B16843A003AD46E /* LiveActitiyShared.swift in Sources */,
+				79A256022E1F680600F4C7FC /* PumpIconOption.swift in Sources */,
 				79FE39982D81E55A00BCD63B /* FunctionScript.swift in Sources */,
 				195D80B92AF697F700D25097 /* DynamicProvider.swift in Sources */,
 				D6D02515BBFBE64FEBE89856 /* DataTableRootView.swift in Sources */,

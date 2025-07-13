@@ -27,12 +27,13 @@ extension StatConfig {
         @Published var profileButton: Bool = true
         @Published var hideInsulinBadge: Bool = false
         // Dana UI Toggels
-        @Published var pumpIconRawValue: String = "ic_dana_rs"
+        @Published var showPumpIcon: Bool = false
+        @Published var pumpIconRawValue: String = "Nano 200"
         @Published var danaBar: Bool = false
         @Published var legendsSwitch: Bool = false
         @Published var tempTargetBar: Bool = false
         @Published var timeSettings: Bool = false
-        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.teal.rawValue
+        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
         @Published var danaBarOption: String = DanaBarOption.max.rawValue
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
@@ -112,6 +113,8 @@ extension StatConfig {
             subscribeSetting(\.profileButton, on: $profileButton) { profileButton = $0 }
             // Dana Toggels
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
+            subscribeSetting(\.showPumpIcon, on: $showPumpIcon) { showPumpIcon = $0 }
+            subscribeSetting(\.pumpIconRawValue, on: $pumpIconRawValue) { pumpIconRawValue = $0 }
             subscribeSetting(\.danaBarOption, on: $danaBarOption) { danaBarOption = $0 }
             subscribeSetting(\.insulinAgeOption, on: $insulinAgeOption) { insulinAgeOption = $0 }
             subscribeSetting(\.cannulaAgeOption, on: $cannulaAgeOption) { cannulaAgeOption = $0 }
