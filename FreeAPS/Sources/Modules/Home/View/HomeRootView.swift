@@ -615,6 +615,7 @@ extension Home {
             var fillFraction: CGFloat
             var symbolRotation: Double = 0
             var symbolBackgroundColor: Color = .clear
+            var symbolColor: Color? = nil
 
             let angularGradient = AngularGradient(
                 gradient: Gradient(colors: [
@@ -640,7 +641,7 @@ extension Home {
                             if button3DBackground {
                                 Circle()
                                     .fill(Color.black.opacity(0.2))
-                                    .frame(width: 50, height: 50)
+                                    .frame(width: 51, height: 51)
                                     .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
                             }
 
@@ -659,7 +660,7 @@ extension Home {
                                     ),
                                     lineWidth: 2
                                 )
-                                .frame(width: 50, height: 50)
+                                .frame(width: 51, height: 51)
                         } else {
                             Circle()
                                 .fill(Color.black.opacity(0.2))
@@ -670,22 +671,22 @@ extension Home {
                             startAngle: .degrees(-90),
                             endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                         )
-                        .fill(color)
+                        .fill(color.opacity(0.0))
                         .frame(width: 50, height: 50)
                         .opacity(0.5)
 
                         // Symbol-Hintergrund (NEU, 40x40)
                         if symbolBackgroundColor != .clear {
                             Circle()
-                                .fill(symbolBackgroundColor)
-                                .frame(width: 40, height: 40)
+                                .fill(symbolBackgroundColor.opacity(0.0))
+                                .frame(width: 50, height: 50)
                         }
 
                         Image(systemName: symbol)
                             .resizable()
                             .scaledToFit()
                             .frame(width: symbolSize, height: symbolSize)
-                            .foregroundColor(.white)
+                            .foregroundColor(symbolColor ?? .white)
                             .rotationEffect(.degrees(symbolRotation))
                     }
 
@@ -1024,13 +1025,11 @@ extension Home {
 
                             FillablePieSegment(
                                 pieSegmentViewModel: carbsPieSegmentViewModel,
-                                // fillFraction: fill,
-                                // color: .white.opacity(0.5),
-                                color: .orange,
+                                color: .white,
                                 backgroundColor: .clear,
                                 displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
                                 symbolSize: 20,
-                                symbol: "fork.knife",
+                                symbol: "",
                                 animateProgress: true,
                                 button3D: state.button3D,
                                 button3DBackground: state.button3DBackground,
@@ -1040,6 +1039,20 @@ extension Home {
                                 fillFraction: fill,
                                 symbolBackgroundColor: backgroundColor
                             )
+                            Image(systemName: "apple.logo")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 27, height: 27)
+                                .foregroundColor(.white.opacity(0.8))
+                                .verticalFillMask(
+                                    fillFraction: fill,
+                                    gradient: LinearGradient(
+                                        gradient: Gradient(colors: [.green, .yellow, .orange]),
+                                        startPoint: .bottom,
+                                        endPoint: .top
+                                    )
+                                )
+                                .offset(y: -1.5)
                         }
                     }
                 }
@@ -1065,19 +1078,18 @@ extension Home {
 
                             let isNegative = substance < 0
                             // let pieColor: Color = isNegative ? .red : .white.opacity(0.5)
-                            let pieColor: Color = isNegative ? .red : .blue
+                            //  let pieColor: Color = isNegative ? .red : .blue
 
                             let _: Double = isNegative ? 90 : -90
 
                             FillablePieSegment(
                                 pieSegmentViewModel:
                                 insulinPieSegmentViewModel,
-                                // fillFraction: fill,
-                                color: pieColor,
+                                color: .white,
                                 backgroundColor: .clear,
                                 displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
                                 symbolSize: 20,
-                                symbol: "syringe",
+                                symbol: "",
                                 animateProgress: true,
                                 button3D: state.button3D,
                                 button3DBackground: state.button3DBackground,
@@ -1087,6 +1099,20 @@ extension Home {
                                 fillFraction: fill,
                                 symbolBackgroundColor: backgroundColor
                             )
+                            Image(systemName: "drop.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 27, height: 27)
+                                .foregroundColor(.white.opacity(0.8))
+                                .verticalFillMask(
+                                    fillFraction: fill,
+                                    gradient: LinearGradient(
+                                        gradient: Gradient(colors: [.blue, .blue]),
+                                        startPoint: .bottom,
+                                        endPoint: .top
+                                    )
+                                )
+                                .offset(y: -1.5)
                         }
                     }
                     .onTapGesture {
@@ -1267,7 +1293,7 @@ extension Home {
                         }
                     }()
 
-                    let shouldBlink = reservoirColor == .red
+                    // let shouldBlink = reservoirColor == .red
 
                     ZStack {
                         FillablePieSegment(
@@ -1275,7 +1301,7 @@ extension Home {
                             color: reservoirColor,
                             backgroundColor: .clear,
                             displayText: displayText,
-                            symbolSize: 25,
+                            symbolSize: 21,
                             symbol: "cross.vial.fill",
                             animateProgress: true,
                             button3D: state.button3D,
@@ -1283,10 +1309,11 @@ extension Home {
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
-                            fillFraction: fill
+                            fillFraction: fill,
+                            symbolColor: reservoirColor
                         )
                         .frame(width: 60, height: 60)
-                        .modifier(BlinkingModifier(shouldBlink: shouldBlink))
+                        // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     }
                 }
             }
@@ -1347,12 +1374,12 @@ extension Home {
                     return colorForRemainingHours(remainingHours)
                 }()
 
-                let shouldBlink = insulinColor == .red
+                // let shouldBlink = insulinColor == .red
 
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: insulinAgePieSegmentViewModel,
-                        color: shouldBlink ? .red : insulinColor,
+                        color: .white,
                         backgroundColor: .clear,
                         displayText: insulinDisplayText,
                         symbolSize: 25,
@@ -1364,34 +1391,16 @@ extension Home {
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview,
                         fillFraction: insulinFraction,
-                        symbolBackgroundColor: backgroundColor
+                        symbolBackgroundColor: backgroundColor,
+                        symbolColor: insulinColor
                     )
                     .frame(width: 60, height: 60)
-                    .modifier(BlinkingModifier(shouldBlink: shouldBlink))
+                    // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                 }
             }
         }
 
         struct InsulinCatheterSymbol: View {
-            var body: some View {
-                ZStack {
-                    Image(systemName: "hockey.puck")
-                        .resizable()
-                        // .rotationEffect(.degrees(-50))
-                        .foregroundStyle(Color(.white))
-                        .frame(width: 22, height: 12)
-                        .offset(x: 0, y: -1)
-
-                    Rectangle()
-                        .frame(width: 2, height: 7)
-                        .foregroundStyle(Color(.white))
-                        .offset(x: 0, y: 8)
-                }
-                .frame(width: 40, height: 40)
-            }
-        }
-
-        struct InsulinCatheterSymbol2: View {
             var color: Color // Farbe von außen übergeben
             var baseSize: CGFloat = 40 // Basisgröße
 
@@ -1471,12 +1480,12 @@ extension Home {
 
                 }()
 
-                let shouldBlink = cannulaColor == .red
+                // let shouldBlink = cannulaColor == .red
 
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: cannulaPieSegmentViewModel,
-                        color: cannulaColor,
+                        color: .white,
                         backgroundColor: .clear,
                         displayText: cannulaDisplayText,
                         symbolSize: 20,
@@ -1488,13 +1497,15 @@ extension Home {
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview,
                         fillFraction: cannulaFraction,
-                        symbolBackgroundColor: backgroundColor
+                        symbolBackgroundColor: backgroundColor,
+                        symbolColor: cannulaColor
                     )
                     .frame(width: 60, height: 60)
 
-                    InsulinCatheterSymbol()
+                    InsulinCatheterSymbol(color: cannulaColor)
                         .offset(y: -1.5)
-                        .modifier(BlinkingModifier(shouldBlink: shouldBlink)) }
+                    // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
+                }
             }
         }
 
@@ -1547,7 +1558,8 @@ extension Home {
                         ) ?? .atriumview,
                         fillFraction: 1.0,
                         symbolRotation: -90,
-                        symbolBackgroundColor: backgroundColor
+                        symbolBackgroundColor: backgroundColor,
+                        symbolColor: .white
                     )
                     Image(systemName: "timer.circle.fill")
                         .resizable()
@@ -1595,13 +1607,12 @@ extension Home {
                         }
                     }()
 
-                    let shouldBlink = sensorColor == .red
+                    // let shouldBlink = sensorColor == .red
 
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: sensorAgeSegmentViewModel,
-                            // fillFraction: fillFraction,
-                            color: sensorColor,
+                            color: .white,
                             backgroundColor: .clear,
                             displayText: sensorAgeText,
                             symbolSize: 25,
@@ -1613,10 +1624,11 @@ extension Home {
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
                             fillFraction: fillFraction,
-                            symbolBackgroundColor: backgroundColor
+                            symbolBackgroundColor: backgroundColor,
+                            symbolColor: sensorColor
                         )
                         .frame(width: 60, height: 60)
-                        .modifier(BlinkingModifier(shouldBlink: shouldBlink))
+                        // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     }
                 }
             }
@@ -1657,7 +1669,8 @@ extension Home {
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
                             fillFraction: connectionFraction,
-                            symbolBackgroundColor: backgroundColor
+                            symbolBackgroundColor: backgroundColor,
+                            symbolColor: .white
                         )
                         .frame(width: 60, height: 60)
                     }
@@ -2203,7 +2216,7 @@ extension Home {
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
             var body: some View {
-                InsulinCatheterSymbol2(color: color) // Farbe übergeben
+                InsulinCatheterSymbol(color: color) // Farbe übergeben
                     .scaleEffect(1.0) // Skaliert auf 100% der Basisgröße (20x20)
                     .offset(y: -1.5)
             }
@@ -2496,6 +2509,7 @@ extension Home {
             symbolRenderingMode: SymbolRenderingMode? = .hierarchical,
             colors: [Color] = [.white],
             circleColor _: Color,
+            gradient: LinearGradient? = nil,
             action: @escaping () -> Void
         ) -> some View {
             Button(action: action) {
@@ -2544,56 +2558,32 @@ extension Home {
                             .overlay(Circle().stroke(Color.white, lineWidth: 0))
                     }
 
-                    // Spezielles Styling für fork.knife
-                    if iconName == "fork.knife.custom" {
-                        ZStack {
-                            Circle()
-                                .fill(Color.clear)
-                                .frame(width: 30, height: 30)
-
-                            Image(systemName: "fork.knife")
-                                .symbolRenderingMode(.hierarchical)
-                                .foregroundStyle(.orange)
-                                .font(.system(size: 20))
-                        }
-                        .font(.system(size: 20))
-                    }
-
-                    // Spezielles Styling für Syringe
-                    if iconName == "syringe.custom" {
-                        ZStack {
-                            Circle()
-                                .fill(Color.clear)
-                                .frame(width: 30, height: 30)
-
-                            Image(systemName: "syringe")
-                                .symbolRenderingMode(.hierarchical)
-                                .foregroundStyle(.blue)
-                                .font(.system(size: 20))
-                        }
-                        .font(.system(size: 20))
-                    }
-
                     // SF Symbol Darstellung mit direkter Farbanwendung
-                    else if isSFSymbol {
+                    if isSFSymbol {
                         Group {
-                            switch colors.count {
-                            case 1:
-                                Image(systemName: iconName)
-                                    .symbolRenderingMode(symbolRenderingMode)
-                                    .foregroundStyle(colors[0])
-                            case 2:
-                                Image(systemName: iconName)
-                                    .symbolRenderingMode(symbolRenderingMode)
-                                    .foregroundStyle(colors[0], colors[1])
-                            case 3:
-                                Image(systemName: iconName)
-                                    .symbolRenderingMode(symbolRenderingMode)
-                                    .foregroundStyle(colors[0], colors[1], colors[2])
-                            default:
-                                Image(systemName: iconName)
-                                    .symbolRenderingMode(symbolRenderingMode)
-                                    .foregroundStyle(colors.first ?? .white)
+                            let symbolImage = Image(systemName: iconName)
+                                .symbolRenderingMode(symbolRenderingMode)
+                                .font(.system(size: 25, weight: .medium))
+                                .frame(width: 40, height: 40)
+
+                            if let gradient = gradient {
+                                symbolImage
+                                    .foregroundColor(.white.opacity(0.0)) // Basis transparent
+                                    .overlay(
+                                        gradient
+                                            .mask(symbolImage)
+                                    )
+                            } else {
+                                switch colors.count {
+                                case 1:
+                                    symbolImage.foregroundStyle(colors[0])
+                                case 2:
+                                    symbolImage.foregroundStyle(colors[0], colors[1])
+                                case 3:
+                                    symbolImage.foregroundStyle(colors[0], colors[1], colors[2])
+                                default:
+                                    symbolImage.foregroundStyle(colors.first ?? .white)
+                                }
                             }
                         }
                         .font(.system(size: 25, weight: .medium))
@@ -2626,10 +2616,15 @@ extension Home {
                     if state.carbButton {
                         ZStack {
                             buttonWithCircle(
-                                iconName: "fork.knife.custom",
+                                iconName: "apple.logo",
                                 symbolRenderingMode: .palette,
                                 colors: [.orange, .clear],
-                                circleColor: Color.black.opacity(1.0)
+                                circleColor: Color.black.opacity(1.0),
+                                gradient: LinearGradient(
+                                    gradient: Gradient(colors: [.green, .yellow, .orange]),
+                                    startPoint: .bottom,
+                                    endPoint: .top
+                                )
                             ) {
                                 state.showModal(for: .addCarbs(editMode: false, override: false))
                             }
@@ -2648,7 +2643,8 @@ extension Home {
 
                     // IOB Button
                     buttonWithCircle(
-                        iconName: "syringe.custom",
+                        // iconName: "syringe.custom",
+                        iconName: "drop.fill",
                         colors: [.blue, .clear], // [Spritzenfarbe, Kreisfarbe]
                         circleColor: Color.black.opacity(1.0)
                     ) {

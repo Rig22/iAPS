@@ -525,3 +525,44 @@ extension View {
         modifier(GradientMaskAnimationModifier(isActive: isActive))
     }
 }
+
+struct VerticalFillMaskModifier: ViewModifier {
+    let fillFraction: CGFloat
+    let fillColor: Color
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                GeometryReader { geometry in
+                    let height = geometry.size.height * fillFraction
+                    fillColor
+                        .frame(height: height)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                        .mask(content)
+                }
+                .allowsHitTesting(false)
+            }
+    }
+}
+
+/* extension View {
+     func verticalFillMask(fillFraction: CGFloat, fillColor: Color) -> some View {
+         modifier(VerticalFillMaskModifier(fillFraction: fillFraction, fillColor: fillColor))
+     }
+ } */
+extension View {
+    func verticalFillMask(fillFraction: CGFloat, gradient: LinearGradient) -> some View {
+        overlay(
+            GeometryReader { geo in
+                gradient
+                    .frame(height: geo.size.height * fillFraction)
+                    .position(
+                        x: geo.size.width / 2,
+                        y: geo.size.height * (1 - fillFraction / 2)
+                    )
+                    .clipped()
+            }
+            .mask(self)
+        )
+    }
+}
