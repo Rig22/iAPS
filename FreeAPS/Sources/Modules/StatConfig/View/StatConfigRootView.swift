@@ -306,10 +306,6 @@ extension StatConfig {
 
                                 Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
                                 Toggle("3D Look", isOn: $state.button3D)
-                                /*   Toggle(
-                                     "Icons Backgrounds ⇢ Dark",
-                                     isOn: $state.button3DBackground
-                                 )*/
                                 if state.button3D {
                                     Toggle(
                                         "Icons Backgrounds ⇢ Dark",
@@ -341,10 +337,18 @@ extension StatConfig {
                             } header: { Text("Choose your App Icon") }
 
                             Section(
-                                header: Text("Sensor Settings"),
+                                header: Text(
+                                    "Show Sensor Age for nightscout, dexcomG5, dexcomG6, dexcomG7, libre1, libre2 and enlite"
+                                ),
+                                footer: Text("Direct Support implemented")
+                            ) { Toggle("Display Sensor Age", isOn: $state.displayExpiration)
+                            }
+
+                            Section(
+                                header: Text("Sensor Settings for Libre 3 and 3+ Users"),
                                 footer: Text("Long press for setting new Sensor Start Time")
                             ) {
-                                Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)
+                                /* Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)*/
                                 if state.displayExpiration {
                                     Picker("Select Sensor Span", selection: $state.sensorAgeDays) {
                                         ForEach(SensorAgeDays.allCases, id: \.self) { sensorAge in

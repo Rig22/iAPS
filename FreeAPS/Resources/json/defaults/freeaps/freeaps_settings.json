@@ -88,7 +88,6 @@
   "sensorDays": 10.0,
   "fpus": true,
   "fpuAmounts": false,
-  "lightMode": LightMode.auto,
   "timeSettings": false,
   "danaIconRawValue": "ic_dana_rs",
   "danaBar": false,

@@ -16,7 +16,7 @@ struct CurrentGlucoseView: View {
     @Binding var cgm: CGMType
     @Binding var sensordays: Double
 
-    // @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.sizeCategory) private var fontSize
 
     @State private var rotationDegrees: Double = 0
@@ -94,6 +94,10 @@ struct CurrentGlucoseView: View {
 
     var body: some View {
         ZStack {
+            if displayExpiration {
+                sageView
+                    .offset(x: -9, y: -70)
+            }
             // TriangleShape(color: triangleColor)
             TriangleShape(color: currentTriangleColor)
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))
@@ -207,6 +211,39 @@ struct CurrentGlucoseView: View {
         default:
             return (2, 0)
         }
+    }
+
+    private var sageView: some View {
+        ZStack {
+            if let date = recentGlucose?.sessionStartDate {
+                let sensorAge: TimeInterval = (-1 * date.timeIntervalSinceNow)
+                let expiration = sensordays - sensorAge
+                let secondsOfDay = 8.64E4
+                let colour: Color = colorScheme == .light ? .secondary : Color.black
+                let lineColour: Color = sensorAge >= sensordays - secondsOfDay * 1 ? Color.red
+                    .opacity(0.9) : sensorAge >= sensordays - secondsOfDay * 2 ? Color
+                    .orange : Color.gray
+
+                Sage(amount: sensorAge, expiration: expiration, lineColour: lineColour, sensordays: sensordays)
+                    .frame(width: 36, height: 36)
+                    .overlay {
+                        HStack {
+                            Text(
+                                sensorAge >= 1 * 8.64E4 ?
+                                    (remainingTimeFormatterDays.string(from: sensorAge) ?? "")
+                                    .replacingOccurrences(of: ",", with: " ") :
+                                    (remainingTimeFormatter.string(from: sensorAge) ?? "")
+                                    .replacingOccurrences(of: ",", with: " ")
+                            ).foregroundStyle(Color.white)
+                            // .foregroundStyle(colour)
+                        }
+                    }
+            }
+        }
+        .font(.footnote)
+        .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing).padding(20)
+        .offset(x: -5)
     }
 
     var colourGlucoseText: Color {

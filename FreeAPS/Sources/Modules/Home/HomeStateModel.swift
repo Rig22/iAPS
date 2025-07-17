@@ -244,7 +244,15 @@ extension Home {
             hours = settingsManager.settings.hours
             displayExpiration = settingsManager.settings.displayExpiration
             cgm = settingsManager.settings.cgm
-            sensorDays = settingsManager.settings.sensorDays
+            sensorDays = switch settingsManager.settings.cgm {
+            case .nightscout: CGMType.nightscout.expiration
+            case .dexcomG5: CGMType.dexcomG5.expiration
+            case .dexcomG6: CGMType.dexcomG6.expiration
+            case .dexcomG7: CGMType.dexcomG7.expiration
+            case .libreTransmitter: CGMType.libreTransmitter.expiration
+            case .enlite: CGMType.enlite.expiration
+            default: settingsManager.settings.sensorDays
+            }
             carbButton = settingsManager.settings.carbButton
             profileButton = settingsManager.settings.profileButton
             // Dana UI Toggels
@@ -863,9 +871,17 @@ extension Home.StateModel:
         hours = settingsManager.settings.hours
         displayExpiration = settingsManager.settings.displayExpiration
         cgm = settingsManager.settings.cgm
-        sensorDays = settingsManager.settings.sensorDays
         carbButton = settingsManager.settings.carbButton
         profileButton = settingsManager.settings.profileButton
+        sensorDays = switch settingsManager.settings.cgm {
+        case .nightscout: CGMType.nightscout.expiration
+        case .dexcomG5: CGMType.dexcomG5.expiration
+        case .dexcomG6: CGMType.dexcomG6.expiration
+        case .dexcomG7: CGMType.dexcomG7.expiration
+        case .libreTransmitter: CGMType.libreTransmitter.expiration
+        case .enlite: CGMType.enlite.expiration
+        default: settingsManager.settings.sensorDays
+        }
         hideInsulinBadge = settingsManager.settings.hideInsulinBadge
         setupGlucose()
         setupOverrideHistory()

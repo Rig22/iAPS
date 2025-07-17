@@ -133,6 +133,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var glucoseOverrideThresholdActive: Bool = false
     var glucoseOverrideThresholdActiveDown: Bool = false
     var glucoseOverrideThresholdDown: Decimal = 100
+    // var lightMode: LightMode = .auto
     // Dana-Toggles
     // Auto ISF
     var autoisf: Bool = false

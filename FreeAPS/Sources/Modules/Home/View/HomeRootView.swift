@@ -1013,46 +1013,56 @@ extension Home {
         // CarbView Anfang
         @StateObject private var carbsPieSegmentViewModel = PieSegmentViewModel()
 
+        @State private var animatedFill: CGFloat = 0.0
+
         var carbsView: some View {
             HStack {
                 if let settings = state.settingsManager {
-                    HStack {
-                        ZStack {
-                            let substance = Double(state.data.suggestion?.cob ?? 0)
-                            let maxValue = max(Double(settings.preferences.maxCOB), 1)
-                            let fraction = CGFloat(substance / maxValue)
-                            let fill = max(min(fraction, 1.0), 0.0)
+                    let substance = Double(state.data.suggestion?.cob ?? 0)
+                    let maxValue = max(Double(settings.preferences.maxCOB), 1)
+                    let targetFill = CGFloat(substance / maxValue)
 
-                            FillablePieSegment(
-                                pieSegmentViewModel: carbsPieSegmentViewModel,
-                                color: .white,
-                                backgroundColor: .clear,
-                                displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
-                                symbolSize: 20,
-                                symbol: "",
-                                animateProgress: true,
-                                button3D: state.button3D,
-                                button3DBackground: state.button3DBackground,
-                                incidenceOfLight: state.incidenceOfLight,
-                                lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                    .atriumview,
-                                fillFraction: fill,
-                                symbolBackgroundColor: backgroundColor
-                            )
-                            Image(systemName: "apple.logo")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 27, height: 27)
-                                .foregroundColor(.white.opacity(0.8))
-                                .verticalFillMask(
-                                    fillFraction: fill,
-                                    gradient: LinearGradient(
-                                        gradient: Gradient(colors: [.green, .yellow, .orange]),
-                                        startPoint: .bottom,
-                                        endPoint: .top
-                                    )
+                    ZStack {
+                        FillablePieSegment(
+                            pieSegmentViewModel: carbsPieSegmentViewModel,
+                            color: .orange,
+                            backgroundColor: .clear,
+                            displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
+                            symbolSize: 20,
+                            symbol: "",
+                            animateProgress: true,
+                            button3D: state.button3D,
+                            button3DBackground: state.button3DBackground,
+                            incidenceOfLight: state.incidenceOfLight,
+                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                                .atriumview,
+                            fillFraction: animatedFill,
+                            symbolBackgroundColor: backgroundColor
+                        )
+
+                        Image(systemName: "apple.logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 27, height: 27)
+                            .foregroundColor(.white.opacity(0.8))
+                            .verticalFillMask(
+                                fillFraction: animatedFill,
+                                gradient: LinearGradient(
+                                    gradient: Gradient(colors: [.green, .orange, .yellow]),
+                                    startPoint: .bottom,
+                                    endPoint: .top
                                 )
-                                .offset(y: -1.5)
+                            )
+                            .offset(y: -1.5)
+                    }
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 5.6)) {
+                            animatedFill = max(min(targetFill, 1.0), 0.0)
+                        }
+                    }
+                    .onChange(of: targetFill) { _, newValue in
+                        withAnimation(.easeInOut(duration: 10.6)) {
+                            animatedFill = max(min(newValue, 1.0), 0.0)
                         }
                     }
                 }
@@ -1065,27 +1075,23 @@ extension Home {
 
         @StateObject private var insulinPieSegmentViewModel = PieSegmentViewModel()
 
+        @State private var animatedInsulinFill: CGFloat = 0.0
+
         var insulinView: some View {
-            HStack {
-                if let settings = state.settingsManager {
+            let substance = Double(state.data.suggestion?.iob ?? 0)
+            let maxValue = max(Double(state.settingsManager?.preferences.maxIOB ?? 1), 1)
+            let fraction = CGFloat(abs(substance) / maxValue)
+            let fill = min(fraction, 1.0)
+            let isNegative = substance < 0
+            let pieColor: Color = isNegative ? .red : .blue
+
+            return HStack {
+                if let _ = state.settingsManager {
                     HStack {
                         ZStack {
-                            let substance = Double(state.data.suggestion?.iob ?? 0)
-                            let maxValue = max(Double(settings.preferences.maxIOB), 1)
-
-                            let fraction = CGFloat(abs(substance) / maxValue)
-                            let fill = min(fraction, 1.0)
-
-                            let isNegative = substance < 0
-                            // let pieColor: Color = isNegative ? .red : .white.opacity(0.5)
-                            //  let pieColor: Color = isNegative ? .red : .blue
-
-                            let _: Double = isNegative ? 90 : -90
-
                             FillablePieSegment(
-                                pieSegmentViewModel:
-                                insulinPieSegmentViewModel,
-                                color: .white,
+                                pieSegmentViewModel: insulinPieSegmentViewModel,
+                                color: pieColor,
                                 backgroundColor: .clear,
                                 displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
                                 symbolSize: 20,
@@ -1096,23 +1102,37 @@ extension Home {
                                 incidenceOfLight: state.incidenceOfLight,
                                 lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                     .atriumview,
-                                fillFraction: fill,
+                                fillFraction: animatedInsulinFill,
                                 symbolBackgroundColor: backgroundColor
                             )
+
                             Image(systemName: "drop.fill")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 27, height: 27)
                                 .foregroundColor(.white.opacity(0.8))
                                 .verticalFillMask(
-                                    fillFraction: fill,
-                                    gradient: LinearGradient(
-                                        gradient: Gradient(colors: [.blue, .blue]),
-                                        startPoint: .bottom,
-                                        endPoint: .top
-                                    )
+                                    fillFraction: animatedInsulinFill,
+                                    gradient: isNegative
+                                        ? LinearGradient(colors: [pieColor, pieColor], startPoint: .bottom, endPoint: .top)
+                                        : LinearGradient(colors: [.blue, .blue], startPoint: .bottom, endPoint: .top)
                                 )
                                 .offset(y: -1.5)
+                        }
+                    }
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 5.6)) {
+                            animatedInsulinFill = fill
+                        }
+                    }
+                    .onChange(of: state.data.suggestion?.iob) { _, _ in
+                        let newSubstance = Double(state.data.suggestion?.iob ?? 0)
+                        let newMax = max(Double(state.settingsManager?.preferences.maxIOB ?? 1), 1)
+                        let newFraction = CGFloat(abs(newSubstance) / newMax)
+                        let newFill = min(newFraction, 1.0)
+
+                        withAnimation(.easeOut(duration: 10.6)) {
+                            animatedInsulinFill = newFill
                         }
                     }
                     .onTapGesture {
@@ -1294,7 +1314,6 @@ extension Home {
                     }()
 
                     // let shouldBlink = reservoirColor == .red
-
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: reservoirPieSegmentViewModel,
@@ -1303,7 +1322,7 @@ extension Home {
                             displayText: displayText,
                             symbolSize: 21,
                             symbol: "cross.vial.fill",
-                            animateProgress: true,
+                            animateProgress: false,
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
@@ -1561,13 +1580,14 @@ extension Home {
                         symbolBackgroundColor: backgroundColor,
                         symbolColor: .white
                     )
-                    Image(systemName: "timer.circle.fill")
+                    .frame(width: 60, height: 60)
+
+                    Image(systemName: "clock.fill")
                         .resizable()
                         // .rotationEffect(.degrees(-50))
                         .foregroundStyle(Color(.white))
                         .frame(width: 15, height: 15)
                         .offset(x: 13, y: -17)
-                        .frame(width: 60, height: 60)
                 }
             }
         }

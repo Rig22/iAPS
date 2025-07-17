@@ -468,9 +468,47 @@ extension UIImage {
             let height: CGFloat = 1 - portion
             let rectToFill = CGRect(x: 0, y: size.height * portion, width: size.width, height: size.height * height)
             UIColor(color).setFill()
-            context.fill(rectToFill, blendMode: .sourceIn)
+            context.fill(rectToFill, blendMode: .sourceAtop)
         }
         return Image(uiImage: image)
+    }
+}
+
+struct Sage: View {
+    @Environment(\.colorScheme) var colorScheme
+    let amount: Double
+    let expiration: Double
+    let lineColour: Color
+    let sensordays: TimeInterval
+    var body: some View {
+        let fill = max(expiration / amount, 0.15)
+        let colour: Color = (expiration < 0.5 * 8.64E4) ? .red
+            .opacity(0.9) : (expiration < 2 * 8.64E4) ? .orange.opacity(0.8) : colorScheme == .light ? Color.white : Color.white
+            .opacity(0.8)
+        let scheme = colorScheme == .light ? Color(.systemGray5) : Color(.systemGray2)
+
+        Circle()
+            .stroke(scheme, lineWidth: 5)
+            .background(
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                Gradient.Stop(
+                                    color: colour,
+                                    location: fill
+                                ),
+                                Gradient.Stop(
+                                    color: colorScheme == .light ? backgroundColor : backgroundColor,
+                                    location: fill
+                                )
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .shadow(radius: 4)
+            )
     }
 }
 
@@ -545,11 +583,6 @@ struct VerticalFillMaskModifier: ViewModifier {
     }
 }
 
-/* extension View {
-     func verticalFillMask(fillFraction: CGFloat, fillColor: Color) -> some View {
-         modifier(VerticalFillMaskModifier(fillFraction: fillFraction, fillColor: fillColor))
-     }
- } */
 extension View {
     func verticalFillMask(fillFraction: CGFloat, gradient: LinearGradient) -> some View {
         overlay(
