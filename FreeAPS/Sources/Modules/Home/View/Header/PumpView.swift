@@ -290,8 +290,11 @@ struct PumpView: View {
             let amountFraction = 1.0 - (Double(reservoir) / 300.0)
 
             HStack(spacing: 0) {
-                Text(reservoirFormatter.string(from: reservoir as NSNumber) ?? "")
-                    .font(.statusFont)
+                Text(
+                    reservoirFormatter
+                        .string(from: (reservoir * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ?? ""
+                )
+                .font(.statusFont)
                 Text("U")
                     .font(.statusFont)
             }
