@@ -77,6 +77,8 @@ extension Home {
         @Published var maxCOB: Decimal = 0
         @Published var autoisf = false
         @Published var displayExpiration = false
+        @Published var displayExpiration2 = false
+        @Published var displaySAGE = true
         @Published var cgm: CGMType = .nightscout
         @Published var sensorDays: Double = 10
         @Published var carbButton: Bool = true
@@ -84,7 +86,7 @@ extension Home {
         @Published var hideInsulinBadge: Bool = true
         // Dana UI Toggels
         @Published var showPumpIcon: Bool = false
-        @Published var pumpIconRawValue: String = "Nano200"
+        @Published var pumpIconRawValue: String = "Nano 200"
         @Published var danaBar: Bool = false
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
@@ -103,13 +105,12 @@ extension Home {
         @Published var remainingSensorMinutes: Int?
         @Published var elapsedMinutes: Int = 0
         @Published var incidenceOfLight: Bool = false
-        @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
+        @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview.rawValue
         @Published var insulinHours: Double?
         @Published var insulinAge: String = "--"
         @Published var batteryHours: Double?
         @Published var batteryAge: String = "--"
         @Published var button3DBackground: Bool = false
-        @Published var batteryIconOption: Bool = false
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -243,6 +244,8 @@ extension Home {
             autoisf = settingsManager.settings.autoisf
             hours = settingsManager.settings.hours
             displayExpiration = settingsManager.settings.displayExpiration
+            displayExpiration2 = settingsManager.settings.displayExpiration2
+            displaySAGE = settingsManager.settings.displaySAGE
             cgm = settingsManager.settings.cgm
             sensorDays = switch settingsManager.settings.cgm {
             case .nightscout: CGMType.nightscout.expiration
@@ -260,7 +263,6 @@ extension Home {
             showPumpIcon = settingsManager.settings.showPumpIcon
             pumpIconRawValue = settingsManager.settings.pumpIconRawValue
             hideInsulinBadge = settingsManager.settings.hideInsulinBadge
-            legendsSwitch = settingsManager.settings.legendsSwitch
             tempTargetbar = settingsManager.settings.tempTargetbar
             timeSettings = settingsManager.settings.timeSettings
             backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
@@ -275,7 +277,6 @@ extension Home {
             incidenceOfLight = settingsManager.settings.incidenceOfLight
             lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
             button3DBackground = settingsManager.settings.button3DBackground
-            batteryIconOption = settingsManager.settings.batteryIconOption
             // Dana UI Toggels
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -870,6 +871,8 @@ extension Home.StateModel:
         autoisf = settingsManager.settings.autoisf
         hours = settingsManager.settings.hours
         displayExpiration = settingsManager.settings.displayExpiration
+        displayExpiration2 = settingsManager.settings.displayExpiration2
+        displaySAGE = settingsManager.settings.displaySAGE
         cgm = settingsManager.settings.cgm
         carbButton = settingsManager.settings.carbButton
         profileButton = settingsManager.settings.profileButton
@@ -892,7 +895,6 @@ extension Home.StateModel:
         pumpIconRawValue = settingsManager.settings.pumpIconRawValue
         insulinAgeOption = settingsManager.settings.insulinAgeOption
         cannulaAgeOption = settingsManager.settings.cannulaAgeOption
-        legendsSwitch = settingsManager.settings.legendsSwitch
         tempTargetbar = settingsManager.settings.tempTargetbar
         timeSettings = settingsManager.settings.timeSettings
         backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
@@ -906,7 +908,6 @@ extension Home.StateModel:
         incidenceOfLight = settingsManager.settings.incidenceOfLight
         lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
         button3DBackground = settingsManager.settings.button3DBackground
-        batteryIconOption = settingsManager.settings.batteryIconOption
         // Dana UI Toggels
     }
 

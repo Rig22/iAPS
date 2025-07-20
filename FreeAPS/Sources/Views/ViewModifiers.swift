@@ -485,7 +485,7 @@ struct Sage: View {
         let colour: Color = (expiration < 0.5 * 8.64E4) ? .red
             .opacity(0.9) : (expiration < 2 * 8.64E4) ? .orange.opacity(0.8) : colorScheme == .light ? Color.white : Color.white
             .opacity(0.8)
-        let scheme = colorScheme == .light ? Color(.systemGray5) : Color(.systemGray2)
+        let scheme = colorScheme == .light ? Color(.systemGray5) : Color(.black).opacity(0.2)
 
         Circle()
             .stroke(scheme, lineWidth: 5)

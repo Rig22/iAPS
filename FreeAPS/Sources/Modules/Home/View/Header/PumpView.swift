@@ -86,79 +86,31 @@ struct PumpView: View {
                     omnipodContent()
                 }
             }
-            // MDT/Dana layout
+            // MDT/Dana/Simulator layout
             else {
                 mdtDanaContent()
+                simulatorContent()
             }
         }
         .offset(x: 0, y: 15) // Overall vertical adjustment
     }
 
-    // Medtrum-spezifischer Content
-    /*  @ViewBuilder private func medtrumContent() -> some View {
-         if let date = expiresAtDate {
-             // Insulin amount (U)
-             if let insulin = reservoir {
-                 // 120 % due to being non rectangular. +10 because of bottom inserter
-                 let amountFraction = 1.0 - (Double(insulin + 10) * 1.2 / 200)
-                 if insulin == 0xDEAD_BEEF {
-                     medtrumInsulinAmount(portion: amountFraction)
-                         .padding(.leading, showInsulinBadge ? 7 : 0)
-                         .overlay {
-                             if let timeZone = timeZone,
-                                timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
-                             {
-                                 ClockOffset(mdtPump: false)
-                             }
-                             if showInsulinBadge {
-                                 NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
-                             }
-                         }
-                         .offset(y: -5) // Pod insulin vertical adjustment
-                 } else {
-                     HStack(spacing: 0) {
-                         Text(
-                             reservoirFormatter
-                                 .string(from: (insulin * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ??
-                                 ""
-                         )
-                         Text("U").foregroundStyle(.white)
-                     }
-                     .offset(x: 2, y: 0) // Horizontal adjustment
-                     medtrumInsulinAmount(portion: amountFraction)
-                         .padding(.leading, showInsulinBadge ? 7 : 0)
-                         .overlay {
-                             if let timeZone = timeZone,
-                                timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
-                             {
-                                 ClockOffset(mdtPump: false)
-                             }
-                             if showInsulinBadge {
-                                 NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
-                             }
-                         }
-                         .offset(y: -5) // Pod insulin vertical adjustment
-                 }
-             }
+    // MARK: - Simulator
 
-             HStack(spacing: 4) {
-                 remainingTime(time: date.timeIntervalSince(timerDate))
-                     .font(.pumpFont)
-
-                 // Battery only for Medtrum
-                 if battery != nil {
-                     batteryIcon(for: .medtrum)
-                         .offset(x: -6, y: 0) // Fine-tuning für Medtrum Batterie
-                 }
-             }
-             .offset(x: -4, y: 0) // Vertical adjustment für Medtrum time+battery Reihe
-         } else {
-             Text("No Pump")
-                 .font(.statusFont)
-                 .foregroundStyle(.white)
-                 .offset(x: 0, y: -4)
-         }
-     }*/
+    @ViewBuilder private func simulatorContent() -> some View {
+        Image(systemName: "gearshape.2.fill")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 36, height: 36)
+            .foregroundColor(.gray)
+            .overlay(
+                Text("Sim")
+                    .font(.caption2)
+                    .bold()
+                    .foregroundColor(.white)
+                    .offset(y: 18)
+            )
+    }
 
     @ViewBuilder private func medtrumContent() -> some View {
         if let date = expiresAtDate {

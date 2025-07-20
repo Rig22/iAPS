@@ -188,113 +188,70 @@ extension Home {
             return scene
         }
 
-        struct TimeEllipse: View {
-            let characters: Int
-            var button3D: Bool = false
-            var button3DBackground: Bool = false
-            var incidenceOfLight: Bool
-            var lightGlowOverlaySelector: LightGlowOverlaySelector
-
-            var body: some View {
-                ZStack {
-                    if button3D {
-                        let glowColor1 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.9)
-
-                        let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.4)
-
-                        if button3DBackground {
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color.black.opacity(0.2))
-                                .frame(width: CGFloat(characters * 7), height: 25)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                        }
-
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        glowColor1.opacity(0.5),
-                                        glowColor2.opacity(0.3),
-                                        Color.clear,
-                                        Color.black.opacity(0.3),
-                                        Color.black.opacity(0.6)
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-
-                                ),
-                                lineWidth: 1
-                            )
-                            .frame(width: CGFloat(characters * 7), height: 25)
-                    } else {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.black.opacity(0.2))
-                            .frame(width: CGFloat(characters * 7), height: 25)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
-                    }
-                }
+        // Preference Key zur Breitenmessung
+        struct TextWidthKey: PreferenceKey {
+            static var defaultValue: CGFloat = 0
+            static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+                value = nextValue()
             }
         }
 
-        struct TimeEllipseBig: View {
-            let characters: Int
+        struct TimeEllipse: View {
             var button3D: Bool = false
             var button3DBackground: Bool = false
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
             var body: some View {
-                ZStack {
-                    if button3D {
-                        let glowColor1 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.9)
+                GeometryReader { geometry in
+                    ZStack {
+                        // Zentrierte Ellipse mit berechneter Breite
+                        let ellipseWidth = max(geometry.size.width + 10, 80) // Mindestbreite 80
 
-                        let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.4)
+                        if button3D {
+                            let glowColor1 = incidenceOfLight
+                                ? lightGlowOverlaySelector.highlightColor
+                                : Color.white.opacity(0.9)
 
-                        if button3DBackground {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.black.opacity(0.2))
-                                .frame(width: CGFloat(characters * 10), height: 25)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                        }
+                            let glowColor2 = incidenceOfLight
+                                ? lightGlowOverlaySelector.highlightColor
+                                : Color.white.opacity(0.4)
 
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        glowColor1.opacity(1.0),
-                                        glowColor2.opacity(0.8),
-                                        Color.clear,
-                                        Color.black.opacity(0.3),
-                                        Color.black.opacity(0.6)
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-
-                                ),
-                                lineWidth: 1
-                            )
-                            .frame(width: CGFloat(characters * 10), height: 26)
-                    } else {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.black.opacity(0.2))
-                            .frame(width: CGFloat(characters * 10), height: 26)
-                            .overlay(
+                            if button3DBackground {
                                 RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
+                                    .fill(Color.black.opacity(0.2))
+                                    .frame(width: ellipseWidth, height: 25)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            }
+
+                            RoundedRectangle(cornerRadius: 15)
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            glowColor1.opacity(0.5),
+                                            glowColor2.opacity(0.3),
+                                            Color.clear,
+                                            Color.black.opacity(0.3),
+                                            Color.black.opacity(0.6)
+                                        ]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    ),
+                                    lineWidth: 1
+                                )
+                                .frame(width: ellipseWidth, height: 25)
+                        } else {
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color.black.opacity(0.2))
+                                .frame(width: ellipseWidth, height: 25)
+                            RoundedRectangle(cornerRadius: 15)
+                                .stroke(Color.white, lineWidth: 0)
+                                .frame(width: ellipseWidth, height: 25)
+                        }
                     }
+                    .frame(width: geometry.size.width, height: 25, alignment: .center)
                 }
+                .frame(height: 25)
             }
         }
 
@@ -443,8 +400,8 @@ extension Home {
                     bolusProgress: doubleBolusProgress,
                     displayDelta: $state.displayDelta,
                     alwaysUseColors: $state.alwaysUseColors,
-                    scrolling: $displayGlucose,
-                    displayExpiration: $state.displayExpiration, cgm: $state.cgm, sensordays: $state.sensorDays
+                    scrolling: $displayGlucose, displaySAGE: $state.displaySAGE, displayExpiration: $state.displayExpiration,
+                    cgm: $state.cgm, sensordays: $state.sensorDays
                 )
                 .zIndex(1)
                 .onTapGesture {
@@ -862,8 +819,7 @@ extension Home {
                     }
                     .font(.timeSettingFont)
                     .background(
-                        TimeEllipseBig(
-                            characters: 11,
+                        TimeEllipse(
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
@@ -918,8 +874,7 @@ extension Home {
                     }
                     .font(.timeSettingFont)
                     .background(
-                        TimeEllipseBig(
-                            characters: 10,
+                        TimeEllipse(
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
@@ -1255,32 +1210,34 @@ extension Home {
 
         // danaBarMax
 
-        var danaBarMax: some View {
+        @ViewBuilder var danaBarMax: some View {
             if state.danaBar {
-                return AnyView(
-                    VStack(spacing: 20) {
-                        HStack(spacing: 20) {
-                            HStack(spacing: 10) {
-                                insulinAgeView
-                            }
-                            HStack(spacing: 10) {
-                                cannulaAgeView
-                            }
-                            HStack(spacing: 10) {
-                                batteryAgeView
-                            }
-                            HStack(spacing: 10) {
-                                sensorAgeDays
-                            }
-                            HStack(spacing: 10) {
-                                BluetoothConnectionView
-                            }
-                        }
+                VStack(spacing: 20) {
+                    HStack(spacing: 20) {
+                        insulinAgeView.frame(width: 60)
+                        cannulaAgeView.frame(width: 60)
+                        batteryAgeView.frame(width: 60)
+                        sensorConditionalView
+                        BluetoothConnectionView.frame(width: 60)
                     }
-                )
+                }
             } else {
-                return AnyView(EmptyView())
+                EmptyView()
             }
+        }
+
+        // Separater ViewBuilder für den bedingten Teil
+        @ViewBuilder private var sensorConditionalView: some View {
+            if shouldShowSensorAgeDays {
+                sensorAgeDays.frame(width: 60)
+            } else {
+                EmptyView().frame(width: 0)
+            }
+        }
+
+        // Hilfsfunktion zur Überprüfung des Sensor-Status
+        private var shouldShowSensorAgeDays: Bool {
+            true
         }
 
         // Top Bar Modules Start
@@ -1508,7 +1465,7 @@ extension Home {
                         backgroundColor: .clear,
                         displayText: cannulaDisplayText,
                         symbolSize: 20,
-                        symbol: "InsulinCatheterSymbol",
+                        symbol: "",
                         animateProgress: true,
                         button3D: state.button3D,
                         button3DBackground: state.button3DBackground,
@@ -1597,7 +1554,7 @@ extension Home {
 
         private var sensorAgeDays: some View {
             Group {
-                if state.displayExpiration {
+                if state.displayExpiration2 {
                     let totalHours = state.sensorAgeDays.asInt() * 24
                     let remainingHours = max(1, totalHours - state.elapsedHours)
                     let fillFraction: CGFloat = remainingHours <= 1 ? 1.0 : CGFloat(remainingHours) / CGFloat(totalHours)
@@ -1656,7 +1613,7 @@ extension Home {
 
         private func startSensorBlinkAnimationIfNeeded() {
             isSensorBlinking = false
-            guard state.displayExpiration else { return }
+            guard state.displayExpiration2 else { return }
 
             let totalHours = state.sensorAgeDays.asInt() * 24
             let remainingHours = max(1, totalHours - state.elapsedHours)
@@ -1745,7 +1702,7 @@ extension Home {
         }
 
         private var sensorColor: Color {
-            if state.displayExpiration {
+            if state.displayExpiration2 {
                 guard let days = state.remainingSensorDays,
                       let hours = state.remainingSensorHours,
                       let minutes = state.remainingSensorMinutes
@@ -1883,7 +1840,7 @@ extension Home {
             }
 
             // Sensor
-            if state.displayExpiration {
+            if state.displayExpiration2 {
                 if let days = state.remainingSensorDays,
                    let hours = state.remainingSensorHours,
                    let minutes = state.remainingSensorMinutes
@@ -2108,7 +2065,7 @@ extension Home {
                             }
                         }
                         // Sensor
-                        if state.displayExpiration {
+                        if state.displayExpiration2 {
                             let incidenceOfLight = state.incidenceOfLight
                             let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview
@@ -2267,7 +2224,7 @@ extension Home {
         }
 
         private var useBigSensorView: Bool {
-            guard state.displayExpiration,
+            guard state.displayExpiration2,
                   let days = state.remainingSensorDays,
                   let hours = state.remainingSensorHours,
                   let minutes = state.remainingSensorMinutes
@@ -2385,7 +2342,6 @@ extension Home {
 
             .background(
                 TimeEllipse(
-                    characters: 17,
                     button3D: state.button3D,
                     button3DBackground: state.button3DBackground,
                     incidenceOfLight: state.incidenceOfLight,
@@ -2452,7 +2408,6 @@ extension Home {
                     }
                     .background(
                         TimeEllipse(
-                            characters: 12,
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
@@ -2487,7 +2442,6 @@ extension Home {
             .padding(.vertical, 15)
             .background(
                 TimeEllipse(
-                    characters: 12,
                     button3D: state.button3D,
                     button3DBackground: state.button3DBackground,
                     incidenceOfLight: state.incidenceOfLight,
@@ -2496,24 +2450,35 @@ extension Home {
             ) }
 
         private var tddView: some View {
-            ZStack {
-                HStack {
-                    Image(systemName: "circle.slash").font(.system(size: 13)).foregroundStyle(.white)
+            HStack(spacing: 4) {
+                Image(systemName: "circle.slash")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.white)
 
-                    Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0") U")
-                        .foregroundStyle(.white)
-                }
-                .font(.timeSettingFont)
-                .background(
-                    TimeEllipse(
-                        characters: 13,
-                        button3D: state.button3D,
-                        button3DBackground: state.button3DBackground,
-                        incidenceOfLight: state.incidenceOfLight,
-                        lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                            .atriumview
-                    )
+                Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0") U")
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .fixedSize()
+            }
+            .font(.timeSettingFont)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(
+                TimeEllipse(
+                    button3D: state.button3D,
+                    button3DBackground: state.button3DBackground,
+                    incidenceOfLight: state.incidenceOfLight,
+                    lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
                 )
+            )
+            .overlay(
+                GeometryReader { geometry in
+                    Color.clear
+                        .preference(key: TextWidthKey.self, value: geometry.size.width)
+                }
+            )
+            .onPreferenceChange(TextWidthKey.self) { _ in
+                // Möglichkeit die Breite für weitere Anpassungen  zu verwenden
             }
         }
 

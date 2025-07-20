@@ -1,8 +1,7 @@
 import Foundation
 
-// Originale FreeAPSSettings Struktur
-struct FreeAPSSettings: JSON, Equatable, Codable {
-    var units: GlucoseUnits = .mgdL
+struct FreeAPSSettings: JSON, Equatable {
+    var units: GlucoseUnits = .mmolL
     var closedLoop: Bool = false
     var allowAnnouncements: Bool = false
     var useAutotune: Bool = false
@@ -13,7 +12,7 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var insulinReqPercentage: Decimal = 70
     var skipBolusScreenAfterCarbs: Bool = false
     var displayHR: Bool = false
-    var cgm: CGMType = .glucoseDirect
+    var cgm: CGMType = .nightscout
     var uploadGlucose: Bool = true
     var useCalendar: Bool = false
     var displayCalendarIOBandCOB: Bool = false
@@ -39,8 +38,8 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var low: Decimal = 70
     var uploadStats: Bool = false
     var hours: Int = 6
-    var xGridLines: Bool = false
-    var yGridLines: Bool = false
+    var xGridLines: Bool = true
+    var yGridLines: Bool = true
     var oneDimensionalGraph: Bool = false
     var rulerMarks: Bool = false
     var maxCarbs: Decimal = 1000
@@ -52,14 +51,12 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var fattyMeals: Bool = false
     var fattyMealFactor: Decimal = 0.7
     var displayPredictions: Bool = true
-    var useLiveActivity: Bool = true
-    var liveActivityEventualArrow: Bool = false
+    var useLiveActivity: Bool = false
     var liveActivityChart = false
     var liveActivityChartShowPredictions = true
-    var liveActivityChartThresholdLines = true
-    var liveActivityChartDynamicRange = true
     var useTargetButton: Bool = false
     var alwaysUseColors: Bool = false
+    var timeSettings: Bool = true
     var disable15MinTrend: Bool = false
     // Sounds
     var hypoSound: String = "Default"
@@ -82,59 +79,33 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var eventualBG: Bool = false
     var minumimPrediction: Bool = false
     var minimumSMB: Decimal = 0.3
-    var useInsulinBars: Bool = true
+    var useInsulinBars: Bool = false
     var disableCGMError: Bool = true
-    var uploadVersion: Bool = true
     var skipGlucoseChart: Bool = false
     var birthDate = Date.distantPast
     var sexSetting: Int = 3
-    var disableHypoTreatment: Bool = false
-    var hideInsulinBadge: Bool = false
-    var allowDilution: Bool = false
     var displayDelta: Bool = false
     var profileID: String = "Hypo Treatment"
+    var allowDilution: Bool = false
+    var hideInsulinBadge: Bool = false
     var extended_overrides = false
     var extendHomeView = true
     var displayExpiration = false
+    var displayExpiration2 = false
+    var displaySAGE = true
     var sensorDays: Double = 10
     var fpus: Bool = true
     var fpuAmounts: Bool = false
-    // Dana-Toggles
-    var timeSettings: Bool = true
-    // var pumpIconRawValue: String = "ic_dana_rs"
-    var showPumpIcon: Bool = false
-    var pumpIconRawValue: String = "Nano200"
-    var danaBar: Bool = false
-    var legendsSwitch: Bool = false
-    var tempTargetbar: Bool = false
-    var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
-    var danaBarOption: String = DanaBarOption.max.rawValue
-    var insulinAgeOption: String = "Drei_Tage"
-    var cannulaAgeOption: String = "Drei_Tage"
-    var chartBackgroundColored: Bool = false
-    var carbInsulinLoopViewOption: Bool = false
-    var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.none.rawValue
-    var topBarActive: Bool = false
-    var danaBarActive: Bool = false
-    var ttBarActive: Bool = false
-    var bottomBarActive: Bool = false
-    var button3D: Bool = false
-    var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
-    var sensorStartTime: Date?
-    var sensorStartTimeDefault = Date.distantPast
-    var incidenceOfLight = false
-    var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
-    var insulinHours: Double?
-    var button3DBackground: Bool = false
-    var batteryIconOption: Bool = false
     var carbButton: Bool = true
     var profileButton: Bool = true
+    var showInsulinActivity: Bool = true
+    var showCobChart: Bool = true
     var glucoseOverrideThreshold: Decimal = 100
     var glucoseOverrideThresholdActive: Bool = false
     var glucoseOverrideThresholdActiveDown: Bool = false
     var glucoseOverrideThresholdDown: Decimal = 100
-    // var lightMode: LightMode = .auto
-    // Dana-Toggles
+    // ColorScheme
+    var lightMode: LightMode = .auto
     // Auto ISF
     var autoisf: Bool = false
     var smbDeliveryRatioBGrange: Decimal = 0
@@ -165,360 +136,657 @@ struct FreeAPSSettings: JSON, Equatable, Codable {
     var ketoProtectBasalPercent: Decimal = 20
     var ketoProtectAbsolut: Bool = false
     var ketoProtectBasalAbsolut: Decimal = 0
+    // Dana-Toggles
+    var showPumpIcon: Bool = false
+    var pumpIconOption: String = "nano200"
+    var pumpIconRawValue: String = "nano200"
+    var danaBar: Bool = false
+    var tempTargetbar: Bool = false
+    var backgroundColorOption: BackgroundColorOption = .darkBlue
+    var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
+    var danaBarOption: String = DanaBarOption.max.rawValue
+    var insulinAgeOption: String = "Drei_Tage"
+    var cannulaAgeOption: String = "Drei_Tage"
+    var chartBackgroundColored: Bool = false
+    var carbInsulinLoopViewOption: Bool = false
+    var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.none.rawValue
+    var topBarActive: Bool = false
+    var danaBarActive: Bool = false
+    var ttBarActive: Bool = false
+    var bottomBarActive: Bool = false
+    var button3D: Bool = false
+    var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
+    var sensorStartTime: Date?
+    var sensorStartTimeDefault = Date.distantPast
+    var incidenceOfLight = false
+    var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview.rawValue
+    var insulinHours: Double?
+    var button3DBackground: Bool = false
+    var batteryIconOption: Bool = false
+}
 
-    // Computed property for background color option
-    var backgroundColorOption: BackgroundColorOption {
-        get {
-            BackgroundColorOption(rawValue: backgroundColorOptionRawValue) ?? .darkBlue
-        }
-        set {
-            backgroundColorOptionRawValue = newValue.rawValue
-        }
-    }
+extension FreeAPSSettings: Decodable {
+    // Needed to decode incomplete JSON
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        var settings = FreeAPSSettings()
 
-    // Computed property for Dana Icon
-    var pumpIconOption: PumpIconOption {
-        get {
-            PumpIconOption(rawValue: pumpIconRawValue) ?? .nano200
+        if let units = try? container.decode(GlucoseUnits.self, forKey: .units) {
+            settings.units = units
         }
-        set {
-            pumpIconRawValue = newValue.rawValue
+
+        if let closedLoop = try? container.decode(Bool.self, forKey: .closedLoop) {
+            settings.closedLoop = closedLoop
         }
+
+        if let allowAnnouncements = try? container.decode(Bool.self, forKey: .allowAnnouncements) {
+            settings.allowAnnouncements = allowAnnouncements
+        }
+
+        if let useAutotune = try? container.decode(Bool.self, forKey: .useAutotune) {
+            settings.useAutotune = useAutotune
+        }
+
+        if let isUploadEnabled = try? container.decode(Bool.self, forKey: .isUploadEnabled) {
+            settings.isUploadEnabled = isUploadEnabled
+        }
+
+        if let useLocalGlucoseSource = try? container.decode(Bool.self, forKey: .useLocalGlucoseSource) {
+            settings.useLocalGlucoseSource = useLocalGlucoseSource
+        }
+
+        if let localGlucosePort = try? container.decode(Int.self, forKey: .localGlucosePort) {
+            settings.localGlucosePort = localGlucosePort
+        }
+
+        if let debugOptions = try? container.decode(Bool.self, forKey: .debugOptions) {
+            settings.debugOptions = debugOptions
+        }
+
+        if let fpus = try? container.decode(Bool.self, forKey: .fpus) {
+            settings.fpus = fpus
+        }
+
+        if let fpuAmounts = try? container.decode(Bool.self, forKey: .fpuAmounts) {
+            settings.fpuAmounts = fpuAmounts
+        }
+
+        if let insulinReqPercentage = try? container.decode(Decimal.self, forKey: .insulinReqPercentage) {
+            settings.insulinReqPercentage = insulinReqPercentage
+        }
+
+        if let skipBolusScreenAfterCarbs = try? container.decode(Bool.self, forKey: .skipBolusScreenAfterCarbs) {
+            settings.skipBolusScreenAfterCarbs = skipBolusScreenAfterCarbs
+        }
+
+        if let displayHR = try? container.decode(Bool.self, forKey: .displayHR) {
+            settings.displayHR = displayHR
+            // compatibility if displayOnWatch is not available in json files
+            settings.displayOnWatch = (displayHR == true) ? AwConfig.HR : AwConfig.BGTarget
+        }
+
+        if let displayOnWatch = try? container.decode(AwConfig.self, forKey: .displayOnWatch) {
+            settings.displayOnWatch = displayOnWatch
+        }
+
+        if let cgm = try? container.decode(CGMType.self, forKey: .cgm) {
+            settings.cgm = cgm
+        }
+
+        if let uploadGlucose = try? container.decode(Bool.self, forKey: .uploadGlucose) {
+            settings.uploadGlucose = uploadGlucose
+        }
+
+        if let useCalendar = try? container.decode(Bool.self, forKey: .useCalendar) {
+            settings.useCalendar = useCalendar
+        }
+
+        if let displayCalendarIOBandCOB = try? container.decode(Bool.self, forKey: .displayCalendarIOBandCOB) {
+            settings.displayCalendarIOBandCOB = displayCalendarIOBandCOB
+        }
+
+        if let displayCalendarEmojis = try? container.decode(Bool.self, forKey: .displayCalendarEmojis) {
+            settings.displayCalendarEmojis = displayCalendarEmojis
+        }
+
+        if let useAppleHealth = try? container.decode(Bool.self, forKey: .useAppleHealth) {
+            settings.useAppleHealth = useAppleHealth
+        }
+
+        if let glucoseBadge = try? container.decode(Bool.self, forKey: .glucoseBadge) {
+            settings.glucoseBadge = glucoseBadge
+        }
+
+        if let useFPUconversion = try? container.decode(Bool.self, forKey: .useFPUconversion) {
+            settings.useFPUconversion = useFPUconversion
+        }
+
+        if let individualAdjustmentFactor = try? container.decode(Decimal.self, forKey: .individualAdjustmentFactor) {
+            settings.individualAdjustmentFactor = individualAdjustmentFactor
+        }
+
+        if let useCalc = try? container.decode(Bool.self, forKey: .useCalc) {
+            settings.useCalc = useCalc
+        }
+
+        if let fattyMeals = try? container.decode(Bool.self, forKey: .fattyMeals) {
+            settings.fattyMeals = fattyMeals
+        }
+
+        if let lowAlert = try? container.decode(Bool.self, forKey: .lowAlert) {
+            settings.lowAlert = lowAlert
+        }
+
+        if let highAlert = try? container.decode(Bool.self, forKey: .highAlert) {
+            settings.highAlert = highAlert
+        }
+
+        if let ascendingAlert = try? container.decode(Bool.self, forKey: .ascendingAlert) {
+            settings.ascendingAlert = ascendingAlert
+        }
+
+        if let descendingAlert = try? container.decode(Bool.self, forKey: .descendingAlert) {
+            settings.descendingAlert = descendingAlert
+        }
+
+        if let carbsRequiredAlert = try? container.decode(Bool.self, forKey: .carbsRequiredAlert) {
+            settings.carbsRequiredAlert = carbsRequiredAlert
+        }
+
+        if let disable15MinTrend = try? container.decode(Bool.self, forKey: .disable15MinTrend) {
+            settings.disable15MinTrend = disable15MinTrend
+        }
+
+        if let fattyMealFactor = try? container.decode(Decimal.self, forKey: .fattyMealFactor) {
+            settings.fattyMealFactor = fattyMealFactor
+        }
+
+        if let overrideFactor = try? container.decode(Decimal.self, forKey: .overrideFactor) {
+            settings.overrideFactor = overrideFactor
+        }
+
+        if let timeCap = try? container.decode(Int.self, forKey: .timeCap) {
+            settings.timeCap = timeCap
+        }
+
+        if let minuteInterval = try? container.decode(Int.self, forKey: .minuteInterval) {
+            settings.minuteInterval = minuteInterval
+        }
+
+        if let delay = try? container.decode(Int.self, forKey: .delay) {
+            settings.delay = delay
+        }
+
+        if let glucoseNotificationsAlways = try? container.decode(Bool.self, forKey: .glucoseNotificationsAlways) {
+            settings.glucoseNotificationsAlways = glucoseNotificationsAlways
+        }
+
+        if let useAlarmSound = try? container.decode(Bool.self, forKey: .useAlarmSound) {
+            settings.useAlarmSound = useAlarmSound
+        }
+
+        if let carbButton = try? container.decode(Bool.self, forKey: .carbButton) {
+            settings.carbButton = carbButton
+        }
+
+        if let profileButton = try? container.decode(Bool.self, forKey: .profileButton) {
+            settings.profileButton = profileButton
+        }
+
+        if let showInsulinActivity = try? container.decode(Bool.self, forKey: .showInsulinActivity) {
+            settings.showInsulinActivity = showInsulinActivity
+        }
+
+        if let showCobChart = try? container.decode(Bool.self, forKey: .showCobChart) {
+            settings.showCobChart = showCobChart
+        }
+
+        if let addSourceInfoToGlucoseNotifications = try? container.decode(
+            Bool.self,
+            forKey: .addSourceInfoToGlucoseNotifications
+        ) {
+            settings.addSourceInfoToGlucoseNotifications = addSourceInfoToGlucoseNotifications
+        }
+
+        if let lightMode = try? container.decode(LightMode.self, forKey: .lightMode) {
+            settings.lightMode = lightMode
+        }
+
+        if let lowGlucose = try? container.decode(Decimal.self, forKey: .lowGlucose) {
+            settings.lowGlucose = lowGlucose
+        }
+
+        if let highGlucose = try? container.decode(Decimal.self, forKey: .highGlucose) {
+            settings.highGlucose = highGlucose
+        }
+
+        if let carbsRequiredThreshold = try? container.decode(Decimal.self, forKey: .carbsRequiredThreshold) {
+            settings.carbsRequiredThreshold = carbsRequiredThreshold
+        }
+
+        if let animatedBackground = try? container.decode(Bool.self, forKey: .animatedBackground) {
+            settings.animatedBackground = animatedBackground
+        }
+
+        if let smoothGlucose = try? container.decode(Bool.self, forKey: .smoothGlucose) {
+            settings.smoothGlucose = smoothGlucose
+        }
+
+        if let low = try? container.decode(Decimal.self, forKey: .low) {
+            settings.low = low
+        }
+
+        if let high = try? container.decode(Decimal.self, forKey: .high) {
+            settings.high = high
+        }
+
+        if let sensorDays = try? container.decode(Double.self, forKey: .sensorDays) {
+            settings.sensorDays = sensorDays
+        }
+
+        if let uploadStats = try? container.decode(Bool.self, forKey: .uploadStats) {
+            settings.uploadStats = uploadStats
+        }
+
+        if let hours = try? container.decode(Int.self, forKey: .hours) {
+            settings.hours = hours
+        }
+
+        if let xGridLines = try? container.decode(Bool.self, forKey: .xGridLines) {
+            settings.xGridLines = xGridLines
+        }
+
+        if let yGridLines = try? container.decode(Bool.self, forKey: .yGridLines) {
+            settings.yGridLines = yGridLines
+        }
+
+        if let oneDimensionalGraph = try? container.decode(Bool.self, forKey: .oneDimensionalGraph) {
+            settings.oneDimensionalGraph = oneDimensionalGraph
+        }
+
+        if let rulerMarks = try? container.decode(Bool.self, forKey: .rulerMarks) {
+            settings.rulerMarks = rulerMarks
+        }
+
+        if let overrideHbA1cUnit = try? container.decode(Bool.self, forKey: .overrideHbA1cUnit) {
+            settings.overrideHbA1cUnit = overrideHbA1cUnit
+        }
+
+        if let maxCarbs = try? container.decode(Decimal.self, forKey: .maxCarbs) {
+            settings.maxCarbs = maxCarbs
+        }
+
+        if let displayFatAndProteinOnWatch = try? container.decode(Bool.self, forKey: .displayFatAndProteinOnWatch) {
+            settings.displayFatAndProteinOnWatch = displayFatAndProteinOnWatch
+        }
+
+        if let confirmBolusFaster = try? container.decode(Bool.self, forKey: .confirmBolusFaster) {
+            settings.confirmBolusFaster = confirmBolusFaster
+        }
+
+        if let onlyAutotuneBasals = try? container.decode(Bool.self, forKey: .onlyAutotuneBasals) {
+            settings.onlyAutotuneBasals = onlyAutotuneBasals
+        }
+
+        if let displayPredictions = try? container.decode(Bool.self, forKey: .displayPredictions) {
+            settings.displayPredictions = displayPredictions
+        }
+
+        if let useLiveActivity = try? container.decode(Bool.self, forKey: .useLiveActivity) {
+            settings.useLiveActivity = useLiveActivity
+        }
+
+        // --- live activity chart
+
+        if let liveActivityChart = try? container.decode(Bool.self, forKey: .liveActivityChart) {
+            settings.liveActivityChart = liveActivityChart
+        }
+
+        if let liveActivityChartShowPredictions = try? container.decode(Bool.self, forKey: .liveActivityChartShowPredictions) {
+            settings.liveActivityChartShowPredictions = liveActivityChartShowPredictions
+        }
+
+        // ----
+
+        if let useTargetButton = try? container.decode(Bool.self, forKey: .useTargetButton) {
+            settings.useTargetButton = useTargetButton
+        }
+
+        if let alwaysUseColors = try? container.decode(Bool.self, forKey: .alwaysUseColors) {
+            settings.alwaysUseColors = alwaysUseColors
+        }
+
+        if let timeSettings = try? container.decode(Bool.self, forKey: .timeSettings) {
+            settings.timeSettings = timeSettings
+        }
+
+        if let hypoSound = try? container.decode(String.self, forKey: .hypoSound) {
+            settings.hypoSound = hypoSound
+        }
+
+        if let hyperSound = try? container.decode(String.self, forKey: .hyperSound) {
+            settings.hyperSound = hyperSound
+        }
+
+        if let ascending = try? container.decode(String.self, forKey: .ascending) {
+            settings.ascending = ascending
+        }
+
+        if let descending = try? container.decode(String.self, forKey: .descending) {
+            settings.descending = descending
+        }
+
+        if let carbSound = try? container.decode(String.self, forKey: .carbSound) {
+            settings.carbSound = carbSound
+        }
+
+        if let bolusFailure = try? container.decode(String.self, forKey: .bolusFailure) {
+            settings.bolusFailure = bolusFailure
+        }
+
+        if let missingLoops = try? container.decode(Bool.self, forKey: .missingLoops) {
+            settings.missingLoops = missingLoops
+        }
+
+        if let profilesOrTempTargets = try? container.decode(Bool.self, forKey: .profilesOrTempTargets) {
+            settings.profilesOrTempTargets = profilesOrTempTargets
+        }
+
+        if let allowBolusShortcut = try? container.decode(Bool.self, forKey: .allowBolusShortcut) {
+            settings.allowBolusShortcut = allowBolusShortcut
+        }
+
+        if let allowedRemoteBolusAmount = try? container.decode(Decimal.self, forKey: .allowedRemoteBolusAmount) {
+            settings.allowedRemoteBolusAmount = allowedRemoteBolusAmount
+        }
+
+        if let eventualBG = try? container.decode(Bool.self, forKey: .eventualBG) {
+            settings.eventualBG = eventualBG
+        }
+
+        if let minumimPrediction = try? container.decode(Bool.self, forKey: .minumimPrediction) {
+            settings.minumimPrediction = minumimPrediction
+        }
+
+        if let minimumSMB = try? container.decode(Decimal.self, forKey: .minimumSMB) {
+            settings.minimumSMB = minimumSMB
+        }
+
+        if let useInsulinBars = try? container.decode(Bool.self, forKey: .useInsulinBars) {
+            settings.useInsulinBars = useInsulinBars
+        }
+
+        if let disableCGMError = try? container.decode(Bool.self, forKey: .disableCGMError) {
+            settings.disableCGMError = disableCGMError
+        }
+
+        if let skipGlucoseChart = try? container.decode(Bool.self, forKey: .skipGlucoseChart) {
+            settings.skipGlucoseChart = skipGlucoseChart
+        }
+
+        if let birthDate = try? container.decode(Date.self, forKey: .birthDate) {
+            settings.birthDate = birthDate
+        }
+
+        if let sexSetting = try? container.decode(Int.self, forKey: .sexSetting) {
+            settings.sexSetting = sexSetting
+        }
+
+        if let displayDelta = try? container.decode(Bool.self, forKey: .displayDelta) {
+            settings.displayDelta = displayDelta
+        }
+
+        if let profileID = try? container.decode(String.self, forKey: .profileID) {
+            settings.profileID = profileID
+        }
+
+        if let hideInsulinBadge = try? container.decode(Bool.self, forKey: .hideInsulinBadge) {
+            settings.hideInsulinBadge = hideInsulinBadge
+        }
+
+        if let allowDilution = try? container.decode(Bool.self, forKey: .allowDilution) {
+            settings.allowDilution = allowDilution
+        }
+
+        if let extended_overrides = try? container.decode(Bool.self, forKey: .extended_overrides) {
+            settings.extended_overrides = extended_overrides
+        }
+
+        if let extendHomeView = try? container.decode(Bool.self, forKey: .extendHomeView) {
+            settings.extendHomeView = extendHomeView
+        }
+
+        if let displayExpiration = try? container.decode(Bool.self, forKey: .displayExpiration) {
+            settings.displayExpiration = displayExpiration
+        }
+
+        if let displayExpiration2 = try? container.decode(Bool.self, forKey: .displayExpiration2) {
+            settings.displayExpiration2 = displayExpiration2
+        }
+
+        if let displaySAGE = try? container.decode(Bool.self, forKey: .displaySAGE) {
+            settings.displaySAGE = displaySAGE
+        }
+
+        // AutoISF
+        if let autoisf = try? container.decode(Bool.self, forKey: .autoisf) {
+            settings.autoisf = autoisf
+        }
+
+        if let enableBGacceleration = try? container.decode(Bool.self, forKey: .enableBGacceleration) {
+            settings.enableBGacceleration = enableBGacceleration
+        }
+
+        if let use_B30 = try? container.decode(Bool.self, forKey: .use_B30) {
+            settings.use_B30 = use_B30
+        }
+
+        if let smbDeliveryRatioBGrange = try? container.decode(Decimal.self, forKey: .smbDeliveryRatioBGrange) {
+            settings.smbDeliveryRatioBGrange = smbDeliveryRatioBGrange
+        }
+
+        if let smbDeliveryRatioMin = try? container.decode(Decimal.self, forKey: .smbDeliveryRatioMin) {
+            settings.smbDeliveryRatioMin = smbDeliveryRatioMin
+        }
+
+        if let smbDeliveryRatioMax = try? container.decode(Decimal.self, forKey: .smbDeliveryRatioMax) {
+            settings.smbDeliveryRatioMax = smbDeliveryRatioMax
+        }
+
+        if let autoISFhourlyChange = try? container.decode(Decimal.self, forKey: .autoISFhourlyChange) {
+            settings.autoISFhourlyChange = autoISFhourlyChange
+        }
+
+        if let higherISFrangeWeight = try? container.decode(Decimal.self, forKey: .higherISFrangeWeight) {
+            settings.higherISFrangeWeight = higherISFrangeWeight
+        }
+
+        if let lowerISFrangeWeight = try? container.decode(Decimal.self, forKey: .lowerISFrangeWeight) {
+            settings.lowerISFrangeWeight = lowerISFrangeWeight
+        }
+
+        if let postMealISFweight = try? container.decode(Decimal.self, forKey: .postMealISFweight) {
+            settings.postMealISFweight = postMealISFweight
+        }
+
+        if let bgAccelISFweight = try? container.decode(Decimal.self, forKey: .bgAccelISFweight) {
+            settings.bgAccelISFweight = bgAccelISFweight
+        }
+
+        if let bgBrakeISFweight = try? container.decode(Decimal.self, forKey: .bgBrakeISFweight) {
+            settings.bgBrakeISFweight = bgBrakeISFweight
+        }
+
+        if let iTime_Start_Bolus = try? container.decode(Decimal.self, forKey: .iTime_Start_Bolus) {
+            settings.iTime_Start_Bolus = iTime_Start_Bolus
+        }
+
+        if let b30targetLevel = try? container.decode(Decimal.self, forKey: .b30targetLevel) {
+            settings.b30targetLevel = b30targetLevel
+        }
+
+        if let b30upperLimit = try? container.decode(Decimal.self, forKey: .b30upperLimit) {
+            settings.b30upperLimit = b30upperLimit
+        }
+
+        if let b30upperdelta = try? container.decode(Decimal.self, forKey: .b30upperdelta) {
+            settings.b30upperdelta = b30upperdelta
+        }
+
+        if let b30factor = try? container.decode(Decimal.self, forKey: .b30factor) {
+            settings.b30factor = b30factor
+        }
+
+        if let iTime_target = try? container.decode(Decimal.self, forKey: .iTime_target) {
+            settings.iTime_target = iTime_target
+        }
+
+        if let b30_duration = try? container.decode(Decimal.self, forKey: .b30_duration) {
+            settings.b30_duration = b30_duration
+        }
+
+        if let b30_duration = try? container.decode(Decimal.self, forKey: .b30_duration) {
+            settings.b30_duration = b30_duration
+        }
+
+        if let iobThresholdPercent = try? container.decode(Decimal.self, forKey: .iobThresholdPercent) {
+            settings.iobThresholdPercent = iobThresholdPercent
+        }
+
+        if let autoisf_max = try? container.decode(Decimal.self, forKey: .autoisf_max) {
+            settings.autoisf_max = autoisf_max
+        }
+
+        if let autoisf_min = try? container.decode(Decimal.self, forKey: .autoisf_min) {
+            settings.autoisf_min = autoisf_min
+        }
+
+        if let glucoseOverrideThreshold = try? container.decode(Decimal.self, forKey: .glucoseOverrideThreshold) {
+            settings.glucoseOverrideThreshold = glucoseOverrideThreshold
+        }
+
+        if let glucoseOverrideThresholdActive = try? container.decode(Bool.self, forKey: .glucoseOverrideThresholdActive) {
+            settings.glucoseOverrideThresholdActive = glucoseOverrideThresholdActive
+        }
+
+        if let glucoseOverrideThresholdDown = try? container.decode(Decimal.self, forKey: .glucoseOverrideThresholdDown) {
+            settings.glucoseOverrideThresholdDown = glucoseOverrideThresholdDown
+        }
+
+        if let glucoseOverrideThresholdActiveDown = try? container
+            .decode(Bool.self, forKey: .glucoseOverrideThresholdActiveDown)
+        {
+            settings.glucoseOverrideThresholdActiveDown = glucoseOverrideThresholdActiveDown
+        }
+
+        // Auto ISF Keto Protection
+        if let ketoProtectBasalAbsolut = try? container.decode(Decimal.self, forKey: .ketoProtectBasalAbsolut) {
+            settings.ketoProtectBasalAbsolut = ketoProtectBasalAbsolut
+        }
+
+        if let ketoProtect = try? container.decode(Bool.self, forKey: .ketoProtect) {
+            settings.ketoProtect = ketoProtect
+        }
+
+        if let variableKetoProtect = try? container.decode(Bool.self, forKey: .variableKetoProtect) {
+            settings.variableKetoProtect = variableKetoProtect
+        }
+
+        if let ketoProtectAbsolut = try? container.decode(Bool.self, forKey: .ketoProtectAbsolut) {
+            settings.ketoProtectAbsolut = ketoProtectAbsolut
+        }
+        // Dana Toogels
+        if let showPumpIcon = try? container.decode(Bool.self, forKey: .showPumpIcon) {
+            settings.showPumpIcon = showPumpIcon
+        }
+
+        if let danaBar = try? container.decode(Bool.self, forKey: .danaBar) {
+            settings.danaBar = danaBar
+        }
+        if let tempTargetbar = try? container.decode(Bool.self, forKey: .tempTargetbar) {
+            settings.tempTargetbar = tempTargetbar
+        }
+        if let backgroundColorOptionRawValue = try? container.decode(String.self, forKey: .backgroundColorOptionRawValue) {
+            settings.backgroundColorOptionRawValue = backgroundColorOptionRawValue
+        }
+        if let danaBarOption = try? container.decode(String.self, forKey: .danaBarOption) {
+            settings.danaBarOption = danaBarOption
+        }
+        if let insulinAgeOption = try? container.decode(String.self, forKey: .insulinAgeOption) {
+            settings.insulinAgeOption = insulinAgeOption
+        }
+        if let cannulaAgeOption = try? container.decode(String.self, forKey: .cannulaAgeOption) {
+            settings.cannulaAgeOption = cannulaAgeOption
+        }
+        if let chartBackgroundColored = try? container.decode(Bool.self, forKey: .chartBackgroundColored) {
+            settings.chartBackgroundColored = chartBackgroundColored
+        }
+        if let carbInsulinLoopViewOption = try? container.decode(
+            Bool.self,
+            forKey: .carbInsulinLoopViewOption
+        ) { settings.carbInsulinLoopViewOption = carbInsulinLoopViewOption
+        }
+        if let topBarActive
+            = try? container.decode(
+                Bool.self,
+                forKey: .topBarActive
+            )
+        {
+            settings.topBarActive
+                = topBarActive
+        }
+
+        if let danaBarActive = try? container.decode(Bool.self, forKey: .danaBarActive) {
+            settings.danaBarActive = danaBarActive
+        }
+        if let ttBarActive = try? container.decode(Bool.self, forKey: .ttBarActive) {
+            settings.ttBarActive = ttBarActive
+        }
+        if let bottomBarActive = try? container.decode(Bool.self, forKey: .bottomBarActive) {
+            settings.bottomBarActive = bottomBarActive
+        }
+        if let barViewOptionConfigurationRawValue = try? container.decode(
+            String.self,
+            forKey: .barViewOptionConfigurationRawValue
+        ) {
+            settings.barViewOptionConfigurationRawValue = barViewOptionConfigurationRawValue
+        }
+        if let button3D = try? container.decode(Bool.self, forKey: .button3D) {
+            settings.button3D = button3D
+        }
+        if let sensorAgeDays = try? container.decode(SensorAgeDays.self, forKey: .sensorAgeDays) {
+            settings.sensorAgeDays = sensorAgeDays
+        }
+        if let sensorStartTime = try? container.decode(Date.self, forKey: .sensorStartTime) {
+            settings.sensorStartTime = sensorStartTime
+        }
+        if let sensorStartTimeDefault = try? container.decode(Date.self, forKey: .sensorStartTimeDefault) {
+            settings.sensorStartTimeDefault = sensorStartTimeDefault
+        }
+        if let incidenceOfLight = try? container.decode(Bool.self, forKey: .incidenceOfLight) {
+            settings.incidenceOfLight = incidenceOfLight
+        }
+        if let lightGlowOverlaySelector = try? container.decode(String.self, forKey: .lightGlowOverlaySelector) {
+            settings.lightGlowOverlaySelector = lightGlowOverlaySelector
+        }
+        if let insulinHours = try? container.decode(Double.self, forKey: .insulinHours) {
+            settings.insulinHours = insulinHours
+        }
+        if let button3DBackground = try? container.decode(Bool.self, forKey: .button3DBackground) {
+            settings.button3DBackground = button3DBackground
+        }
+        if let batteryIconOption = try? container.decode(Bool.self, forKey: .batteryIconOption) {
+            settings.batteryIconOption = batteryIconOption
+        }
+
+        self = settings
     }
 }
 
-// Wrapper für FreeAPSSettings, um Encodable zu unterstützen
-struct EncodableFreeAPSSettings: Encodable {
-    private let settings: FreeAPSSettings
+enum LightMode: String, JSON, Identifiable, CaseIterable {
+    case light = "Light"
+    case dark = "Dark"
+    case auto = "Auto"
 
-    init(settings: FreeAPSSettings) {
-        self.settings = settings
-    }
-
-    enum CodingKeys: String, CodingKey {
-        case units
-        case closedLoop
-        case allowAnnouncements
-        case useAutotune
-        case isUploadEnabled
-        case useLocalGlucoseSource
-        case localGlucosePort
-        case debugOptions
-        case insulinReqPercentage
-        case skipBolusScreenAfterCarbs
-        case displayHR
-        case cgm
-        case uploadGlucose
-        case useCalendar
-        case displayCalendarIOBandCOB
-        case displayCalendarEmojis
-        case glucoseBadge
-        case glucoseNotificationsAlways
-        case useAlarmSound
-        case addSourceInfoToGlucoseNotifications
-        case lowGlucose
-        case highGlucose
-        case carbsRequiredThreshold
-        case animatedBackground
-        case useFPUconversion
-        case individualAdjustmentFactor
-        case timeCap
-        case minuteInterval
-        case delay
-        case useAppleHealth
-        case smoothGlucose
-        case displayOnWatch
-        case overrideHbA1cUnit
-        case high
-        case low
-        case uploadStats
-        case hours
-        case xGridLines
-        case yGridLines
-        case oneDimensionalGraph
-        case rulerMarks
-        case maxCarbs
-        case displayFatAndProteinOnWatch
-        case confirmBolusFaster
-        case onlyAutotuneBasals
-        case overrideFactor
-        case useCalc
-        case fattyMeals
-        case fattyMealFactor
-        case displayPredictions
-        case useLiveActivity
-        case liveActivityEventualArrow
-        case liveActivityChart
-        case liveActivityChartShowPredictions
-        case liveActivityChartThresholdLines
-        case liveActivityChartDynamicRange
-        case liveActivityThresholdLines
-        case useTargetButton
-        case alwaysUseColors
-        case hypoSound
-        case hyperSound
-        case ascending
-        case descending
-        case carbSound
-        case bolusFailure
-        case missingLoops
-        case lowAlert
-        case highAlert
-        case ascendingAlert
-        case descendingAlert
-        case carbsRequiredAlert
-        case profilesOrTempTargets
-        case allowBolusShortcut
-        case allowedRemoteBolusAmount
-        case eventualBG
-        case minumimPrediction
-        case minimumSMB
-        case useInsulinBars
-        case disableCGMError
-        case uploadVersion
-        case skipGlucoseChart
-        case birthDate
-        case sexSetting
-        case displayDelta
-        case disableHypoTreatment
-        case allowDilution
-        case profileID
-        case extendedOverride
-        case extendHomeView
-        case displayExpiration
-        case sensorDays
-        case fpus
-        case fpuAmount
-        case disable15MinTrend
-        // Dana Toggles
-        case showPumpIcon
-        case pumpIconRawValue
-        case danaBar
-        case insulinBadge
-        case hideInsulinBadge
-        case legendsSwitch
-        case tempTargetbar
-        case timeSettings
-        case backgroundColorOptionRawValue
-        case danaBarOption
-        case insulinAgeOption
-        case cannulaAgeOption
-        case chartBackgroundColored
-        case carbInsulinLoopViewOption
-        case topBarActive
-        case danaBarActive
-        case ttBarActive
-        case bottomBarActive
-        case barViewOptionConfigurationRawValue
-        case button3D
-        case sensorAgeDays
-        case sensorStartTime
-        case sensorStartTimeDefault
-        case incidenceOfLight
-        case lightGlowOverlaySelector
-        case insulinHours
-        case button3DBackground
-        case batteryIconOption
-        case carbButton
-        case profileButton
-        case glucoseOverrideThreshold
-        case glucoseOverrideThresholdActive
-        case glucoseOverrideThresholdActiveDown
-        case glucoseOverrideThresholdDown
-        // Dana Toggles
-        // AutoISF
-        case autoisf
-        case smbDeliveryRatioRange
-        case smbDeliveryRatioMin
-        case smbDeliveryRatioMax
-        case autoISFhourlyChange
-        case higherISFrangeWeight
-        case lowerISFrangeWeight
-        case postMealISFweight
-        case enableBGacceleration
-        case bgAccelISFweight
-        case bgBrakeISFweight
-        case iobThresholdPercent
-        case autoisf_max
-        case autoisf_min
-        // B30
-        case use_B30
-        case iTime_Start_Bolus
-        case iTime_target
-        case b30targetLevel
-        case b30upperLimit
-        case b30upperdelta
-        case b30factor
-        case b30_duration
-        // Keto Protect
-        case ketoProtect
-        case variableKetoProtect
-        case ketoProtectBasalPercent
-        case ketoProtectAbsolut
-        case ketoProtectBasalAbsolut
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-
-        try container.encode(settings.units, forKey: .units)
-        try container.encode(settings.closedLoop, forKey: .closedLoop)
-        try container.encode(settings.closedLoop, forKey: .closedLoop)
-        try container.encode(settings.allowAnnouncements, forKey: .allowAnnouncements)
-        try container.encode(settings.useAutotune, forKey: .useAutotune)
-        try container.encode(settings.isUploadEnabled, forKey: .isUploadEnabled)
-        try container.encode(settings.useLocalGlucoseSource, forKey: .useLocalGlucoseSource)
-        try container.encode(settings.localGlucosePort, forKey: .localGlucosePort)
-        try container.encode(settings.debugOptions, forKey: .debugOptions)
-        try container.encode(settings.insulinReqPercentage, forKey: .insulinReqPercentage)
-        try container.encode(settings.skipBolusScreenAfterCarbs, forKey: .skipBolusScreenAfterCarbs)
-        try container.encode(settings.displayHR, forKey: .displayHR)
-        try container.encode(settings.cgm, forKey: .cgm)
-        try container.encode(settings.uploadGlucose, forKey: .uploadGlucose)
-        try container.encode(settings.useCalendar, forKey: .useCalendar)
-        try container.encode(settings.displayCalendarIOBandCOB, forKey: .displayCalendarIOBandCOB)
-        try container.encode(settings.displayCalendarEmojis, forKey: .displayCalendarEmojis)
-        try container.encode(settings.glucoseBadge, forKey: .glucoseBadge)
-        try container.encode(settings.glucoseNotificationsAlways, forKey: .glucoseNotificationsAlways)
-        try container.encode(settings.useAlarmSound, forKey: .useAlarmSound)
-        try container.encode(settings.addSourceInfoToGlucoseNotifications, forKey: .addSourceInfoToGlucoseNotifications)
-        try container.encode(settings.lowGlucose, forKey: .lowGlucose)
-        try container.encode(settings.highGlucose, forKey: .highGlucose)
-        try container.encode(settings.carbsRequiredThreshold, forKey: .carbsRequiredThreshold)
-        try container.encode(settings.animatedBackground, forKey: .animatedBackground)
-        try container.encode(settings.useFPUconversion, forKey: .useFPUconversion)
-        try container.encode(settings.individualAdjustmentFactor, forKey: .individualAdjustmentFactor)
-        try container.encode(settings.timeCap, forKey: .timeCap)
-        try container.encode(settings.minuteInterval, forKey: .minuteInterval)
-        try container.encode(settings.delay, forKey: .delay)
-        try container.encode(settings.useAppleHealth, forKey: .useAppleHealth)
-        try container.encode(settings.smoothGlucose, forKey: .smoothGlucose)
-        try container.encode(settings.displayOnWatch, forKey: .displayOnWatch)
-        try container.encode(settings.overrideHbA1cUnit, forKey: .overrideHbA1cUnit)
-        try container.encode(settings.high, forKey: .high)
-        try container.encode(settings.low, forKey: .low)
-        try container.encode(settings.uploadStats, forKey: .uploadStats)
-        try container.encode(settings.hours, forKey: .hours)
-        try container.encode(settings.xGridLines, forKey: .xGridLines)
-        try container.encode(settings.yGridLines, forKey: .yGridLines)
-        try container.encode(settings.oneDimensionalGraph, forKey: .oneDimensionalGraph)
-        try container.encode(settings.rulerMarks, forKey: .rulerMarks)
-        try container.encode(settings.maxCarbs, forKey: .maxCarbs)
-        try container.encode(settings.displayFatAndProteinOnWatch, forKey: .displayFatAndProteinOnWatch)
-        try container.encode(settings.confirmBolusFaster, forKey: .confirmBolusFaster)
-        try container.encode(settings.onlyAutotuneBasals, forKey: .onlyAutotuneBasals)
-        try container.encode(settings.overrideFactor, forKey: .overrideFactor)
-        try container.encode(settings.useCalc, forKey: .useCalc)
-        try container.encode(settings.fattyMeals, forKey: .fattyMeals)
-        try container.encode(settings.fattyMealFactor, forKey: .fattyMealFactor)
-        try container.encode(settings.displayPredictions, forKey: .displayPredictions)
-        try container.encode(settings.useLiveActivity, forKey: .useLiveActivity)
-        try container.encode(settings.liveActivityEventualArrow, forKey: .liveActivityEventualArrow)
-        // --- live activity chart
-        try container.encode(settings.liveActivityChart, forKey: .liveActivityChart)
-        try container.encode(settings.liveActivityChartShowPredictions, forKey: .liveActivityChartShowPredictions)
-        try container.encode(settings.liveActivityChartThresholdLines, forKey: .liveActivityChartThresholdLines)
-        try container.encode(settings.liveActivityChartDynamicRange, forKey: .liveActivityChartDynamicRange)
-        // ----
-        try container.encode(settings.hypoSound, forKey: .hypoSound)
-        try container.encode(settings.hyperSound, forKey: .hyperSound)
-        try container.encode(settings.ascending, forKey: .ascending)
-        try container.encode(settings.descending, forKey: .descending)
-        try container.encode(settings.carbSound, forKey: .carbSound)
-        try container.encode(settings.bolusFailure, forKey: .bolusFailure)
-        try container.encode(settings.missingLoops, forKey: .missingLoops)
-        try container.encode(settings.lowAlert, forKey: .lowAlert)
-        try container.encode(settings.highAlert, forKey: .highAlert)
-        try container.encode(settings.ascendingAlert, forKey: .ascendingAlert)
-        try container.encode(settings.descendingAlert, forKey: .descendingAlert)
-        try container.encode(settings.carbsRequiredAlert, forKey: .carbsRequiredAlert)
-        try container.encode(settings.alwaysUseColors, forKey: .alwaysUseColors)
-        try container.encode(settings.profilesOrTempTargets, forKey: .profilesOrTempTargets)
-        try container.encode(settings.allowBolusShortcut, forKey: .allowBolusShortcut)
-        try container.encode(settings.allowedRemoteBolusAmount, forKey: .allowedRemoteBolusAmount)
-        try container.encode(settings.eventualBG, forKey: .eventualBG)
-        try container.encode(settings.minumimPrediction, forKey: .minumimPrediction)
-        try container.encode(settings.minimumSMB, forKey: .minimumSMB)
-        try container.encode(settings.useInsulinBars, forKey: .useInsulinBars)
-        try container.encode(settings.disableCGMError, forKey: .disableCGMError)
-        try container.encode(settings.uploadVersion, forKey: .uploadVersion)
-        try container.encode(settings.skipGlucoseChart, forKey: .skipGlucoseChart)
-        try container.encode(settings.birthDate, forKey: .birthDate)
-        try container.encode(settings.sexSetting, forKey: .sexSetting)
-        try container.encode(settings.disableHypoTreatment, forKey: .disableHypoTreatment)
-        try container.encode(settings.allowDilution, forKey: .allowDilution)
-        try container.encode(settings.extended_overrides, forKey: .extendedOverride)
-        try container.encode(settings.displayDelta, forKey: .displayDelta)
-        try container.encode(settings.profileID, forKey: .profileID)
-        try container.encode(settings.displayExpiration, forKey: .displayExpiration)
-        try container.encode(settings.sensorDays, forKey: .sensorDays)
-        try container.encode(settings.fpus, forKey: .fpus)
-        try container.encode(settings.fpuAmounts, forKey: .fpuAmount)
-        try container.encode(settings.disable15MinTrend, forKey: .disable15MinTrend)
-        // Dana Toggels
-        try container.encode(settings.danaBar, forKey: .danaBar)
-        try container.encode(settings.showPumpIcon, forKey: .showPumpIcon)
-        try container.encode(settings.pumpIconRawValue, forKey: .pumpIconRawValue)
-        try container.encode(settings.hideInsulinBadge, forKey: .hideInsulinBadge)
-        try container.encode(settings.legendsSwitch, forKey: .legendsSwitch)
-        try container.encode(settings.tempTargetbar, forKey: .tempTargetbar)
-        try container.encode(settings.timeSettings, forKey: .timeSettings)
-        try container.encode(settings.backgroundColorOptionRawValue, forKey: .backgroundColorOptionRawValue)
-        try container.encode(settings.danaBarOption, forKey: .danaBarOption)
-        try container.encode(settings.insulinAgeOption, forKey: .insulinAgeOption)
-        try container.encode(settings.cannulaAgeOption, forKey: .cannulaAgeOption)
-        try container.encode(settings.chartBackgroundColored, forKey: .chartBackgroundColored)
-        try container.encode(settings.carbInsulinLoopViewOption, forKey: .carbInsulinLoopViewOption)
-        try container.encode(settings.topBarActive, forKey: .topBarActive)
-        try container.encode(settings.danaBarActive, forKey: .danaBarActive)
-        try container.encode(settings.ttBarActive, forKey: .ttBarActive)
-        try container.encode(settings.bottomBarActive, forKey: .bottomBarActive)
-        try container.encode(settings.barViewOptionConfigurationRawValue, forKey: .barViewOptionConfigurationRawValue)
-        try container.encode(settings.button3D, forKey: .button3D)
-        try container.encode(settings.sensorAgeDays, forKey: .sensorAgeDays)
-        try container.encodeIfPresent(settings.sensorStartTime, forKey: .sensorStartTime)
-        try container.encode(settings.sensorStartTimeDefault, forKey: .sensorStartTimeDefault)
-        try container.encode(settings.incidenceOfLight, forKey: .incidenceOfLight)
-        try container.encode(settings.lightGlowOverlaySelector, forKey: .lightGlowOverlaySelector)
-        try container.encode(settings.insulinHours, forKey: .insulinHours)
-        try container.encode(settings.button3DBackground, forKey: .button3DBackground)
-        try container.encode(settings.batteryIconOption, forKey: .batteryIconOption)
-        try container.encode(settings.carbButton, forKey: .carbButton)
-        try container.encode(settings.profileButton, forKey: .profileButton)
-        try container.encode(settings.glucoseOverrideThreshold, forKey: .glucoseOverrideThreshold)
-        try container.encode(settings.glucoseOverrideThresholdActive, forKey: .glucoseOverrideThresholdActive)
-        try container.encode(settings.glucoseOverrideThresholdActiveDown, forKey: .glucoseOverrideThresholdActiveDown)
-        try container.encode(settings.glucoseOverrideThresholdDown, forKey: .glucoseOverrideThresholdDown)
-        // Dana Toggels
-        // AutoISF
-        try container.encode(settings.autoisf, forKey: .autoisf)
-        try container.encode(settings.smbDeliveryRatioBGrange, forKey: .smbDeliveryRatioRange)
-        try container.encode(settings.smbDeliveryRatioMin, forKey: .smbDeliveryRatioMin)
-        try container.encode(settings.smbDeliveryRatioMax, forKey: .smbDeliveryRatioMax)
-        try container.encode(settings.autoISFhourlyChange, forKey: .autoISFhourlyChange)
-        try container.encode(settings.higherISFrangeWeight, forKey: .higherISFrangeWeight)
-        try container.encode(settings.lowerISFrangeWeight, forKey: .lowerISFrangeWeight)
-        try container.encode(settings.postMealISFweight, forKey: .postMealISFweight)
-        try container.encode(settings.enableBGacceleration, forKey: .enableBGacceleration)
-        try container.encode(settings.bgAccelISFweight, forKey: .bgAccelISFweight)
-        try container.encode(settings.bgBrakeISFweight, forKey: .bgBrakeISFweight)
-        try container.encode(settings.iobThresholdPercent, forKey: .iobThresholdPercent)
-        try container.encode(settings.autoisf_max, forKey: .autoisf_max)
-        try container.encode(settings.autoisf_min, forKey: .autoisf_min)
-        // B30
-        try container.encode(settings.use_B30, forKey: .use_B30)
-        try container.encode(settings.iTime_Start_Bolus, forKey: .iTime_Start_Bolus)
-        try container.encode(settings.iTime_target, forKey: .iTime_target)
-        try container.encode(settings.b30targetLevel, forKey: .b30targetLevel)
-        try container.encode(settings.b30upperLimit, forKey: .b30upperLimit)
-        try container.encode(settings.b30upperdelta, forKey: .b30upperdelta)
-        try container.encode(settings.b30factor, forKey: .b30factor)
-        try container.encode(settings.b30_duration, forKey: .b30_duration)
-        // Keto Protect
-        try container.encode(settings.ketoProtect, forKey: .ketoProtect)
-        try container.encode(settings.variableKetoProtect, forKey: .variableKetoProtect)
-        try container.encode(settings.ketoProtectBasalPercent, forKey: .ketoProtectBasalPercent)
-        try container.encode(settings.ketoProtectAbsolut, forKey: .ketoProtectAbsolut)
-        try container.encode(settings.ketoProtectBasalAbsolut, forKey: .ketoProtectBasalAbsolut)
-    }
+    var id: LightMode { self }
 }

@@ -1,10 +1,10 @@
 enum PumpIconOption: String, Codable, CaseIterable {
-    case danaI = "DanaI"
-    case danaRS = "DanaRS"
-    case medtronic = "Medtronic"
-    case pod = "OmniPod"
-    case nano200 = "Nano200"
-    case nano300 = "Nano300"
+    case danaI
+    case danaRS
+    case medtronic
+    case pod
+    case nano200
+    case nano300
 
     var displayName: String {
         switch self {

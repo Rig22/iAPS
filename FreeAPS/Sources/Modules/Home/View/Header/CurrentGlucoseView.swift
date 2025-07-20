@@ -12,6 +12,7 @@ struct CurrentGlucoseView: View {
     @Binding var displayDelta: Bool
     @Binding var alwaysUseColors: Bool
     @Binding var scrolling: Bool
+    @Binding var displaySAGE: Bool
     @Binding var displayExpiration: Bool
     @Binding var cgm: CGMType
     @Binding var sensordays: Double
@@ -94,7 +95,7 @@ struct CurrentGlucoseView: View {
 
     var body: some View {
         ZStack {
-            if displayExpiration {
+            if displayExpiration || displaySAGE {
                 sageView
                     .offset(x: -9, y: -70)
             }
@@ -230,9 +231,9 @@ struct CurrentGlucoseView: View {
                         HStack {
                             Text(
                                 sensorAge >= 1 * 8.64E4 ?
-                                    (remainingTimeFormatterDays.string(from: sensorAge) ?? "")
+                                    (remainingTimeFormatterDays.string(from: displayExpiration ? sensorAge : expiration) ?? "")
                                     .replacingOccurrences(of: ",", with: " ") :
-                                    (remainingTimeFormatter.string(from: sensorAge) ?? "")
+                                    (remainingTimeFormatter.string(from: displayExpiration ? sensorAge : expiration) ?? "")
                                     .replacingOccurrences(of: ",", with: " ")
                             ).foregroundStyle(Color.white)
                             // .foregroundStyle(colour)

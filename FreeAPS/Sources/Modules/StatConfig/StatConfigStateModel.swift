@@ -20,6 +20,8 @@ extension StatConfig {
         @Published var extendHomeView: Bool = true
         @Published var displayDelta: Bool = false
         @Published var displayExpiration: Bool = false
+        @Published var displayExpiration2 = false
+        @Published var displaySAGE: Bool = true
         @Published var anubis: Bool = false
         @Published var fpus: Bool = true
         @Published var fpuAmounts: Bool = false
@@ -28,7 +30,7 @@ extension StatConfig {
         @Published var hideInsulinBadge: Bool = false
         // Dana UI Toggels
         @Published var showPumpIcon: Bool = false
-        @Published var pumpIconRawValue: String = "Nano 200"
+        @Published var pumpIconRawValue: String = "nano200"
         @Published var danaBar: Bool = false
         @Published var legendsSwitch: Bool = false
         @Published var tempTargetBar: Bool = false
@@ -49,9 +51,8 @@ extension StatConfig {
         @Published var sensorStartTime: Date?
         @Published var sensorStartTimeDefault = Date.distantPast
         @Published var incidenceOfLight: Bool = false
-        @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
+        @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview.rawValue
         @Published var button3DBackground: Bool = false
-        @Published var batteryIconOption: Bool = false
         // Dana UI Toggels
 
         // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
@@ -105,8 +106,9 @@ extension StatConfig {
             subscribeSetting(\.useInsulinBars, on: $useInsulinBars) { useInsulinBars = $0 }
             subscribeSetting(\.extendHomeView, on: $extendHomeView) { extendHomeView = $0 }
             subscribeSetting(\.displayExpiration, on: $displayExpiration) { displayExpiration = $0 }
+            subscribeSetting(\.displayExpiration2, on: $displayExpiration2) { displayExpiration2 = $0 }
+            subscribeSetting(\.displaySAGE, on: $displaySAGE) { displaySAGE = $0 }
             subscribeSetting(\.displayDelta, on: $displayDelta) { displayDelta = $0 }
-            //    subscribeSetting(\.anubis, on: $anubis) { anubis = $0 }
             subscribeSetting(\.fpus, on: $fpus) { fpus = $0 }
             subscribeSetting(\.fpuAmounts, on: $fpuAmounts) { fpuAmounts = $0 }
             subscribeSetting(\.carbButton, on: $carbButton) { carbButton = $0 }
@@ -119,7 +121,6 @@ extension StatConfig {
             subscribeSetting(\.insulinAgeOption, on: $insulinAgeOption) { insulinAgeOption = $0 }
             subscribeSetting(\.cannulaAgeOption, on: $cannulaAgeOption) { cannulaAgeOption = $0 }
             subscribeSetting(\.hideInsulinBadge, on: $hideInsulinBadge) { hideInsulinBadge = $0 }
-            subscribeSetting(\.legendsSwitch, on: $legendsSwitch) { legendsSwitch = $0 }
             subscribeSetting(\.tempTargetbar, on: $tempTargetBar) { tempTargetBar = $0 }
             subscribeSetting(\.timeSettings, on: $timeSettings) { timeSettings = $0 }
             subscribeSetting(\.backgroundColorOptionRawValue, on: $backgroundColorOptionRawValue) {
@@ -139,7 +140,6 @@ extension StatConfig {
             subscribeSetting(\.incidenceOfLight, on: $incidenceOfLight) { incidenceOfLight = $0 }
             subscribeSetting(\.lightGlowOverlaySelector, on: $lightGlowOverlaySelector) { lightGlowOverlaySelector = $0 }
             subscribeSetting(\.button3DBackground, on: $button3DBackground) { button3DBackground = $0 }
-            subscribeSetting(\.batteryIconOption, on: $batteryIconOption) { batteryIconOption = $0 }
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {

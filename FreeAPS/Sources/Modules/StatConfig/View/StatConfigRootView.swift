@@ -328,7 +328,6 @@ extension StatConfig {
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
                                 }
-                                // Toggle("Batterie Anzeige", isOn: $state.batteryIconOption)
                             }
                             Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
 
@@ -341,15 +340,28 @@ extension StatConfig {
                                     "Show Sensor Age for nightscout, dexcomG5, dexcomG6, dexcomG7, libre1, libre2 and enlite"
                                 ),
                                 footer: Text("Direct Support implemented")
-                            ) { Toggle("Display Sensor Age", isOn: $state.displayExpiration)
+                            ) {
+                                Toggle("Display Sensor Age", isOn: $state.displayExpiration)
+                                    ._onBindingChange($state.displayExpiration) { enabled in
+                                        if enabled {
+                                            state.displaySAGE = false
+                                        }
+                                    }
+
+                                Toggle("Display Sensor Time Remaining", isOn: $state.displaySAGE)
+                                    ._onBindingChange($state.displaySAGE) { enabled in
+                                        if enabled {
+                                            state.displayExpiration = false
+                                        }
+                                    }
                             }
 
                             Section(
                                 header: Text("Sensor Settings for Libre 3 and 3+ Users"),
                                 footer: Text("Long press for setting new Sensor Start Time")
                             ) {
-                                /* Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)*/
-                                if state.displayExpiration {
+                                Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration2)
+                                if state.displayExpiration2 {
                                     Picker("Select Sensor Span", selection: $state.sensorAgeDays) {
                                         ForEach(SensorAgeDays.allCases, id: \.self) { sensorAge in
                                             Text(sensorAge.localizedName).tag(sensorAge)
