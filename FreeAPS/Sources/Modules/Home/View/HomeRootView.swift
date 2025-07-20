@@ -3022,6 +3022,7 @@ extension Home {
                     .ignoresSafeArea(.keyboard)
                     .sheet(isPresented: $displayAutoHistory) {
                         AutoISFHistoryView(units: state.data.units)
+                            .environment(\.colorScheme, colorScheme)
                     }
                     .sheet(isPresented: $displayDynamicHistory) {
                         DynamicHistoryView(units: state.data.units)

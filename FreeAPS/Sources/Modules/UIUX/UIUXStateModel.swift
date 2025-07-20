@@ -1,6 +1,6 @@
 import SwiftUI
 
-extension StatConfig {
+extension UIUX {
     final class StateModel: BaseStateModel<Provider> {
         @Published var overrideHbA1cUnit = false
         @Published var low: Decimal = 4 / 0.0555
@@ -22,11 +22,11 @@ extension StatConfig {
         @Published var displayExpiration: Bool = false
         @Published var displayExpiration2 = false
         @Published var displaySAGE: Bool = true
-        @Published var anubis: Bool = false
         @Published var fpus: Bool = true
         @Published var fpuAmounts: Bool = false
         @Published var carbButton: Bool = true
         @Published var profileButton: Bool = true
+        @Published var lightMode: LightMode = .auto
         @Published var hideInsulinBadge: Bool = false
         // Dana UI Toggels
         @Published var showPumpIcon: Bool = false
@@ -113,6 +113,7 @@ extension StatConfig {
             subscribeSetting(\.fpuAmounts, on: $fpuAmounts) { fpuAmounts = $0 }
             subscribeSetting(\.carbButton, on: $carbButton) { carbButton = $0 }
             subscribeSetting(\.profileButton, on: $profileButton) { profileButton = $0 }
+            subscribeSetting(\.lightMode, on: $lightMode) { lightMode = $0 }
             // Dana Toggels
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
             subscribeSetting(\.showPumpIcon, on: $showPumpIcon) { showPumpIcon = $0 }

@@ -1,7 +1,7 @@
 import SwiftUI
 import Swinject
 
-extension StatConfig {
+extension UIUX {
     struct RootView: BaseView {
         let resolver: Resolver
         @StateObject var state = StateModel()
@@ -445,6 +445,13 @@ extension StatConfig {
                                 Toggle("Display Temp Targets Button", isOn: $state.useTargetButton)
                                 Toggle("Display Profile Override Button", isOn: $state.profileButton)
                                 Toggle("Display Meal Button", isOn: $state.carbButton)
+                                Section {
+                                    Picker(selection: $state.lightMode, label: Text("Color Scheme")) {
+                                        ForEach(LightMode.allCases) { item in
+                                            Text(NSLocalizedString(item.rawValue, comment: "ColorScheme Selection"))
+                                        }
+                                    }
+                                } header: { Text("Light / Dark Mode") }
                             }
 
                             Section(header: Text("Statistics settings")) {

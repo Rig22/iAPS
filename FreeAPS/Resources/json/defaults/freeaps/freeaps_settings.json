@@ -106,6 +106,7 @@
   "displaySAGE": true,
   "fpus": true,
   "fpuAmounts": false,
+  "lightMode": LightMode.auto,
   "danaBar": false,
   "pumpIconRawValue": "nano200",
   "tempTargetbar": false,

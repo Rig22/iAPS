@@ -468,7 +468,7 @@ extension UIImage {
             let height: CGFloat = 1 - portion
             let rectToFill = CGRect(x: 0, y: size.height * portion, width: size.width, height: size.height * height)
             UIColor(color).setFill()
-            context.fill(rectToFill, blendMode: .sourceAtop)
+            context.fill(rectToFill, blendMode: .sourceIn)
         }
         return Image(uiImage: image)
     }
