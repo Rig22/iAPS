@@ -348,6 +348,68 @@ extension Home {
             }
 
             return ZStack(alignment: .center) {
+                // sensorAgeDays
+                // .offset(y: -80)
+                if state.displayExpiration2 {
+                    let totalHours = state.sensorAgeDays.asInt() * 24
+                    let remainingHours = max(1, totalHours - state.elapsedHours)
+                    let fillFraction: CGFloat = remainingHours <= 1 ? 1.0 : CGFloat(remainingHours) / CGFloat(totalHours)
+
+                    let sensorColor: Color = {
+                        switch remainingHours {
+                        case ...2: return .red
+                        case ...6: return .yellow
+                        default: return .white
+                        }
+                    }()
+
+                    let sensorAgeText: String = {
+                        guard let days = state.remainingSensorDays,
+                              let hours = state.remainingSensorHours,
+                              let minutes = state.remainingSensorMinutes
+                        else {
+                            return "\(state.sensorAgeDays.asInt())d"
+                        }
+
+                        if days >= 1 {
+                            return "\(days)d\(hours)h"
+                        } else if hours >= 1 {
+                            return "\(hours)h\(minutes)m"
+                        } else {
+                            return "\(minutes)m"
+                        }
+                    }()
+
+                    // let shouldBlink = sensorColor == .red
+
+                    ZStack {
+                        FillablePieSegment2(
+                            pieSegmentViewModel: sensorAgeSegmentViewModel,
+                            color: .white,
+                            backgroundColor: .clear,
+                            symbolSize: 22,
+                            symbol: "sensor.tag.radiowaves.forward",
+                            animateProgress: true,
+                            button3D: state.button3D,
+                            button3DBackground: state.button3DBackground,
+                            incidenceOfLight: state.incidenceOfLight,
+                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                                .atriumview,
+                            fillFraction: fillFraction,
+                            symbolBackgroundColor: backgroundColor,
+                            symbolColor: sensorColor
+                        )
+                        .frame(width: 35, height: 35)
+                        .offset(y: -94)
+                        .zIndex(1)
+
+                        Text(sensorAgeText)
+                            .font(.system(size: 12))
+                            .foregroundColor(.white)
+                            .offset(x: 38, y: -84)
+                    }
+                }
+
                 let incidenceOfLight = state.incidenceOfLight
                 let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                     .atriumview
@@ -403,7 +465,7 @@ extension Home {
                     scrolling: $displayGlucose, displaySAGE: $state.displaySAGE, displayExpiration: $state.displayExpiration,
                     cgm: $state.cgm, sensordays: $state.sensorDays
                 )
-                .zIndex(1)
+                .zIndex(2)
                 .onTapGesture {
                     if state.alarm == nil {
                         state.openCGM()
@@ -650,6 +712,110 @@ extension Home {
                     Text(displayText)
                         .font(.system(size: 15))
                         .foregroundColor(.white)
+                }
+                .offset(y: 10)
+                .onAppear {
+                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+                }
+                .onChange(of: fillFraction) { _, newValue in
+                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+                }
+            }
+        }
+
+        struct FillablePieSegment2: View {
+            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
+
+            var color: Color
+            var backgroundColor: Color
+            var symbolSize: CGFloat
+            var symbol: String
+            var animateProgress: Bool
+            var button3D: Bool
+            var button3DBackground: Bool
+            var incidenceOfLight: Bool
+            var lightGlowOverlaySelector: LightGlowOverlaySelector
+            var fillFraction: CGFloat
+            var symbolRotation: Double = 0
+            var symbolBackgroundColor: Color = .clear
+            var symbolColor: Color? = nil
+
+            let angularGradient = AngularGradient(
+                gradient: Gradient(colors: [
+                    Color.gray.opacity(0.3)
+                ]),
+                center: .center,
+                startAngle: .degrees(0),
+                endAngle: .degrees(360)
+            )
+
+            var body: some View {
+                VStack {
+                    ZStack {
+                        if button3D {
+                            let glowColor1 = incidenceOfLight
+                                ? lightGlowOverlaySelector.highlightColor
+                                : Color.white.opacity(0.7)
+
+                            let glowColor2 = incidenceOfLight
+                                ? lightGlowOverlaySelector.highlightColor
+                                : Color.white.opacity(0.4)
+
+                            if button3DBackground {
+                                Circle()
+                                    .fill(Color.black.opacity(0.2))
+                                    .frame(width: 36, height: 36)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            }
+
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            glowColor1.opacity(0.7),
+                                            glowColor2.opacity(0.3),
+                                            Color.clear,
+                                            Color.black.opacity(0.3),
+                                            Color.black.opacity(0.6)
+                                        ]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    ),
+                                    lineWidth: 2
+                                )
+                                .frame(width: 36, height: 36)
+                        } else {
+                            Circle()
+                                .fill(Color.black.opacity(0.2))
+                                .frame(width: 35, height: 35)
+                        }
+
+                        PieSliceView(
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                        )
+                        .fill(color.opacity(0.0))
+                        .frame(width: 35, height: 35)
+                        .opacity(0.5)
+
+                        // Symbol-Hintergrund (NEU, 40x40)
+                        if symbolBackgroundColor != .clear {
+                            Circle()
+                                .fill(symbolBackgroundColor.opacity(0.0))
+                                .frame(width: 35, height: 35)
+                        }
+
+                        Image(systemName: symbol)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: symbolSize, height: symbolSize)
+                            .foregroundColor(symbolColor ?? .white)
+                            .rotationEffect(.degrees(symbolRotation))
+                    }
+
+                    /* Text(displayText)
+                     .font(.system(size: 15))
+                     .foregroundColor(.white)*/
                 }
                 .offset(y: 10)
                 .onAppear {
@@ -2137,7 +2303,7 @@ extension Home {
                                         )
                                     }
                                 }
-                                .frame(width: 40, height: 40)
+                                .frame(width: 30, height: 30)
 
                                 Text(formatSensorTime())
                                     .foregroundColor(.white)
@@ -2283,10 +2449,10 @@ extension Home {
                         danaBarMarquee
                             .padding(.vertical, 10)
                             .padding(.top, 20)
-                    case .standard:
-                        danaBarStandard
-                            .padding(.vertical, 10)
-                            .padding(.top, 20)
+                    /* case .standard:
+                     danaBarStandard
+                         .padding(.vertical, 10)
+                         .padding(.top, 20)*/
                     case .standard2:
                         danaBarStandard2
                             .padding(.vertical, 10)

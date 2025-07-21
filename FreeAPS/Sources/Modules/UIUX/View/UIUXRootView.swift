@@ -98,7 +98,7 @@ extension UIUX {
 
         private func getDescription(for option: DanaBarOption) -> String {
             switch option {
-            case .standard: return "Standard"
+            // case .standard: return "Standard"
             case .standard2: return "Standard 2"
             case .marquee: return "Running Text"
             case .max: return "For Dana User"
@@ -166,10 +166,10 @@ extension UIUX {
                             }
 
                             Section(
-                                header: Text("Bar Selection"),
+                                header: Text("Dana Bar Selection"),
                                 footer: Text("Select the desired bar view")
                             ) {
-                                Toggle("Top Bars", isOn: $state.danaBar)
+                                Toggle("Dana Bars", isOn: $state.danaBar)
 
                                 if state.danaBar {
                                     Picker("Choose a view", selection: $state.danaBarOption) {
@@ -215,24 +215,24 @@ extension UIUX {
                                         .pickerStyle(NavigationLinkPickerStyle())
                                     }
 
-                                    if state.danaBarOption == DanaBarOption.standard.rawValue {
-                                        Picker(
-                                            "Max Reservoir Insulin Age",
-                                            selection: $state.insulinAgeOption
-                                        ) {
-                                            Text("1 Day").tag("Ein_Tag")
-                                            Text("2 Days").tag("Zwei_Tage")
-                                            Text("3 Days").tag("Drei_Tage")
-                                            Text("4 Days").tag("Vier_Tage")
-                                            Text("5 Days").tag("Fuenf_Tage")
-                                            Text("6 Days").tag("Sechs_Tage")
-                                            Text("7 Days").tag("Sieben_Tage")
-                                            Text("8 Days").tag("Acht_Tage")
-                                            Text("9 Days").tag("Neun_Tage")
-                                            Text("10 Days").tag("Zehn_Tage")
-                                        }
-                                        .pickerStyle(NavigationLinkPickerStyle())
-                                    }
+                                    /*    if state.danaBarOption == DanaBarOption.standard.rawValue {
+                                         Picker(
+                                             "Max Reservoir Insulin Age",
+                                             selection: $state.insulinAgeOption
+                                         ) {
+                                             Text("1 Day").tag("Ein_Tag")
+                                             Text("2 Days").tag("Zwei_Tage")
+                                             Text("3 Days").tag("Drei_Tage")
+                                             Text("4 Days").tag("Vier_Tage")
+                                             Text("5 Days").tag("Fuenf_Tage")
+                                             Text("6 Days").tag("Sechs_Tage")
+                                             Text("7 Days").tag("Sieben_Tage")
+                                             Text("8 Days").tag("Acht_Tage")
+                                             Text("9 Days").tag("Neun_Tage")
+                                             Text("10 Days").tag("Zehn_Tage")
+                                         }
+                                         .pickerStyle(NavigationLinkPickerStyle())
+                                     }*/
 
                                     if state.danaBarOption == DanaBarOption.standard2.rawValue {
                                         Picker(
@@ -281,6 +281,12 @@ extension UIUX {
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
                                 }
+                            }
+
+                            Section(
+                                header: Text("Bars"),
+                                footer: Text("Added Bars you want")
+                            ) {
                                 Toggle("TT Bar", isOn: $state.tempTargetBar)
                                 Toggle("Bottom Bar", isOn: $state.timeSettings)
                             }
@@ -345,6 +351,7 @@ extension UIUX {
                                     ._onBindingChange($state.displayExpiration) { enabled in
                                         if enabled {
                                             state.displaySAGE = false
+                                            state.displayExpiration2 = false
                                         }
                                     }
 
@@ -352,6 +359,7 @@ extension UIUX {
                                     ._onBindingChange($state.displaySAGE) { enabled in
                                         if enabled {
                                             state.displayExpiration = false
+                                            state.displayExpiration2 = false
                                         }
                                     }
                             }
@@ -361,6 +369,13 @@ extension UIUX {
                                 footer: Text("Long press for setting new Sensor Start Time")
                             ) {
                                 Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration2)
+                                    ._onBindingChange($state.displayExpiration2) { enabled in
+                                        if enabled {
+                                            state.displayExpiration = false
+                                            state.displaySAGE = false
+                                        }
+                                    }
+
                                 if state.displayExpiration2 {
                                     Picker("Select Sensor Span", selection: $state.sensorAgeDays) {
                                         ForEach(SensorAgeDays.allCases, id: \.self) { sensorAge in
@@ -368,6 +383,7 @@ extension UIUX {
                                         }
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
+
                                     HStack {
                                         DatePicker(
                                             "Select Start Time",
@@ -377,6 +393,7 @@ extension UIUX {
                                         )
                                         .datePickerStyle(.compact)
                                     }
+
                                     VStack(alignment: .leading, spacing: 8) {
                                         Button(action: {}, label: {
                                             Text("Start New Sensor Time")
@@ -387,10 +404,9 @@ extension UIUX {
                                             .buttonStyle(.bordered)
                                             .padding(.top)
                                             .simultaneousGesture(
-                                                LongPressGesture(minimumDuration: 1.0) // 1 Sekunde halten
+                                                LongPressGesture(minimumDuration: 1.0)
                                                     .onEnded { _ in
-                                                        let newStartTime = state
-                                                            .sensorStartTimeDefault
+                                                        let newStartTime = state.sensorStartTimeDefault
                                                         state.sensorStartTime = newStartTime
                                                         state.settingsManager.settings.sensorStartTime = newStartTime
 
@@ -403,6 +419,7 @@ extension UIUX {
                                                         print("New sensor started at: \(newStartTime)")
                                                     }
                                             )
+
                                         HStack {
                                             Text("Last sensor start time:")
                                                 .font(.subheadline)
@@ -426,6 +443,8 @@ extension UIUX {
                                 Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
                                 Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
                                 Toggle("Display Chart Threshold lines for Low and High", isOn: $state.rulerMarks)
+                                Toggle("Display Insulin Activity Chart", isOn: $state.showInsulinActivity)
+                                Toggle("Display COB Chart", isOn: $state.showCobChart)
                                 HStack {
                                     Text("Currently selected chart time")
                                     Spacer()

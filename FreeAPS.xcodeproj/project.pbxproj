@@ -326,6 +326,7 @@
 		791D86DC2D071A04001D2763 /* InsulinAgeOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */; };
 		7927B9132E09A82700C46026 /* MedtrumPumpManagerExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7927B9122E09A81600C46026 /* MedtrumPumpManagerExtensions.swift */; };
 		7927D7162D082E8400385439 /* CannulaAgeOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7927D7152D082E7300385439 /* CannulaAgeOption.swift */; };
+		7929C39D2E2D3A2000EB00D5 /* IOBTick0.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7929C39C2E2D3A2000EB00D5 /* IOBTick0.swift */; };
 		792F32F62CD9DCAF009E7F7A /* BackgroundColorOption.swift in Sources */ = {isa = PBXBuildFile; fileRef = 792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */; };
 		7949F9012DC11A710058BF94 /* SystemSoundsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7949F9002DC11A550058BF94 /* SystemSoundsManager.swift */; };
 		795148C72E0A280C00615856 /* DynamicHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795148C62E0A27F900615856 /* DynamicHistoryView.swift */; };
@@ -334,6 +335,7 @@
 		795CBE162D3F949D0044854B /* ChartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE152D3F94900044854B /* ChartModel.swift */; };
 		797A852E2D97E8EF00DAB622 /* LightGlowOverlaySelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */; };
 		798421512E082FCF003A7410 /* PumpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798421502E082FC8003A7410 /* PumpView.swift */; };
+		7985ADB32E2E1D1900BC1C80 /* MainChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7985ADB12E2E1D1900BC1C80 /* MainChartView.swift */; };
 		7987CE052D6A10D80045F6EA /* SensorAgeDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */; };
 		798BC9172D6F9C4700ADABFD /* TemporaryData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798BC9162D6F9AAF00ADABFD /* TemporaryData.swift */; };
 		799A13D22E11B06100669334 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 799A13D12E11B06100669334 /* Settings.bundle */; };
@@ -978,6 +980,7 @@
 		791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinAgeOption.swift; sourceTree = "<group>"; };
 		7927B9122E09A81600C46026 /* MedtrumPumpManagerExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MedtrumPumpManagerExtensions.swift; sourceTree = "<group>"; };
 		7927D7152D082E7300385439 /* CannulaAgeOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CannulaAgeOption.swift; sourceTree = "<group>"; };
+		7929C39C2E2D3A2000EB00D5 /* IOBTick0.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOBTick0.swift; sourceTree = "<group>"; };
 		792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundColorOption.swift; sourceTree = "<group>"; };
 		7949F9002DC11A550058BF94 /* SystemSoundsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemSoundsManager.swift; sourceTree = "<group>"; };
 		795148C62E0A27F900615856 /* DynamicHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicHistoryView.swift; sourceTree = "<group>"; };
@@ -986,6 +989,7 @@
 		795CBE152D3F94900044854B /* ChartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartModel.swift; sourceTree = "<group>"; };
 		797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LightGlowOverlaySelector.swift; sourceTree = "<group>"; };
 		798421502E082FC8003A7410 /* PumpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpView.swift; sourceTree = "<group>"; };
+		7985ADB12E2E1D1900BC1C80 /* MainChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainChartView.swift; sourceTree = "<group>"; };
 		7987CE042D6A10B90045F6EA /* SensorAgeDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorAgeDays.swift; sourceTree = "<group>"; };
 		798BC9162D6F9AAF00ADABFD /* TemporaryData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemporaryData.swift; sourceTree = "<group>"; };
 		799A13D12E11B06100669334 /* Settings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Settings.bundle; sourceTree = "<group>"; };
@@ -1129,7 +1133,6 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		7910CDA62CD53A0E001E77AC /* Chart */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Chart; sourceTree = "<group>"; };
 		795CBE6E2D4166240044854B /* Views */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Views; sourceTree = "<group>"; };
 		79D9D59C2D4E590D00FA92D7 /* OpenClosed */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = OpenClosed; sourceTree = "<group>"; };
 		79D9D5A02D4E598700FA92D7 /* SuspendResume */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = SuspendResume; sourceTree = "<group>"; };
@@ -1490,27 +1493,24 @@
 			isa = PBXGroup;
 			children = (
 				79056CA62E2D1E360008B27D /* AutoISF */,
-				F2159A472BA60A0300A0B716 /* ContactTrick */,
-				BD7DA9A32AE06DBA00601B20 /* BolusCalculatorConfig */,
-				19F191D92BE4F93400F6297E /* Sharing */,
-				195D80B22AF696EE00D25097 /* Dynamic */,
-				19F95FF129F10F9C00314DDC /* Stat */,
-				CE94597C29E9E1CD0047C9C6 /* WatchConfig */,
-				19E1F7E629D0828B005C8D20 /* IconConfig */,
-				19D466A129AA2B0A004D5F33 /* FPUConfig */,
-				F90692CD274B99850037068D /* HealthKit */,
+				672F63EEAE27400625E14BAD /* AutotuneConfig */,
 				6DC5D590658EF8B8DF94F9F5 /* AddCarbs */,
 				A9A4C88374496B3C89058A89 /* AddTempTarget */,
-				672F63EEAE27400625E14BAD /* AutotuneConfig */,
-				A42F1FEDFFD0DDE00AAD54D3 /* BasalProfileEditor */,
 				3811DE0425C9D32E00A708ED /* Base */,
+				A42F1FEDFFD0DDE00AAD54D3 /* BasalProfileEditor */,
 				C2C98283C436DB934D7E7994 /* Bolus */,
+				BD7DA9A32AE06DBA00601B20 /* BolusCalculatorConfig */,
 				E8176B120B55CE89F1591542 /* Calibrations */,
 				F75CB57ED6971B46F8756083 /* CGM */,
-				0610F7D6D2EC00E3BA1569F0 /* ConfigEditor */,
 				E42231DBF0DBE2B4B92D1B15 /* CREditor */,
+				0610F7D6D2EC00E3BA1569F0 /* ConfigEditor */,
+				F2159A472BA60A0300A0B716 /* ContactTrick */,
 				9E56E3626FAD933385101B76 /* DataTable */,
+				195D80B22AF696EE00D25097 /* Dynamic */,
+				19D466A129AA2B0A004D5F33 /* FPUConfig */,
+				F90692CD274B99850037068D /* HealthKit */,
 				3811DE2725C9D49500A708ED /* Home */,
+				19E1F7E629D0828B005C8D20 /* IconConfig */,
 				D8F047E14D567F2B5DBEFD96 /* ISFEditor */,
 				C11D545CED3ECEB525EDEE23 /* LibreConfig */,
 				3811DE1A25C9D48300A708ED /* Main */,
@@ -1522,10 +1522,13 @@
 				99C01B871ACAB3F32CE755C7 /* PumpConfig */,
 				E493126EA71765130F64CCE5 /* PumpSettingsEditor */,
 				79056CBB2E2D22340008B27D /* Restore */,
-				190EBCC229FF134900BA767D /* UIUX */,
 				3811DE3825C9D4A100A708ED /* Settings */,
+				19F191D92BE4F93400F6297E /* Sharing */,
 				29B478DF61BF8D270F7D8954 /* Snooze */,
+				19F95FF129F10F9C00314DDC /* Stat */,
 				6517011F19F244F64E1FF14B /* TargetsEditor */,
+				190EBCC229FF134900BA767D /* UIUX */,
+				CE94597C29E9E1CD0047C9C6 /* WatchConfig */,
 			);
 			path = Modules;
 			sourceTree = "<group>";
@@ -1603,6 +1606,9 @@
 		3811DE2C25C9D49500A708ED /* View */ = {
 			isa = PBXGroup;
 			children = (
+				7985ADB22E2E1D1900BC1C80 /* Chart */,
+				3833B51F260264B6003021B3 /* Header */,
+				194D7E6C2B974EA4007A38C1 /* Previews */,
 				79E4DE0B2E23FF330059CA58 /* DanaBarOption.swift */,
 				79A256012E1F67F300F4C7FC /* PumpIconOption.swift */,
 				797A852D2D97E8E500DAB622 /* LightGlowOverlaySelector.swift */,
@@ -1611,10 +1617,7 @@
 				7927D7152D082E7300385439 /* CannulaAgeOption.swift */,
 				791D86DB2D0719EA001D2763 /* InsulinAgeOption.swift */,
 				792F32F52CD9DC82009E7F7A /* BackgroundColorOption.swift */,
-				7910CDA62CD53A0E001E77AC /* Chart */,
 				3811DE2E25C9D49500A708ED /* HomeRootView.swift */,
-				3833B51F260264B6003021B3 /* Header */,
-				194D7E6C2B974EA4007A38C1 /* Previews */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1935,6 +1938,7 @@
 		388E5A5925B6F0250019842D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				7929C39C2E2D3A2000EB00D5 /* IOBTick0.swift */,
 				79FE399B2D81E68200BCD63B /* ForBolusView.swift */,
 				798BC9162D6F9AAF00ADABFD /* TemporaryData.swift */,
 				795CBE152D3F94900044854B /* ChartModel.swift */,
@@ -2402,6 +2406,14 @@
 			path = Restore;
 			sourceTree = "<group>";
 		};
+		7985ADB22E2E1D1900BC1C80 /* Chart */ = {
+			isa = PBXGroup;
+			children = (
+				7985ADB12E2E1D1900BC1C80 /* MainChartView.swift */,
+			);
+			path = Chart;
+			sourceTree = "<group>";
+		};
 		833DA2F9E47E64E305F92F9D /* View */ = {
 			isa = PBXGroup;
 			children = (
@@ -2793,7 +2805,6 @@
 				6B1A8D272B14D91700E76752 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				7910CDA62CD53A0E001E77AC /* Chart */,
 				79D9D59C2D4E590D00FA92D7 /* OpenClosed */,
 				79D9D5A02D4E598700FA92D7 /* SuspendResume */,
 				79D9D5A42D4E5A0A00FA92D7 /* TempBasal */,
@@ -3171,6 +3182,7 @@
 				3811DE3225C9D49500A708ED /* HomeDataFlow.swift in Sources */,
 				CE1856F52ADC4858007E39C7 /* AddCarbPresetIntent.swift in Sources */,
 				38569347270B5DFB0002C50D /* CGMType.swift in Sources */,
+				7985ADB32E2E1D1900BC1C80 /* MainChartView.swift in Sources */,
 				3821ED4C25DD18BA00BC42AD /* Constants.swift in Sources */,
 				384E803425C385E60086DB71 /* JavaScriptWorker.swift in Sources */,
 				3811DE5D25C9D4D500A708ED /* Publisher.swift in Sources */,
@@ -3404,6 +3416,7 @@
 				891DECF7BC20968D7F566161 /* AutotuneConfigProvider.swift in Sources */,
 				D76333C9256787610B3B4875 /* AutotuneConfigStateModel.swift in Sources */,
 				A05235B9112E677ED03B6E8E /* AutotuneConfigRootView.swift in Sources */,
+				7929C39D2E2D3A2000EB00D5 /* IOBTick0.swift in Sources */,
 				7F7B756BE8543965D9FDF1A2 /* DataTableDataFlow.swift in Sources */,
 				1D845DF2E3324130E1D95E67 /* DataTableProvider.swift in Sources */,
 				19F95FFA29F1102A00314DDC /* StatRootView.swift in Sources */,

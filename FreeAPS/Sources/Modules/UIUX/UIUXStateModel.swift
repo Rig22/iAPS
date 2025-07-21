@@ -27,6 +27,8 @@ extension UIUX {
         @Published var carbButton: Bool = true
         @Published var profileButton: Bool = true
         @Published var lightMode: LightMode = .auto
+        @Published var showInsulinActivity: Bool = true
+        @Published var showCobChart: Bool = true
         @Published var hideInsulinBadge: Bool = false
         // Dana UI Toggels
         @Published var showPumpIcon: Bool = false
@@ -114,6 +116,8 @@ extension UIUX {
             subscribeSetting(\.carbButton, on: $carbButton) { carbButton = $0 }
             subscribeSetting(\.profileButton, on: $profileButton) { profileButton = $0 }
             subscribeSetting(\.lightMode, on: $lightMode) { lightMode = $0 }
+            subscribeSetting(\.showInsulinActivity, on: $showInsulinActivity) { showInsulinActivity = $0 }
+            subscribeSetting(\.showCobChart, on: $showCobChart) { showCobChart = $0 }
             // Dana Toggels
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
             subscribeSetting(\.showPumpIcon, on: $showPumpIcon) { showPumpIcon = $0 }
