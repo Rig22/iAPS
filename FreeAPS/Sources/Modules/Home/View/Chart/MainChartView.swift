@@ -275,7 +275,7 @@ struct MainChartView: View {
     }
 
     private func yGridView(fullSize: CGSize) -> some View {
-        let useColour = data.displayYgridLines ? Color.secondary : Color.clear
+        let useColour = data.displayYgridLines ? Color.white : Color.clear
         return ZStack {
             Path { path in
                 let range = glucoseYRange
@@ -337,7 +337,7 @@ struct MainChartView: View {
                             x: fullSize.width,
                             y: fullSize.height - Config.bottomPadding - Config.activityChartHeight
                         ))
-                }.stroke(Color.secondary, lineWidth: 1)
+                }.stroke(Color.white, lineWidth: 1)
 
                 // background for COB/activity
                 Path { path in
@@ -422,7 +422,6 @@ struct MainChartView: View {
             VStack {
                 ZStack {
                     xGridView(fullSize: fullSize)
-                    carbsView(fullSize: fullSize)
                     bolusView(fullSize: fullSize)
                     if data.smooth { unSmoothedGlucoseView(fullSize: fullSize) }
                     else { connectingGlucoseLinesView(fullSize: fullSize) }
@@ -433,6 +432,7 @@ struct MainChartView: View {
                     if data.showCobChart {
                         cobView(fullSize: fullSize)
                     }
+                    carbsView(fullSize: fullSize) // has to be after activityView()
                     manualGlucoseView(fullSize: fullSize)
                     manualGlucoseCenterView(fullSize: fullSize)
                     announcementView(fullSize: fullSize)
@@ -448,7 +448,7 @@ struct MainChartView: View {
     @Environment(\.colorScheme) var colorScheme
 
     private func xGridView(fullSize: CGSize) -> some View {
-        let useColour = data.displayXgridLines ? Color.secondary : Color.clear
+        let useColour = data.displayXgridLines ? Color.white : Color.clear
         return ZStack {
             Path { path in
                 for hour in 0 ..< data.hours + data.hours {
@@ -492,7 +492,7 @@ struct MainChartView: View {
                                 CGFloat(hour) * CGFloat(1.hours.timeInterval),
                             y: 10.0
                         )
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.white)
                 }
             }
         }.frame(maxHeight: 20)
@@ -863,7 +863,7 @@ struct MainChartView: View {
                     return Text(carbsFormatter.string(from: info.value as NSNumber) ?? "")
                         .font(.system(size: data.showCobChart ? 10 : 12))
                         .foregroundStyle(
-                            data.showCobChart ? Color.loopYellow : Color.secondary
+                            data.showCobChart ? Color.loopYellow : Color.white
                         )
                         .opacity(data.showCobChart && colorScheme == .dark ? 0.7 : 1.0)
                         .position(position)
