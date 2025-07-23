@@ -310,13 +310,28 @@ struct MainChartView: View {
                 }
             }
 
+            if data.showInsulinActivity || data.showCobChart {
+                // background for COB/activity
+                Path { path in
+                    path.move(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding))
+                    path.addLine(to: CGPoint(x: fullSize.width, y: fullSize.height - Config.bottomPadding))
+                    path
+                        .addLine(to: CGPoint(
+                            x: fullSize.width,
+                            y: fullSize.height - Config.bottomPadding - Config.activityChartHeight
+                        ))
+                    path.addLine(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding - Config.activityChartHeight))
+                    path.addLine(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding))
+                }.fill(Color(.gray)).opacity(0.0)
+            }
+
             if data.showInsulinActivity, data.displayYgridLines {
                 ForEach([(peakActivity_1unit, 1), (peakActivity_maxBolus, 2)], id: \.1) { activity, _ in
                     let yCoord = activityToYCoordinate(Decimal(activity), fullSize: fullSize)
                     Path { path in
                         path.move(to: CGPoint(x: 0, y: yCoord))
                         path.addLine(to: CGPoint(x: fullSize.width, y: yCoord))
-                    }.stroke(useColour, lineWidth: 0.25)
+                    }.stroke(useColour, lineWidth: 0.15)
                 }
             }
 
@@ -330,14 +345,14 @@ struct MainChartView: View {
 
             if data.showInsulinActivity || data.showCobChart {
                 // chart separator
-                Path { path in
-                    path.move(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding - Config.activityChartHeight))
-                    path
-                        .addLine(to: CGPoint(
-                            x: fullSize.width,
-                            y: fullSize.height - Config.bottomPadding - Config.activityChartHeight
-                        ))
-                }.stroke(Color.white, lineWidth: 1)
+                /*   Path { path in
+                     path.move(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding - Config.activityChartHeight))
+                     path
+                         .addLine(to: CGPoint(
+                             x: fullSize.width,
+                             y: fullSize.height - Config.bottomPadding - Config.activityChartHeight
+                         ))
+                 }.stroke(Color.white, lineWidth: 1)*/
 
                 // background for COB/activity
                 Path { path in
@@ -820,21 +835,16 @@ struct MainChartView: View {
         ZStack {
             carbsPath
                 .fill(Color.loopYellow)
-                .opacity(data.showCobChart ? 0.8 : 1.0)
             carbsPath
-                .stroke(Color.primary, lineWidth: 0.5)
-                .opacity(data.showCobChart ? 0.8 : 1.0)
+                .stroke(Color.white, lineWidth: 0.4)
 
             ForEach(carbsDots, id: \.rect.minX) { info -> AnyView in
                 let position = data.showCobChart ? CGPoint(x: info.rect.midX, y: info.rect.minY - 8) :
                     CGPoint(x: info.rect.midX, y: info.rect.maxY + 8)
                 return Text((carbsFormatter.string(from: info.value as NSNumber) ?? "") + (data.showCobChart ? "g" : ""))
-                    .font(.carbsDotFont)
+                    .font(.system(size: 12, weight: data.showCobChart && colorScheme == .light ? .semibold : .regular))
                     .position(position)
-                    .foregroundStyle(
-                        (data.showCobChart ? Color.loopYellow : Color.primary)
-                            .opacity(data.showCobChart && colorScheme == .dark ? 0.9 : 1.0)
-                    )
+                    .foregroundStyle(data.showCobChart ? Color.loopYellow : Color.white)
                     .asAny()
             }
         }
@@ -865,7 +875,6 @@ struct MainChartView: View {
                         .foregroundStyle(
                             data.showCobChart ? Color.loopYellow : Color.white
                         )
-                        .opacity(data.showCobChart && colorScheme == .dark ? 0.7 : 1.0)
                         .position(position)
                         .asAny()
                 }
