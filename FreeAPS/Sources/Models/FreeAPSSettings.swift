@@ -138,7 +138,6 @@ struct FreeAPSSettings: JSON, Equatable {
     var ketoProtectBasalAbsolut: Decimal = 0
     // Dana-Toggles
     var showPumpIcon: Bool = false
-    var pumpIconOption: String = "nano200"
     var pumpIconRawValue: String = "nano200"
     var danaBar: Bool = false
     var tempTargetbar: Bool = false
@@ -698,6 +697,10 @@ extension FreeAPSSettings: Decodable {
         // Dana Toogels
         if let showPumpIcon = try? container.decode(Bool.self, forKey: .showPumpIcon) {
             settings.showPumpIcon = showPumpIcon
+        }
+
+        if let pumpIconRawValue = try? container.decode(String.self, forKey: .pumpIconRawValue) {
+            settings.pumpIconRawValue = pumpIconRawValue
         }
 
         if let danaBar = try? container.decode(Bool.self, forKey: .danaBar) {
