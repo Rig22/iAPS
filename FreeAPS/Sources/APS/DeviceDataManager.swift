@@ -5,7 +5,7 @@ import Foundation
 import LoopKit
 import LoopKitUI
 import MedtrumKit
-import MinimedKit
+@preconcurrency import MinimedKit
 import MockKit
 import OmniBLE
 import OmniKit

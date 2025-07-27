@@ -78,15 +78,15 @@ struct FillablePieSegment: View {
                     startAngle: .degrees(-90),
                     endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                 )
-                .fill(color)
+                .fill(color.opacity(0.0))
                 .frame(width: 50, height: 50)
                 .opacity(0.5)
 
                 // Symbol-Hintergrund (NEU, 40x40)
                 if symbolBackgroundColor != .clear {
                     Circle()
-                        .fill(symbolBackgroundColor)
-                        .frame(width: 40, height: 40)
+                        .fill(symbolBackgroundColor.opacity(0.0))
+                        .frame(width: 42, height: 42)
                 }
 
                 Image(systemName: symbol)

@@ -12,11 +12,12 @@ struct CurrentGlucoseView: View {
     @Binding var displayDelta: Bool
     @Binding var alwaysUseColors: Bool
     @Binding var scrolling: Bool
+    @Binding var displaySAGE: Bool
     @Binding var displayExpiration: Bool
     @Binding var cgm: CGMType
     @Binding var sensordays: Double
 
-    // @Environment(\.colorScheme) var colorScheme
+    @Environment(\.colorScheme) var colorScheme
     @Environment(\.sizeCategory) private var fontSize
 
     @State private var rotationDegrees: Double = 0
@@ -94,6 +95,10 @@ struct CurrentGlucoseView: View {
 
     var body: some View {
         ZStack {
+            if displayExpiration || displaySAGE {
+                sageView
+                    .offset(x: -9, y: -70)
+            }
             // TriangleShape(color: triangleColor)
             TriangleShape(color: currentTriangleColor)
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))
@@ -207,6 +212,40 @@ struct CurrentGlucoseView: View {
         default:
             return (2, 0)
         }
+    }
+
+    private var sageView: some View {
+        ZStack {
+            if let date = recentGlucose?.sessionStartDate {
+                let sensorAge: TimeInterval = (-1 * date.timeIntervalSinceNow)
+                let expiration = sensordays - sensorAge
+                let secondsOfDay = 8.64E4
+                let colour: Color = colorScheme == .light ? .secondary : Color.black
+                let lineColour: Color = sensorAge >= sensordays - secondsOfDay * 1 ? Color.red
+                    .opacity(0.9) : sensorAge >= sensordays - secondsOfDay * 2 ? Color
+                    .orange : Color.gray
+                let minutesAndHours = (displayExpiration && expiration < 1 * 8.64E4) || (displaySAGE && sensorAge < 1 * 8.64E4)
+
+                Sage(amount: sensorAge, expiration: expiration, lineColour: lineColour, sensordays: sensordays)
+                    .frame(width: 36, height: 36)
+                    .overlay {
+                        HStack {
+                            Text(
+                                !minutesAndHours ?
+                                    (remainingTimeFormatterDays.string(from: displayExpiration ? expiration : sensorAge) ?? "")
+                                    .replacingOccurrences(of: ",", with: " ") :
+                                    (remainingTimeFormatter.string(from: displayExpiration ? expiration : sensorAge) ?? "")
+                                    .replacingOccurrences(of: ",", with: " ")
+                            ).foregroundStyle(Color.white)
+                            // .foregroundStyle(colour)
+                        }
+                    }
+            }
+        }
+        .font(.footnote)
+        .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing).padding(20)
+        .offset(x: -5)
     }
 
     var colourGlucoseText: Color {

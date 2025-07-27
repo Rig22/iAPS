@@ -473,3 +473,129 @@ extension UIImage {
         return Image(uiImage: image)
     }
 }
+
+struct Sage: View {
+    @Environment(\.colorScheme) var colorScheme
+    let amount: Double
+    let expiration: Double
+    let lineColour: Color
+    let sensordays: TimeInterval
+    var body: some View {
+        let fill = max(expiration / amount, 0.15)
+        let colour: Color = (expiration < 0.5 * 8.64E4) ? .red
+            .opacity(0.9) : (expiration < 2 * 8.64E4) ? .orange.opacity(0.8) : colorScheme == .light ? Color.white : Color.white
+            .opacity(0.8)
+        let scheme = colorScheme == .light ? Color(.systemGray5) : Color(.black).opacity(0.2)
+
+        Circle()
+            .stroke(scheme, lineWidth: 5)
+            .background(
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                Gradient.Stop(
+                                    color: colour,
+                                    location: fill
+                                ),
+                                Gradient.Stop(
+                                    color: colorScheme == .light ? backgroundColor : backgroundColor,
+                                    location: fill
+                                )
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .shadow(radius: 4)
+            )
+    }
+}
+
+func colorForRemainingHours(_ remainingHours: CGFloat) -> Color {
+    switch remainingHours {
+    case ..<2:
+        return .red
+    case ..<6:
+        return .yellow
+    default:
+        return .white
+    }
+}
+
+func colorForRemainingMinutes(_ remainingMinutes: CGFloat) -> Color {
+    switch remainingMinutes {
+    case ..<120:
+        return .red
+    case ..<360:
+        return .yellow
+    default:
+        return .white
+    }
+}
+
+struct GradientMaskAnimationModifier: ViewModifier {
+    let isActive: Bool
+    @State private var animate = false
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                if isActive {
+                    LinearGradient(
+                        gradient: Gradient(colors: [Color.clear, Color.blue]),
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                    .frame(width: 60)
+                    .offset(x: animate ? -60 : 60)
+                    .animation(.linear(duration: 1.2).repeatForever(autoreverses: false), value: animate)
+                    .mask(content)
+                    .onAppear { animate = true }
+                    .onDisappear { animate = false }
+                }
+            }
+    }
+}
+
+extension View {
+    func loopingGradientMask(isActive: Bool) -> some View {
+        modifier(GradientMaskAnimationModifier(isActive: isActive))
+    }
+}
+
+struct VerticalFillMaskModifier: ViewModifier {
+    let fillFraction: CGFloat
+    let fillColor: Color
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                GeometryReader { geometry in
+                    let height = geometry.size.height * fillFraction
+                    fillColor
+                        .frame(height: height)
+                        .frame(maxHeight: .infinity, alignment: .bottom)
+                        .mask(content)
+                }
+                .allowsHitTesting(false)
+            }
+    }
+}
+
+extension View {
+    func verticalFillMask(fillFraction: CGFloat, gradient: LinearGradient) -> some View {
+        overlay(
+            GeometryReader { geo in
+                gradient
+                    .frame(height: geo.size.height * fillFraction)
+                    .position(
+                        x: geo.size.width / 2,
+                        y: geo.size.height * (1 - fillFraction / 2)
+                    )
+                    .clipped()
+            }
+            .mask(self)
+        )
+    }
+}

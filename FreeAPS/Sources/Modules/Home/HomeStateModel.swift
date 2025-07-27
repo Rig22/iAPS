@@ -77,13 +77,16 @@ extension Home {
         @Published var maxCOB: Decimal = 0
         @Published var autoisf = false
         @Published var displayExpiration = false
+        @Published var displayExpiration2 = false
+        @Published var displaySAGE = true
         @Published var cgm: CGMType = .nightscout
         @Published var sensorDays: Double = 10
         @Published var carbButton: Bool = true
         @Published var profileButton: Bool = true
         @Published var hideInsulinBadge: Bool = true
         // Dana UI Toggels
-        @Published var pumpIconRawValue: String = "ic_dana_rs"
+        @Published var showPumpIcon: Bool = false
+        @Published var pumpIconRawValue: String = "Nano 200"
         @Published var danaBar: Bool = false
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
@@ -91,7 +94,7 @@ extension Home {
         @Published var tempTargetbar: Bool = false
         @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
-        @Published var danaBarOption: String = DanaBarOption.standard.rawValue
+        @Published var danaBarOption: String = DanaBarOption.standard2.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = false
         @Published var button3D: Bool = false
@@ -102,13 +105,12 @@ extension Home {
         @Published var remainingSensorMinutes: Int?
         @Published var elapsedMinutes: Int = 0
         @Published var incidenceOfLight: Bool = false
-        @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview1.rawValue
+        @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview.rawValue
         @Published var insulinHours: Double?
         @Published var insulinAge: String = "--"
         @Published var batteryHours: Double?
         @Published var batteryAge: String = "--"
         @Published var button3DBackground: Bool = false
-        @Published var batteryIconOption: Bool = false
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -128,6 +130,8 @@ extension Home {
         var data = ChartModel(
             suggestion: nil,
             glucose: [],
+            activity: [],
+            cob: [],
             isManual: [],
             tempBasals: [],
             boluses: [],
@@ -149,12 +153,18 @@ extension Home {
             thresholdLines: true,
             overrideHistory: [],
             minimumSMB: 0,
+            insulinDIA: 7,
+            insulinPeak: 75,
             maxBolus: 0,
             maxBolusValue: 1,
+            maxIOB: 0,
+            maxCOB: 1,
             useInsulinBars: true,
             screenHours: 6,
             fpus: true,
-            fpuAmounts: false
+            fpuAmounts: false,
+            showInsulinActivity: true,
+            showCobChart: true
         )
         /*  var backgroundColor: Color {
              BackgroundColorOption(rawValue: backgroundColorOptionRawValue)?.color ?? .clear
@@ -164,6 +174,16 @@ extension Home {
             switch BackgroundColorOption(rawValue: backgroundColorOptionRawValue) {
             default:
                 return .blue // Standardfarbe, falls keine Übereinstimmung gefunden wird
+            }
+        }
+
+        var pumpIconOption: PumpIconOption {
+            get {
+                PumpIconOption(rawValue: pumpIconRawValue) ??
+                    .nano200 // Standardwert, falls der Raw-Wert nicht gefunden wird
+            }
+            set {
+                pumpIconRawValue = newValue.rawValue
             }
         }
 
@@ -180,6 +200,7 @@ extension Home {
             setupGlucose()
             setupBasals()
             setupBoluses()
+            setupActivity()
             setupSuspensions()
             setupPumpSettings()
             setupBasalProfile()
@@ -192,6 +213,7 @@ extension Home {
             setupOverrideHistory()
             setupLoopStats()
             setupData()
+            setupCob()
 
             data.suggestion = provider.suggestion
             dynamicVariables = provider.dynamicVariables
@@ -215,11 +237,18 @@ extension Home {
             data.displayXgridLines = settingsManager.settings.xGridLines
             data.displayYgridLines = settingsManager.settings.yGridLines
             data.thresholdLines = settingsManager.settings.rulerMarks
+            data.showInsulinActivity = settingsManager.settings.showInsulinActivity
+            data.showCobChart = settingsManager.settings.showCobChart
             useTargetButton = settingsManager.settings.useTargetButton
             data.screenHours = settingsManager.settings.hours
             alwaysUseColors = settingsManager.settings.alwaysUseColors
             data.minimumSMB = settingsManager.settings.minimumSMB
+            data.insulinDIA = settingsManager.pumpSettings.insulinActionCurve
+            data.insulinPeak = settingsManager.preferences.useCustomPeakTime ? settingsManager.preferences.insulinPeakTime :
+                (settingsManager.preferences.curve == .ultraRapid ? 55 : 75)
             data.maxBolus = settingsManager.pumpSettings.maxBolus
+            data.maxIOB = settingsManager.preferences.maxIOB
+            data.maxCOB = settingsManager.preferences.maxCOB
             data.useInsulinBars = settingsManager.settings.useInsulinBars
             data.fpus = settingsManager.settings.fpus
             data.fpuAmounts = settingsManager.settings.fpuAmounts
@@ -232,14 +261,25 @@ extension Home {
             autoisf = settingsManager.settings.autoisf
             hours = settingsManager.settings.hours
             displayExpiration = settingsManager.settings.displayExpiration
+            displayExpiration2 = settingsManager.settings.displayExpiration2
+            displaySAGE = settingsManager.settings.displaySAGE
             cgm = settingsManager.settings.cgm
-            sensorDays = settingsManager.settings.sensorDays
+            sensorDays = switch settingsManager.settings.cgm {
+            case .nightscout: CGMType.nightscout.expiration
+            case .dexcomG5: CGMType.dexcomG5.expiration
+            case .dexcomG6: CGMType.dexcomG6.expiration
+            case .dexcomG7: CGMType.dexcomG7.expiration
+            case .libreTransmitter: CGMType.libreTransmitter.expiration
+            case .enlite: CGMType.enlite.expiration
+            default: settingsManager.settings.sensorDays
+            }
             carbButton = settingsManager.settings.carbButton
             profileButton = settingsManager.settings.profileButton
             // Dana UI Toggels
             danaBar = settingsManager.settings.danaBar
+            showPumpIcon = settingsManager.settings.showPumpIcon
+            pumpIconRawValue = settingsManager.settings.pumpIconRawValue
             hideInsulinBadge = settingsManager.settings.hideInsulinBadge
-            legendsSwitch = settingsManager.settings.legendsSwitch
             tempTargetbar = settingsManager.settings.tempTargetbar
             timeSettings = settingsManager.settings.timeSettings
             backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
@@ -254,7 +294,6 @@ extension Home {
             incidenceOfLight = settingsManager.settings.incidenceOfLight
             lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
             button3DBackground = settingsManager.settings.button3DBackground
-            batteryIconOption = settingsManager.settings.batteryIconOption
             // Dana UI Toggels
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -588,6 +627,20 @@ extension Home {
             }
         }
 
+        private func setupActivity() {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.data.activity = CoreDataStorage().fetchInsulinData(interval: DateFilter().day)
+            }
+        }
+
+        private func setupCob() {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                self.data.cob = self.iobData
+            }
+        }
+
         private func setupPumpSettings() {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
@@ -793,6 +846,8 @@ extension Home.StateModel:
         setupOverrideHistory()
         setupLoopStats()
         setupData()
+        setupActivity()
+        setupCob()
     }
 
     func updateRemainingSensorDays() {
@@ -832,6 +887,8 @@ extension Home.StateModel:
         data.displayXgridLines = settingsManager.settings.xGridLines
         data.displayYgridLines = settingsManager.settings.yGridLines
         data.thresholdLines = settingsManager.settings.rulerMarks
+        data.showInsulinActivity = settingsManager.settings.showInsulinActivity
+        data.showCobChart = settingsManager.settings.showCobChart
         useTargetButton = settingsManager.settings.useTargetButton
         data.screenHours = settingsManager.settings.hours
         alwaysUseColors = settingsManager.settings.alwaysUseColors
@@ -849,19 +906,30 @@ extension Home.StateModel:
         autoisf = settingsManager.settings.autoisf
         hours = settingsManager.settings.hours
         displayExpiration = settingsManager.settings.displayExpiration
+        displayExpiration2 = settingsManager.settings.displayExpiration2
+        displaySAGE = settingsManager.settings.displaySAGE
         cgm = settingsManager.settings.cgm
-        sensorDays = settingsManager.settings.sensorDays
         carbButton = settingsManager.settings.carbButton
         profileButton = settingsManager.settings.profileButton
+        sensorDays = switch settingsManager.settings.cgm {
+        case .nightscout: CGMType.nightscout.expiration
+        case .dexcomG5: CGMType.dexcomG5.expiration
+        case .dexcomG6: CGMType.dexcomG6.expiration
+        case .dexcomG7: CGMType.dexcomG7.expiration
+        case .libreTransmitter: CGMType.libreTransmitter.expiration
+        case .enlite: CGMType.enlite.expiration
+        default: settingsManager.settings.sensorDays
+        }
         hideInsulinBadge = settingsManager.settings.hideInsulinBadge
         setupGlucose()
         setupOverrideHistory()
         setupData()
         // Dana UI Toggels
         danaBar = settingsManager.settings.danaBar
+        showPumpIcon = settingsManager.settings.showPumpIcon
+        pumpIconRawValue = settingsManager.settings.pumpIconRawValue
         insulinAgeOption = settingsManager.settings.insulinAgeOption
         cannulaAgeOption = settingsManager.settings.cannulaAgeOption
-        legendsSwitch = settingsManager.settings.legendsSwitch
         tempTargetbar = settingsManager.settings.tempTargetbar
         timeSettings = settingsManager.settings.timeSettings
         backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
@@ -875,7 +943,6 @@ extension Home.StateModel:
         incidenceOfLight = settingsManager.settings.incidenceOfLight
         lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
         button3DBackground = settingsManager.settings.button3DBackground
-        batteryIconOption = settingsManager.settings.batteryIconOption
         // Dana UI Toggels
     }
 

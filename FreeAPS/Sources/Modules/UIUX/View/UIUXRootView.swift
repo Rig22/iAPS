@@ -1,7 +1,7 @@
 import SwiftUI
 import Swinject
 
-extension StatConfig {
+extension UIUX {
     struct RootView: BaseView {
         let resolver: Resolver
         @StateObject var state = StateModel()
@@ -98,7 +98,7 @@ extension StatConfig {
 
         private func getDescription(for option: DanaBarOption) -> String {
             switch option {
-            case .standard: return "Standard"
+            // case .standard: return "Standard"
             case .standard2: return "Standard 2"
             case .marquee: return "Running Text"
             case .max: return "For Dana User"
@@ -117,6 +117,18 @@ extension StatConfig {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 360, height: 280)
+
+                    if state.showPumpIcon {
+                        Circle()
+                            .fill(Color(.darkGray))
+                            .frame(width: 20, height: 20)
+                            .offset(x: -10, y: -96)
+
+                        Image(state.pumpIconRawValue)
+                            .resizable()
+                            .frame(width: 15, height: 15)
+                            .offset(x: -10, y: -96)
+                    }
                 }
                 .frame(width: 360, height: 280)
                 .padding(.top, 20)
@@ -130,14 +142,34 @@ extension StatConfig {
                                 header: Text("Pump Settings"),
                                 footer: Text("Configure pump display options")
                             ) {
+                                Toggle("Show Pump Icon", isOn: $state.showPumpIcon)
+
+                                if state.showPumpIcon {
+                                    if #available(iOS 18.0, *) {
+                                        Picker("Select Icon", selection: $state.pumpIconRawValue) {
+                                            ForEach(PumpIconOption.allCases, id: \.rawValue) { option in
+                                                HStack {
+                                                    Image(option.rawValue)
+                                                        .resizable()
+                                                        .scaledToFit()
+                                                        .frame(width: 60, height: 40)
+                                                    Text(option.displayName)
+                                                        .foregroundColor(.primary)
+                                                }
+                                                .tag(option.rawValue)
+                                            }
+                                        }
+                                        .pickerStyle(NavigationLinkPickerStyle())
+                                    }
+                                }
                                 Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
                             }
 
                             Section(
-                                header: Text("Bar Selection"),
+                                header: Text("Dana Bar Selection"),
                                 footer: Text("Select the desired bar view")
                             ) {
-                                Toggle("Top Bars", isOn: $state.danaBar)
+                                Toggle("Dana Bars", isOn: $state.danaBar)
 
                                 if state.danaBar {
                                     Picker("Choose a view", selection: $state.danaBarOption) {
@@ -183,27 +215,25 @@ extension StatConfig {
                                         .pickerStyle(NavigationLinkPickerStyle())
                                     }
 
-                                    // DanaBar Simple specific settings
-                                    if state.danaBarOption == DanaBarOption.standard.rawValue {
-                                        Picker(
-                                            "Max Reservoir Insulin Age",
-                                            selection: $state.insulinAgeOption
-                                        ) {
-                                            Text("1 Day").tag("Ein_Tag")
-                                            Text("2 Days").tag("Zwei_Tage")
-                                            Text("3 Days").tag("Drei_Tage")
-                                            Text("4 Days").tag("Vier_Tage")
-                                            Text("5 Days").tag("Fuenf_Tage")
-                                            Text("6 Days").tag("Sechs_Tage")
-                                            Text("7 Days").tag("Sieben_Tage")
-                                            Text("8 Days").tag("Acht_Tage")
-                                            Text("9 Days").tag("Neun_Tage")
-                                            Text("10 Days").tag("Zehn_Tage")
-                                        }
-                                        .pickerStyle(NavigationLinkPickerStyle())
-                                    }
+                                    /*    if state.danaBarOption == DanaBarOption.standard.rawValue {
+                                         Picker(
+                                             "Max Reservoir Insulin Age",
+                                             selection: $state.insulinAgeOption
+                                         ) {
+                                             Text("1 Day").tag("Ein_Tag")
+                                             Text("2 Days").tag("Zwei_Tage")
+                                             Text("3 Days").tag("Drei_Tage")
+                                             Text("4 Days").tag("Vier_Tage")
+                                             Text("5 Days").tag("Fuenf_Tage")
+                                             Text("6 Days").tag("Sechs_Tage")
+                                             Text("7 Days").tag("Sieben_Tage")
+                                             Text("8 Days").tag("Acht_Tage")
+                                             Text("9 Days").tag("Neun_Tage")
+                                             Text("10 Days").tag("Zehn_Tage")
+                                         }
+                                         .pickerStyle(NavigationLinkPickerStyle())
+                                     }*/
 
-                                    // Common settings for all views
                                     if state.danaBarOption == DanaBarOption.standard2.rawValue {
                                         Picker(
                                             "Max Reservoir Insulin Age",
@@ -251,6 +281,12 @@ extension StatConfig {
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
                                 }
+                            }
+
+                            Section(
+                                header: Text("Bars"),
+                                footer: Text("Added Bars you want")
+                            ) {
                                 Toggle("TT Bar", isOn: $state.tempTargetBar)
                                 Toggle("Bottom Bar", isOn: $state.timeSettings)
                             }
@@ -298,7 +334,6 @@ extension StatConfig {
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
                                 }
-                                // Toggle("Batterie Anzeige", isOn: $state.batteryIconOption)
                             }
                             Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
 
@@ -307,17 +342,48 @@ extension StatConfig {
                             } header: { Text("Choose your App Icon") }
 
                             Section(
-                                header: Text("Sensor Settings"),
+                                header: Text(
+                                    "Show Sensor Age for nightscout, dexcomG5, dexcomG6, dexcomG7, libre1, libre2 and enlite"
+                                ),
+                                footer: Text("Direct Support implemented")
+                            ) {
+                                Toggle("Display Sensor Age", isOn: $state.displayExpiration)
+                                    ._onBindingChange($state.displayExpiration) { enabled in
+                                        if enabled {
+                                            state.displaySAGE = false
+                                            state.displayExpiration2 = false
+                                        }
+                                    }
+
+                                Toggle("Display Sensor Time Remaining", isOn: $state.displaySAGE)
+                                    ._onBindingChange($state.displaySAGE) { enabled in
+                                        if enabled {
+                                            state.displayExpiration = false
+                                            state.displayExpiration2 = false
+                                        }
+                                    }
+                            }
+
+                            Section(
+                                header: Text("Sensor Settings for Libre 3 and 3+ Users"),
                                 footer: Text("Long press for setting new Sensor Start Time")
                             ) {
-                                Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)
-                                if state.displayExpiration {
+                                Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration2)
+                                    ._onBindingChange($state.displayExpiration2) { enabled in
+                                        if enabled {
+                                            state.displayExpiration = false
+                                            state.displaySAGE = false
+                                        }
+                                    }
+
+                                if state.displayExpiration2 {
                                     Picker("Select Sensor Span", selection: $state.sensorAgeDays) {
                                         ForEach(SensorAgeDays.allCases, id: \.self) { sensorAge in
                                             Text(sensorAge.localizedName).tag(sensorAge)
                                         }
                                     }
                                     .pickerStyle(NavigationLinkPickerStyle())
+
                                     HStack {
                                         DatePicker(
                                             "Select Start Time",
@@ -327,6 +393,7 @@ extension StatConfig {
                                         )
                                         .datePickerStyle(.compact)
                                     }
+
                                     VStack(alignment: .leading, spacing: 8) {
                                         Button(action: {}, label: {
                                             Text("Start New Sensor Time")
@@ -337,10 +404,9 @@ extension StatConfig {
                                             .buttonStyle(.bordered)
                                             .padding(.top)
                                             .simultaneousGesture(
-                                                LongPressGesture(minimumDuration: 1.0) // 1 Sekunde halten
+                                                LongPressGesture(minimumDuration: 1.0)
                                                     .onEnded { _ in
-                                                        let newStartTime = state
-                                                            .sensorStartTimeDefault
+                                                        let newStartTime = state.sensorStartTimeDefault
                                                         state.sensorStartTime = newStartTime
                                                         state.settingsManager.settings.sensorStartTime = newStartTime
 
@@ -353,6 +419,7 @@ extension StatConfig {
                                                         print("New sensor started at: \(newStartTime)")
                                                     }
                                             )
+
                                         HStack {
                                             Text("Last sensor start time:")
                                                 .font(.subheadline)
@@ -376,6 +443,8 @@ extension StatConfig {
                                 Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
                                 Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
                                 Toggle("Display Chart Threshold lines for Low and High", isOn: $state.rulerMarks)
+                                Toggle("Display Insulin Activity Chart", isOn: $state.showInsulinActivity)
+                                Toggle("Display COB Chart", isOn: $state.showCobChart)
                                 HStack {
                                     Text("Currently selected chart time")
                                     Spacer()
@@ -395,6 +464,13 @@ extension StatConfig {
                                 Toggle("Display Temp Targets Button", isOn: $state.useTargetButton)
                                 Toggle("Display Profile Override Button", isOn: $state.profileButton)
                                 Toggle("Display Meal Button", isOn: $state.carbButton)
+                                Section {
+                                    Picker(selection: $state.lightMode, label: Text("Color Scheme")) {
+                                        ForEach(LightMode.allCases) { item in
+                                            Text(NSLocalizedString(item.rawValue, comment: "ColorScheme Selection"))
+                                        }
+                                    }
+                                } header: { Text("Light / Dark Mode") }
                             }
 
                             Section(header: Text("Statistics settings")) {

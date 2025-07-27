@@ -188,226 +188,70 @@ extension Home {
             return scene
         }
 
+        // Preference Key zur Breitenmessung
+        struct TextWidthKey: PreferenceKey {
+            static var defaultValue: CGFloat = 0
+            static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
+                value = nextValue()
+            }
+        }
+
         struct TimeEllipse: View {
-            let characters: Int
             var button3D: Bool = false
             var button3DBackground: Bool = false
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
             var body: some View {
-                ZStack {
-                    if button3D {
-                        let glowColor1 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.9)
+                GeometryReader { geometry in
+                    ZStack {
+                        // Zentrierte Ellipse mit berechneter Breite
+                        let ellipseWidth = max(geometry.size.width + 10, 80) // Mindestbreite 80
 
-                        let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.4)
+                        if button3D {
+                            let glowColor1 = incidenceOfLight
+                                ? lightGlowOverlaySelector.highlightColor
+                                : Color.white.opacity(0.9)
 
-                        if button3DBackground {
+                            let glowColor2 = incidenceOfLight
+                                ? lightGlowOverlaySelector.highlightColor
+                                : Color.white.opacity(0.4)
+
+                            if button3DBackground {
+                                RoundedRectangle(cornerRadius: 15)
+                                    .fill(Color.black.opacity(0.2))
+                                    .frame(width: ellipseWidth, height: 25)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            }
+
+                            RoundedRectangle(cornerRadius: 15)
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            glowColor1.opacity(0.5),
+                                            glowColor2.opacity(0.3),
+                                            Color.clear,
+                                            Color.black.opacity(0.3),
+                                            Color.black.opacity(0.6)
+                                        ]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    ),
+                                    lineWidth: 1
+                                )
+                                .frame(width: ellipseWidth, height: 25)
+                        } else {
                             RoundedRectangle(cornerRadius: 15)
                                 .fill(Color.black.opacity(0.2))
-                                .frame(width: CGFloat(characters * 7), height: 25)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                        }
-
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        glowColor1.opacity(0.5),
-                                        glowColor2.opacity(0.3),
-                                        Color.clear,
-                                        Color.black.opacity(0.3),
-                                        Color.black.opacity(0.6)
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-
-                                ),
-                                lineWidth: 1
-                            )
-                            .frame(width: CGFloat(characters * 7), height: 25)
-                    } else {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.black.opacity(0.2))
-                            .frame(width: CGFloat(characters * 7), height: 25)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
-                    }
-                }
-            }
-        }
-
-        struct TimeEllipseBig: View {
-            let characters: Int
-            var button3D: Bool = false
-            var button3DBackground: Bool = false
-            var incidenceOfLight: Bool
-            var lightGlowOverlaySelector: LightGlowOverlaySelector
-
-            var body: some View {
-                ZStack {
-                    if button3D {
-                        let glowColor1 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.9)
-
-                        let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.4)
-
-                        if button3DBackground {
-                            RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.black.opacity(0.2))
-                                .frame(width: CGFloat(characters * 10), height: 25)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                        }
-
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        glowColor1.opacity(1.0),
-                                        glowColor2.opacity(0.8),
-                                        Color.clear,
-                                        Color.black.opacity(0.3),
-                                        Color.black.opacity(0.6)
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-
-                                ),
-                                lineWidth: 1
-                            )
-                            .frame(width: CGFloat(characters * 10), height: 26)
-                    } else {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.black.opacity(0.2))
-                            .frame(width: CGFloat(characters * 10), height: 26)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 15)
-                                    .stroke(Color.white, lineWidth: 0)
-                            )
-                    }
-                }
-            }
-        }
-
-        struct BatteryEllipse: View {
-            var battery: Battery?
-            var button3D: Bool
-            var button3DBackground: Bool
-            var incidenceOfLight: Bool
-            var lightGlowOverlaySelector: LightGlowOverlaySelector
-            @State private var isLowBatteryBlinking = false
-
-            private var shouldBlink: Bool {
-                guard let percent = battery?.percent else { return false }
-                return percent <= 50
-            }
-
-            private var batteryColor: Color {
-                guard let percent = battery?.percent else { return .gray }
-                switch percent {
-                case ...25: return .red
-                case ...50: return .yellow
-                default: return .green
-                }
-            }
-
-            private var batterySymbol: String {
-                guard let percent = battery?.percent else { return "battery.0" }
-                switch percent {
-                case 81 ... 100: return "battery.100"
-                case 61 ... 80: return "battery.75"
-                case 41 ... 60: return "battery.50"
-                case 21 ... 40: return "battery.25"
-                default: return "battery.0"
-                }
-            }
-
-            private var percentageText: String {
-                if let percent = battery?.percent {
-                    return "\(percent)%"
-                } else {
-                    return "--"
-                }
-            }
-
-            var body: some View {
-                ZStack {
-                    if button3D {
-                        let glowColor1 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.9)
-
-                        let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.4)
-
-                        if button3DBackground {
+                                .frame(width: ellipseWidth, height: 25)
                             RoundedRectangle(cornerRadius: 15)
-                                .fill(Color.black.opacity(0.2))
-                                .frame(width: 74, height: 25) // Feste Breite für Batterie
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                                .stroke(Color.white, lineWidth: 0)
+                                .frame(width: ellipseWidth, height: 25)
                         }
-
-                        RoundedRectangle(cornerRadius: 15)
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        glowColor1.opacity(0.9),
-                                        glowColor2.opacity(0.6),
-                                        Color.clear,
-                                        Color.black.opacity(0.3),
-                                        Color.black.opacity(0.6)
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                ),
-                                lineWidth: 1
-                            )
-                            .frame(width: 74, height: 25)
-                    } else {
-                        RoundedRectangle(cornerRadius: 15)
-                            .fill(Color.black.opacity(0.2))
-                            .frame(width: 74, height: 25)
                     }
-
-                    HStack(spacing: 6) {
-                        Image(systemName: batterySymbol)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
-                            .foregroundColor(batteryColor)
-                            .opacity(shouldBlink ? (isLowBatteryBlinking ? 0.5 : 1) : 1)
-
-                        Text(percentageText)
-                            .font(.system(size: 12))
-                            .foregroundColor(.white)
-                    }
-                    .padding(.horizontal, 8)
+                    .frame(width: geometry.size.width, height: 25, alignment: .center)
                 }
-                .onAppear { startBlinkAnimationIfNeeded() }
-                .onChange(of: battery?.percent) {
-                    startBlinkAnimationIfNeeded()
-                } }
-
-            private func startBlinkAnimationIfNeeded() {
-                isLowBatteryBlinking = false
-                guard shouldBlink else { return }
-
-                withAnimation(
-                    Animation.easeInOut(duration: 0.8)
-                        .repeatForever(autoreverses: true)
-                ) {
-                    isLowBatteryBlinking = true
-                }
+                .frame(height: 25)
             }
         }
 
@@ -504,6 +348,68 @@ extension Home {
             }
 
             return ZStack(alignment: .center) {
+                // sensorAgeDays
+                // .offset(y: -80)
+                if state.displayExpiration2 {
+                    let totalHours = state.sensorAgeDays.asInt() * 24
+                    let remainingHours = max(1, totalHours - state.elapsedHours)
+                    let fillFraction: CGFloat = remainingHours <= 1 ? 1.0 : CGFloat(remainingHours) / CGFloat(totalHours)
+
+                    let sensorColor: Color = {
+                        switch remainingHours {
+                        case ...2: return .red
+                        case ...6: return .yellow
+                        default: return .white
+                        }
+                    }()
+
+                    let sensorAgeText: String = {
+                        guard let days = state.remainingSensorDays,
+                              let hours = state.remainingSensorHours,
+                              let minutes = state.remainingSensorMinutes
+                        else {
+                            return "\(state.sensorAgeDays.asInt())d"
+                        }
+
+                        if days >= 1 {
+                            return "\(days)d\(hours)h"
+                        } else if hours >= 1 {
+                            return "\(hours)h\(minutes)m"
+                        } else {
+                            return "\(minutes)m"
+                        }
+                    }()
+
+                    // let shouldBlink = sensorColor == .red
+
+                    ZStack {
+                        FillablePieSegment2(
+                            pieSegmentViewModel: sensorAgeSegmentViewModel,
+                            color: .white,
+                            backgroundColor: .clear,
+                            symbolSize: 22,
+                            symbol: "sensor.tag.radiowaves.forward",
+                            animateProgress: true,
+                            button3D: state.button3D,
+                            button3DBackground: state.button3DBackground,
+                            incidenceOfLight: state.incidenceOfLight,
+                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                                .atriumview,
+                            fillFraction: fillFraction,
+                            symbolBackgroundColor: backgroundColor,
+                            symbolColor: sensorColor
+                        )
+                        .frame(width: 35, height: 35)
+                        .offset(y: -94)
+                        .zIndex(1)
+
+                        Text(sensorAgeText)
+                            .font(.system(size: 12))
+                            .foregroundColor(.white)
+                            .offset(x: 38, y: -84)
+                    }
+                }
+
                 let incidenceOfLight = state.incidenceOfLight
                 let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                     .atriumview
@@ -556,10 +462,10 @@ extension Home {
                     bolusProgress: doubleBolusProgress,
                     displayDelta: $state.displayDelta,
                     alwaysUseColors: $state.alwaysUseColors,
-                    scrolling: $displayGlucose,
-                    displayExpiration: $state.displayExpiration, cgm: $state.cgm, sensordays: $state.sensorDays
+                    scrolling: $displayGlucose, displaySAGE: $state.displaySAGE, displayExpiration: $state.displayExpiration,
+                    cgm: $state.cgm, sensordays: $state.sensorDays
                 )
-                .zIndex(1)
+                .zIndex(2)
                 .onTapGesture {
                     if state.alarm == nil {
                         state.openCGM()
@@ -715,7 +621,6 @@ extension Home {
         struct FillablePieSegment: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
-            // var fillFraction: CGFloat
             var color: Color
             var backgroundColor: Color
             var displayText: String
@@ -729,6 +634,7 @@ extension Home {
             var fillFraction: CGFloat
             var symbolRotation: Double = 0
             var symbolBackgroundColor: Color = .clear
+            var symbolColor: Color? = nil
 
             let angularGradient = AngularGradient(
                 gradient: Gradient(colors: [
@@ -754,7 +660,7 @@ extension Home {
                             if button3DBackground {
                                 Circle()
                                     .fill(Color.black.opacity(0.2))
-                                    .frame(width: 50, height: 50)
+                                    .frame(width: 51, height: 51)
                                     .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
                             }
 
@@ -771,9 +677,9 @@ extension Home {
                                         startPoint: .top,
                                         endPoint: .bottom
                                     ),
-                                    lineWidth: 1
+                                    lineWidth: 2
                                 )
-                                .frame(width: 50, height: 50)
+                                .frame(width: 51, height: 51)
                         } else {
                             Circle()
                                 .fill(Color.black.opacity(0.2))
@@ -784,28 +690,132 @@ extension Home {
                             startAngle: .degrees(-90),
                             endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                         )
-                        .fill(color)
+                        .fill(color.opacity(0.0))
                         .frame(width: 50, height: 50)
                         .opacity(0.5)
 
                         // Symbol-Hintergrund (NEU, 40x40)
                         if symbolBackgroundColor != .clear {
                             Circle()
-                                .fill(symbolBackgroundColor)
-                                .frame(width: 40, height: 40)
+                                .fill(symbolBackgroundColor.opacity(0.0))
+                                .frame(width: 50, height: 50)
                         }
 
                         Image(systemName: symbol)
                             .resizable()
                             .scaledToFit()
                             .frame(width: symbolSize, height: symbolSize)
-                            .foregroundColor(.white)
+                            .foregroundColor(symbolColor ?? .white)
                             .rotationEffect(.degrees(symbolRotation))
                     }
 
                     Text(displayText)
                         .font(.system(size: 15))
                         .foregroundColor(.white)
+                }
+                .offset(y: 10)
+                .onAppear {
+                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
+                }
+                .onChange(of: fillFraction) { _, newValue in
+                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
+                }
+            }
+        }
+
+        struct FillablePieSegment2: View {
+            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
+
+            var color: Color
+            var backgroundColor: Color
+            var symbolSize: CGFloat
+            var symbol: String
+            var animateProgress: Bool
+            var button3D: Bool
+            var button3DBackground: Bool
+            var incidenceOfLight: Bool
+            var lightGlowOverlaySelector: LightGlowOverlaySelector
+            var fillFraction: CGFloat
+            var symbolRotation: Double = 0
+            var symbolBackgroundColor: Color = .clear
+            var symbolColor: Color? = nil
+
+            let angularGradient = AngularGradient(
+                gradient: Gradient(colors: [
+                    Color.gray.opacity(0.3)
+                ]),
+                center: .center,
+                startAngle: .degrees(0),
+                endAngle: .degrees(360)
+            )
+
+            var body: some View {
+                VStack {
+                    ZStack {
+                        if button3D {
+                            let glowColor1 = incidenceOfLight
+                                ? lightGlowOverlaySelector.highlightColor
+                                : Color.white.opacity(0.7)
+
+                            let glowColor2 = incidenceOfLight
+                                ? lightGlowOverlaySelector.highlightColor
+                                : Color.white.opacity(0.4)
+
+                            if button3DBackground {
+                                Circle()
+                                    .fill(Color.black.opacity(0.2))
+                                    .frame(width: 36, height: 36)
+                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                            }
+
+                            Circle()
+                                .stroke(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [
+                                            glowColor1.opacity(0.7),
+                                            glowColor2.opacity(0.3),
+                                            Color.clear,
+                                            Color.black.opacity(0.3),
+                                            Color.black.opacity(0.6)
+                                        ]),
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    ),
+                                    lineWidth: 2
+                                )
+                                .frame(width: 36, height: 36)
+                        } else {
+                            Circle()
+                                .fill(Color.black.opacity(0.2))
+                                .frame(width: 35, height: 35)
+                        }
+
+                        PieSliceView(
+                            startAngle: .degrees(-90),
+                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
+                        )
+                        .fill(color.opacity(0.0))
+                        .frame(width: 35, height: 35)
+                        .opacity(0.5)
+
+                        // Symbol-Hintergrund (NEU, 40x40)
+                        if symbolBackgroundColor != .clear {
+                            Circle()
+                                .fill(symbolBackgroundColor.opacity(0.0))
+                                .frame(width: 35, height: 35)
+                        }
+
+                        Image(systemName: symbol)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: symbolSize, height: symbolSize)
+                            .foregroundColor(symbolColor ?? .white)
+                            .rotationEffect(.degrees(symbolRotation))
+                    }
+
+                    /* Text(displayText)
+                     .font(.system(size: 15))
+                     .foregroundColor(.white)*/
                 }
                 .offset(y: 10)
                 .onAppear {
@@ -878,6 +888,43 @@ extension Home {
 
         // HEADERVIEW Anfang
 
+        private var pumpIconView: some View {
+            state.showPumpIcon ? AnyView(pumpIconContent) : AnyView(EmptyView())
+        }
+
+        @ViewBuilder private var pumpIconContent: some View {
+            ZStack {
+                FillablePieSegment(
+                    pieSegmentViewModel: connectionPieSegmentViewModel,
+                    color: Color.white.opacity(0.5),
+                    backgroundColor: .clear,
+                    displayText: "",
+                    symbolSize: 25,
+                    symbol: "",
+                    animateProgress: false,
+                    button3D: state.button3D,
+                    button3DBackground: state.button3DBackground,
+                    incidenceOfLight: state.incidenceOfLight,
+                    lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview,
+                    fillFraction: 0.0,
+                    symbolBackgroundColor: backgroundColor
+                )
+                .frame(width: 60, height: 60)
+
+                Image(state.pumpIconRawValue)
+                    .resizable()
+                    .frame(width: 30, height: 30)
+                    .offset(y: 3)
+                    .loopingGradientMask(isActive: state.isLooping)
+
+                    .onTapGesture {
+                        if state.pumpDisplayState != nil {
+                            state.setupPump = true
+                        }
+                    }
+            }
+        }
+
         private var stackedLeftTopView: some View {
             VStack(spacing: 25) {
                 tempRateView
@@ -887,10 +934,18 @@ extension Home {
         }
 
         private var stackedRightTopView: some View {
-            VStack(spacing: 120) {
+            VStack(spacing: 0) {
                 eventualBGView
+
+                if state.showPumpIcon {
+                    Spacer().frame(height: 32)
+                    pumpIconContent
+                    Spacer().frame(height: 32)
+                } else {
+                    Spacer().frame(height: 122)
+                }
+
                 loopView
-                // pumpView
             }
         }
 
@@ -930,8 +985,7 @@ extension Home {
                     }
                     .font(.timeSettingFont)
                     .background(
-                        TimeEllipseBig(
-                            characters: 11,
+                        TimeEllipse(
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
@@ -944,17 +998,6 @@ extension Home {
         }
 
         // Temp Basal Ende
-
-        var batteryView: some View {
-            BatteryEllipse(
-                battery: state.battery,
-                button3D: state.button3D,
-                button3DBackground: state.button3DBackground,
-                incidenceOfLight: state.incidenceOfLight,
-                lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
-            )
-            .offset(y: 0)
-        }
 
         // eventualBG Anfang
 
@@ -997,8 +1040,7 @@ extension Home {
                     }
                     .font(.timeSettingFont)
                     .background(
-                        TimeEllipseBig(
-                            characters: 10,
+                        TimeEllipse(
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
@@ -1092,34 +1134,56 @@ extension Home {
         // CarbView Anfang
         @StateObject private var carbsPieSegmentViewModel = PieSegmentViewModel()
 
+        @State private var animatedFill: CGFloat = 0.0
+
         var carbsView: some View {
             HStack {
                 if let settings = state.settingsManager {
-                    HStack {
-                        ZStack {
-                            let substance = Double(state.data.suggestion?.cob ?? 0)
-                            let maxValue = max(Double(settings.preferences.maxCOB), 1)
-                            let fraction = CGFloat(substance / maxValue)
-                            let fill = max(min(fraction, 1.0), 0.0)
+                    let substance = Double(state.data.suggestion?.cob ?? 0)
+                    let maxValue = max(Double(settings.preferences.maxCOB), 1)
+                    let targetFill = CGFloat(substance / maxValue)
 
-                            FillablePieSegment(
-                                pieSegmentViewModel: carbsPieSegmentViewModel,
-                                // fillFraction: fill,
-                                // color: .white.opacity(0.5),
-                                color: .orange,
-                                backgroundColor: .clear,
-                                displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
-                                symbolSize: 20,
-                                symbol: "fork.knife",
-                                animateProgress: true,
-                                button3D: state.button3D,
-                                button3DBackground: state.button3DBackground,
-                                incidenceOfLight: state.incidenceOfLight,
-                                lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                    .atriumview,
-                                fillFraction: fill,
-                                symbolBackgroundColor: backgroundColor
+                    ZStack {
+                        FillablePieSegment(
+                            pieSegmentViewModel: carbsPieSegmentViewModel,
+                            color: .orange,
+                            backgroundColor: .clear,
+                            displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
+                            symbolSize: 20,
+                            symbol: "",
+                            animateProgress: true,
+                            button3D: state.button3D,
+                            button3DBackground: state.button3DBackground,
+                            incidenceOfLight: state.incidenceOfLight,
+                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                                .atriumview,
+                            fillFraction: animatedFill,
+                            symbolBackgroundColor: backgroundColor
+                        )
+
+                        Image(systemName: "apple.logo")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 27, height: 27)
+                            .foregroundColor(.white.opacity(0.8))
+                            .verticalFillMask(
+                                fillFraction: animatedFill,
+                                gradient: LinearGradient(
+                                    gradient: Gradient(colors: [.green, .orange, .yellow]),
+                                    startPoint: .bottom,
+                                    endPoint: .top
+                                )
                             )
+                            .offset(y: -1.5)
+                    }
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 5.6)) {
+                            animatedFill = max(min(targetFill, 1.0), 0.0)
+                        }
+                    }
+                    .onChange(of: targetFill) { _, newValue in
+                        withAnimation(.easeInOut(duration: 10.6)) {
+                            animatedFill = max(min(newValue, 1.0), 0.0)
                         }
                     }
                 }
@@ -1132,41 +1196,64 @@ extension Home {
 
         @StateObject private var insulinPieSegmentViewModel = PieSegmentViewModel()
 
+        @State private var animatedInsulinFill: CGFloat = 0.0
+
         var insulinView: some View {
-            HStack {
-                if let settings = state.settingsManager {
+            let substance = Double(state.data.suggestion?.iob ?? 0)
+            let maxValue = max(Double(state.settingsManager?.preferences.maxIOB ?? 1), 1)
+            let fraction = CGFloat(abs(substance) / maxValue)
+            let fill = min(fraction, 1.0)
+            let isNegative = substance < 0
+            let pieColor: Color = isNegative ? .red : .blue
+
+            return HStack {
+                if let _ = state.settingsManager {
                     HStack {
                         ZStack {
-                            let substance = Double(state.data.suggestion?.iob ?? 0)
-                            let maxValue = max(Double(settings.preferences.maxIOB), 1)
-
-                            let fraction = CGFloat(abs(substance) / maxValue)
-                            let fill = min(fraction, 1.0)
-
-                            let isNegative = substance < 0
-                            // let pieColor: Color = isNegative ? .red : .white.opacity(0.5)
-                            let pieColor: Color = isNegative ? .red : .blue
-
-                            let _: Double = isNegative ? 90 : -90
-
                             FillablePieSegment(
-                                pieSegmentViewModel:
-                                insulinPieSegmentViewModel,
-                                // fillFraction: fill,
+                                pieSegmentViewModel: insulinPieSegmentViewModel,
                                 color: pieColor,
                                 backgroundColor: .clear,
                                 displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
                                 symbolSize: 20,
-                                symbol: "syringe",
+                                symbol: "",
                                 animateProgress: true,
                                 button3D: state.button3D,
                                 button3DBackground: state.button3DBackground,
                                 incidenceOfLight: state.incidenceOfLight,
                                 lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                     .atriumview,
-                                fillFraction: fill,
+                                fillFraction: animatedInsulinFill,
                                 symbolBackgroundColor: backgroundColor
                             )
+
+                            Image(systemName: "drop.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 27, height: 27)
+                                .foregroundColor(.white.opacity(0.8))
+                                .verticalFillMask(
+                                    fillFraction: animatedInsulinFill,
+                                    gradient: isNegative
+                                        ? LinearGradient(colors: [pieColor, pieColor], startPoint: .bottom, endPoint: .top)
+                                        : LinearGradient(colors: [.blue, .blue], startPoint: .bottom, endPoint: .top)
+                                )
+                                .offset(y: -1.5)
+                        }
+                    }
+                    .onAppear {
+                        withAnimation(.easeOut(duration: 5.6)) {
+                            animatedInsulinFill = fill
+                        }
+                    }
+                    .onChange(of: state.data.suggestion?.iob) { _, _ in
+                        let newSubstance = Double(state.data.suggestion?.iob ?? 0)
+                        let newMax = max(Double(state.settingsManager?.preferences.maxIOB ?? 1), 1)
+                        let newFraction = CGFloat(abs(newSubstance) / newMax)
+                        let newFill = min(newFraction, 1.0)
+
+                        withAnimation(.easeOut(duration: 10.6)) {
+                            animatedInsulinFill = newFill
                         }
                     }
                     .onTapGesture {
@@ -1218,7 +1305,7 @@ extension Home {
                                 startPoint: .top,
                                 endPoint: .bottom
                             ),
-                            lineWidth: 1
+                            lineWidth: 2
                         )
                         .frame(width: 50, height: 50)
                         .offset(y: -2.5)
@@ -1289,35 +1376,37 @@ extension Home {
 
         // danaBarMax
 
-        var danaBarMax: some View {
+        @ViewBuilder var danaBarMax: some View {
             if state.danaBar {
-                return AnyView(
-                    VStack(spacing: 20) {
-                        HStack(spacing: 20) {
-                            HStack(spacing: 10) {
-                                insulinAgeView
-                            }
-                            HStack(spacing: 10) {
-                                cannulaAgeView
-                            }
-                            HStack(spacing: 10) {
-                                batteryAgeView
-                            }
-                            HStack(spacing: 10) {
-                                sensorAgeDays
-                            }
-                            HStack(spacing: 10) {
-                                BluetoothConnectionView
-                            }
-                        }
+                VStack(spacing: 20) {
+                    HStack(spacing: 20) {
+                        insulinAgeView.frame(width: 60)
+                        cannulaAgeView.frame(width: 60)
+                        batteryAgeView.frame(width: 60)
+                        sensorConditionalView
+                        BluetoothConnectionView.frame(width: 60)
                     }
-                )
+                }
             } else {
-                return AnyView(EmptyView())
+                EmptyView()
             }
         }
 
-        // DanaBar Modules Start
+        // Separater ViewBuilder für den bedingten Teil
+        @ViewBuilder private var sensorConditionalView: some View {
+            if shouldShowSensorAgeDays {
+                sensorAgeDays.frame(width: 60)
+            } else {
+                EmptyView().frame(width: 0)
+            }
+        }
+
+        // Hilfsfunktion zur Überprüfung des Sensor-Status
+        private var shouldShowSensorAgeDays: Bool {
+            true
+        }
+
+        // Top Bar Modules Start
 
         private var reservoirView: some View {
             Group {
@@ -1347,27 +1436,26 @@ extension Home {
                         }
                     }()
 
-                    let shouldBlink = reservoir < 20
-
+                    // let shouldBlink = reservoirColor == .red
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: reservoirPieSegmentViewModel,
-                            // fillFraction: fill,
                             color: reservoirColor,
                             backgroundColor: .clear,
                             displayText: displayText,
-                            symbolSize: 25,
+                            symbolSize: 21,
                             symbol: "cross.vial.fill",
-                            animateProgress: true,
+                            animateProgress: false,
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
-                            fillFraction: fill
+                            fillFraction: fill,
+                            symbolColor: reservoirColor
                         )
                         .frame(width: 60, height: 60)
-                        .modifier(BlinkingModifier(shouldBlink: shouldBlink))
+                        // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     }
                 }
             }
@@ -1423,37 +1511,17 @@ extension Home {
                     }
 
                     let maxInsulinAge = insulinAgeOption.maxInsulinAge
-                    let warningThreshold = maxInsulinAge * 0.75
-                    let dangerThreshold = maxInsulinAge * 0.85
+                    let remainingHours = maxInsulinAge - CGFloat(insulinHours)
 
-                    if insulinHours >= maxInsulinAge {
-                        return .red
-                    }
-
-                    switch insulinHours {
-                    case dangerThreshold...:
-                        return .red
-                    case warningThreshold ..< dangerThreshold:
-                        return .yellow
-                    default:
-                        return .white.opacity(0.5)
-                    }
+                    return colorForRemainingHours(remainingHours)
                 }()
 
-                let shouldBlink: Bool = {
-                    guard let insulinHours = state.insulinHours,
-                          let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption)
-                    else {
-                        return false
-                    }
-                    return (insulinAgeOption.maxInsulinAge - insulinHours) <= 1
-                }()
+                // let shouldBlink = insulinColor == .red
 
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: insulinAgePieSegmentViewModel,
-                        // fillFraction: insulinFraction,
-                        color: shouldBlink ? .red : insulinColor,
+                        color: .white,
                         backgroundColor: .clear,
                         displayText: insulinDisplayText,
                         symbolSize: 25,
@@ -1465,49 +1533,33 @@ extension Home {
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview,
                         fillFraction: insulinFraction,
-                        symbolBackgroundColor: backgroundColor
+                        symbolBackgroundColor: backgroundColor,
+                        symbolColor: insulinColor
                     )
                     .frame(width: 60, height: 60)
+                    // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                 }
-                .onAppear {
-                    startInsulinBlinkAnimationIfNeeded()
-                }
-                .onChange(of: state.insulinHours) {
-                    startInsulinBlinkAnimationIfNeeded()
-                }
-            }
-        }
-
-        // State-Variable in der Haupt-View hinzugefügt
-        @State private var isInsulinBlinking = false
-
-        private func startInsulinBlinkAnimationIfNeeded() {
-            isInsulinBlinking = false
-            guard let insulinHours = state.insulinHours,
-                  let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption),
-                  (insulinAgeOption.maxInsulinAge - insulinHours) <= 1 else { return }
-
-            withAnimation(.easeInOut(duration: 0.8).repeatForever()) {
-                isInsulinBlinking = true
             }
         }
 
         struct InsulinCatheterSymbol: View {
+            var color: Color // Farbe von außen übergeben
+            var baseSize: CGFloat = 40 // Basisgröße
+
             var body: some View {
                 ZStack {
                     Image(systemName: "hockey.puck")
                         .resizable()
-                        // .rotationEffect(.degrees(-50))
-                        .foregroundStyle(Color(.white))
+                        .foregroundStyle(color)
                         .frame(width: 22, height: 12)
                         .offset(x: 0, y: -1)
 
                     Rectangle()
                         .frame(width: 2, height: 7)
-                        .foregroundStyle(Color(.white))
+                        .foregroundStyle(color)
                         .offset(x: 0, y: 8)
                 }
-                .frame(width: 40, height: 40)
+                .frame(width: baseSize, height: baseSize)
             }
         }
 
@@ -1559,51 +1611,27 @@ extension Home {
 
                 let cannulaColor: Color = {
                     if let cannulaHours = state.cannulaHours,
-                       let cannulaAgeOption = CannulaAgeOption(
-                           rawValue: state
-                               .cannulaAgeOption
-                       )
+                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
                     {
                         let maxCannulaAge = cannulaAgeOption.maxCannulaAge
-                        let warningThreshold = maxCannulaAge * 0.75
-                        let dangerThreshold = maxCannulaAge * 0.85
-
-                        if cannulaHours >= maxCannulaAge {
-                            return .red
-                        }
-
-                        switch CGFloat(cannulaHours) {
-                        case dangerThreshold...:
-                            return .red
-                        case warningThreshold ..< dangerThreshold:
-                            return .yellow
-                        default:
-                            return .white.opacity(0.5)
-                        }
+                        let remainingHours = maxCannulaAge - CGFloat(cannulaHours)
+                        return colorForRemainingHours(remainingHours)
                     } else {
                         return .clear
                     }
+
                 }()
 
-                let shouldBlink: Bool = {
-                    guard let cannulaHours = state.cannulaHours,
-                          let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
-                    else {
-                        return false
-                    }
-                    let remainingHours = cannulaAgeOption.maxCannulaAge - cannulaHours
-                    return remainingHours <= 1
-                }()
+                // let shouldBlink = cannulaColor == .red
 
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: cannulaPieSegmentViewModel,
-                        // fillFraction: cannulaFraction,
-                        color: cannulaColor,
+                        color: .white,
                         backgroundColor: .clear,
                         displayText: cannulaDisplayText,
                         symbolSize: 20,
-                        symbol: "InsulinCatheterSymbol",
+                        symbol: "",
                         animateProgress: true,
                         button3D: state.button3D,
                         button3DBackground: state.button3DBackground,
@@ -1611,31 +1639,15 @@ extension Home {
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview,
                         fillFraction: cannulaFraction,
-                        symbolBackgroundColor: backgroundColor
+                        symbolBackgroundColor: backgroundColor,
+                        symbolColor: cannulaColor
                     )
                     .frame(width: 60, height: 60)
 
-                    InsulinCatheterSymbol()
+                    InsulinCatheterSymbol(color: cannulaColor)
                         .offset(y: -1.5)
-                        .modifier(BlinkingModifier(shouldBlink: shouldBlink)) }
-
-                    .onAppear { startCannulaBlinkAnimationIfNeeded() }
-                    .onChange(of: state.cannulaHours) {
-                        startCannulaBlinkAnimationIfNeeded()
-                    }
-            }
-        }
-
-        @State private var isCannulaBlinking = false
-
-        private func startCannulaBlinkAnimationIfNeeded() {
-            isCannulaBlinking = false
-            guard let cannulaHours = state.cannulaHours,
-                  let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption),
-                  (cannulaAgeOption.maxCannulaAge - cannulaHours) <= 1 else { return }
-
-            withAnimation(.easeInOut(duration: 0.8).repeatForever()) {
-                isCannulaBlinking = true
+                    // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
+                }
             }
         }
 
@@ -1674,7 +1686,6 @@ extension Home {
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: batteryAgePieSegmentViewModel,
-                        // fillFraction: 1.0, // Volle Kreis-Anzeige (kein Füllstand)
                         color: batteryAgeColor,
                         backgroundColor: .clear,
                         displayText: batteryAgeText,
@@ -1689,15 +1700,17 @@ extension Home {
                         ) ?? .atriumview,
                         fillFraction: 1.0,
                         symbolRotation: -90,
-                        symbolBackgroundColor: backgroundColor
+                        symbolBackgroundColor: backgroundColor,
+                        symbolColor: .white
                     )
-                    Image(systemName: "timer.circle.fill")
+                    .frame(width: 60, height: 60)
+
+                    Image(systemName: "clock.fill")
                         .resizable()
                         // .rotationEffect(.degrees(-50))
                         .foregroundStyle(Color(.white))
                         .frame(width: 15, height: 15)
                         .offset(x: 13, y: -17)
-                        .frame(width: 60, height: 60)
                 }
             }
         }
@@ -1707,17 +1720,16 @@ extension Home {
 
         private var sensorAgeDays: some View {
             Group {
-                if state.displayExpiration {
+                if state.displayExpiration2 {
                     let totalHours = state.sensorAgeDays.asInt() * 24
                     let remainingHours = max(1, totalHours - state.elapsedHours)
                     let fillFraction: CGFloat = remainingHours <= 1 ? 1.0 : CGFloat(remainingHours) / CGFloat(totalHours)
 
                     let sensorColor: Color = {
                         switch remainingHours {
-                        case ...1: return .red // Blinkt
-                        case ...24: return .red // Rot aber kein Blinken
-                        case ...48: return .yellow // Gelb
-                        default: return .white.opacity(0.5)
+                        case ...2: return .red
+                        case ...6: return .yellow
+                        default: return .white
                         }
                     }()
 
@@ -1738,13 +1750,12 @@ extension Home {
                         }
                     }()
 
-                    let shouldBlink = remainingHours < 24
+                    // let shouldBlink = sensorColor == .red
 
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: sensorAgeSegmentViewModel,
-                            // fillFraction: fillFraction,
-                            color: shouldBlink ? .red : sensorColor,
+                            color: .white,
                             backgroundColor: .clear,
                             displayText: sensorAgeText,
                             symbolSize: 25,
@@ -1756,17 +1767,11 @@ extension Home {
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
                             fillFraction: fillFraction,
-                            symbolBackgroundColor: backgroundColor
+                            symbolBackgroundColor: backgroundColor,
+                            symbolColor: sensorColor
                         )
                         .frame(width: 60, height: 60)
-                    }
-                    .onAppear {
-                        state.settingsDidChange(state.settingsManager.settings)
-                        state.sensorAgeDays = state.settingsManager.settings.sensorAgeDays
-                        startSensorBlinkAnimationIfNeeded()
-                    }
-                    .onChange(of: state.elapsedHours) {
-                        startSensorBlinkAnimationIfNeeded()
+                        // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     }
                 }
             }
@@ -1774,7 +1779,7 @@ extension Home {
 
         private func startSensorBlinkAnimationIfNeeded() {
             isSensorBlinking = false
-            guard state.displayExpiration else { return }
+            guard state.displayExpiration2 else { return }
 
             let totalHours = state.sensorAgeDays.asInt() * 24
             let remainingHours = max(1, totalHours - state.elapsedHours)
@@ -1794,8 +1799,8 @@ extension Home {
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: connectionPieSegmentViewModel,
-                            // fillFraction: connectionFraction,
-                            color: Color.white.opacity(0.5),
+                            // color: Color.white.opacity(0.5),
+                            color: Color.blue,
                             backgroundColor: .clear,
                             displayText: displayText,
                             symbolSize: 25,
@@ -1807,7 +1812,8 @@ extension Home {
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
                             fillFraction: connectionFraction,
-                            symbolBackgroundColor: backgroundColor
+                            symbolBackgroundColor: backgroundColor,
+                            symbolColor: .white
                         )
                         .frame(width: 60, height: 60)
                     }
@@ -1820,7 +1826,88 @@ extension Home {
         // State-Variable in der Haupt-View hinzugefügt
         @State private var isSensorBlinking = false
 
-        // danaBar Max Modules Ende
+        // TopBar Max Modules Ende
+
+        // MARK: - Helper-Views for Standard 1 und DanaBar Anfang
+
+        private func formatTime(_ hours: Double) -> String {
+            let totalMinutes = Int(hours * 60)
+            let days = totalMinutes / (24 * 60)
+            let hours = (totalMinutes % (24 * 60)) / 60
+            let minutes = totalMinutes % 60
+
+            if days >= 1 {
+                return "\(days)d\(hours)h"
+            } else if hours >= 1 {
+                return "\(hours)h"
+            } else {
+                return "\(minutes)m"
+            }
+        }
+
+        private func formatSensorTime() -> String {
+            guard let days = state.remainingSensorDays,
+                  let hours = state.remainingSensorHours,
+                  let minutes = state.remainingSensorMinutes
+            else {
+                return "--"
+            }
+
+            let totalHours = Double(days * 24 + hours) + Double(minutes) / 60.0
+            return formatTime(totalHours)
+        }
+
+        private var sensorRemainingTime: String {
+            guard let days = state.remainingSensorDays,
+                  let hours = state.remainingSensorHours,
+                  let minutes = state.remainingSensorMinutes
+            else {
+                return "--"
+            }
+            return formatSensorTime(days: days, hours: hours, minutes: minutes)
+        }
+
+        private var sensorColor: Color {
+            if state.displayExpiration2 {
+                guard let days = state.remainingSensorDays,
+                      let hours = state.remainingSensorHours,
+                      let minutes = state.remainingSensorMinutes
+                else { return .white }
+
+                // Gesamtverbleibende Zeit in Minuten berechnen
+                let totalMinutes = (days * 24 * 60) + (hours * 60) + minutes
+                switch totalMinutes {
+                case ...120: // ≤ 2 Stunden (0-120 Minuten)
+                    return .red
+                case 121 ... 400:
+                    return .yellow
+                default: // > 12 Stunden
+                    return .white
+                }
+            } else {
+                return state.sensorAgeDays.asInt() > 13 ? .yellow : .white
+            }
+        }
+
+        @State private var timerInterval: TimeInterval = 2 // Startet nach 2 Sekunden
+        @State private var timer: Timer? = nil
+
+        func startTimer() {
+            timer?.invalidate() // Falls ein vorheriger Timer existiert, wird er gestoppt
+            timer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: true) { _ in
+                state.specialDanaKitFunction()
+                state.updateRemainingSensorDays()
+                // Nach 15 Sekunden auf 60 Sekunden Intervall wechseln
+                if timerInterval == 2 {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
+                        timerInterval = 60
+                        startTimer()
+                    }
+                }
+            }
+        }
+
+        // MARK: - Helper-Views for Standard 1 und DanaBar Ende
 
         //  TopBar Marquee
 
@@ -1840,7 +1927,7 @@ extension Home {
             }
         }
 
-        // Helper for danaBar Marquee Start
+        // MARK: - Helper-Views for Marquee Anfang
 
         struct MarqueeText: View {
             var text: String
@@ -1919,7 +2006,7 @@ extension Home {
             }
 
             // Sensor
-            if state.displayExpiration {
+            if state.displayExpiration2 {
                 if let days = state.remainingSensorDays,
                    let hours = state.remainingSensorHours,
                    let minutes = state.remainingSensorMinutes
@@ -1960,9 +2047,9 @@ extension Home {
             }
         }
 
-        // Helper for danaBar Marquee End
+        // MARK: - Helper-Views for Marquee Ende
 
-        // danaBarStandard 2
+        // TopBar Standard 2
 
         var danaBarStandard2: some View {
             Group {
@@ -1981,17 +2068,9 @@ extension Home {
 
                             let insulinColor: Color = {
                                 if insulinHours >= maxInsulinAge { return .red }
-                                // Umrechnung Stunden in Minuten (präziser)
-                                let remainingMinutes = remainingHours * 60
 
-                                switch remainingMinutes {
-                                case ...120: // ≤ 2 Stunden (120 Minuten)
-                                    return .red
-                                case 121 ... 720: // 2.01h bis 12h (121-720 Minuten)
-                                    return .white
-                                default: // > 12 Stunden
-                                    return .white
-                                }
+                                let remainingMinutes = remainingHours * 60
+                                return colorForRemainingMinutes(remainingMinutes)
                             }()
 
                             HStack(spacing: 4) {
@@ -2078,15 +2157,7 @@ extension Home {
                                 if cannulaHours >= maxHours { return .red }
 
                                 let remainingMinutes = remainingHours * 60
-
-                                switch remainingMinutes {
-                                case ...120:
-                                    return .red
-                                case 121 ... 720:
-                                    return .white
-                                default: // > 12 Stunden
-                                    return .white
-                                }
+                                return colorForRemainingMinutes(remainingMinutes)
                             }()
 
                             HStack(spacing: 4) {
@@ -2160,7 +2231,7 @@ extension Home {
                             }
                         }
                         // Sensor
-                        if state.displayExpiration {
+                        if state.displayExpiration2 {
                             let incidenceOfLight = state.incidenceOfLight
                             let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview
@@ -2213,7 +2284,7 @@ extension Home {
                                         }
                                     }
 
-                                    if shouldBlink {
+                                    if useBigSensorView {
                                         BigSensorView(
                                             color: sensorColor
                                         )
@@ -2232,7 +2303,7 @@ extension Home {
                                         )
                                     }
                                 }
-                                .frame(width: 40, height: 40)
+                                .frame(width: 30, height: 30)
 
                                 Text(formatSensorTime())
                                     .foregroundColor(.white)
@@ -2246,8 +2317,6 @@ extension Home {
                 }
             }
         }
-
-        // MARK: - Helper-Views for danaBarClassic Anfang
 
         struct BigVialView: View {
             var color: Color
@@ -2288,10 +2357,11 @@ extension Home {
             var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
+
             var body: some View {
-                Image(systemName: "drop.fill")
-                    .font(.system(size: 20))
-                    .foregroundColor(color)
+                InsulinCatheterSymbol(color: color) // Farbe übergeben
+                    .scaleEffect(1.0) // Skaliert auf 100% der Basisgröße (20x20)
+                    .offset(y: -1.5)
             }
         }
 
@@ -2319,36 +2389,8 @@ extension Home {
             }
         }
 
-        private func formatTime(_ hours: Double) -> String {
-            let totalMinutes = Int(hours * 60)
-            let days = totalMinutes / (24 * 60)
-            let hours = (totalMinutes % (24 * 60)) / 60
-            let minutes = totalMinutes % 60
-
-            if days >= 1 {
-                return "\(days)d\(hours)h"
-            } else if hours >= 1 {
-                return "\(hours)h"
-            } else {
-                return "\(minutes)m"
-            }
-        }
-
-        private func formatSensorTime() -> String {
-            guard let days = state.remainingSensorDays,
-                  let hours = state.remainingSensorHours,
-                  let minutes = state.remainingSensorMinutes
-            else {
-                return "--"
-            }
-
-            let totalHours = Double(days * 24 + hours) + Double(minutes) / 60.0
-            return formatTime(totalHours)
-        }
-
-        // SENSOR
-        private var shouldBlink: Bool { // Dient nur noch zur Steuerung des Icons in der SensorView
-            guard state.displayExpiration,
+        private var useBigSensorView: Bool {
+            guard state.displayExpiration2,
                   let days = state.remainingSensorDays,
                   let hours = state.remainingSensorHours,
                   let minutes = state.remainingSensorMinutes
@@ -2357,59 +2399,6 @@ extension Home {
             // Gesamtrestzeit in Stunden
             let totalRemaining = Double(days * 24 + hours) + Double(minutes) / 60.0
             return totalRemaining <= 6.0 // Stellschraube wann er zum großen Icon wechselt
-        }
-
-        private var sensorRemainingTime: String {
-            guard let days = state.remainingSensorDays,
-                  let hours = state.remainingSensorHours,
-                  let minutes = state.remainingSensorMinutes
-            else {
-                return "--"
-            }
-            return formatSensorTime(days: days, hours: hours, minutes: minutes)
-        }
-
-        private var sensorColor: Color {
-            if state.displayExpiration {
-                guard let days = state.remainingSensorDays,
-                      let hours = state.remainingSensorHours,
-                      let minutes = state.remainingSensorMinutes
-                else { return .white }
-
-                // Gesamtverbleibende Zeit in Minuten berechnen
-                let totalMinutes = (days * 24 * 60) + (hours * 60) + minutes
-
-                switch totalMinutes {
-                case ...120: // ≤ 2 Stunden (0-120 Minuten)
-                    return .red
-                case 121 ... 720:
-                    return .yellow
-                default: // > 12 Stunden
-                    return .white
-                }
-            } else {
-                return state.sensorAgeDays.asInt() > 13 ? .yellow : .white
-            }
-        }
-
-        // MARK: - Helper-Views for danaBarClassic Ende
-
-        @State private var timerInterval: TimeInterval = 2 // Startet nach 2 Sekunden
-        @State private var timer: Timer? = nil
-
-        func startTimer() {
-            timer?.invalidate() // Falls ein vorheriger Timer existiert, wird er gestoppt
-            timer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: true) { _ in
-                state.specialDanaKitFunction()
-                state.updateRemainingSensorDays()
-                // Nach 15 Sekunden auf 60 Sekunden Intervall wechseln
-                if timerInterval == 2 {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
-                        timerInterval = 60
-                        startTimer()
-                    }
-                }
-            }
         }
 
         // TopBars Ende
@@ -2460,10 +2449,10 @@ extension Home {
                         danaBarMarquee
                             .padding(.vertical, 10)
                             .padding(.top, 20)
-                    case .standard:
-                        danaBarStandard
-                            .padding(.vertical, 10)
-                            .padding(.top, 20)
+                    /* case .standard:
+                     danaBarStandard
+                         .padding(.vertical, 10)
+                         .padding(.top, 20)*/
                     case .standard2:
                         danaBarStandard2
                             .padding(.vertical, 10)
@@ -2519,7 +2508,6 @@ extension Home {
 
             .background(
                 TimeEllipse(
-                    characters: 17,
                     button3D: state.button3D,
                     button3DBackground: state.button3DBackground,
                     incidenceOfLight: state.incidenceOfLight,
@@ -2586,7 +2574,6 @@ extension Home {
                     }
                     .background(
                         TimeEllipse(
-                            characters: 12,
                             button3D: state.button3D,
                             button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
@@ -2621,7 +2608,6 @@ extension Home {
             .padding(.vertical, 15)
             .background(
                 TimeEllipse(
-                    characters: 12,
                     button3D: state.button3D,
                     button3DBackground: state.button3DBackground,
                     incidenceOfLight: state.incidenceOfLight,
@@ -2630,24 +2616,35 @@ extension Home {
             ) }
 
         private var tddView: some View {
-            ZStack {
-                HStack {
-                    Image(systemName: "circle.slash").font(.system(size: 13)).foregroundStyle(.white)
+            HStack(spacing: 4) {
+                Image(systemName: "circle.slash")
+                    .font(.system(size: 13))
+                    .foregroundStyle(.white)
 
-                    Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0") U")
-                        .foregroundStyle(.white)
-                }
-                .font(.timeSettingFont)
-                .background(
-                    TimeEllipse(
-                        characters: 13,
-                        button3D: state.button3D,
-                        button3DBackground: state.button3DBackground,
-                        incidenceOfLight: state.incidenceOfLight,
-                        lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                            .atriumview
-                    )
+                Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0") U")
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .fixedSize()
+            }
+            .font(.timeSettingFont)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(
+                TimeEllipse(
+                    button3D: state.button3D,
+                    button3DBackground: state.button3DBackground,
+                    incidenceOfLight: state.incidenceOfLight,
+                    lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
                 )
+            )
+            .overlay(
+                GeometryReader { geometry in
+                    Color.clear
+                        .preference(key: TextWidthKey.self, value: geometry.size.width)
+                }
+            )
+            .onPreferenceChange(TextWidthKey.self) { _ in
+                // Möglichkeit die Breite für weitere Anpassungen  zu verwenden
             }
         }
 
@@ -2663,6 +2660,7 @@ extension Home {
             symbolRenderingMode: SymbolRenderingMode? = .hierarchical,
             colors: [Color] = [.white],
             circleColor _: Color,
+            gradient: LinearGradient? = nil,
             action: @escaping () -> Void
         ) -> some View {
             Button(action: action) {
@@ -2701,7 +2699,7 @@ extension Home {
                                     startPoint: .top,
                                     endPoint: .bottom
                                 ),
-                                lineWidth: 1
+                                lineWidth: 2
                             )
                             .frame(width: 50, height: 50)
                     } else {
@@ -2711,56 +2709,32 @@ extension Home {
                             .overlay(Circle().stroke(Color.white, lineWidth: 0))
                     }
 
-                    // Spezielles Styling für fork.knife
-                    if iconName == "fork.knife.custom" {
-                        ZStack {
-                            Circle()
-                                .fill(Color.clear)
-                                .frame(width: 30, height: 30)
-
-                            Image(systemName: "fork.knife")
-                                .symbolRenderingMode(.hierarchical)
-                                .foregroundStyle(.orange)
-                                .font(.system(size: 20))
-                        }
-                        .font(.system(size: 20))
-                    }
-
-                    // Spezielles Styling für Syringe
-                    if iconName == "syringe.custom" {
-                        ZStack {
-                            Circle()
-                                .fill(Color.clear)
-                                .frame(width: 30, height: 30)
-
-                            Image(systemName: "syringe")
-                                .symbolRenderingMode(.hierarchical)
-                                .foregroundStyle(.blue)
-                                .font(.system(size: 20))
-                        }
-                        .font(.system(size: 20))
-                    }
-
                     // SF Symbol Darstellung mit direkter Farbanwendung
-                    else if isSFSymbol {
+                    if isSFSymbol {
                         Group {
-                            switch colors.count {
-                            case 1:
-                                Image(systemName: iconName)
-                                    .symbolRenderingMode(symbolRenderingMode)
-                                    .foregroundStyle(colors[0])
-                            case 2:
-                                Image(systemName: iconName)
-                                    .symbolRenderingMode(symbolRenderingMode)
-                                    .foregroundStyle(colors[0], colors[1])
-                            case 3:
-                                Image(systemName: iconName)
-                                    .symbolRenderingMode(symbolRenderingMode)
-                                    .foregroundStyle(colors[0], colors[1], colors[2])
-                            default:
-                                Image(systemName: iconName)
-                                    .symbolRenderingMode(symbolRenderingMode)
-                                    .foregroundStyle(colors.first ?? .white)
+                            let symbolImage = Image(systemName: iconName)
+                                .symbolRenderingMode(symbolRenderingMode)
+                                .font(.system(size: 25, weight: .medium))
+                                .frame(width: 40, height: 40)
+
+                            if let gradient = gradient {
+                                symbolImage
+                                    .foregroundColor(.white.opacity(0.0)) // Basis transparent
+                                    .overlay(
+                                        gradient
+                                            .mask(symbolImage)
+                                    )
+                            } else {
+                                switch colors.count {
+                                case 1:
+                                    symbolImage.foregroundStyle(colors[0])
+                                case 2:
+                                    symbolImage.foregroundStyle(colors[0], colors[1])
+                                case 3:
+                                    symbolImage.foregroundStyle(colors[0], colors[1], colors[2])
+                                default:
+                                    symbolImage.foregroundStyle(colors.first ?? .white)
+                                }
                             }
                         }
                         .font(.system(size: 25, weight: .medium))
@@ -2793,10 +2767,15 @@ extension Home {
                     if state.carbButton {
                         ZStack {
                             buttonWithCircle(
-                                iconName: "fork.knife.custom",
+                                iconName: "apple.logo",
                                 symbolRenderingMode: .palette,
                                 colors: [.orange, .clear],
-                                circleColor: Color.black.opacity(1.0)
+                                circleColor: Color.black.opacity(1.0),
+                                gradient: LinearGradient(
+                                    gradient: Gradient(colors: [.green, .yellow, .orange]),
+                                    startPoint: .bottom,
+                                    endPoint: .top
+                                )
                             ) {
                                 state.showModal(for: .addCarbs(editMode: false, override: false))
                             }
@@ -2815,7 +2794,8 @@ extension Home {
 
                     // IOB Button
                     buttonWithCircle(
-                        iconName: "syringe.custom",
+                        // iconName: "syringe.custom",
+                        iconName: "drop.fill",
                         colors: [.blue, .clear], // [Spritzenfarbe, Kreisfarbe]
                         circleColor: Color.black.opacity(1.0)
                     ) {
@@ -2876,21 +2856,9 @@ extension Home {
 
                     // UI/UX Button
                     buttonWithCircle(
-                        /* iconName: "uiwindow.split.2x1",
-                         symbolRenderingMode: .hierarchical,
-                         colors: [.indigo],*/
-
                         iconName: "square.3.layers.3d",
                         symbolRenderingMode: .palette,
                         colors: [.purple, .blue],
-
-                        /*  iconName: "paintpalette.fill",
-                            symbolRenderingMode: .palette,
-                            colors: [.teal, .mint],*/
-
-                        /*  iconName: "slider.horizontal.3",
-                            symbolRenderingMode: .palette,
-                            colors: [.gray, .blue],*/
                         circleColor: Color.black.opacity(1.0)
                     ) {
                         state.showModal(for: .statisticsConfig)
@@ -3193,9 +3161,9 @@ extension Home {
                                             .onChange(of: scrollPosition) { _, newValue in
                                                 let yThreshold: CGFloat = -550
                                                 if newValue < yThreshold {
-                                                    withAnimation(.easeOut(duration: 0.3)) { display = true }
+                                                    withAnimation(.easeOut(duration: 0.1)) { display = true }
                                                 } else {
-                                                    withAnimation(.easeOut(duration: 0.4)) { display = false }
+                                                    withAnimation(.easeOut(duration: 0.1)) { display = false }
                                                 }
                                             }
                                     }
@@ -3206,28 +3174,7 @@ extension Home {
                         buttonPanel(geo)
                             .frame(height: 60)
                     }
-                    .background(backgroundColor)
-                    /*  .background(
-                     LinearGradient(
-                     gradient: Gradient(
-                     stops: colorScheme == .light
-                     ? [
-                     .init(color: Color.cyan.opacity(0.2), location: 0.0),
-                     .init(color: Color.white, location: 0.3),
-                     .init(color: Color.white, location: 0.8),
-                     .init(color: Color.cyan.opacity(0.2), location: 1.0)
-                     ]
-                     : [
-                     .init(color: Color.cyan.opacity(0.3), location: 0.0),
-                     .init(color: Color.black, location: 0.3),
-                     .init(color: Color.black, location: 0.8),
-                     .init(color: Color.cyan.opacity(0.3), location: 1.0)
-                     ]
-                     ),
-                     startPoint: .top,
-                     endPoint: .bottom
-                     )*/
-
+                    .background(backgroundColor) // Kompletter Homeview BG
                     .ignoresSafeArea(edges: .vertical)
                     .onAppear {
                         startProgress()
@@ -3241,6 +3188,7 @@ extension Home {
                     .ignoresSafeArea(.keyboard)
                     .sheet(isPresented: $displayAutoHistory) {
                         AutoISFHistoryView(units: state.data.units)
+                            .environment(\.colorScheme, colorScheme)
                     }
                     .sheet(isPresented: $displayDynamicHistory) {
                         DynamicHistoryView(units: state.data.units)
@@ -3269,7 +3217,6 @@ extension Home {
                         }
                         configureView()
                     }
-                    // )
                 }
             }
         }
@@ -3301,7 +3248,7 @@ extension Home {
                 }
             }
             .padding()
-            .background(backgroundColor) // Für das Popup mit den Loop Informationen
+            .background(backgroundColor)
             .cornerRadius(10)
             .shadow(radius: 2)
         }
