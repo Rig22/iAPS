@@ -72,7 +72,6 @@ extension Home {
         @Published var tddActualAverage: Decimal = 0
         @Published var skipGlucoseChart: Bool = false
         @Published var displayDelta: Bool = false
-        @Published var extended = true
         @Published var maxIOB: Decimal = 0
         @Published var maxCOB: Decimal = 0
         @Published var autoisf = false
@@ -177,16 +176,6 @@ extension Home {
             }
         }
 
-        var pumpIconOption: PumpIconOption {
-            get {
-                PumpIconOption(rawValue: pumpIconRawValue) ??
-                    .nano200 // Standardwert, falls der Raw-Wert nicht gefunden wird
-            }
-            set {
-                pumpIconRawValue = newValue.rawValue
-            }
-        }
-
         var elapsedHours: Int {
             guard let startTime = sensorStartTime else {
                 return 0
@@ -254,7 +243,6 @@ extension Home {
             data.fpuAmounts = settingsManager.settings.fpuAmounts
             displayDelta = settingsManager.settings.displayDelta
             skipGlucoseChart = settingsManager.settings.skipGlucoseChart
-            extended = settingsManager.settings.extendHomeView
             maxIOB = settingsManager.preferences.maxIOB
             maxCOB = settingsManager.preferences.maxCOB
             useCalc = settingsManager.settings.useCalc
@@ -900,7 +888,6 @@ extension Home.StateModel:
         data.fpuAmounts = settingsManager.settings.fpuAmounts
         skipGlucoseChart = settingsManager.settings.skipGlucoseChart
         displayDelta = settingsManager.settings.displayDelta
-        extended = settingsManager.settings.extendHomeView
         maxIOB = settingsManager.preferences.maxIOB
         maxCOB = settingsManager.preferences.maxCOB
         autoisf = settingsManager.settings.autoisf
