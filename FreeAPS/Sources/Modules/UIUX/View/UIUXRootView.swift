@@ -343,7 +343,7 @@ extension UIUX {
 
                             Section(
                                 header: Text(
-                                    "Show Sensor Age for nightscout, dexcomG5, dexcomG6, dexcomG7, libre1, libre2 and enlite"
+                                    "Show Sensor Age for nightscout, Dexcom G5, G6, G7, Libre 1, Libre 2 and Enlite"
                                 ),
                                 footer: Text("Direct Support implemented")
                             ) {
@@ -365,7 +365,7 @@ extension UIUX {
                             }
 
                             Section(
-                                header: Text("Sensor Settings for Libre 3 and 3+ Users"),
+                                header: Text("Sensor Settings for xDrip4iOS, Libre 3 and 3+ Users"),
                                 footer: Text("Long press for setting new Sensor Start Time")
                             ) {
                                 Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration2)
