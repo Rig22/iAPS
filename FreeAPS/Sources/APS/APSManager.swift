@@ -28,6 +28,7 @@ protocol APSManager {
     func makeProfiles() -> AnyPublisher<Bool, Never>
     func determineBasal() -> AnyPublisher<Bool, Never>
     func determineBasalSync()
+    func iobSync() async -> Decimal?
     func roundBolus(amount: Decimal) -> Decimal
     var lastError: CurrentValueSubject<Error?, Never> { get }
     func cancelBolus()
@@ -86,6 +87,9 @@ final class BaseAPSManager: APSManager, Injectable {
     @Injected() private var settingsManager: SettingsManager!
     @Injected() private var broadcaster: Broadcaster!
     @Injected() private var keychain: Keychain!
+
+    // private var scriptExecutor = WebViewScriptExecutor()
+
     @Persisted(key: "lastAutotuneDate") private var lastAutotuneDate = Date()
     @Persisted(key: "lastStartLoopDate") private var lastStartLoopDate: Date = .distantPast
     @Persisted(key: "lastLoopDate") var lastLoopDate: Date = .distantPast {
@@ -139,14 +143,21 @@ final class BaseAPSManager: APSManager, Injectable {
         CoreDataStorage().insulinConcentration()
     }
 
+    private var scriptExecutor: WebViewScriptExecutor!
+
     init(resolver: Resolver) {
+        // ... bestehender Code ...
         injectServices(resolver)
-        openAPS = OpenAPS(
-            storage: storage,
-            nightscout: nightscout,
-            pumpStorage: pumpHistoryStorage,
-            scriptExecutor: WebViewScriptExecutor()
-        )
+        Task { @MainActor in
+            self.scriptExecutor = WebViewScriptExecutor()
+            self.openAPS = OpenAPS(
+                storage: storage,
+                nightscout: nightscout,
+                pumpStorage: pumpHistoryStorage,
+                scriptExecutor: scriptExecutor // Zugriff erst nach Initialisierung sicherstellen
+            )
+        }
+        // ... Rest des Codes ...
         subscribe()
         lastLoopDateSubject.send(lastLoopDate)
 
@@ -154,6 +165,22 @@ final class BaseAPSManager: APSManager, Injectable {
             .weakAssign(to: \.deviceDataManager.loopInProgress, on: self)
             .store(in: &lifetime)
     }
+
+    /*  init(resolver: Resolver) {
+         injectServices(resolver)
+         openAPS = OpenAPS(
+             storage: storage,
+             nightscout: nightscout,
+             pumpStorage: pumpHistoryStorage,
+             scriptExecutor: scriptExecutor
+         )
+         subscribe()
+         lastLoopDateSubject.send(lastLoopDate)
+
+         isLooping
+             .weakAssign(to: \.deviceDataManager.loopInProgress, on: self)
+             .store(in: &lifetime)
+     }*/
 
     private func subscribe() {
         deviceDataManager.recommendsLoop
@@ -219,8 +246,8 @@ final class BaseAPSManager: APSManager, Injectable {
         }
 
         // start background time extension
-        backGroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "Loop starting") {
-            guard let backgroundTask = self.backGroundTaskID else { return }
+        backGroundTaskID = UIApplication.shared.beginBackgroundTask(withName: "Loop starting") { [self] in
+            guard let backgroundTask = backGroundTaskID else { return }
             UIApplication.shared.endBackgroundTask(backgroundTask)
             self.backGroundTaskID = .invalid
         }
@@ -391,8 +418,8 @@ final class BaseAPSManager: APSManager, Injectable {
             .flatMap { _ in self.openAPS.determineBasal(currentTemp: temp, clock: now, temporary: temporary) }
             .map { suggestion -> Bool in
                 if let suggestion = suggestion {
-                    DispatchQueue.main.async {
-                        self.broadcaster.notify(SuggestionObserver.self, on: .main) {
+                    DispatchQueue.main.async { [self] in
+                        broadcaster.notify(SuggestionObserver.self, on: .main) {
                             $0.suggestionDidUpdate(suggestion)
                         }
                     }
@@ -415,6 +442,13 @@ final class BaseAPSManager: APSManager, Injectable {
         }
 
         return mainPublisher
+    }
+
+    func iobSync() async -> Decimal? {
+        let sync = await openAPS.iobSync()
+        guard let iobEntries = IOBTick0.parseArrayFromJSON(from: sync) else { return nil }
+
+        return CoreDataStorage().saveInsulinData(iobEntries: iobEntries)
     }
 
     func determineBasalSync() {

@@ -7,11 +7,12 @@ import SpriteKit
 import SwiftDate
 import SwiftUI
 import Swinject
+import UIKit
 
 extension Home {
     struct RootView: BaseView {
         let resolver: Resolver
-
+        // State
         @StateObject var state = StateModel()
         @State var isStatusPopupPresented = false
         @State var showCancelAlert = false
@@ -23,6 +24,26 @@ extension Home {
         @State var showBolusActiveAlert = false
         @State var displayAutoHistory = false
         @State var displayDynamicHistory = false
+        @State private var isSensorBlinking = false
+        @State private var progress: Double = 0.0
+        @State private var animatedFill: CGFloat = 0.0
+        @State private var animatedInsulinFill: CGFloat = 0.0
+        @State private var sensorAgeText: String = ""
+        @State private var didLongPress = false
+        @State private var timer: Timer? = nil
+
+        // StateObject
+        @StateObject private var bolusPieSegmentViewModel2 = PieSegmentViewModel()
+        @StateObject private var carbsPieSegmentViewModel = PieSegmentViewModel()
+        @StateObject private var insulinPieSegmentViewModel = PieSegmentViewModel()
+        @StateObject private var cannulaPieSegmentViewModel = PieSegmentViewModel()
+        @StateObject private var reservoirPieSegmentViewModel = PieSegmentViewModel()
+        @StateObject private var reservoirAgePieSegmentViewModel = PieSegmentViewModel()
+        @StateObject private var connectionPieSegmentViewModel = PieSegmentViewModel()
+        @StateObject private var insulinAgePieSegmentViewModel = PieSegmentViewModel()
+        @StateObject private var batteryAgePieSegmentViewModel = PieSegmentViewModel()
+        @StateObject private var sensorAgeSegmentViewModel = PieSegmentViewModel()
+        @State private var timerInterval: TimeInterval = 2 // Startet nach 2 Sekunden
 
         @Namespace var scrollSpace
 
@@ -67,8 +88,6 @@ extension Home {
             entity: Onboarding.entity(),
             sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
         ) var onboarded: FetchedResults<Onboarding>
-
-        @State private var progress: Double = 0.0
 
         private var numberFormatter: NumberFormatter {
             let formatter = NumberFormatter()
@@ -406,7 +425,7 @@ extension Home {
                         Text(sensorAgeText)
                             .font(.system(size: 12))
                             .foregroundColor(.white)
-                            .offset(x: 38, y: -84)
+                            .offset(x: 36, y: -86)
                     }
                 }
 
@@ -518,8 +537,6 @@ extension Home {
                 .frame(width: 110, height: 110)
             }
         }
-
-        @StateObject private var bolusPieSegmentViewModel2 = PieSegmentViewModel()
 
         @ViewBuilder private func bolusProgressView() -> some View {
             if let progress = state.bolusProgress, let amount = state.bolusAmount {
@@ -764,7 +781,7 @@ extension Home {
                             if button3DBackground {
                                 Circle()
                                     .fill(Color.black.opacity(0.2))
-                                    .frame(width: 36, height: 36)
+                                    .frame(width: 31, height: 31)
                                     .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
                             }
 
@@ -783,11 +800,11 @@ extension Home {
                                     ),
                                     lineWidth: 2
                                 )
-                                .frame(width: 36, height: 36)
+                                .frame(width: 31, height: 31)
                         } else {
                             Circle()
                                 .fill(Color.black.opacity(0.2))
-                                .frame(width: 35, height: 35)
+                                .frame(width: 31, height: 31)
                         }
 
                         PieSliceView(
@@ -795,14 +812,14 @@ extension Home {
                             endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                         )
                         .fill(color.opacity(0.0))
-                        .frame(width: 35, height: 35)
+                        .frame(width: 30, height: 30)
                         .opacity(0.5)
 
                         // Symbol-Hintergrund (NEU, 40x40)
                         if symbolBackgroundColor != .clear {
                             Circle()
                                 .fill(symbolBackgroundColor.opacity(0.0))
-                                .frame(width: 35, height: 35)
+                                .frame(width: 30, height: 30)
                         }
 
                         Image(systemName: symbol)
@@ -817,7 +834,7 @@ extension Home {
                      .font(.system(size: 15))
                      .foregroundColor(.white)*/
                 }
-                .offset(y: 10)
+                .offset(y: 8)
                 .onAppear {
                     pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
                 }
@@ -1062,7 +1079,7 @@ extension Home {
         }
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-            let height: CGFloat = display ? 150 : 230
+            let height: CGFloat = display ? 120 : 230
             LinearGradient(
                 gradient: Gradient(colors: [.clear, .clear, .clear]),
                 startPoint: .top,
@@ -1071,6 +1088,7 @@ extension Home {
             .frame(height: fontSize < .extraExtraLarge ? height + geo.safeAreaInsets.top : height + 10 + geo.safeAreaInsets.top)
             .overlay(alignment: .top) {
                 lightGlowOverlayContent()
+                    .padding(.top, geo.safeAreaInsets.top + (display ? 5 : 20)) // neu
 
                 // Horizontale Hauptcontainer
                 HStack(spacing: 0) {
@@ -1081,7 +1099,7 @@ extension Home {
                             .padding(.leading, 20)
                     }
 
-                    VStack(spacing: 25) {
+                    VStack(spacing: display ? 8 : 20) {
                         Group {
                             if display {
                                 glucoseView
@@ -1093,6 +1111,7 @@ extension Home {
                                 }
                             }
                         }
+
                         if !display {
                             pumpView
                                 .frame(maxWidth: .infinity)
@@ -1107,7 +1126,7 @@ extension Home {
                             .padding(.trailing, 20)
                     }
                 }
-                .padding(.top, geo.safeAreaInsets.top + 20)
+                .padding(.top, geo.safeAreaInsets.top + (display ? 0 : 20))
                 .animation(.easeInOut(duration: 1.2), value: display)
             }
         }
@@ -1129,12 +1148,7 @@ extension Home {
 
         // Head Ende
 
-        // TopBar Anfang
-
         // CarbView Anfang
-        @StateObject private var carbsPieSegmentViewModel = PieSegmentViewModel()
-
-        @State private var animatedFill: CGFloat = 0.0
 
         var carbsView: some View {
             HStack {
@@ -1148,7 +1162,16 @@ extension Home {
                             pieSegmentViewModel: carbsPieSegmentViewModel,
                             color: .orange,
                             backgroundColor: .clear,
-                            displayText: "\(numberFormatter.string(from: (state.data.suggestion?.cob ?? 0) as NSNumber) ?? "0")g",
+                            displayText: {
+                                if let loop = state.data.suggestion,
+                                   let cob = loop.cob,
+                                   let formatted = numberFormatter.string(from: cob as NSNumber)
+                                {
+                                    return "\(formatted)g"
+                                } else {
+                                    return "0g"
+                                }
+                            }(),
                             symbolSize: 0,
                             symbol: "cross.vial",
                             animateProgress: true,
@@ -1194,12 +1217,9 @@ extension Home {
 
         // InsulinView Anfang
 
-        @StateObject private var insulinPieSegmentViewModel = PieSegmentViewModel()
-
-        @State private var animatedInsulinFill: CGFloat = 0.0
-
         var insulinView: some View {
             let substance = Double(state.data.suggestion?.iob ?? 0)
+            // let substance = Double(state.data.iob ?? 0)
             let maxValue = max(Double(state.settingsManager?.preferences.maxIOB ?? 1), 1)
             let fraction = CGFloat(abs(substance) / maxValue)
             let fill = min(fraction, 1.0)
@@ -1342,13 +1362,6 @@ extension Home {
         }
 
         // Top Bars
-
-        @StateObject private var cannulaPieSegmentViewModel = PieSegmentViewModel()
-        @StateObject private var reservoirPieSegmentViewModel = PieSegmentViewModel()
-        @StateObject private var reservoirAgePieSegmentViewModel = PieSegmentViewModel()
-        @StateObject private var connectionPieSegmentViewModel = PieSegmentViewModel()
-        @StateObject private var insulinAgePieSegmentViewModel = PieSegmentViewModel()
-        @StateObject private var batteryAgePieSegmentViewModel = PieSegmentViewModel()
 
         // Standard
 
@@ -1715,9 +1728,6 @@ extension Home {
             }
         }
 
-        @StateObject private var sensorAgeSegmentViewModel = PieSegmentViewModel()
-        @State private var sensorAgeText: String = ""
-
         private var sensorAgeDays: some View {
             Group {
                 if state.displayExpiration2 {
@@ -1823,9 +1833,6 @@ extension Home {
             .animation(.easeInOut(duration: 0.3), value: state.isConnected)
         }
 
-        // State-Variable in der Haupt-View hinzugefügt
-        @State private var isSensorBlinking = false
-
         // TopBar Max Modules Ende
 
         // MARK: - Helper-Views for Standard 1 und DanaBar Anfang
@@ -1889,9 +1896,6 @@ extension Home {
             }
         }
 
-        @State private var timerInterval: TimeInterval = 2 // Startet nach 2 Sekunden
-        @State private var timer: Timer? = nil
-
         func startTimer() {
             timer?.invalidate() // Falls ein vorheriger Timer existiert, wird er gestoppt
             timer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: true) { _ in
@@ -1909,134 +1913,6 @@ extension Home {
 
         // MARK: - Helper-Views for Standard 1 und DanaBar Ende
 
-        //  TopBar Marquee
-
-        var danaBarMarquee: some View {
-            Group {
-                if state.danaBar {
-                    MarqueeText(
-                        text: createMarqueeText(),
-                        fontSize: 15,
-                        textColor: .white,
-                        startDelay: 1.5,
-                        animationDuration: 20.0
-                    )
-                    .frame(width: 420)
-                    .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                }
-            }
-        }
-
-        // MARK: - Helper-Views for Marquee Anfang
-
-        struct MarqueeText: View {
-            var text: String
-            var fontSize: CGFloat = 15
-            var textColor: Color = .white
-            var startDelay: Double = 2.0
-            var animationDuration: Double = 10.0
-
-            @State private var offset: CGFloat = 0
-            @State private var textWidth: CGFloat = 0
-            @State private var containerWidth: CGFloat = 0
-
-            var body: some View {
-                GeometryReader { geometry in
-                    ZStack(alignment: .leading) {
-                        // Unsichtbare Breitenmessung
-                        Text(text)
-                            .font(.system(size: fontSize))
-                            .lineLimit(1)
-                            .fixedSize()
-                            .background(GeometryReader { geo in
-                                Color.clear
-                                    .onAppear {
-                                        textWidth = geo.size.width
-                                        containerWidth = geometry.size.width
-                                        startAnimation()
-                                    }
-                            })
-                            .hidden()
-
-                        // Sichtbarer Lauftext
-                        Text(text)
-                            .font(.system(size: fontSize))
-                            .foregroundColor(textColor)
-                            .lineLimit(1)
-                            .fixedSize()
-                            .offset(x: offset)
-                    }
-                    .frame(width: containerWidth)
-                    .clipped()
-                }
-                .frame(height: fontSize * 1.5)
-            }
-
-            private func startAnimation() {
-                offset = containerWidth // Startposition rechts
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + startDelay) {
-                    withAnimation(
-                        .linear(duration: animationDuration)
-                            .repeatForever(autoreverses: false)
-                    ) {
-                        offset = -textWidth // Endposition links
-                    }
-                }
-            }
-        }
-
-        private func createMarqueeText() -> String {
-            var components = [String]()
-
-            // Insulin Age
-            if let insulinHours = state.insulinHours,
-               let option = InsulinAgeOption(rawValue: state.insulinAgeOption)
-            {
-                let remaining = option.maxInsulinAge - insulinHours
-                components.append("Insulin Age left: \(formatHours(remaining))")
-            }
-
-            // Cannula Age
-            if let cannulaHours = state.cannulaHours,
-               let option = CannulaAgeOption(rawValue: state.cannulaAgeOption)
-            {
-                let remaining = option.maxCannulaAge - cannulaHours
-                components.append("Cannula Age left: \(formatHours(remaining))")
-            }
-
-            // Sensor
-            if state.displayExpiration2 {
-                if let days = state.remainingSensorDays,
-                   let hours = state.remainingSensorHours,
-                   let minutes = state.remainingSensorMinutes
-                {
-                    components.append("Sensor Age left: \(formatSensorTime(days: days, hours: hours, minutes: minutes))")
-                } else {
-                    components.append("Sensor Age left: \(state.sensorAgeDays.asInt())d")
-                }
-            }
-
-            return components.joined(separator: " | ")
-        }
-
-        private func formatHours(_ hours: Double) -> String {
-            let days = Int(hours) / 24
-            let remainingHours = Int(hours) % 24
-            return days > 0 ? "\(days)d\(remainingHours)h" : "\(remainingHours)h"
-        }
-
-        private func formatBatteryTime(_ hours: Double) -> String {
-            let totalMinutes = Int(hours * 60)
-            if totalMinutes < 60 {
-                return "\(totalMinutes)min"
-            } else {
-                let days = totalMinutes / (24 * 60)
-                let hours = (totalMinutes % (24 * 60)) / 60
-                return days > 0 ? "\(days)d\(hours)h" : "\(hours)h"
-            }
-        }
-
         private func formatSensorTime(days: Int, hours: Int, minutes: Int) -> String {
             if days >= 1 {
                 return "\(days)d\(hours)h"
@@ -2046,8 +1922,6 @@ extension Home {
                 return "\(minutes)m"
             }
         }
-
-        // MARK: - Helper-Views for Marquee Ende
 
         // TopBar Standard 2
 
@@ -2445,14 +2319,6 @@ extension Home {
                         danaBarMax
                             .padding(.vertical, 10)
                             .padding(.top, 20)
-                    case .marquee:
-                        danaBarMarquee
-                            .padding(.vertical, 10)
-                            .padding(.top, 20)
-                    /* case .standard:
-                     danaBarStandard
-                         .padding(.vertical, 10)
-                         .padding(.top, 20)*/
                     case .standard2:
                         danaBarStandard2
                             .padding(.vertical, 10)
@@ -2651,8 +2517,7 @@ extension Home {
         // BottomInfoBar End
 
         // ButtonPanel Start
-        @State private var didLongPress = false
-
+        private static let heavyFeedback = UIImpactFeedbackGenerator(style: .heavy)
         // buttonWithCircle Funktion
         @ViewBuilder private func buttonWithCircle(
             iconName: String,
@@ -2663,7 +2528,10 @@ extension Home {
             gradient: LinearGradient? = nil,
             action: @escaping () -> Void
         ) -> some View {
-            Button(action: action) {
+            Button(action: {
+                RootView.heavyFeedback.impactOccurred()
+                action()
+            }) {
                 ZStack {
                     let incidenceOfLight = state.incidenceOfLight
                     let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
@@ -3216,6 +3084,7 @@ extension Home {
                             state.fetchPreferences()
                         }
                         configureView()
+                        RootView.heavyFeedback.prepare()
                     }
                 }
             }
