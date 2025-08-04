@@ -351,6 +351,7 @@ struct MainChartView: View {
             return Text(value == 0 ? "" : glucoseFormatter.string(from: value as NSNumber) ?? "")
                 .position(CGPoint(x: fullSize.width - 12, y: range.minY + CGFloat(line) * yStep))
                 .font(.bolusDotFont)
+                .foregroundStyle(Color.white)
                 .asAny()
         }
     }
@@ -365,8 +366,8 @@ struct MainChartView: View {
             let value = bolus
 
             return HStack(spacing: 2) {
-                Text(glucoseFormatter.string(from: value as NSNumber) ?? "").font(.bolusDotFont)
-                Text("U").font(.bolusDotFont.smallCaps()) // .foregroundStyle(Color.white)
+                Text(glucoseFormatter.string(from: value as NSNumber) ?? "").font(.bolusDotFont).foregroundStyle(Color.white)
+                Text("U").font(.bolusDotFont.smallCaps()).foregroundStyle(Color.white)
             }.foregroundStyle(Color(.insulin).opacity(0.8))
                 .position(CGPoint(x: fullSize.width - 12, y: yCoord))
                 .asAny()
@@ -438,7 +439,6 @@ struct MainChartView: View {
             Path { path in
                 for hour in 0 ..< data.hours + data.hours {
                     if data.screenHours < 12 || hour % 2 == 0 {
-                        // only show every second line if screenHours is too big
                         let x = firstHourPosition(viewWidth: fullSize.width) +
                             oneSecondStep(viewWidth: fullSize.width) *
                             CGFloat(hour) * CGFloat(1.hours.timeInterval)
@@ -455,11 +455,40 @@ struct MainChartView: View {
                 path.addLine(to: CGPoint(x: x, y: fullSize.height - 20))
             }
             .stroke(
-                colorScheme == .dark ? IAPSconfig.chartBackgroundLight : IAPSconfig.chartBackgroundDark,
+                Color.white, // 👈 Immer Weiß, unabhängig vom Farbschema
                 style: StrokeStyle(lineWidth: 0.5, dash: [5])
             )
         }
     }
+
+    /*  private func xGridView(fullSize: CGSize) -> some View {
+         let useColour = data.displayXgridLines ? Color.white : Color.clear
+         return ZStack {
+             Path { path in
+                 for hour in 0 ..< data.hours + data.hours {
+                     if data.screenHours < 12 || hour % 2 == 0 {
+                         // only show every second line if screenHours is too big
+                         let x = firstHourPosition(viewWidth: fullSize.width) +
+                             oneSecondStep(viewWidth: fullSize.width) *
+                             CGFloat(hour) * CGFloat(1.hours.timeInterval)
+                         path.move(to: CGPoint(x: x, y: 0))
+                         path.addLine(to: CGPoint(x: x, y: fullSize.height - 20))
+                     }
+                 }
+             }
+             .stroke(useColour, lineWidth: 0.15)
+
+             Path { path in // vertical timeline
+                 let x = timeToXCoordinate(data.timerDate.timeIntervalSince1970, fullSize: fullSize)
+                 path.move(to: CGPoint(x: x, y: 0))
+                 path.addLine(to: CGPoint(x: x, y: fullSize.height - 20))
+             }
+             .stroke(
+                  colorScheme == .dark ? IAPSconfig.chartBackgroundLight : IAPSconfig.chartBackgroundDark,
+                 style: StrokeStyle(lineWidth: 0.5, dash: [5])
+             )
+         }
+     }*/
 
     private func timeLabelsView(fullSize: CGSize) -> some View {
         let format = date24Formatter
@@ -789,7 +818,7 @@ struct MainChartView: View {
                     let position = CGPoint(x: info.rect.midX, y: info.rect.minY - (8 + stringLength + Config.pointSizeHeight))
                     Text(info.value >= data.minimumSMB ? string : "")
                         .rotationEffect(Angle(degrees: -90))
-                        .font(bolusFont())
+                        .font(bolusFont()).foregroundStyle(Color.white)
                         .position(position)
                         .asAny()
                 }
@@ -797,7 +826,7 @@ struct MainChartView: View {
                 ForEach(bolusDots, id: \.rect.minX) { info -> AnyView in
                     let position = CGPoint(x: info.rect.midX, y: info.rect.minY - 8)
                     return Text(info.value >= data.minimumSMB ? (bolusFormatter.string(from: info.value as NSNumber) ?? "") : "")
-                        .font(.bolusDotFont)
+                        .font(.bolusDotFont).foregroundStyle(Color.white)
                         .position(position)
                         .asAny()
                 }
@@ -824,6 +853,7 @@ struct MainChartView: View {
             ForEach(carbsDots, id: \.rect.minX) { info -> AnyView in
                 let position = CGPoint(x: info.rect.midX, y: info.rect.maxY + 8)
                 return Text(carbsFormatter.string(from: info.value as NSNumber) ?? "").font(.carbsDotFont)
+                    .foregroundStyle(Color.white)
                     .position(position)
                     .asAny()
             }

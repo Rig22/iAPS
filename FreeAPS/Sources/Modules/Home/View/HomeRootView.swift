@@ -1325,7 +1325,7 @@ extension Home {
                                 startPoint: .top,
                                 endPoint: .bottom
                             ),
-                            lineWidth: 2
+                            lineWidth: 1
                         )
                         .frame(width: 50, height: 50)
                         .offset(y: -2.5)
@@ -2526,10 +2526,12 @@ extension Home {
             colors: [Color] = [.white],
             circleColor _: Color,
             gradient: LinearGradient? = nil,
+            feedbackStyle: UIImpactFeedbackGenerator.FeedbackStyle = .medium,
             action: @escaping () -> Void
         ) -> some View {
             Button(action: {
-                RootView.heavyFeedback.impactOccurred()
+                let generator = UIImpactFeedbackGenerator(style: feedbackStyle)
+                generator.impactOccurred()
                 action()
             }) {
                 ZStack {

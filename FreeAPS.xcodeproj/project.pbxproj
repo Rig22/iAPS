@@ -2379,10 +2379,10 @@
 		79056CA62E2D1E360008B27D /* AutoISF */ = {
 			isa = PBXGroup;
 			children = (
-				79056CA22E2D1E360008B27D /* View */,
 				79056CA32E2D1E360008B27D /* AutoISFDataFlow.swift */,
 				79056CA42E2D1E360008B27D /* AutoISFProvider.swift */,
 				79056CA52E2D1E360008B27D /* AutoISFStateModel.swift */,
+				79056CA22E2D1E360008B27D /* View */,
 			);
 			path = AutoISF;
 			sourceTree = "<group>";
