@@ -17,7 +17,6 @@ extension UIUX {
         @Published var minimumSMB: Decimal = 0.3
         @Published var useInsulinBars: Bool = true
         @Published var skipGlucoseChart: Bool = false
-        @Published var extendHomeView: Bool = true
         @Published var displayDelta: Bool = false
         @Published var displayExpiration: Bool = false
         @Published var displayExpiration2 = false
@@ -106,7 +105,6 @@ extension UIUX {
             subscribeSetting(\.skipBolusScreenAfterCarbs, on: $skipBolusScreenAfterCarbs) { skipBolusScreenAfterCarbs = $0 }
             subscribeSetting(\.oneDimensionalGraph, on: $oneDimensionalGraph) { oneDimensionalGraph = $0 }
             subscribeSetting(\.useInsulinBars, on: $useInsulinBars) { useInsulinBars = $0 }
-            subscribeSetting(\.extendHomeView, on: $extendHomeView) { extendHomeView = $0 }
             subscribeSetting(\.displayExpiration, on: $displayExpiration) { displayExpiration = $0 }
             subscribeSetting(\.displayExpiration2, on: $displayExpiration2) { displayExpiration2 = $0 }
             subscribeSetting(\.displaySAGE, on: $displaySAGE) { displaySAGE = $0 }

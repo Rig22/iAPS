@@ -98,9 +98,7 @@ extension UIUX {
 
         private func getDescription(for option: DanaBarOption) -> String {
             switch option {
-            // case .standard: return "Standard"
             case .standard2: return "Standard 2"
-            case .marquee: return "Running Text"
             case .max: return "For Dana User"
             }
         }
@@ -215,25 +213,6 @@ extension UIUX {
                                         .pickerStyle(NavigationLinkPickerStyle())
                                     }
 
-                                    /*    if state.danaBarOption == DanaBarOption.standard.rawValue {
-                                         Picker(
-                                             "Max Reservoir Insulin Age",
-                                             selection: $state.insulinAgeOption
-                                         ) {
-                                             Text("1 Day").tag("Ein_Tag")
-                                             Text("2 Days").tag("Zwei_Tage")
-                                             Text("3 Days").tag("Drei_Tage")
-                                             Text("4 Days").tag("Vier_Tage")
-                                             Text("5 Days").tag("Fuenf_Tage")
-                                             Text("6 Days").tag("Sechs_Tage")
-                                             Text("7 Days").tag("Sieben_Tage")
-                                             Text("8 Days").tag("Acht_Tage")
-                                             Text("9 Days").tag("Neun_Tage")
-                                             Text("10 Days").tag("Zehn_Tage")
-                                         }
-                                         .pickerStyle(NavigationLinkPickerStyle())
-                                     }*/
-
                                     if state.danaBarOption == DanaBarOption.standard2.rawValue {
                                         Picker(
                                             "Max Reservoir Insulin Age",
@@ -252,34 +231,6 @@ extension UIUX {
                                         }
                                         .pickerStyle(NavigationLinkPickerStyle())
                                     }
-
-                                    if state.danaBarOption == DanaBarOption.marquee.rawValue {
-                                        Picker(
-                                            "Max Reservoir Insulin Age",
-                                            selection: $state.insulinAgeOption
-                                        ) {
-                                            Text("1 Day").tag("Ein_Tag")
-                                            Text("2 Days").tag("Zwei_Tage")
-                                            Text("3 Days").tag("Drei_Tage")
-                                            Text("4 Days").tag("Vier_Tage")
-                                            Text("5 Days").tag("Fuenf_Tage")
-                                            Text("6 Days").tag("Sechs_Tage")
-                                            Text("7 Days").tag("Sieben_Tage")
-                                            Text("8 Days").tag("Acht_Tage")
-                                            Text("9 Days").tag("Neun_Tage")
-                                            Text("10 Days").tag("Zehn_Tage")
-                                        }
-                                        .pickerStyle(NavigationLinkPickerStyle())
-                                    }
-
-                                    Picker("Max Cannula Age", selection: $state.cannulaAgeOption) {
-                                        Text("1 Day").tag("Ein_Tag")
-                                        Text("2 Days").tag("Zwei_Tage")
-                                        Text("3 Days").tag("Drei_Tage")
-                                        Text("4 Days").tag("Vier_Tage")
-                                        Text("5 Days").tag("Fuenf_Tage")
-                                    }
-                                    .pickerStyle(NavigationLinkPickerStyle())
                                 }
                             }
 
@@ -343,11 +294,11 @@ extension UIUX {
 
                             Section(
                                 header: Text(
-                                    "Show Sensor Age for nightscout, dexcomG5, dexcomG6, dexcomG7, libre1, libre2 and enlite"
+                                    "Show Sensor Age for Dexcom G5, G6, G7, Libre 1, Libre 2 and Enlite"
                                 ),
                                 footer: Text("Direct Support implemented")
                             ) {
-                                Toggle("Display Sensor Age", isOn: $state.displayExpiration)
+                                Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)
                                     ._onBindingChange($state.displayExpiration) { enabled in
                                         if enabled {
                                             state.displaySAGE = false
@@ -355,7 +306,7 @@ extension UIUX {
                                         }
                                     }
 
-                                Toggle("Display Sensor Time Remaining", isOn: $state.displaySAGE)
+                                Toggle("Display Sensor Age", isOn: $state.displaySAGE)
                                     ._onBindingChange($state.displaySAGE) { enabled in
                                         if enabled {
                                             state.displayExpiration = false
@@ -365,7 +316,7 @@ extension UIUX {
                             }
 
                             Section(
-                                header: Text("Sensor Settings for Libre 3 and 3+ Users"),
+                                header: Text("Sensor Settings for xDrip4iOS, Nightscout, Libre 3 and 3+ Users"),
                                 footer: Text("Long press for setting new Sensor Start Time")
                             ) {
                                 Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration2)

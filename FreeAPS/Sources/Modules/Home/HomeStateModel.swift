@@ -72,7 +72,6 @@ extension Home {
         @Published var tddActualAverage: Decimal = 0
         @Published var skipGlucoseChart: Bool = false
         @Published var displayDelta: Bool = false
-        @Published var extended = true
         @Published var maxIOB: Decimal = 0
         @Published var maxCOB: Decimal = 0
         @Published var autoisf = false
@@ -164,7 +163,8 @@ extension Home {
             fpus: true,
             fpuAmounts: false,
             showInsulinActivity: true,
-            showCobChart: true
+            showCobChart: true,
+            iob: nil
         )
         /*  var backgroundColor: Color {
              BackgroundColorOption(rawValue: backgroundColorOptionRawValue)?.color ?? .clear
@@ -174,16 +174,6 @@ extension Home {
             switch BackgroundColorOption(rawValue: backgroundColorOptionRawValue) {
             default:
                 return .blue // Standardfarbe, falls keine Übereinstimmung gefunden wird
-            }
-        }
-
-        var pumpIconOption: PumpIconOption {
-            get {
-                PumpIconOption(rawValue: pumpIconRawValue) ??
-                    .nano200 // Standardwert, falls der Raw-Wert nicht gefunden wird
-            }
-            set {
-                pumpIconRawValue = newValue.rawValue
             }
         }
 
@@ -254,7 +244,6 @@ extension Home {
             data.fpuAmounts = settingsManager.settings.fpuAmounts
             displayDelta = settingsManager.settings.displayDelta
             skipGlucoseChart = settingsManager.settings.skipGlucoseChart
-            extended = settingsManager.settings.extendHomeView
             maxIOB = settingsManager.preferences.maxIOB
             maxCOB = settingsManager.preferences.maxCOB
             useCalc = settingsManager.settings.useCalc
@@ -761,6 +750,19 @@ extension Home {
             }
         }
 
+        private func setupIOB() {
+            DispatchQueue.main.async { [weak self] in
+                guard let self = self else { return }
+                Task {
+                    do {
+                        if let sync = try await self.provider.iob() {
+                            self.data.iob = sync
+                        }
+                    } catch { debug(.apsManager, "Error - Couldn't update foreground IOB value.") }
+                }
+            }
+        }
+
         private func setupData() {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
@@ -841,6 +843,7 @@ extension Home.StateModel:
 
     func suggestionDidUpdate(_ suggestion: Suggestion) {
         data.suggestion = suggestion
+        data.iob = data.suggestion?.iob
         carbsRequired = suggestion.carbsReq
         setStatusTitle()
         setupOverrideHistory()
@@ -900,7 +903,6 @@ extension Home.StateModel:
         data.fpuAmounts = settingsManager.settings.fpuAmounts
         skipGlucoseChart = settingsManager.settings.skipGlucoseChart
         displayDelta = settingsManager.settings.displayDelta
-        extended = settingsManager.settings.extendHomeView
         maxIOB = settingsManager.preferences.maxIOB
         maxCOB = settingsManager.preferences.maxCOB
         autoisf = settingsManager.settings.autoisf
@@ -951,6 +953,8 @@ extension Home.StateModel:
         setupBoluses()
         setupSuspensions()
         setupAnnouncements()
+        setupIOB()
+        setupActivity()
     }
 
     func pumpSettingsDidChange(_: PumpSettings) {

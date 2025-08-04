@@ -37,6 +37,10 @@ extension Home {
             CoreDataStorage().fetchReasons(interval: DateFilter().day)
         }
 
+        func iob() async throws -> Decimal? {
+            await apsManager.iobSync()
+        }
+
         func iobData(_ data: [Reasons]) -> [IOBData]? {
             guard data.count > 3 else {
                 return nil

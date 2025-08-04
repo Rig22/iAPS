@@ -81,7 +81,7 @@ struct PumpView: View {
                 // Container für Medtrum mit Offset
                 if pumpType == .medtrum {
                     medtrumContent()
-                        .offset(x: 15) // Medtrum-spezifischer Offset
+                    // .offset(x: 15) // Medtrum-spezifischer Offset
                 } else {
                     omnipodContent()
                 }
@@ -118,6 +118,7 @@ struct PumpView: View {
                 let adjustedReservoir = Double(insulin) * (concentration.last?.concentration ?? 1)
                 let maxReservoir: Double = 200
                 let portion = max(0.0, min(1.0, adjustedReservoir / maxReservoir))
+                let color = reservoirColor
 
                 if insulin == 0xDEAD_BEEF {
                     medtrumInsulinAmount(portion: 1 - portion)
@@ -163,10 +164,10 @@ struct PumpView: View {
                 remainingTime(time: date.timeIntervalSince(timerDate))
                     .font(.pumpFont)
 
-                if battery != nil {
-                    batteryIcon(for: .medtrum)
-                        .offset(x: -6, y: 0)
-                }
+                /* if battery != nil {
+                     batteryIcon(for: .medtrum)
+                         .offset(x: -6, y: 0)
+                 }*/
             }
             .offset(x: -4, y: 0)
         } else {
@@ -361,7 +362,7 @@ struct PumpView: View {
         ZStack {
             let pump = colorScheme == .dark ? "pod_dark" : "pod_light"
             UIImage(imageLiteralResourceName: pump)
-                .fillImageUpToPortion(color: .insulin.opacity(0.8), portion: portion)
+                .fillImageUpToPortion(color: reservoirColor.opacity(0.8), portion: portion)
                 .resizable()
                 .aspectRatio(0.72, contentMode: .fit)
                 .frame(width: IAPSconfig.iconSize, height: IAPSconfig.iconSize)
@@ -384,7 +385,7 @@ struct PumpView: View {
         ZStack {
             let pump = colorScheme == .dark ? "pump_dark" : "pump_light"
             UIImage(imageLiteralResourceName: pump)
-                .fillImageUpToPortion(color: .insulin.opacity(0.8), portion: max(portion, 0.0))
+                .fillImageUpToPortion(color: reservoirColor.opacity(0.8), portion: max(portion, 0.0))
                 .resizable()
                 .frame(maxWidth: 30, maxHeight: 30)
                 .symbolRenderingMode(.palette)
@@ -397,7 +398,7 @@ struct PumpView: View {
         ZStack {
             let pump = colorScheme == .dark ? "nano200pumpview" : "nano200pumpview"
             UIImage(imageLiteralResourceName: pump)
-                .fillImageUpToPortion(color: .insulin.opacity(0.8), portion: max(portion, 0.0))
+                .fillImageUpToPortion(color: reservoirColor.opacity(0.8), portion: max(portion, 0.0))
                 .resizable()
                 .frame(maxWidth: 30, maxHeight: 30)
                 .symbolRenderingMode(.palette)

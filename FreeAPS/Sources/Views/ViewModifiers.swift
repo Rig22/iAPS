@@ -474,37 +474,62 @@ extension UIImage {
     }
 }
 
+extension Color {
+    var isLightColor: Bool {
+        // Convert SwiftUI Color to UIColor
+        guard let components = UIColor(self).cgColor.components else {
+            return false
+        }
+
+        // Calculate relative luminance (per ITU-R BT.709)
+        let red = components[0]
+        let green = components[1]
+        let blue = components[2]
+        let luminance = (0.2126 * red) + (0.7152 * green) + (0.0722 * blue)
+
+        return luminance > 0.6
+    }
+}
+
 struct Sage: View {
-    @Environment(\.colorScheme) var colorScheme
     let amount: Double
     let expiration: Double
     let lineColour: Color
     let sensordays: TimeInterval
+
+    // Fixed colors configuration
+    private let strokeColor = Color.white.opacity(0.4)
+    private let normalFillColor = Color.blue.opacity(0.4)
+    private let backgroundFillColor = Color.gray.opacity(0.8)
+
     var body: some View {
-        let fill = max(expiration / amount, 0.15)
-        let colour: Color = (expiration < 0.5 * 8.64E4) ? .red
-            .opacity(0.9) : (expiration < 2 * 8.64E4) ? .orange.opacity(0.8) : colorScheme == .light ? Color.white : Color.white
-            .opacity(0.8)
-        let scheme = colorScheme == .light ? Color(.systemGray5) : Color(.black).opacity(0.2)
+        let fill = min(max(expiration / amount, 0.15), 1.0)
+
+        let fillColor: Color = {
+            switch expiration {
+            case ..<(0.5 * 8.64E4): // Less than 12 hours
+                return .red.opacity(0.9)
+            case ..<(2 * 8.64E4): // Less than 2 days
+                return .orange.opacity(0.8)
+            default: // Normal state
+                return normalFillColor
+            }
+        }()
 
         Circle()
-            .stroke(scheme, lineWidth: 5)
+            .stroke(strokeColor, lineWidth: 2)
             .background(
                 Circle()
                     .fill(
                         LinearGradient(
                             gradient: Gradient(stops: [
-                                Gradient.Stop(
-                                    color: colour,
-                                    location: fill
-                                ),
-                                Gradient.Stop(
-                                    color: colorScheme == .light ? backgroundColor : backgroundColor,
-                                    location: fill
-                                )
+                                Gradient.Stop(color: fillColor, location: 0),
+                                Gradient.Stop(color: fillColor, location: fill),
+                                Gradient.Stop(color: backgroundFillColor, location: fill),
+                                Gradient.Stop(color: backgroundFillColor, location: 1)
                             ]),
-                            startPoint: .leading,
-                            endPoint: .trailing
+                            startPoint: .top,
+                            endPoint: .bottom
                         )
                     )
                     .shadow(radius: 4)
