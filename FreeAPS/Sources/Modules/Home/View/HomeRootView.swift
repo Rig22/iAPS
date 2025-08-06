@@ -1769,28 +1769,6 @@ extension Home {
             .frame(minHeight: UIScreen.main.bounds.height / 1.7) // Je größer der Wert, desto kleiner der mainChart
         }
 
-        /*     var chart: some View {
-             VStack(spacing: 0) {
-                 Group {
-                     switch DanaBarOption(rawValue: state.danaBar) ?? .max {
-                     case .max:
-                         danaBarMax
-                             .padding(.vertical, 10)
-                             .padding(.top, 20)
-                     case .standard2:
-                         danaBarStandard2
-                             .padding(.vertical, 10)
-                             .padding(.top, 20)
-                     }
-                     mainChart.padding(.top, 35)
-                     tempTargetbar.padding(.top, 35)
-                     bottomBar.padding(.top, 20).padding(.bottom, 10)
-                         .frame(width: UIScreen.main.bounds.width)
-                 }
-             }
-             .frame(minHeight: UIScreen.main.bounds.height / 1.7) // Je größer der Wert, desto kleiner der mainChart
-         }*/
-
         var tempTargetbar: some View {
             ZStack {
                 if state.tempTargetbar {
