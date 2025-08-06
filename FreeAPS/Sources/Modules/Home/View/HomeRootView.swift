@@ -340,255 +340,6 @@ extension Home {
             }
         }
 
-        var pumpView: some View {
-            PumpView(
-                reservoir: $state.reservoir,
-                battery: $state.battery,
-                name: $state.pumpName,
-                expiresAtDate: $state.pumpExpiresAtDate,
-                timerDate: $state.data.timerDate, timeZone: $state.timeZone,
-                state: state
-            )
-            .onTapGesture {
-                if state.pumpDisplayState != nil {
-                    state.setupPump = true
-                }
-            }
-            .offset(y: 1)
-        }
-
-        var glucoseView: some View {
-            let doubleBolusProgress = Binding<Double?> {
-                state.bolusProgress.map { Double(truncating: $0 as NSNumber) }
-            } set: { newValue in
-                if let newDecimalValue = newValue.map({ Decimal($0) }) {
-                    state.bolusProgress = newDecimalValue
-                }
-            }
-
-            return ZStack(alignment: .center) {
-                // sensorAgeDays
-                // .offset(y: -80)
-                if state.displayExpiration2 {
-                    let totalHours = state.sensorAgeDays.asInt() * 24
-                    let remainingHours = max(1, totalHours - state.elapsedHours)
-                    let fillFraction: CGFloat = remainingHours <= 1 ? 1.0 : CGFloat(remainingHours) / CGFloat(totalHours)
-
-                    let sensorColor: Color = {
-                        switch remainingHours {
-                        case ...2: return .red
-                        case ...6: return .yellow
-                        default: return .white
-                        }
-                    }()
-
-                    let sensorAgeText: String = {
-                        guard let days = state.remainingSensorDays,
-                              let hours = state.remainingSensorHours,
-                              let minutes = state.remainingSensorMinutes
-                        else {
-                            return "\(state.sensorAgeDays.asInt())d"
-                        }
-
-                        if days >= 1 {
-                            return "\(days)d\(hours)h"
-                        } else if hours >= 1 {
-                            return "\(hours)h\(minutes)m"
-                        } else {
-                            return "\(minutes)m"
-                        }
-                    }()
-
-                    // let shouldBlink = sensorColor == .red
-
-                    ZStack {
-                        FillablePieSegment2(
-                            pieSegmentViewModel: sensorAgeSegmentViewModel,
-                            color: .white,
-                            backgroundColor: .clear,
-                            symbolSize: 22,
-                            symbol: "sensor.tag.radiowaves.forward",
-                            animateProgress: true,
-                            button3D: state.button3D,
-                            button3DBackground: state.button3DBackground,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview,
-                            fillFraction: fillFraction,
-                            symbolBackgroundColor: backgroundColor,
-                            symbolColor: sensorColor
-                        )
-                        .frame(width: 35, height: 35)
-                        .offset(y: -94)
-                        .zIndex(1)
-
-                        Text(sensorAgeText)
-                            .font(.system(size: 12))
-                            .foregroundColor(.white)
-                            .offset(x: 36, y: -86)
-                    }
-                }
-
-                let incidenceOfLight = state.incidenceOfLight
-                let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                    .atriumview
-
-                if state.button3D {
-                    let glowColor1 = incidenceOfLight
-                        ? lightGlowOverlaySelector.highlightColor
-                        : Color.white.opacity(0.9)
-
-                    let glowColor2 = incidenceOfLight
-                        ? lightGlowOverlaySelector.highlightColor
-                        : Color.white.opacity(0.4)
-
-                    if state.button3DBackground {
-                        Circle()
-                            .fill(Color.black.opacity(0.2))
-                            .frame(width: 110, height: 110)
-                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                    }
-
-                    Circle()
-                        .stroke(
-                            LinearGradient(
-                                gradient: Gradient(colors: [
-                                    glowColor1.opacity(0.9),
-                                    glowColor2.opacity(0.6),
-                                    Color.clear,
-                                    Color.black.opacity(0.3),
-                                    Color.black.opacity(0.6)
-                                ]),
-                                startPoint: .top,
-                                endPoint: .bottom
-                            ),
-                            lineWidth: 2
-                        )
-                        .frame(width: 110, height: 110)
-                } else {
-                    Circle()
-                        .fill(Color.black.opacity(0.2))
-                        .frame(width: 110, height: 110)
-                }
-                CurrentGlucoseView(
-                    recentGlucose: $state.recentGlucose,
-                    timerDate: $state.data.timerDate,
-                    delta: $state.glucoseDelta,
-                    units: $state.data.units,
-                    alarm: $state.alarm,
-                    lowGlucose: $state.data.lowGlucose,
-                    highGlucose: $state.data.highGlucose,
-                    bolusProgress: doubleBolusProgress,
-                    displayDelta: $state.displayDelta,
-                    alwaysUseColors: $state.alwaysUseColors,
-                    scrolling: $displayGlucose, displaySAGE: $state.displaySAGE, displayExpiration: $state.displayExpiration,
-                    cgm: $state.cgm, sensordays: $state.sensorDays
-                )
-                .zIndex(2)
-                .onTapGesture {
-                    if state.alarm == nil {
-                        state.openCGM()
-                    } else {
-                        state.showModal(for: .snooze)
-                    }
-                }
-                .onLongPressGesture {
-                    let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                    impactHeavy.impactOccurred()
-                    if state.alarm == nil {
-                        state.showModal(for: .snooze)
-                    } else {
-                        state.openCGM()
-                    }
-                }
-            }
-        }
-
-        private func startProgress() {
-            Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { timer in
-                withAnimation(Animation.linear(duration: 0.02)) {
-                    progress += 0.01
-                }
-                if progress >= 1.0 {
-                    timer.invalidate()
-                }
-            }
-        }
-
-        // Progressbar by Rig22
-        public struct CircularProgressViewStyle: ProgressViewStyle {
-            public func makeBody(configuration: ProgressViewStyleConfiguration) -> some View {
-                let progress = CGFloat(configuration.fractionCompleted ?? 0)
-
-                ZStack {
-                    Circle()
-                        .trim(from: 0.0, to: progress)
-                        .stroke(
-                            LinearGradient(
-                                gradient: Gradient(colors: [Color.white.opacity(0.5), Color.white.opacity(0.5)]),
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                        )
-                        .rotationEffect(Angle(degrees: 270))
-                        .animation(.linear(duration: 0.25), value: progress)
-                }
-                .frame(width: 110, height: 110)
-            }
-        }
-
-        @ViewBuilder private func bolusProgressView() -> some View {
-            if let progress = state.bolusProgress, let amount = state.bolusAmount {
-                let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
-                let bolused = bolusProgressFormatter.string(from: (amount * progress) as NSNumber) ?? ""
-
-                ZStack(alignment: .center) {
-                    BigFillablePieSegment(
-                        pieSegmentViewModel: bolusPieSegmentViewModel2,
-                        fillFraction: fillFraction,
-                        backgroundColor: backgroundColor,
-                        color: .blue,
-                        animateProgress: true,
-                        button3D: state.button3D,
-                        button3DBackground: state.button3DBackground,
-                        incidenceOfLight: state.incidenceOfLight,
-                        lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                            .atriumview
-                    )
-                    .frame(width: 110, height: 110)
-
-                    Circle()
-                        .fill(Color.black.opacity(0.2))
-                        .frame(width: 110, height: 110)
-
-                    Circle()
-                        .fill(backgroundColor.opacity(1.0))
-                        .frame(width: 80, height: 80)
-
-                    Circle()
-                        .fill(Color.clear)
-                        .frame(width: 25, height: 25)
-                        .overlay(
-                            Image(systemName: "xmark")
-                                .font(.system(size: 18, weight: .bold))
-                                .foregroundColor(.white)
-                        )
-                        .onTapGesture { state.cancelBolus() }
-
-                    Text(
-                        bolused + " " + NSLocalizedString("of", comment: "") + " " +
-                            amount.formatted(.number.precision(.fractionLength(2))) +
-                            NSLocalizedString(" U", comment: " ")
-                    )
-                    .font(.system(size: 14))
-                    .foregroundStyle(Color.white)
-                    .offset(y: -80)
-                }
-                .frame(width: 110, height: 110)
-            }
-        }
-
         // Pie Animation Anfang
 
         struct PieSliceView: Shape {
@@ -889,7 +640,7 @@ extension Home {
                         endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                     )
                     .fill(color)
-                    .frame(width: 110, height: 110)
+                    .frame(width: 140, height: 140)
                     .opacity(1.0)
                 }
                 .onAppear {
@@ -902,6 +653,193 @@ extension Home {
         }
 
         // Fillable PieSegments Ende
+
+        var pumpView: some View {
+            PumpView(
+                reservoir: $state.reservoir,
+                battery: $state.battery,
+                name: $state.pumpName,
+                expiresAtDate: $state.pumpExpiresAtDate,
+                timerDate: $state.data.timerDate, timeZone: $state.timeZone,
+                state: state
+            )
+            .onTapGesture {
+                if state.pumpDisplayState != nil {
+                    state.setupPump = true
+                }
+            }
+            .offset(y: 1)
+        }
+
+        var glucoseView: some View {
+            let doubleBolusProgress = Binding<Double?> {
+                state.bolusProgress.map { Double(truncating: $0 as NSNumber) }
+            } set: { newValue in
+                if let newDecimalValue = newValue.map({ Decimal($0) }) {
+                    state.bolusProgress = newDecimalValue
+                }
+            }
+
+            return ZStack(alignment: .center) {
+                let incidenceOfLight = state.incidenceOfLight
+                let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                    .atriumview
+
+                if state.button3D {
+                    let glowColor1 = incidenceOfLight
+                        ? lightGlowOverlaySelector.highlightColor
+                        : Color.white.opacity(0.9)
+
+                    let glowColor2 = incidenceOfLight
+                        ? lightGlowOverlaySelector.highlightColor
+                        : Color.white.opacity(0.4)
+
+                    if state.button3DBackground {
+                        Circle()
+                            .fill(Color.black.opacity(0.2))
+                            .frame(width: 140, height: 140)
+                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
+                    }
+
+                    Circle()
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [
+                                    glowColor1.opacity(0.9),
+                                    glowColor2.opacity(0.6),
+                                    Color.clear,
+                                    Color.black.opacity(0.3),
+                                    Color.black.opacity(0.6)
+                                ]),
+                                startPoint: .top,
+                                endPoint: .bottom
+                            ),
+                            lineWidth: 2
+                        )
+                        .frame(width: 140, height: 140)
+                } else {
+                    Circle()
+                        .fill(Color.black.opacity(0.2))
+                        .frame(width: 140, height: 140)
+                }
+                CurrentGlucoseView(
+                    recentGlucose: $state.recentGlucose,
+                    timerDate: $state.data.timerDate,
+                    delta: $state.glucoseDelta,
+                    units: $state.data.units,
+                    alarm: $state.alarm,
+                    lowGlucose: $state.data.lowGlucose,
+                    highGlucose: $state.data.highGlucose,
+                    bolusProgress: doubleBolusProgress,
+                    displayDelta: $state.displayDelta,
+                    alwaysUseColors: $state.alwaysUseColors,
+                    scrolling: $displayGlucose, displaySAGE: $state.displaySAGE, displayExpiration: $state.displayExpiration,
+                    cgm: $state.cgm, sensordays: $state.sensorDays
+                )
+                .zIndex(2)
+                .onTapGesture {
+                    if state.alarm == nil {
+                        state.openCGM()
+                    } else {
+                        state.showModal(for: .snooze)
+                    }
+                }
+                .onLongPressGesture {
+                    let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                    impactHeavy.impactOccurred()
+                    if state.alarm == nil {
+                        state.showModal(for: .snooze)
+                    } else {
+                        state.openCGM()
+                    }
+                }
+            }
+        }
+
+        private func startProgress() {
+            Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { timer in
+                withAnimation(Animation.linear(duration: 0.02)) {
+                    progress += 0.01
+                }
+                if progress >= 1.0 {
+                    timer.invalidate()
+                }
+            }
+        }
+
+        // Progressbar by Rig22
+        public struct CircularProgressViewStyle: ProgressViewStyle {
+            public func makeBody(configuration: ProgressViewStyleConfiguration) -> some View {
+                let progress = CGFloat(configuration.fractionCompleted ?? 0)
+
+                ZStack {
+                    Circle()
+                        .trim(from: 0.0, to: progress)
+                        .stroke(
+                            LinearGradient(
+                                gradient: Gradient(colors: [Color.white.opacity(0.5), Color.white.opacity(0.5)]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            style: StrokeStyle(lineWidth: 6, lineCap: .round)
+                        )
+                        .rotationEffect(Angle(degrees: 270))
+                        .animation(.linear(duration: 0.25), value: progress)
+                }
+                .frame(width: 140, height: 140)
+            }
+        }
+
+        @ViewBuilder private func bolusProgressView() -> some View {
+            if let progress = state.bolusProgress, let amount = state.bolusAmount {
+                let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
+                let bolused = bolusProgressFormatter.string(from: (amount * progress) as NSNumber) ?? ""
+
+                ZStack(alignment: .center) {
+                    BigFillablePieSegment(
+                        pieSegmentViewModel: bolusPieSegmentViewModel2,
+                        fillFraction: fillFraction,
+                        backgroundColor: backgroundColor,
+                        color: .blue,
+                        animateProgress: true,
+                        button3D: state.button3D,
+                        button3DBackground: state.button3DBackground,
+                        incidenceOfLight: state.incidenceOfLight,
+                        lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                            .atriumview
+                    )
+                    .frame(width: 140, height: 140)
+
+                    Circle()
+                        .fill(Color.black.opacity(0.2))
+                        .frame(width: 140, height: 140)
+
+                    Circle()
+                        .fill(backgroundColor.opacity(1.0))
+                        .frame(width: 115, height: 115)
+
+                    Circle()
+                        .fill(Color.clear)
+                        .frame(width: 25, height: 25)
+                        .overlay(
+                            Image(systemName: "pause.fill")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.white)
+                        )
+                        .onTapGesture { state.cancelBolus() }
+
+                    Text(
+                        bolused + " " + NSLocalizedString("of", comment: "") + " " +
+                            amount.formatted(.number.precision(.fractionLength(2))) +
+                            NSLocalizedString(" U", comment: " ")
+                    )
+                    .font(.system(size: 14))
+                    .foregroundStyle(Color.white)
+                    .offset(y: -86)
+                }
+                .frame(width: 140, height: 140)
+            }
+        }
 
         // HEADERVIEW Anfang
 
@@ -953,7 +891,6 @@ extension Home {
         private var stackedRightTopView: some View {
             VStack(spacing: 0) {
                 eventualBGView
-
                 if state.showPumpIcon {
                     Spacer().frame(height: 32)
                     pumpIconContent
@@ -961,7 +898,6 @@ extension Home {
                 } else {
                     Spacer().frame(height: 122)
                 }
-
                 loopView
             }
         }
@@ -1074,12 +1010,14 @@ extension Home {
         @ViewBuilder private func glucoseAndLoopView() -> some View {
             VStack {
                 glucoseView
-                    .frame(width: 110, height: 110)
+                    .frame(width: 140, height: 140)
             }
         }
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-            let height: CGFloat = display ? 120 : 230
+            let height: CGFloat = display ? 170 : 243
+            let overlayOffset: CGFloat = display ? -50 : -15
+
             LinearGradient(
                 gradient: Gradient(colors: [.clear, .clear, .clear]),
                 startPoint: .top,
@@ -1087,10 +1025,17 @@ extension Home {
             )
             .frame(height: fontSize < .extraExtraLarge ? height + geo.safeAreaInsets.top : height + 10 + geo.safeAreaInsets.top)
             .overlay(alignment: .top) {
-                lightGlowOverlayContent()
-                    .padding(.top, geo.safeAreaInsets.top + (display ? 5 : 20)) // neu
+                Color.clear
+                    .frame(height: 200)
+                    .padding(.top, geo.safeAreaInsets.top + overlayOffset)
+                    .overlay(alignment: .top) {
+                        if state.incidenceOfLight {
+                            lightGlowOverlayContent()
+                                .padding(.top, geo.safeAreaInsets.top + overlayOffset)
+                        }
+                    }
 
-                // Horizontale Hauptcontainer
+                // Horizontaler Hauptcontainer
                 HStack(spacing: 0) {
                     if !display {
                         stackedLeftTopView
@@ -1117,7 +1062,7 @@ extension Home {
                                 .frame(maxWidth: .infinity)
                         }
                     }
-                    .frame(maxWidth: .infinity) // Wichtig: Nimmt verfügbaren Platz ein
+                    .frame(maxWidth: .infinity)
 
                     if !display {
                         stackedRightTopView
@@ -1126,7 +1071,7 @@ extension Home {
                             .padding(.trailing, 20)
                     }
                 }
-                .padding(.top, geo.safeAreaInsets.top + (display ? 0 : 20))
+                .padding(.top, geo.safeAreaInsets.top + (state.incidenceOfLight ? 10 : -overlayOffset))
                 .animation(.easeInOut(duration: 1.2), value: display)
             }
         }
@@ -1285,8 +1230,6 @@ extension Home {
             }
         }
 
-        // InsulinView Ende
-
         // LoopView
 
         var loopView: some View {
@@ -1363,30 +1306,6 @@ extension Home {
 
         // Top Bars
 
-        // Standard
-
-        var danaBarStandard: some View {
-            if state.danaBar {
-                return AnyView(
-                    VStack(spacing: 20) {
-                        HStack(spacing: 20) {
-                            HStack(spacing: 10) {
-                                insulinAgeView
-                            }
-                            HStack(spacing: 10) {
-                                cannulaAgeView
-                            }
-                            HStack(spacing: 10) {
-                                sensorAgeDays
-                            }
-                        }
-                    }
-                )
-            } else {
-                return AnyView(EmptyView())
-            }
-        }
-
         // danaBarMax
 
         @ViewBuilder var danaBarMax: some View {
@@ -1396,27 +1315,13 @@ extension Home {
                         insulinAgeView.frame(width: 60)
                         cannulaAgeView.frame(width: 60)
                         batteryAgeView.frame(width: 60)
-                        sensorConditionalView
+                        // sensorConditionalView
                         BluetoothConnectionView.frame(width: 60)
                     }
                 }
             } else {
                 EmptyView()
             }
-        }
-
-        // Separater ViewBuilder für den bedingten Teil
-        @ViewBuilder private var sensorConditionalView: some View {
-            if shouldShowSensorAgeDays {
-                sensorAgeDays.frame(width: 60)
-            } else {
-                EmptyView().frame(width: 0)
-            }
-        }
-
-        // Hilfsfunktion zur Überprüfung des Sensor-Status
-        private var shouldShowSensorAgeDays: Bool {
-            true
         }
 
         // Top Bar Modules Start
@@ -1728,78 +1633,6 @@ extension Home {
             }
         }
 
-        private var sensorAgeDays: some View {
-            Group {
-                if state.displayExpiration2 {
-                    let totalHours = state.sensorAgeDays.asInt() * 24
-                    let remainingHours = max(1, totalHours - state.elapsedHours)
-                    let fillFraction: CGFloat = remainingHours <= 1 ? 1.0 : CGFloat(remainingHours) / CGFloat(totalHours)
-
-                    let sensorColor: Color = {
-                        switch remainingHours {
-                        case ...2: return .red
-                        case ...6: return .yellow
-                        default: return .white
-                        }
-                    }()
-
-                    let sensorAgeText: String = {
-                        guard let days = state.remainingSensorDays,
-                              let hours = state.remainingSensorHours,
-                              let minutes = state.remainingSensorMinutes
-                        else {
-                            return "\(state.sensorAgeDays.asInt())d"
-                        }
-
-                        if days >= 1 {
-                            return "\(days)d\(hours)h"
-                        } else if hours >= 1 {
-                            return "\(hours)h\(minutes)m"
-                        } else {
-                            return "\(minutes)m"
-                        }
-                    }()
-
-                    // let shouldBlink = sensorColor == .red
-
-                    ZStack {
-                        FillablePieSegment(
-                            pieSegmentViewModel: sensorAgeSegmentViewModel,
-                            color: .white,
-                            backgroundColor: .clear,
-                            displayText: sensorAgeText,
-                            symbolSize: 25,
-                            symbol: "sensor.tag.radiowaves.forward",
-                            animateProgress: true,
-                            button3D: state.button3D,
-                            button3DBackground: state.button3DBackground,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview,
-                            fillFraction: fillFraction,
-                            symbolBackgroundColor: backgroundColor,
-                            symbolColor: sensorColor
-                        )
-                        .frame(width: 60, height: 60)
-                        // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
-                    }
-                }
-            }
-        }
-
-        private func startSensorBlinkAnimationIfNeeded() {
-            isSensorBlinking = false
-            guard state.displayExpiration2 else { return }
-
-            let totalHours = state.sensorAgeDays.asInt() * 24
-            let remainingHours = max(1, totalHours - state.elapsedHours)
-            guard remainingHours < 24 else { return }
-
-            withAnimation(.easeInOut(duration: 0.8).repeatForever()) {
-                isSensorBlinking = true
-            }
-        }
-
         private var BluetoothConnectionView: some View {
             Group {
                 let connectionFraction: CGFloat = state.isConnected ? 1.0 : 0.0
@@ -1852,55 +1685,10 @@ extension Home {
             }
         }
 
-        private func formatSensorTime() -> String {
-            guard let days = state.remainingSensorDays,
-                  let hours = state.remainingSensorHours,
-                  let minutes = state.remainingSensorMinutes
-            else {
-                return "--"
-            }
-
-            let totalHours = Double(days * 24 + hours) + Double(minutes) / 60.0
-            return formatTime(totalHours)
-        }
-
-        private var sensorRemainingTime: String {
-            guard let days = state.remainingSensorDays,
-                  let hours = state.remainingSensorHours,
-                  let minutes = state.remainingSensorMinutes
-            else {
-                return "--"
-            }
-            return formatSensorTime(days: days, hours: hours, minutes: minutes)
-        }
-
-        private var sensorColor: Color {
-            if state.displayExpiration2 {
-                guard let days = state.remainingSensorDays,
-                      let hours = state.remainingSensorHours,
-                      let minutes = state.remainingSensorMinutes
-                else { return .white }
-
-                // Gesamtverbleibende Zeit in Minuten berechnen
-                let totalMinutes = (days * 24 * 60) + (hours * 60) + minutes
-                switch totalMinutes {
-                case ...120: // ≤ 2 Stunden (0-120 Minuten)
-                    return .red
-                case 121 ... 400:
-                    return .yellow
-                default: // > 12 Stunden
-                    return .white
-                }
-            } else {
-                return state.sensorAgeDays.asInt() > 13 ? .yellow : .white
-            }
-        }
-
         func startTimer() {
             timer?.invalidate() // Falls ein vorheriger Timer existiert, wird er gestoppt
             timer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: true) { _ in
                 state.specialDanaKitFunction()
-                state.updateRemainingSensorDays()
                 // Nach 15 Sekunden auf 60 Sekunden Intervall wechseln
                 if timerInterval == 2 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
@@ -1911,369 +1699,17 @@ extension Home {
             }
         }
 
-        // MARK: - Helper-Views for Standard 1 und DanaBar Ende
+        // MARK: - Helper-Views for DanaBar Ende
 
-        private func formatSensorTime(days: Int, hours: Int, minutes: Int) -> String {
-            if days >= 1 {
-                return "\(days)d\(hours)h"
-            } else if hours >= 1 {
-                return "\(hours)h\(minutes)m"
-            } else {
-                return "\(minutes)m"
-            }
-        }
-
-        // TopBar Standard 2
-
-        var danaBarStandard2: some View {
-            Group {
-                if state.danaBar {
-                    HStack(spacing: 15) {
-                        // Insulin Age
-                        if let insulinHours = state.insulinHours,
-                           let option = InsulinAgeOption(rawValue: state.insulinAgeOption)
-                        {
-                            let maxInsulinAge = option.maxInsulinAge
-                            let remainingHours = max(maxInsulinAge - insulinHours, 0)
-
-                            let incidenceOfLight = state.incidenceOfLight
-                            let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
-
-                            let insulinColor: Color = {
-                                if insulinHours >= maxInsulinAge { return .red }
-
-                                let remainingMinutes = remainingHours * 60
-                                return colorForRemainingMinutes(remainingMinutes)
-                            }()
-
-                            HStack(spacing: 4) {
-                                ZStack {
-                                    if state.button3D {
-                                        let glowColor1 = incidenceOfLight
-                                            ? lightGlowOverlaySelector.highlightColor
-                                            : Color.white.opacity(0.9)
-
-                                        let glowColor2 = incidenceOfLight
-                                            ? lightGlowOverlaySelector.highlightColor
-                                            : Color.white.opacity(0.4)
-
-                                        if state.button3DBackground {
-                                            Circle()
-                                                .fill(Color.black.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                                        }
-
-                                        Circle()
-                                            .stroke(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        glowColor1.opacity(0.9),
-                                                        glowColor2.opacity(0.6),
-                                                        Color.clear,
-                                                        Color.black.opacity(0.3),
-                                                        Color.black.opacity(0.6)
-                                                    ]),
-                                                    startPoint: .top,
-                                                    endPoint: .bottom
-                                                ),
-                                                lineWidth: 1
-                                            )
-                                            .frame(width: 40, height: 40)
-                                    } else {
-                                        if state.button3DBackground {
-                                            Circle()
-                                                .fill(Color.black.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                                        } else {
-                                            Circle()
-                                                .fill(Color.black.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                        }
-                                    }
-
-                                    if remainingHours <= 0 {
-                                        BigVialView(color: insulinColor)
-                                    } else {
-                                        NormalVialView(
-                                            color: insulinColor,
-                                            button3D: state.button3D,
-                                            button3DBackground: state.button3DBackground,
-                                            incidenceOfLight: state.incidenceOfLight,
-                                            lightGlowOverlaySelector: LightGlowOverlaySelector(
-                                                rawValue: state
-                                                    .lightGlowOverlaySelector
-                                            ) ??
-                                                .atriumview
-                                        )
-                                    }
-                                }
-                                .frame(width: 40, height: 40)
-
-                                Text(formatTime(remainingHours))
-                                    .foregroundColor(.white)
-                            }
-                        }
-                        // Cannula
-                        if let cannulaHours = state.cannulaHours,
-                           let option = CannulaAgeOption(rawValue: state.cannulaAgeOption)
-                        {
-                            let maxHours = option.maxCannulaAge
-                            let remainingHours = max(maxHours - cannulaHours, 0)
-
-                            let incidenceOfLight = state.incidenceOfLight
-                            let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
-
-                            let cannulaColor: Color = {
-                                if cannulaHours >= maxHours { return .red }
-
-                                let remainingMinutes = remainingHours * 60
-                                return colorForRemainingMinutes(remainingMinutes)
-                            }()
-
-                            HStack(spacing: 4) {
-                                ZStack {
-                                    if state.button3D {
-                                        let glowColor1 = incidenceOfLight
-                                            ? lightGlowOverlaySelector.highlightColor
-                                            : Color.white.opacity(0.9)
-
-                                        let glowColor2 = incidenceOfLight
-                                            ? lightGlowOverlaySelector.highlightColor
-                                            : Color.white.opacity(0.4)
-
-                                        if state.button3DBackground {
-                                            Circle()
-                                                .fill(Color.black.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                                        }
-
-                                        // Glow-Effekt-Ring
-                                        Circle()
-                                            .stroke(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        glowColor1.opacity(0.9),
-                                                        glowColor2.opacity(0.6),
-                                                        Color.clear,
-                                                        Color.black.opacity(0.3),
-                                                        Color.black.opacity(0.6)
-                                                    ]),
-                                                    startPoint: .top,
-                                                    endPoint: .bottom
-                                                ),
-                                                lineWidth: 1
-                                            )
-                                            .frame(width: 40, height: 40)
-                                    } else {
-                                        if state.button3DBackground {
-                                            Circle()
-                                                .fill(Color.black.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                                        } else {
-                                            Circle()
-                                                .fill(Color.black.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                        }
-                                    }
-
-                                    if remainingHours <= 0 {
-                                        BigFluidBagView(color: cannulaColor)
-                                    } else {
-                                        NormalFluidBagView(
-                                            color: cannulaColor,
-                                            button3D: state.button3D,
-                                            button3DBackground: state.button3DBackground,
-                                            incidenceOfLight: state.incidenceOfLight,
-                                            lightGlowOverlaySelector: LightGlowOverlaySelector(
-                                                rawValue: state
-                                                    .lightGlowOverlaySelector
-                                            ) ??
-                                                .atriumview
-                                        )
-                                    }
-                                }
-                                .frame(width: 40, height: 40)
-
-                                Text(formatTime(remainingHours))
-                                    .foregroundColor(.white)
-                            }
-                        }
-                        // Sensor
-                        if state.displayExpiration2 {
-                            let incidenceOfLight = state.incidenceOfLight
-                            let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
-
-                            HStack(spacing: 4) {
-                                ZStack {
-                                    if state.button3D {
-                                        let glowColor1 = incidenceOfLight
-                                            ? lightGlowOverlaySelector.highlightColor
-                                            : Color.white.opacity(0.9)
-
-                                        let glowColor2 = incidenceOfLight
-                                            ? lightGlowOverlaySelector.highlightColor
-                                            : Color.white.opacity(0.4)
-
-                                        if state.button3DBackground {
-                                            Circle()
-                                                .fill(Color.black.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                                        }
-
-                                        // Glow-Effekt-Ring
-                                        Circle()
-                                            .stroke(
-                                                LinearGradient(
-                                                    gradient: Gradient(colors: [
-                                                        glowColor1.opacity(0.9),
-                                                        glowColor2.opacity(0.6),
-                                                        Color.clear,
-                                                        Color.black.opacity(0.3),
-                                                        Color.black.opacity(0.6)
-                                                    ]),
-                                                    startPoint: .top,
-                                                    endPoint: .bottom
-                                                ),
-                                                lineWidth: 1
-                                            )
-                                            .frame(width: 40, height: 40)
-                                    } else {
-                                        if state.button3DBackground {
-                                            Circle()
-                                                .fill(Color.black.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                                        } else {
-                                            Circle()
-                                                .fill(Color.black.opacity(0.2))
-                                                .frame(width: 40, height: 40)
-                                        }
-                                    }
-
-                                    if useBigSensorView {
-                                        BigSensorView(
-                                            color: sensorColor
-                                        )
-
-                                    } else {
-                                        NormalSensorView(
-                                            color: sensorColor,
-                                            button3D: state.button3D,
-                                            button3DBackground: state.button3DBackground,
-                                            incidenceOfLight: state.incidenceOfLight,
-                                            lightGlowOverlaySelector: LightGlowOverlaySelector(
-                                                rawValue: state
-                                                    .lightGlowOverlaySelector
-                                            ) ??
-                                                .atriumview
-                                        )
-                                    }
-                                }
-                                .frame(width: 30, height: 30)
-
-                                Text(formatSensorTime())
-                                    .foregroundColor(.white)
-                            }
-                        }
-                    }
-                    .font(.system(size: 16, weight: .light, design: .default))
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 12)
-                    .dynamicTypeSize(...DynamicTypeSize.xxLarge)
-                }
-            }
-        }
-
-        struct BigVialView: View {
-            var color: Color
-            var body: some View {
-                Image(systemName: "alarm.fill")
-                    .font(.system(size: 45))
-                    .foregroundColor(color)
-                    .offset(y: -2.5)
-            }
-        }
-
-        struct NormalVialView: View {
-            var color: Color
-            var button3D: Bool
-            var button3DBackground: Bool
-            var incidenceOfLight: Bool
-            var lightGlowOverlaySelector: LightGlowOverlaySelector
-            var body: some View {
-                Image(systemName: "cross.vial")
-                    .font(.system(size: 20))
-                    .foregroundColor(color)
-            }
-        }
-
-        private struct BigFluidBagView: View {
-            var color: Color
-            var body: some View {
-                Image(systemName: "alarm.fill")
-                    .font(.system(size: 45))
-                    .foregroundColor(color)
-                    .offset(y: -2.5)
-            }
-        }
-
-        private struct NormalFluidBagView: View {
-            var color: Color
-            var button3D: Bool
-            var button3DBackground: Bool
-            var incidenceOfLight: Bool
-            var lightGlowOverlaySelector: LightGlowOverlaySelector
-
-            var body: some View {
-                InsulinCatheterSymbol(color: color) // Farbe übergeben
-                    .scaleEffect(1.0) // Skaliert auf 100% der Basisgröße (20x20)
-                    .offset(y: -1.5)
-            }
-        }
-
-        private struct BigSensorView: View {
-            var color: Color
-            var body: some View {
-                Image(systemName: "alarm.fill")
-                    .font(.system(size: 45))
-                    .foregroundColor(color)
-                    .offset(y: -2.5)
-            }
-        }
-
-        private struct NormalSensorView: View {
-            var color: Color
-            var button3D: Bool
-            var button3DBackground: Bool
-            var incidenceOfLight: Bool
-            var lightGlowOverlaySelector: LightGlowOverlaySelector
-
-            var body: some View {
-                Image(systemName: "sensor.tag.radiowaves.forward")
-                    .font(.system(size: 20))
-                    .foregroundColor(color)
-            }
-        }
-
-        private var useBigSensorView: Bool {
-            guard state.displayExpiration2,
-                  let days = state.remainingSensorDays,
-                  let hours = state.remainingSensorHours,
-                  let minutes = state.remainingSensorMinutes
-            else { return false }
-
-            // Gesamtrestzeit in Stunden
-            let totalRemaining = Double(days * 24 + hours) + Double(minutes) / 60.0
-            return totalRemaining <= 6.0 // Stellschraube wann er zum großen Icon wechselt
-        }
+        /*    private func formatSensorTime(days: Int, hours: Int, minutes: Int) -> String {
+             if days >= 1 {
+                 return "\(days)d\(hours)h"
+             } else if hours >= 1 {
+                 return "\(hours)h\(minutes)m"
+             } else {
+                 return "\(minutes)m"
+             }
+         }*/
 
         // TopBars Ende
 
@@ -2313,25 +1749,47 @@ extension Home {
 
         var chart: some View {
             VStack(spacing: 0) {
-                Group {
-                    switch DanaBarOption(rawValue: state.danaBarOption) ?? .max {
-                    case .max:
-                        danaBarMax
-                            .padding(.vertical, 10)
-                            .padding(.top, 20)
-                    case .standard2:
-                        danaBarStandard2
-                            .padding(.vertical, 10)
-                            .padding(.top, 20)
-                    }
-                    mainChart.padding(.top, 35)
-                    tempTargetbar.padding(.top, 35)
-                    bottomBar.padding(.top, 20).padding(.bottom, 10)
-                        .frame(width: UIScreen.main.bounds.width)
+                if state.danaBar {
+                    danaBarMax
+                        .padding(.vertical, 10)
+                        .padding(.top, 20)
                 }
+
+                mainChart
+                    .padding(.top, 35)
+
+                tempTargetbar
+                    .padding(.top, 35)
+
+                bottomBar
+                    .padding(.top, 20)
+                    .padding(.bottom, 10)
+                    .frame(width: UIScreen.main.bounds.width)
             }
             .frame(minHeight: UIScreen.main.bounds.height / 1.7) // Je größer der Wert, desto kleiner der mainChart
         }
+
+        /*     var chart: some View {
+             VStack(spacing: 0) {
+                 Group {
+                     switch DanaBarOption(rawValue: state.danaBar) ?? .max {
+                     case .max:
+                         danaBarMax
+                             .padding(.vertical, 10)
+                             .padding(.top, 20)
+                     case .standard2:
+                         danaBarStandard2
+                             .padding(.vertical, 10)
+                             .padding(.top, 20)
+                     }
+                     mainChart.padding(.top, 35)
+                     tempTargetbar.padding(.top, 35)
+                     bottomBar.padding(.top, 20).padding(.bottom, 10)
+                         .frame(width: UIScreen.main.bounds.width)
+                 }
+             }
+             .frame(minHeight: UIScreen.main.bounds.height / 1.7) // Je größer der Wert, desto kleiner der mainChart
+         }*/
 
         var tempTargetbar: some View {
             ZStack {

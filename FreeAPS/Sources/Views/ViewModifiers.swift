@@ -500,7 +500,7 @@ struct Sage: View {
     // Fixed colors configuration
     private let strokeColor = Color.white.opacity(0.4)
     private let normalFillColor = Color.blue.opacity(0.4)
-    private let backgroundFillColor = Color.gray.opacity(0.8)
+    private let backgroundFillColor = Color.gray.opacity(0.0)
 
     var body: some View {
         let fill = min(max(expiration / amount, 0.15), 1.0)

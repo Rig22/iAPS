@@ -116,16 +116,11 @@
   "loopViewOption": "view1",
   "chartBackgroundColored": false,
   "carbInsulinLoopViewOption": false,
-  "barViewOptionConfigurationRawValue": "none",
   "topBarActive": false,
-  "danaBarActive": false,
   "ttBarActive": false,
   "bottomBarActive": false,
   "button3D": false,
-  "sensorAgeDays": "Fuenfzehn_Tage",
-  "sensorStartTime": "distantPast",
   "lightGlowOverlaySelector": "atriumview",
-  "sensorStartTimeDefault": "distantPast",
   "incidenceOfLight": "false"
 }
 
