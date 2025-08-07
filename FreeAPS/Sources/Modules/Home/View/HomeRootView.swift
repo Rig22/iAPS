@@ -340,6 +340,21 @@ extension Home {
             }
         }
 
+        @ViewBuilder private func lightGlowOverlayContent() -> some View {
+            if state.incidenceOfLight {
+                if let selectedOverlay = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) {
+                    switch selectedOverlay {
+                    case .atriumview: LightGlowOverlay()
+                    case .atriumview1: LightGlowOverlay1()
+                    case .atriumview2: LightGlowOverlay2()
+                    case .atriumview3: LightGlowOverlay3()
+                    case .atriumview4: LightGlowOverlay4()
+                    case .atriumview5: LightGlowOverlay5()
+                    }
+                }
+            }
+        }
+
         // Pie Animation Anfang
 
         struct PieSliceView: Shape {
@@ -1017,25 +1032,11 @@ extension Home {
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             let height: CGFloat = display ? 170 : 243
             let overlayOffset: CGFloat = display ? -50 : -15
+            let topCorrectionOn: CGFloat = display ? 10 : 20 // Bei aktiviertem Light
+            let topCorrectionOff: CGFloat = display ? -10 : -10 // Bei deaktiviertem Light
 
-            LinearGradient(
-                gradient: Gradient(colors: [.clear, .clear, .clear]),
-                startPoint: .top,
-                endPoint: .bottom
-            )
-            .frame(height: fontSize < .extraExtraLarge ? height + geo.safeAreaInsets.top : height + 10 + geo.safeAreaInsets.top)
-            .overlay(alignment: .top) {
-                Color.clear
-                    .frame(height: 200)
-                    .padding(.top, geo.safeAreaInsets.top + overlayOffset)
-                    .overlay(alignment: .top) {
-                        if state.incidenceOfLight {
-                            lightGlowOverlayContent()
-                                .padding(.top, geo.safeAreaInsets.top + overlayOffset)
-                        }
-                    }
-
-                // Horizontaler Hauptcontainer
+            ZStack(alignment: .top) {
+                // Hauptcontainer mit dynamischem Korrektur-Padding
                 HStack(spacing: 0) {
                     if !display {
                         stackedLeftTopView
@@ -1071,24 +1072,16 @@ extension Home {
                             .padding(.trailing, 20)
                     }
                 }
-                .padding(.top, geo.safeAreaInsets.top + (state.incidenceOfLight ? 10 : -overlayOffset))
+                .padding(.top, geo.safeAreaInsets.top + (state.incidenceOfLight ? topCorrectionOn : topCorrectionOff))
                 .animation(.easeInOut(duration: 1.2), value: display)
-            }
-        }
 
-        @ViewBuilder private func lightGlowOverlayContent() -> some View {
-            if state.incidenceOfLight {
-                if let selectedOverlay = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) {
-                    switch selectedOverlay {
-                    case .atriumview: LightGlowOverlay()
-                    case .atriumview1: LightGlowOverlay1()
-                    case .atriumview2: LightGlowOverlay2()
-                    case .atriumview3: LightGlowOverlay3()
-                    case .atriumview4: LightGlowOverlay4()
-                    case .atriumview5: LightGlowOverlay5()
-                    }
+                // Overlay nur wenn aktiviert
+                if state.incidenceOfLight {
+                    lightGlowOverlayContent()
+                        .padding(.top, geo.safeAreaInsets.top + overlayOffset)
                 }
             }
+            .frame(height: fontSize < .extraExtraLarge ? height + geo.safeAreaInsets.top : height + 10 + geo.safeAreaInsets.top)
         }
 
         // Head Ende
