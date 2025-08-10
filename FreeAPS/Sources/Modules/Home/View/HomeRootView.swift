@@ -275,82 +275,32 @@ extension Home {
         }
 
         struct LightGlowOverlay: View {
-            var body: some View {
-                RadialGradient(gradient: Gradient(colors: [
-                    Color.gray.opacity(0.7),
-                    Color.clear
-                ]), center: .top, startRadius: 50, endRadius: 200)
-                    .ignoresSafeArea()
-                    .offset(y: -50)
-            }
-        }
+            let color: Color
+            // let offsetY: CGFloat
 
-        struct LightGlowOverlay1: View {
             var body: some View {
-                RadialGradient(gradient: Gradient(colors: [
-                    Color.white.opacity(0.7),
-                    Color.clear
-                ]), center: .top, startRadius: 50, endRadius: 200)
-                    .ignoresSafeArea()
-                    .offset(y: -50)
-            }
-        }
-
-        struct LightGlowOverlay2: View {
-            var body: some View {
-                RadialGradient(gradient: Gradient(colors: [
-                    Color.loopYellow.opacity(0.7),
-                    Color.clear
-                ]), center: .top, startRadius: 50, endRadius: 200)
-                    .ignoresSafeArea()
-                    .offset(y: -50)
-            }
-        }
-
-        struct LightGlowOverlay3: View {
-            var body: some View {
-                RadialGradient(gradient: Gradient(colors: [
-                    Color.orange.opacity(0.7),
-                    Color.clear
-                ]), center: .top, startRadius: 50, endRadius: 200)
-                    .ignoresSafeArea()
-                    .offset(y: -50)
-            }
-        }
-
-        struct LightGlowOverlay4: View {
-            var body: some View {
-                RadialGradient(gradient: Gradient(colors: [
-                    Color.red.opacity(0.7),
-                    Color.clear
-                ]), center: .top, startRadius: 50, endRadius: 200)
-                    .ignoresSafeArea()
-                    .offset(y: -50)
-            }
-        }
-
-        struct LightGlowOverlay5: View {
-            var body: some View {
-                RadialGradient(gradient: Gradient(colors: [
-                    Color.NorthernLights.opacity(0.7),
-                    Color.clear
-                ]), center: .top, startRadius: 50, endRadius: 200)
-                    .ignoresSafeArea()
-                    .offset(y: -50)
+                RadialGradient(
+                    gradient: Gradient(colors: [color.opacity(0.7), .clear]),
+                    center: .top,
+                    startRadius: 50,
+                    endRadius: 200
+                )
+                .ignoresSafeArea()
+                .offset(y: -130)
+                .allowsHitTesting(false) // 👈 Touch-Events durchlassen
+                .accessibility(hidden: true) // Für VoiceOver unsichtbar
             }
         }
 
         @ViewBuilder private func lightGlowOverlayContent() -> some View {
-            if state.incidenceOfLight {
-                if let selectedOverlay = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) {
-                    switch selectedOverlay {
-                    case .atriumview: LightGlowOverlay()
-                    case .atriumview1: LightGlowOverlay1()
-                    case .atriumview2: LightGlowOverlay2()
-                    case .atriumview3: LightGlowOverlay3()
-                    case .atriumview4: LightGlowOverlay4()
-                    case .atriumview5: LightGlowOverlay5()
-                    }
+            if state.incidenceOfLight, let selectedOverlay = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) {
+                switch selectedOverlay {
+                case .atriumview: LightGlowOverlay(color: .gray)
+                case .atriumview1: LightGlowOverlay(color: .white)
+                case .atriumview2: LightGlowOverlay(color: .loopYellow)
+                case .atriumview3: LightGlowOverlay(color: .orange)
+                case .atriumview4: LightGlowOverlay(color: .red)
+                case .atriumview5: LightGlowOverlay(color: .NorthernLights)
                 }
             }
         }
@@ -506,110 +456,6 @@ extension Home {
             }
         }
 
-        struct FillablePieSegment2: View {
-            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
-
-            var color: Color
-            var backgroundColor: Color
-            var symbolSize: CGFloat
-            var symbol: String
-            var animateProgress: Bool
-            var button3D: Bool
-            var button3DBackground: Bool
-            var incidenceOfLight: Bool
-            var lightGlowOverlaySelector: LightGlowOverlaySelector
-            var fillFraction: CGFloat
-            var symbolRotation: Double = 0
-            var symbolBackgroundColor: Color = .clear
-            var symbolColor: Color? = nil
-
-            let angularGradient = AngularGradient(
-                gradient: Gradient(colors: [
-                    Color.gray.opacity(0.3)
-                ]),
-                center: .center,
-                startAngle: .degrees(0),
-                endAngle: .degrees(360)
-            )
-
-            var body: some View {
-                VStack {
-                    ZStack {
-                        if button3D {
-                            let glowColor1 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor
-                                : Color.white.opacity(0.7)
-
-                            let glowColor2 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor
-                                : Color.white.opacity(0.4)
-
-                            if button3DBackground {
-                                Circle()
-                                    .fill(Color.black.opacity(0.2))
-                                    .frame(width: 31, height: 31)
-                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                            }
-
-                            Circle()
-                                .stroke(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            glowColor1.opacity(0.7),
-                                            glowColor2.opacity(0.3),
-                                            Color.clear,
-                                            Color.black.opacity(0.3),
-                                            Color.black.opacity(0.6)
-                                        ]),
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    ),
-                                    lineWidth: 2
-                                )
-                                .frame(width: 31, height: 31)
-                        } else {
-                            Circle()
-                                .fill(Color.black.opacity(0.2))
-                                .frame(width: 31, height: 31)
-                        }
-
-                        PieSliceView(
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                        )
-                        .fill(color.opacity(0.0))
-                        .frame(width: 30, height: 30)
-                        .opacity(0.5)
-
-                        // Symbol-Hintergrund (NEU, 40x40)
-                        if symbolBackgroundColor != .clear {
-                            Circle()
-                                .fill(symbolBackgroundColor.opacity(0.0))
-                                .frame(width: 30, height: 30)
-                        }
-
-                        Image(systemName: symbol)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: symbolSize, height: symbolSize)
-                            .foregroundColor(symbolColor ?? .white)
-                            .rotationEffect(.degrees(symbolRotation))
-                    }
-
-                    /* Text(displayText)
-                     .font(.system(size: 15))
-                     .foregroundColor(.white)*/
-                }
-                .offset(y: 8)
-                .onAppear {
-                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-                }
-                .onChange(of: fillFraction) { _, newValue in
-                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-                }
-            }
-        }
-
         struct BigFillablePieSegment: View {
             @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
 
@@ -655,7 +501,7 @@ extension Home {
                         endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
                     )
                     .fill(color)
-                    .frame(width: 140, height: 140)
+                    .frame(width: 120, height: 120)
                     .opacity(1.0)
                 }
                 .onAppear {
@@ -712,7 +558,7 @@ extension Home {
                     if state.button3DBackground {
                         Circle()
                             .fill(Color.black.opacity(0.2))
-                            .frame(width: 140, height: 140)
+                            .frame(width: 120, height: 120)
                             .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
                     }
 
@@ -729,13 +575,13 @@ extension Home {
                                 startPoint: .top,
                                 endPoint: .bottom
                             ),
-                            lineWidth: 2
+                            lineWidth: 1
                         )
-                        .frame(width: 140, height: 140)
+                        .frame(width: 120, height: 120)
                 } else {
                     Circle()
                         .fill(Color.black.opacity(0.2))
-                        .frame(width: 140, height: 140)
+                        .frame(width: 120, height: 120)
                 }
                 CurrentGlucoseView(
                     recentGlucose: $state.recentGlucose,
@@ -801,7 +647,7 @@ extension Home {
                         .rotationEffect(Angle(degrees: 270))
                         .animation(.linear(duration: 0.25), value: progress)
                 }
-                .frame(width: 140, height: 140)
+                .frame(width: 120, height: 120)
             }
         }
 
@@ -823,25 +669,32 @@ extension Home {
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview
                     )
-                    .frame(width: 140, height: 140)
+                    .frame(width: 120, height: 120)
 
                     Circle()
                         .fill(Color.black.opacity(0.2))
-                        .frame(width: 140, height: 140)
+                        .frame(width: 120, height: 120)
 
                     Circle()
                         .fill(backgroundColor.opacity(1.0))
-                        .frame(width: 115, height: 115)
+                        .frame(width: 100, height: 100)
 
-                    Circle()
-                        .fill(Color.clear)
-                        .frame(width: 25, height: 25)
-                        .overlay(
-                            Image(systemName: "pause.fill")
-                                .font(.system(size: 20, weight: .bold))
-                                .foregroundColor(.white)
-                        )
-                        .onTapGesture { state.cancelBolus() }
+                    // WICHTIG: Diesen Bereich mit allowsHitTesting isolieren
+                    ZStack {
+                        Circle()
+                            .fill(Color.clear)
+                            .frame(width: 25, height: 25)
+                            .overlay(
+                                Image(systemName: "pause.fill")
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundColor(.white)
+                            )
+                    }
+                    .contentShape(Rectangle()) // Tappbare Fläche vergrößern
+                    .allowsHitTesting(true) // Touch-Events explizit erlauben
+                    .onTapGesture {
+                        state.cancelBolus()
+                    }
 
                     Text(
                         bolused + " " + NSLocalizedString("of", comment: "") + " " +
@@ -852,9 +705,61 @@ extension Home {
                     .foregroundStyle(Color.white)
                     .offset(y: -86)
                 }
-                .frame(width: 140, height: 140)
+                .frame(width: 120, height: 120)
+                .compositingGroup() // Verhindert Überlagerungsprobleme
             }
         }
+
+        /*  @ViewBuilder private func bolusProgressView() -> some View {
+             if let progress = state.bolusProgress, let amount = state.bolusAmount {
+                 let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
+                 let bolused = bolusProgressFormatter.string(from: (amount * progress) as NSNumber) ?? ""
+
+                 ZStack(alignment: .center) {
+                     BigFillablePieSegment(
+                         pieSegmentViewModel: bolusPieSegmentViewModel2,
+                         fillFraction: fillFraction,
+                         backgroundColor: backgroundColor,
+                         color: .blue,
+                         animateProgress: true,
+                         button3D: state.button3D,
+                         button3DBackground: state.button3DBackground,
+                         incidenceOfLight: state.incidenceOfLight,
+                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
+                             .atriumview
+                     )
+                     .frame(width: 120, height: 120)
+
+                     Circle()
+                         .fill(Color.black.opacity(0.2))
+                         .frame(width: 120, height: 120)
+
+                     Circle()
+                         .fill(backgroundColor.opacity(1.0))
+                         .frame(width: 100, height: 100)
+
+                     Circle()
+                         .fill(Color.clear)
+                         .frame(width: 25, height: 25)
+                         .overlay(
+                             Image(systemName: "pause.fill")
+                                 .font(.system(size: 20, weight: .bold))
+                                 .foregroundColor(.white)
+                         )
+                         .onTapGesture { state.cancelBolus() }
+
+                     Text(
+                         bolused + " " + NSLocalizedString("of", comment: "") + " " +
+                             amount.formatted(.number.precision(.fractionLength(2))) +
+                             NSLocalizedString(" U", comment: " ")
+                     )
+                     .font(.system(size: 14))
+                     .foregroundStyle(Color.white)
+                     .offset(y: -86)
+                 }
+                 .frame(width: 120, height: 120)
+             }
+         }*/
 
         // HEADERVIEW Anfang
 
@@ -864,6 +769,10 @@ extension Home {
 
         @ViewBuilder private var pumpIconContent: some View {
             ZStack {
+                Circle()
+                    .fill(backgroundColor)
+                    .frame(width: 60, height: 60)
+
                 FillablePieSegment(
                     pieSegmentViewModel: connectionPieSegmentViewModel,
                     color: Color.white.opacity(0.5),
@@ -1025,7 +934,7 @@ extension Home {
         @ViewBuilder private func glucoseAndLoopView() -> some View {
             VStack {
                 glucoseView
-                    .frame(width: 140, height: 140)
+                    .frame(width: 120, height: 120)
             }
         }
 
@@ -1751,64 +1660,11 @@ extension Home {
                 mainChart
                     .padding(.top, 35)
 
-                tempTargetbar
-                    .padding(.top, 35)
-
                 bottomBar
                     .padding(.top, 20)
-                    .padding(.bottom, 10)
                     .frame(width: UIScreen.main.bounds.width)
             }
-            .frame(minHeight: UIScreen.main.bounds.height / 1.7) // Je größer der Wert, desto kleiner der mainChart
-        }
-
-        var tempTargetbar: some View {
-            ZStack {
-                if state.tempTargetbar {
-                    Targetbar
-                } else {}
-            }
-            .frame(maxWidth: .infinity, maxHeight: state.tempTargetbar ? 25 : 0)
-        }
-
-        var Targetbar: some View {
-            HStack {
-                if state.pumpSuspended {
-                    Text("Pump suspended")
-                        .font(.extraSmall)
-                        .bold()
-                        .foregroundStyle(Color.orange)
-                        .frame(maxWidth: UIScreen.main.bounds.width * 0.3, alignment: .leading)
-                        .frame(height: 20)
-                }
-
-                if let tempTargetString = tempTargetString, !(fetchedPercent.first?.enabled ?? false) {
-                    Text(tempTargetString)
-                        .foregroundStyle(Color.white)
-                        .frame(maxWidth: UIScreen.main.bounds.width * 0.4, alignment: .center)
-                        .frame(height: 20)
-                } else {
-                    profileView
-                        .frame(maxWidth: UIScreen.main.bounds.width * 0.4, alignment: .center)
-                        .frame(height: 20)
-                }
-
-                if state.closedLoop, state.maxIOB == 0 {
-                    Text("Check Max IOB Setting")
-                        .font(.extraSmall)
-                        .foregroundColor(.orange)
-                        .frame(maxWidth: UIScreen.main.bounds.width * 0.3, alignment: .trailing)
-                }
-            }
-
-            .background(
-                TimeEllipse(
-                    button3D: state.button3D,
-                    button3DBackground: state.button3DBackground,
-                    incidenceOfLight: state.incidenceOfLight,
-                    lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
-                )
-            )
+            .frame(minHeight: UIScreen.main.bounds.height / 1.82) // Je größer der Wert, desto kleiner der mainChart
         }
 
         // BottomInfoBar Start
@@ -2052,7 +1908,48 @@ extension Home {
             .contentShape(Circle())
         }
 
-        // ButtonPanel mit modernen SF Symbols für iOS 17
+        @State private var showTargetBubble = false
+
+        struct TargetBubbleView<Content: View>: View {
+            let content: Content
+
+            init(@ViewBuilder content: () -> Content) {
+                self.content = content()
+            }
+
+            var body: some View {
+                VStack(spacing: 0) {
+                    content
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color.black.opacity(0.3))
+                        )
+                        .foregroundColor(.white)
+                        .font(.caption) // vorher .caption
+
+                    Triangle()
+                        .fill(Color.black.opacity(0.3))
+                        .frame(width: 20, height: 12)
+                        .offset(y: 2)
+                }
+            }
+        }
+
+        struct Triangle: Shape {
+            func path(in rect: CGRect) -> Path {
+                var path = Path()
+                path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+                path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
+                path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+                path.closeSubpath()
+                return path
+            }
+        }
+
+        @State private var showProfileBubble = false
+
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {
                 backgroundColor
@@ -2060,134 +1957,186 @@ extension Home {
 
                 let isOverride = fetchedPercent.first?.enabled ?? false
                 let isTarget = (state.tempTarget != nil)
+                let buttonsPresence: [Bool] = [
+                    state.carbButton,
+                    true, // IOB Button immer da
+                    state.allowManualTemp,
+                    state.profileButton,
+                    state.useTargetButton,
+                    true, // UI/UX Button immer da
+                    true // Settings Button immer da
+                ]
 
-                HStack {
-                    // Carb Button
-                    if state.carbButton {
-                        ZStack {
-                            buttonWithCircle(
-                                iconName: "apple.logo",
-                                symbolRenderingMode: .palette,
-                                colors: [.orange, .clear],
-                                circleColor: Color.black.opacity(1.0),
-                                gradient: LinearGradient(
-                                    gradient: Gradient(colors: [.green, .yellow, .orange]),
-                                    startPoint: .bottom,
-                                    endPoint: .top
-                                )
-                            ) {
-                                state.showModal(for: .addCarbs(editMode: false, override: false))
-                            }
+                let totalButtons = buttonsPresence.filter { $0 }.count
+                let indexOfProfileButton = buttonsPresence.prefix(4).filter { $0 }
+                    .count - 1
+                ZStack {
+                    HStack {
+                        // Carb Button
+                        if state.carbButton {
+                            ZStack {
+                                buttonWithCircle(
+                                    iconName: "apple.logo",
+                                    symbolRenderingMode: .palette,
+                                    colors: [.orange, .clear],
+                                    circleColor: Color.black.opacity(1.0),
+                                    gradient: LinearGradient(
+                                        gradient: Gradient(colors: [.green, .yellow, .orange]),
+                                        startPoint: .bottom,
+                                        endPoint: .top
+                                    )
+                                ) {
+                                    state.showModal(for: .addCarbs(editMode: false, override: false))
+                                }
 
-                            if let carbsReq = state.carbsRequired {
-                                Text(numberFormatter.string(from: carbsReq as NSNumber)!)
-                                    .font(.caption)
-                                    .foregroundColor(.white)
-                                    .padding(4)
-                                    .background(Capsule().fill(Color.red))
-                                    .offset(x: 20, y: 10)
+                                if let carbsReq = state.carbsRequired {
+                                    Text(numberFormatter.string(from: carbsReq as NSNumber)!)
+                                        .font(.caption)
+                                        .foregroundColor(.white)
+                                        .padding(4)
+                                        .background(Capsule().fill(Color.red))
+                                        .offset(x: 20, y: 10)
+                                }
                             }
+                            .frame(maxWidth: .infinity)
+                        }
+
+                        // IOB Button
+                        buttonWithCircle(
+                            iconName: "drop.fill",
+                            colors: [.blue, .clear],
+                            circleColor: Color.black.opacity(1.0)
+                        ) {
+                            (state.bolusProgress != nil) ? showBolusActiveAlert = true :
+                                state.showModal(for: .bolus(
+                                    waitForSuggestion: state.useCalc ? true : false,
+                                    fetch: false
+                                ))
                         }
                         .frame(maxWidth: .infinity)
-                    }
 
-                    // IOB Button
-                    buttonWithCircle(
-                        // iconName: "syringe.custom",
-                        iconName: "drop.fill",
-                        colors: [.blue, .clear], // [Spritzenfarbe, Kreisfarbe]
-                        circleColor: Color.black.opacity(1.0)
-                    ) {
-                        (state.bolusProgress != nil) ? showBolusActiveAlert = true :
-                            state.showModal(for: .bolus(
-                                waitForSuggestion: state.useCalc ? true : false,
-                                fetch: false
-                            ))
-                    }
-                    .frame(maxWidth: .infinity)
+                        // Manual Temp Basal Button
+                        if state.allowManualTemp {
+                            buttonWithCircle(
+                                iconName: "speedometer",
+                                symbolRenderingMode: .monochrome,
+                                colors: [.gray],
+                                circleColor: Color.black.opacity(1.0)
+                            ) {
+                                state.showModal(for: .manualTempBasal)
+                            }
+                            .frame(maxWidth: .infinity)
+                        }
 
-                    // Manual Temp Basal Button
-                    if state.allowManualTemp {
+                        if state.profileButton {
+                            buttonWithCircle(
+                                iconName: isOverride ? "person.crop.circle.fill.badge.checkmark" : "person.crop.circle",
+                                symbolRenderingMode: .palette,
+                                colors: [.purple, isOverride ? .green : .gray],
+                                circleColor: Color.black.opacity(1.0)
+                            ) {
+                                // Leere Aktion, damit wir Gesten komplett selbst steuern
+                            }
+                            .simultaneousGesture(
+                                LongPressGesture(minimumDuration: 0.5)
+                                    .onEnded { _ in
+                                        withAnimation {
+                                            showProfileBubble = true
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                            withAnimation {
+                                                showProfileBubble = false
+                                            }
+                                        }
+                                    }
+                            )
+                            .simultaneousGesture(
+                                TapGesture()
+                                    .onEnded {
+                                        if isOverride {
+                                            showCancelAlert.toggle()
+                                        } else {
+                                            state.showModal(for: .overrideProfilesConfig)
+                                        }
+                                    }
+                            )
+                            .frame(maxWidth: .infinity)
+                        }
+
+                        // Target Button
+                        /*    if state.useTargetButton {
+                             buttonWithCircle(
+                                 iconName: "scope",
+                                 symbolRenderingMode: .palette,
+                                 colors: [isTarget ? .red : .white, .clear],
+                                 circleColor: Color.black.opacity(1.0)
+                             ) {
+                                 if isTarget {
+                                     showCancelTTAlert.toggle()
+                                 } else {
+                                     state.showModal(for: .addTempTarget)
+                                 }
+                             }
+                             .frame(maxWidth: .infinity)
+                         }*/
+
+                        // UI/UX Button
                         buttonWithCircle(
-                            iconName: "speedometer",
-                            symbolRenderingMode: .monochrome,
+                            iconName: "square.3.layers.3d",
+                            symbolRenderingMode: .palette,
+                            colors: [.purple, .blue],
+                            circleColor: Color.black.opacity(1.0)
+                        ) {
+                            state.showModal(for: .statisticsConfig)
+                        }
+                        .frame(maxWidth: .infinity)
+
+                        // Settings Button
+                        buttonWithCircle(
+                            iconName: "gearshape.fill",
+                            symbolRenderingMode: .hierarchical,
                             colors: [.gray],
                             circleColor: Color.black.opacity(1.0)
                         ) {
-                            state.showModal(for: .manualTempBasal)
+                            if !didLongPress {
+                                state.showModal(for: .settings)
+                            }
+                            didLongPress = false
                         }
+                        .simultaneousGesture(
+                            LongPressGesture().onEnded { _ in
+                                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                                impactHeavy.impactOccurred()
+                                state.isStatusPopupPresented.toggle()
+                                didLongPress = true
+                            }
+                        )
                         .frame(maxWidth: .infinity)
                     }
+                    .padding(.horizontal, 5)
+                    .padding(.bottom, 15)
 
-                    // Profile Button
-                    if state.profileButton {
-                        buttonWithCircle(
-                            iconName: isOverride ? "person.crop.circle.fill.badge.checkmark" : "person.crop.circle",
-                            symbolRenderingMode: .palette,
-                            colors: [.purple, isOverride ? .green : .gray],
-                            circleColor: Color.black.opacity(1.0)
-                        ) {
-                            if isOverride {
-                                showCancelAlert.toggle()
+                    if showProfileBubble && state.profileButton {
+                        TargetBubbleView {
+                            if let tempTargetString = tempTargetString,
+                               !(fetchedPercent.first?.enabled ?? false)
+                            {
+                                Text(tempTargetString)
+                                    .foregroundStyle(Color.white)
                             } else {
-                                state.showModal(for: .overrideProfilesConfig)
+                                profileView
                             }
                         }
-                        .frame(maxWidth: .infinity)
+                        .frame(width: 350)
+                        .offset(
+                            x: -geo.size.width / 2 + // Linker Rand des HStack
+                                (geo.size.width / CGFloat(totalButtons)) * CGFloat(indexOfProfileButton) + // bis Profil-Button
+                                (geo.size.width / CGFloat(totalButtons) / 2), // in die Mitte des Buttons
+                            y: -55
+                        )
+                        .transition(.scale.combined(with: .opacity))
                     }
-
-                    // Target Button
-                    if state.useTargetButton {
-                        buttonWithCircle(
-                            iconName: "scope",
-                            symbolRenderingMode: .palette,
-                            colors: [isTarget ? .red : .white, .clear],
-                            circleColor: Color.black.opacity(1.0)
-                        ) {
-                            if isTarget {
-                                showCancelTTAlert.toggle()
-                            } else {
-                                state.showModal(for: .addTempTarget)
-                            }
-                        }
-                        .frame(maxWidth: .infinity)
-                    }
-
-                    // UI/UX Button
-                    buttonWithCircle(
-                        iconName: "square.3.layers.3d",
-                        symbolRenderingMode: .palette,
-                        colors: [.purple, .blue],
-                        circleColor: Color.black.opacity(1.0)
-                    ) {
-                        state.showModal(for: .statisticsConfig)
-                    }
-                    .frame(maxWidth: .infinity)
-
-                    // Settings Button
-                    buttonWithCircle(
-                        iconName: "gearshape.fill",
-                        symbolRenderingMode: .hierarchical,
-                        colors: [.gray],
-                        circleColor: Color.black.opacity(1.0)
-                    ) {
-                        if !didLongPress {
-                            state.showModal(for: .settings)
-                        }
-                        didLongPress = false
-                    }
-                    .simultaneousGesture(
-                        LongPressGesture().onEnded { _ in
-                            let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                            impactHeavy.impactOccurred()
-                            state.isStatusPopupPresented.toggle()
-                            didLongPress = true
-                        }
-                    )
-                    .frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal, 5)
-                .padding(.bottom, 15)
             }
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .confirmationDialog("Cancel Profile Override", isPresented: $showCancelAlert) {
