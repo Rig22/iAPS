@@ -90,7 +90,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var hideInsulinBadge: Bool = false
     var extended_overrides = false
     var displayExpiration = false
-    var displayExpiration2 = false
+    // var displayExpiration2 = false
     var displaySAGE = true
     var sensorDays: Double = 10
     var fpus: Bool = true
@@ -143,20 +143,14 @@ struct FreeAPSSettings: JSON, Equatable {
     var tempTargetbar: Bool = false
     var backgroundColorOption: BackgroundColorOption = .darkBlue
     var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
-    var danaBarOption: String = DanaBarOption.max.rawValue
     var insulinAgeOption: String = "Drei_Tage"
     var cannulaAgeOption: String = "Drei_Tage"
     var chartBackgroundColored: Bool = false
     var carbInsulinLoopViewOption: Bool = false
-    var barViewOptionConfigurationRawValue: String = BarViewOptionConfiguration.none.rawValue
     var topBarActive: Bool = false
-    var danaBarActive: Bool = false
     var ttBarActive: Bool = false
     var bottomBarActive: Bool = false
     var button3D: Bool = false
-    var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
-    var sensorStartTime: Date?
-    var sensorStartTimeDefault = Date.distantPast
     var incidenceOfLight = false
     var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview.rawValue
     var insulinHours: Double?
@@ -559,9 +553,9 @@ extension FreeAPSSettings: Decodable {
             settings.displayExpiration = displayExpiration
         }
 
-        if let displayExpiration2 = try? container.decode(Bool.self, forKey: .displayExpiration2) {
-            settings.displayExpiration2 = displayExpiration2
-        }
+        /* if let displayExpiration2 = try? container.decode(Bool.self, forKey: .displayExpiration2) {
+             settings.displayExpiration2 = displayExpiration2
+         }*/
 
         if let displaySAGE = try? container.decode(Bool.self, forKey: .displaySAGE) {
             settings.displaySAGE = displaySAGE
@@ -712,9 +706,7 @@ extension FreeAPSSettings: Decodable {
         if let backgroundColorOptionRawValue = try? container.decode(String.self, forKey: .backgroundColorOptionRawValue) {
             settings.backgroundColorOptionRawValue = backgroundColorOptionRawValue
         }
-        if let danaBarOption = try? container.decode(String.self, forKey: .danaBarOption) {
-            settings.danaBarOption = danaBarOption
-        }
+
         if let insulinAgeOption = try? container.decode(String.self, forKey: .insulinAgeOption) {
             settings.insulinAgeOption = insulinAgeOption
         }
@@ -739,32 +731,14 @@ extension FreeAPSSettings: Decodable {
                 = topBarActive
         }
 
-        if let danaBarActive = try? container.decode(Bool.self, forKey: .danaBarActive) {
-            settings.danaBarActive = danaBarActive
-        }
         if let ttBarActive = try? container.decode(Bool.self, forKey: .ttBarActive) {
             settings.ttBarActive = ttBarActive
         }
         if let bottomBarActive = try? container.decode(Bool.self, forKey: .bottomBarActive) {
             settings.bottomBarActive = bottomBarActive
         }
-        if let barViewOptionConfigurationRawValue = try? container.decode(
-            String.self,
-            forKey: .barViewOptionConfigurationRawValue
-        ) {
-            settings.barViewOptionConfigurationRawValue = barViewOptionConfigurationRawValue
-        }
         if let button3D = try? container.decode(Bool.self, forKey: .button3D) {
             settings.button3D = button3D
-        }
-        if let sensorAgeDays = try? container.decode(SensorAgeDays.self, forKey: .sensorAgeDays) {
-            settings.sensorAgeDays = sensorAgeDays
-        }
-        if let sensorStartTime = try? container.decode(Date.self, forKey: .sensorStartTime) {
-            settings.sensorStartTime = sensorStartTime
-        }
-        if let sensorStartTimeDefault = try? container.decode(Date.self, forKey: .sensorStartTimeDefault) {
-            settings.sensorStartTimeDefault = sensorStartTimeDefault
         }
         if let incidenceOfLight = try? container.decode(Bool.self, forKey: .incidenceOfLight) {
             settings.incidenceOfLight = incidenceOfLight

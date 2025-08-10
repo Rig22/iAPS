@@ -140,8 +140,10 @@ struct PumpView: View {
                             reservoirFormatter
                                 .string(from: (insulin * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ?? ""
                         )
-                        Text("U").foregroundStyle(.white)
+                        // Text("U").foregroundStyle(.white)
+                        Text("U")
                     }
+                    .foregroundStyle(.white)
                     .offset(x: 2, y: 0)
 
                     medtrumInsulinAmount(portion: 1 - portion)
@@ -206,8 +208,9 @@ struct PumpView: View {
                                 .string(from: (insulin * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ??
                                 ""
                         )
-                        Text("U").foregroundStyle(.white)
+                        Text("U")
                     }
+                    .foregroundStyle(.white)
                     .offset(x: 6, y: 0) // Horizontal adjustment
                     podInsulinAmount(portion: amountFraction)
                         .padding(.leading, showInsulinBadge ? 7 : 0)
@@ -276,7 +279,14 @@ struct PumpView: View {
     }
 
     private func remainingTime(time: TimeInterval) -> some View {
-        HStack {
+        let color: Color = {
+            if time <= 0 { return .red }
+            else if time < 4 * 60 * 60 { return .red }
+            else if time < 24 * 60 * 60 { return .yellow }
+            else { return .white }
+        }()
+
+        return HStack {
             if time > 0 {
                 let days = Int(time / 1.days.timeInterval)
                 let hours = Int(time / 1.hours.timeInterval)
@@ -286,31 +296,67 @@ struct PumpView: View {
                 if days >= 1 {
                     HStack(spacing: 0) {
                         Text(" \(days)")
-                        Text(NSLocalizedString("d", comment: "abbreviation for days")).foregroundStyle(.white)
+                        Text(NSLocalizedString("d", comment: "abbreviation for days"))
                         if adjustedHours >= 0 {
                             Text(" ")
                             Text("\(adjustedHours)")
-                            Text(NSLocalizedString("h", comment: "abbreviation for hours")).foregroundStyle(.white)
+                            Text(NSLocalizedString("h", comment: "abbreviation for hours"))
                         }
                     }
                 } else if hours >= 1 {
                     HStack(spacing: 0) {
                         Text("\(hours)")
                         Text(NSLocalizedString("h", comment: "abbreviation for hours"))
-                            .foregroundStyle(time < 4 * 60 * 60 ? .red : .white)
                     }
                 } else {
                     HStack(spacing: 0) {
                         Text(" \(minutes)")
                         Text(NSLocalizedString("m", comment: "abbreviation for minutes"))
-                            .foregroundStyle(time < 4 * 60 * 60 ? .red : .white)
                     }
                 }
             } else {
-                Text(NSLocalizedString("Replace", comment: "View/Header when pod expired")).foregroundStyle(.red)
+                Text(NSLocalizedString("Replace", comment: "View/Header when pod expired"))
             }
         }
+        .foregroundStyle(color)
     }
+
+    /*  private func remainingTime(time: TimeInterval) -> some View {
+         HStack {
+             if time > 0 {
+                 let days = Int(time / 1.days.timeInterval)
+                 let hours = Int(time / 1.hours.timeInterval)
+                 let minutes = Int(time / 1.minutes.timeInterval)
+                 let adjustedHours = Int(hours - days * 24)
+
+                 if days >= 1 {
+                     HStack(spacing: 0) {
+                         Text(" \(days)")
+                         Text(NSLocalizedString("d", comment: "abbreviation for days")).foregroundStyle(.white)
+                         if adjustedHours >= 0 {
+                             Text(" ")
+                             Text("\(adjustedHours)")
+                             Text(NSLocalizedString("h", comment: "abbreviation for hours")).foregroundStyle(.white)
+                         }
+                     }
+                 } else if hours >= 1 {
+                     HStack(spacing: 0) {
+                         Text("\(hours)")
+                         Text(NSLocalizedString("h", comment: "abbreviation for hours"))
+                             .foregroundStyle(time < 4 * 60 * 60 ? .red : .white)
+                     }
+                 } else {
+                     HStack(spacing: 0) {
+                         Text(" \(minutes)")
+                         Text(NSLocalizedString("m", comment: "abbreviation for minutes"))
+                             .foregroundStyle(time < 4 * 60 * 60 ? .red : .white)
+                     }
+                 }
+             } else {
+                 Text(NSLocalizedString("Replace", comment: "View/Header when pod expired")).foregroundStyle(.red)
+             }
+         }
+     }*/
 
     private var batteryColor: Color {
         guard let battery = battery, let percent = battery.percent else {

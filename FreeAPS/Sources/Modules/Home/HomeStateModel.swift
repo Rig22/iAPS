@@ -76,7 +76,7 @@ extension Home {
         @Published var maxCOB: Decimal = 0
         @Published var autoisf = false
         @Published var displayExpiration = false
-        @Published var displayExpiration2 = false
+        // @Published var displayExpiration2 = false
         @Published var displaySAGE = true
         @Published var cgm: CGMType = .nightscout
         @Published var sensorDays: Double = 10
@@ -93,16 +93,9 @@ extension Home {
         @Published var tempTargetbar: Bool = false
         @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
-        @Published var danaBarOption: String = DanaBarOption.standard2.rawValue
         @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = false
         @Published var button3D: Bool = false
-        @Published var sensorAgeDays: SensorAgeDays = .Fuenfzehn_Tage
-        @Published var sensorStartTime: Date?
-        @Published var remainingSensorDays: Int?
-        @Published var remainingSensorHours: Int?
-        @Published var remainingSensorMinutes: Int?
-        @Published var elapsedMinutes: Int = 0
         @Published var incidenceOfLight: Bool = false
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview.rawValue
         @Published var insulinHours: Double?
@@ -177,15 +170,6 @@ extension Home {
             }
         }
 
-        var elapsedHours: Int {
-            guard let startTime = sensorStartTime else {
-                return 0
-            }
-
-            let hours = Calendar.current.dateComponents([.hour], from: startTime, to: Date()).hour ?? 0
-            return hours
-        }
-
         override func subscribe() {
             setupGlucose()
             setupBasals()
@@ -250,7 +234,7 @@ extension Home {
             autoisf = settingsManager.settings.autoisf
             hours = settingsManager.settings.hours
             displayExpiration = settingsManager.settings.displayExpiration
-            displayExpiration2 = settingsManager.settings.displayExpiration2
+            // displayExpiration2 = settingsManager.settings.displayExpiration2
             displaySAGE = settingsManager.settings.displaySAGE
             cgm = settingsManager.settings.cgm
             sensorDays = switch settingsManager.settings.cgm {
@@ -272,14 +256,11 @@ extension Home {
             tempTargetbar = settingsManager.settings.tempTargetbar
             timeSettings = settingsManager.settings.timeSettings
             backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
-            danaBarOption = settingsManager.settings.danaBarOption
             insulinAgeOption = settingsManager.settings.insulinAgeOption
             cannulaAgeOption = settingsManager.settings.cannulaAgeOption
             chartBackgroundColored = settingsManager.settings.chartBackgroundColored
             carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
             button3D = settingsManager.settings.button3D
-            sensorAgeDays = settingsManager.settings.sensorAgeDays
-            sensorStartTime = settingsManager.settings.sensorStartTime
             incidenceOfLight = settingsManager.settings.incidenceOfLight
             lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
             button3DBackground = settingsManager.settings.button3DBackground
@@ -853,29 +834,6 @@ extension Home.StateModel:
         setupCob()
     }
 
-    func updateRemainingSensorDays() {
-        if let startTime = sensorStartTime {
-            let now = Date()
-            elapsedMinutes = Int(now.timeIntervalSince(startTime) / 60)
-            let totalMinutes = sensorAgeDays.asInt() * 24 * 60
-            let remainingMinutes = max(0, totalMinutes - elapsedMinutes)
-
-            // Immer berechnen:
-            let days = remainingMinutes / (24 * 60)
-            let hours = (remainingMinutes % (24 * 60)) / 60
-            let minutes = remainingMinutes % 60
-
-            remainingSensorDays = days
-            remainingSensorHours = hours
-            remainingSensorMinutes = minutes
-        } else {
-            // Fallback
-            remainingSensorDays = sensorAgeDays.asInt()
-            remainingSensorHours = 0
-            remainingSensorMinutes = 0
-        }
-    }
-
     func settingsDidChange(_ settings: FreeAPSSettings) {
         allowManualTemp = !settings.closedLoop
         uploadStats = settingsManager.settings.uploadStats
@@ -908,7 +866,6 @@ extension Home.StateModel:
         autoisf = settingsManager.settings.autoisf
         hours = settingsManager.settings.hours
         displayExpiration = settingsManager.settings.displayExpiration
-        displayExpiration2 = settingsManager.settings.displayExpiration2
         displaySAGE = settingsManager.settings.displaySAGE
         cgm = settingsManager.settings.cgm
         carbButton = settingsManager.settings.carbButton
@@ -935,13 +892,9 @@ extension Home.StateModel:
         tempTargetbar = settingsManager.settings.tempTargetbar
         timeSettings = settingsManager.settings.timeSettings
         backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
-        danaBarOption = settingsManager.settings.danaBarOption
         chartBackgroundColored = settingsManager.settings.chartBackgroundColored
         carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
         button3D = settingsManager.settings.button3D
-        sensorAgeDays = settingsManager.settings.sensorAgeDays
-        sensorStartTime = settingsManager.settings.sensorStartTime
-        updateRemainingSensorDays()
         incidenceOfLight = settingsManager.settings.incidenceOfLight
         lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
         button3DBackground = settingsManager.settings.button3DBackground

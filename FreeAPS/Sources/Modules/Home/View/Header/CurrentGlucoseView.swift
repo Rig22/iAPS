@@ -95,49 +95,35 @@ struct CurrentGlucoseView: View {
 
     var body: some View {
         ZStack {
-            if displayExpiration || displaySAGE {
-                sageView
-                    .offset(x: -9, y: -70)
-            }
-            // TriangleShape(color: triangleColor)
+            // Hintergrund-Dreieck
             TriangleShape(color: currentTriangleColor)
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))
                 .animation(.easeInOut(duration: 3.0), value: rotationDegrees)
 
-            VStack(alignment: .center) {
-                HStack {
-                    Text(
-                        (recentGlucose?.glucose ?? 100) == 400 ? "HIGH" : recentGlucose?.glucose
-                            .map {
-                                glucoseFormatter
-                                    .string(from: Double(units == .mmolL ? $0.asMmolL : Decimal($0)) as NSNumber)!
-                            } ?? "--"
-                    )
-                    .font(.system(size: 30, weight: .bold))
-                    .foregroundColor(alwaysUseColors ? colourGlucoseText : .white)
+            // Dynamische vertikale Anordnung
+            VStack(spacing: 0) {
+                // Oberer Bereich für SAGE/Expiration (nur bei Bedarf)
+                if displayExpiration || displaySAGE {
+                    sageView
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 25) // Reduzierte Höhe für oberen Bereich
+                        .padding(.top, 20)
+                        .offset(x: -22)
                 }
-                HStack {
-                    let elapsedSeconds = -1 * (recentGlucose?.dateString.timeIntervalSinceNow ?? 0)
-                    let elapsedMinutes = elapsedSeconds / 60
-                    let timeText = timaAgoFormatter.string(for: floor(elapsedMinutes)) ?? ""
 
-                    Text(
-                        elapsedSeconds < 60 ? "Now" : "\(timeText) min"
-                    )
-                    .font(.caption2)
-                    .foregroundStyle(Color.white)
-
-                    Text(
-                        delta
-                            .map {
-                                deltaFormatter.string(from: Double(units == .mmolL ? $0.asMmolL : Decimal($0)) as NSNumber)!
-                            } ?? "--"
-                    )
-                    .font(.caption2)
-                    .foregroundStyle(Color.white)
+                // Unterer Bereich für Glukosewert
+                VStack {
+                    Spacer()
+                    glucoseContentView
+                    Spacer()
                 }
+                .frame(maxHeight: .infinity)
+                .padding(.top, (displayExpiration || displaySAGE) ? 0 : 0) // Anpassung hier
+                .offset(y: (displayExpiration || displaySAGE) ? -8 : 0) // 8 Pixel nach oben verschieben
             }
+            .frame(width: 140, height: 140)
         }
+        .frame(width: 140, height: 140)
         .onChange(of: recentGlucose?.direction) { _, newDirection in
             switch newDirection {
             case .doubleUp,
@@ -167,7 +153,43 @@ struct CurrentGlucoseView: View {
                 bumpEffect = 0
             }
         }
-        // .frame(width: !scrolling ? 140 : 80, height: !scrolling ? 140 : 80)
+    }
+
+    private var glucoseContentView: some View {
+        VStack(alignment: .center, spacing: 4) {
+            HStack {
+                Text(
+                    (recentGlucose?.glucose ?? 100) == 400 ? "HIGH" : recentGlucose?.glucose
+                        .map {
+                            glucoseFormatter
+                                .string(from: Double(units == .mmolL ? $0.asMmolL : Decimal($0)) as NSNumber)!
+                        } ?? "--"
+                )
+                .font(.system(size: 30, weight: .bold))
+                .foregroundColor(alwaysUseColors ? colourGlucoseText : .white)
+            }
+
+            HStack {
+                let elapsedSeconds = -1 * (recentGlucose?.dateString.timeIntervalSinceNow ?? 0)
+                let elapsedMinutes = elapsedSeconds / 60
+                let timeText = timaAgoFormatter.string(for: floor(elapsedMinutes)) ?? ""
+
+                Text(
+                    elapsedSeconds < 60 ? "Now" : "\(timeText) min"
+                )
+                .font(.system(size: 12))
+                .foregroundStyle(Color.white)
+
+                Text(
+                    delta
+                        .map {
+                            deltaFormatter.string(from: Double(units == .mmolL ? $0.asMmolL : Decimal($0)) as NSNumber)!
+                        } ?? "--"
+                )
+                .font(.caption2)
+                .foregroundStyle(Color.white)
+            }
+        }
     }
 
     private var adjustments: (degree: Double, x: CGFloat, y: CGFloat) {
@@ -236,7 +258,7 @@ struct CurrentGlucoseView: View {
                     (displaySAGE && sensorAge < 1 * 8.64E4)
 
                 Sage(amount: sensorAge, expiration: expiration, lineColour: lineColour, sensordays: sensordays)
-                    .frame(width: 30, height: 30)
+                    .frame(width: 32, height: 32)
                     .overlay {
                         HStack {
                             Text(
@@ -301,7 +323,7 @@ struct TriangleShape: View {
             .fill(color)
             .frame(width: 30, height: 30)
             .rotationEffect(.degrees(90))
-            .offset(x: 70)
+            .offset(x: 85)
     }
 }
 
