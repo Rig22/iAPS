@@ -68,6 +68,7 @@ struct MainChartView: View {
         static let pointSizeHeightCarbs: Double = 5
         static let bolusHeight: Decimal = 45
         static let carbHeight: Decimal = 45
+        static let carbWidth: CGFloat = 5
     }
 
     private enum Command {
@@ -192,6 +193,9 @@ struct MainChartView: View {
             .onChange(of: data.showCobChart) {
                 update(fullSize: geo.size)
             }
+            .onChange(of: data.useCarbBars) {
+                update(fullSize: geo.size)
+            }
             .onReceive(
                 Foundation.NotificationCenter.default
                     .publisher(for: UIDevice.orientationDidChangeNotification)
@@ -297,7 +301,20 @@ struct MainChartView: View {
                         path.addLine(to: CGPoint(x: 0, y: lowLineY))
                         path.closeSubpath()
                     }
-                    .fill(Color.green.opacity(0.2))
+                    //  .fill(Color.green.opacity(0.2))
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color.green.opacity(0.7),
+                                Color.green.opacity(0.4),
+                                Color.black.opacity(0.3),
+                                Color.clear
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        ),
+                        style: FillStyle(eoFill: false, antialiased: true)
+                    )
                 }
 
                 // Existierende Linien-Darstellung
@@ -2062,8 +2079,8 @@ extension MainChartView {
             let height = carbHeight(amount: value.carbs)
             let rect = CGRect(
                 x: center.x,
-                y: center.y + Config.carbOffset,
-                width: width(value: value.carbs),
+                y: center.y + Config.insulinOffset,
+                width: min(width(value: value.carbs), Config.carbWidth),
                 height: height
             )
             return DotInfo(rect: rect, value: value.carbs)

@@ -679,7 +679,6 @@ extension Home {
                         .fill(backgroundColor.opacity(1.0))
                         .frame(width: 100, height: 100)
 
-                    // WICHTIG: Diesen Bereich mit allowsHitTesting isolieren
                     ZStack {
                         Circle()
                             .fill(Color.clear)
@@ -691,7 +690,7 @@ extension Home {
                             )
                     }
                     .contentShape(Rectangle()) // Tappbare Fläche vergrößern
-                    .allowsHitTesting(true) // Touch-Events explizit erlauben
+                    .allowsHitTesting(true)
                     .onTapGesture {
                         state.cancelBolus()
                     }
@@ -709,57 +708,6 @@ extension Home {
                 .compositingGroup() // Verhindert Überlagerungsprobleme
             }
         }
-
-        /*  @ViewBuilder private func bolusProgressView() -> some View {
-             if let progress = state.bolusProgress, let amount = state.bolusAmount {
-                 let fillFraction = max(min(CGFloat(progress), 1.0), 0.0)
-                 let bolused = bolusProgressFormatter.string(from: (amount * progress) as NSNumber) ?? ""
-
-                 ZStack(alignment: .center) {
-                     BigFillablePieSegment(
-                         pieSegmentViewModel: bolusPieSegmentViewModel2,
-                         fillFraction: fillFraction,
-                         backgroundColor: backgroundColor,
-                         color: .blue,
-                         animateProgress: true,
-                         button3D: state.button3D,
-                         button3DBackground: state.button3DBackground,
-                         incidenceOfLight: state.incidenceOfLight,
-                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                             .atriumview
-                     )
-                     .frame(width: 120, height: 120)
-
-                     Circle()
-                         .fill(Color.black.opacity(0.2))
-                         .frame(width: 120, height: 120)
-
-                     Circle()
-                         .fill(backgroundColor.opacity(1.0))
-                         .frame(width: 100, height: 100)
-
-                     Circle()
-                         .fill(Color.clear)
-                         .frame(width: 25, height: 25)
-                         .overlay(
-                             Image(systemName: "pause.fill")
-                                 .font(.system(size: 20, weight: .bold))
-                                 .foregroundColor(.white)
-                         )
-                         .onTapGesture { state.cancelBolus() }
-
-                     Text(
-                         bolused + " " + NSLocalizedString("of", comment: "") + " " +
-                             amount.formatted(.number.precision(.fractionLength(2))) +
-                             NSLocalizedString(" U", comment: " ")
-                     )
-                     .font(.system(size: 14))
-                     .foregroundStyle(Color.white)
-                     .offset(y: -86)
-                 }
-                 .frame(width: 120, height: 120)
-             }
-         }*/
 
         // HEADERVIEW Anfang
 
@@ -1603,16 +1551,6 @@ extension Home {
 
         // MARK: - Helper-Views for DanaBar Ende
 
-        /*    private func formatSensorTime(days: Int, hours: Int, minutes: Int) -> String {
-             if days >= 1 {
-                 return "\(days)d\(hours)h"
-             } else if hours >= 1 {
-                 return "\(hours)h\(minutes)m"
-             } else {
-                 return "\(minutes)m"
-             }
-         }*/
-
         // TopBars Ende
 
         var mainChart: some View {
@@ -1950,6 +1888,274 @@ extension Home {
 
         @State private var showProfileBubble = false
 
+        /*     @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
+             ZStack {
+                 backgroundColor
+                     .frame(height: 60 + geo.safeAreaInsets.bottom)
+
+                 let isOverride = fetchedPercent.first?.enabled ?? false
+                 let isTarget = (state.tempTarget != nil)
+                 let buttonsPresence: [Bool] = [
+                     state.carbButton,
+                     true, // IOB Button immer da
+                     state.allowManualTemp,
+                     state.profileButton,
+                     state.useTargetButton,
+                     true, // UI/UX Button immer da
+                     true // Settings Button immer da
+                 ]
+
+                 let totalButtons = buttonsPresence.filter { $0 }.count
+                 let indexOfProfileButton = buttonsPresence.prefix(4).filter { $0 }
+                     .count - 1
+                 ZStack {
+                     HStack {
+                         // Carb Button
+                         if state.carbButton {
+                             ZStack {
+                                 buttonWithCircle(
+                                     iconName: "apple.logo",
+                                     symbolRenderingMode: .palette,
+                                     colors: [.orange, .clear],
+                                     circleColor: Color.black.opacity(1.0),
+                                     gradient: LinearGradient(
+                                         gradient: Gradient(colors: [.green, .yellow, .orange]),
+                                         startPoint: .bottom,
+                                         endPoint: .top
+                                     )
+                                 ) {
+                                     state.showModal(for: .addCarbs(editMode: false, override: false))
+                                 }
+
+                                 if let carbsReq = state.carbsRequired {
+                                     Text(numberFormatter.string(from: carbsReq as NSNumber)!)
+                                         .font(.caption)
+                                         .foregroundColor(.white)
+                                         .padding(4)
+                                         .background(Capsule().fill(Color.red))
+                                         .offset(x: 20, y: 10)
+                                 }
+                             }
+                             .frame(maxWidth: .infinity)
+                         }
+
+                         // IOB Button
+                         buttonWithCircle(
+                             iconName: "drop.fill",
+                             colors: [.blue, .clear],
+                             circleColor: Color.black.opacity(1.0)
+                         ) {
+                             (state.bolusProgress != nil) ? showBolusActiveAlert = true :
+                                 state.showModal(for: .bolus(
+                                     waitForSuggestion: state.useCalc ? true : false,
+                                     fetch: false
+                                 ))
+                         }
+                         .frame(maxWidth: .infinity)
+
+                         // Manual Temp Basal Button
+                         if state.allowManualTemp {
+                             buttonWithCircle(
+                                 iconName: "speedometer",
+                                 symbolRenderingMode: .monochrome,
+                                 colors: [.gray],
+                                 circleColor: Color.black.opacity(1.0)
+                             ) {
+                                 state.showModal(for: .manualTempBasal)
+                             }
+                             .frame(maxWidth: .infinity)
+                         }
+
+                         if state.profileButton {
+                             buttonWithCircle(
+                                 iconName: isOverride ? "person.crop.circle.fill.badge.checkmark" : "person.crop.circle",
+                                 symbolRenderingMode: .palette,
+                                 colors: [.purple, isOverride ? .green : .gray],
+                                 circleColor: Color.black.opacity(1.0)
+                             ) {
+                                 // Leere Aktion, damit wir Gesten komplett selbst steuern
+                             }
+                             .simultaneousGesture(
+                                 LongPressGesture(minimumDuration: 0.5)
+                                     .onEnded { _ in
+                                         withAnimation {
+                                             showProfileBubble = true
+                                         }
+                                         DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                             withAnimation {
+                                                 showProfileBubble = false
+                                             }
+                                         }
+                                     }
+                             )
+                             .simultaneousGesture(
+                                 TapGesture()
+                                     .onEnded {
+                                         if isOverride {
+                                             showCancelAlert.toggle()
+                                         } else {
+                                             state.showModal(for: .overrideProfilesConfig)
+                                         }
+                                     }
+                             )
+                             .frame(maxWidth: .infinity)
+                         }
+
+                         // Target Button
+                      /*       if state.useTargetButton {
+                              buttonWithCircle(
+                                  iconName: "scope",
+                                  symbolRenderingMode: .palette,
+                                  colors: [isTarget ? .red : .white, .clear],
+                                  circleColor: Color.black.opacity(1.0)
+                              ) {
+                                  if isTarget {
+                                      showCancelTTAlert.toggle()
+                                  } else {
+                                      state.showModal(for: .addTempTarget)
+                                  }
+                              }
+                              .frame(maxWidth: .infinity)
+                          }*/
+
+                         // Target Button
+                         // Target Button Index (analog zum Profil-Button Index)
+                         let indexOfTargetButton =  state.useTargetButton
+                             ? buttonOrder.firstIndex(of: .target) ?? 0
+                             : 0
+
+                         // Target Button
+                         if state.useTargetButton {
+                             buttonWithCircle(
+                                 iconName: "scope",
+                                 symbolRenderingMode: .palette,
+                                 colors: [isTarget ? .red : .white, .clear],
+                                 circleColor: Color.black.opacity(1.0)
+                             ) {
+                                 // leer, Gesten unten
+                             }
+                             .simultaneousGesture(
+                                 LongPressGesture(minimumDuration: 0.5)
+                                     .onEnded { _ in
+                                         withAnimation {
+                                             showTargetBubble = true
+                                         }
+                                         DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                                             withAnimation {
+                                                 showTargetBubble = false
+                                             }
+                                         }
+                                     }
+                             )
+                             .simultaneousGesture(
+                                 TapGesture()
+                                     .onEnded {
+                                         if isTarget {
+                                             showCancelTTAlert.toggle()
+                                         } else {
+                                             state.showModal(for: .addTempTarget)
+                                         }
+                                     }
+                             )
+                             .frame(maxWidth: .infinity)
+                         }
+
+                         // UI/UX Button
+                         buttonWithCircle(
+                             iconName: "square.3.layers.3d",
+                             symbolRenderingMode: .palette,
+                             colors: [.purple, .blue],
+                             circleColor: Color.black.opacity(1.0)
+                         ) {
+                             state.showModal(for: .statisticsConfig)
+                         }
+                         .frame(maxWidth: .infinity)
+
+                         // Settings Button
+                         buttonWithCircle(
+                             iconName: "gearshape.fill",
+                             symbolRenderingMode: .hierarchical,
+                             colors: [.gray],
+                             circleColor: Color.black.opacity(1.0)
+                         ) {
+                             if !didLongPress {
+                                 state.showModal(for: .settings)
+                             }
+                             didLongPress = false
+                         }
+                         .simultaneousGesture(
+                             LongPressGesture().onEnded { _ in
+                                 let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                                 impactHeavy.impactOccurred()
+                                 state.isStatusPopupPresented.toggle()
+                                 didLongPress = true
+                             }
+                         )
+                         .frame(maxWidth: .infinity)
+                     }
+                     .padding(.horizontal, 5)
+                     .padding(.bottom, 15)
+
+                     // Profile Bubble Anzeige
+                     if showProfileBubble && state.profileButton {
+                         TargetBubbleView {
+                             if let tempTargetString = tempTargetString,
+                                !(fetchedPercent.first?.enabled ?? false)
+                             {
+                                 Text(tempTargetString)
+                                     .foregroundStyle(Color.white)
+                             } else {
+                                 profileView
+                             }
+                         }
+                         .frame(width: 350)
+                         .offset(
+                             x: -geo.size.width / 2 + // Linker Rand des HStack
+                                 (geo.size.width / CGFloat(totalButtons)) * CGFloat(indexOfProfileButton) + // bis Profil-Button
+                                 (geo.size.width / CGFloat(totalButtons) / 2), // in die Mitte des Buttons
+                             y: -55
+                         )
+                         .transition(.scale.combined(with: .opacity))
+                     }
+
+                     // Target Bubble
+                     if showTargetBubble && state.useTargetButton {
+                         TargetBubbleView {
+                             if let tempTargetString = tempTargetString,
+                                !(fetchedPercent.first?.enabled ?? false)
+                             {
+                                 Text(tempTargetString)
+                                     .foregroundStyle(Color.white)
+                             } else {
+                                 Text("Kein TempTarget aktiv")
+                                     .foregroundStyle(Color.gray)
+                             }
+                         }
+                         .frame(width: 350)
+                         .offset(
+                             x: -geo.size.width / 2 +
+                                 (geo.size.width / CGFloat(totalButtons)) * CGFloat(indexOfTargetButton) +
+                                 (geo.size.width / CGFloat(totalButtons) / 2),
+                             y: -55
+                         )
+                         .transition(.scale.combined(with: .opacity))
+                     }                }
+             }
+             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+             .confirmationDialog("Cancel Profile Override", isPresented: $showCancelAlert) {
+                 Button("Cancel Profile Override", role: .destructive) {
+                     state.cancelProfile()
+                     triggerUpdate.toggle()
+                 }
+             }
+             .confirmationDialog("Cancel Temporary Target", isPresented: $showCancelTTAlert) {
+                 Button("Cancel Temporary Target", role: .destructive) {
+                     state.cancelTempTarget()
+                 }
+             }
+             .padding(.bottom, 20)
+         }*/
+
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {
                 backgroundColor
@@ -1968,8 +2174,10 @@ extension Home {
                 ]
 
                 let totalButtons = buttonsPresence.filter { $0 }.count
-                let indexOfProfileButton = buttonsPresence.prefix(4).filter { $0 }
-                    .count - 1
+                // sichere Indizes (0-basierend unter den sichtbaren Buttons)
+                let indexOfProfileButton = max(0, buttonsPresence.prefix(4).filter { $0 }.count - 1)
+                let indexOfTargetButton = max(0, buttonsPresence.prefix(5).filter { $0 }.count - 1)
+
                 ZStack {
                     HStack {
                         // Carb Button
@@ -2028,6 +2236,7 @@ extension Home {
                             .frame(maxWidth: .infinity)
                         }
 
+                        // Profile Button
                         if state.profileButton {
                             buttonWithCircle(
                                 iconName: isOverride ? "person.crop.circle.fill.badge.checkmark" : "person.crop.circle",
@@ -2035,7 +2244,7 @@ extension Home {
                                 colors: [.purple, isOverride ? .green : .gray],
                                 circleColor: Color.black.opacity(1.0)
                             ) {
-                                // Leere Aktion, damit wir Gesten komplett selbst steuern
+                                // Leere Aktion: Tap / LongPress werden per Gesten gesteuert
                             }
                             .simultaneousGesture(
                                 LongPressGesture(minimumDuration: 0.5)
@@ -2064,21 +2273,40 @@ extension Home {
                         }
 
                         // Target Button
-                        /*    if state.useTargetButton {
-                             buttonWithCircle(
-                                 iconName: "scope",
-                                 symbolRenderingMode: .palette,
-                                 colors: [isTarget ? .red : .white, .clear],
-                                 circleColor: Color.black.opacity(1.0)
-                             ) {
-                                 if isTarget {
-                                     showCancelTTAlert.toggle()
-                                 } else {
-                                     state.showModal(for: .addTempTarget)
-                                 }
-                             }
-                             .frame(maxWidth: .infinity)
-                         }*/
+                        if state.useTargetButton {
+                            buttonWithCircle(
+                                iconName: "scope",
+                                symbolRenderingMode: .palette,
+                                colors: [isTarget ? .red : .white, .clear],
+                                circleColor: Color.black.opacity(1.0)
+                            ) {
+                                // Leere Aktion: Tap / LongPress werden per Gesten gesteuert
+                            }
+                            .simultaneousGesture(
+                                LongPressGesture(minimumDuration: 0.5)
+                                    .onEnded { _ in
+                                        withAnimation {
+                                            showTargetBubble = true
+                                        }
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
+                                            withAnimation {
+                                                showTargetBubble = false
+                                            }
+                                        }
+                                    }
+                            )
+                            .simultaneousGesture(
+                                TapGesture()
+                                    .onEnded {
+                                        if isTarget {
+                                            showCancelTTAlert.toggle()
+                                        } else {
+                                            state.showModal(for: .addTempTarget)
+                                        }
+                                    }
+                            )
+                            .frame(maxWidth: .infinity)
+                        }
 
                         // UI/UX Button
                         buttonWithCircle(
@@ -2116,6 +2344,7 @@ extension Home {
                     .padding(.horizontal, 5)
                     .padding(.bottom, 15)
 
+                    // Profile Bubble Anzeige
                     if showProfileBubble && state.profileButton {
                         TargetBubbleView {
                             if let tempTargetString = tempTargetString,
@@ -2129,9 +2358,32 @@ extension Home {
                         }
                         .frame(width: 350)
                         .offset(
-                            x: -geo.size.width / 2 + // Linker Rand des HStack
-                                (geo.size.width / CGFloat(totalButtons)) * CGFloat(indexOfProfileButton) + // bis Profil-Button
-                                (geo.size.width / CGFloat(totalButtons) / 2), // in die Mitte des Buttons
+                            x: -geo.size.width / 2 +
+                                (geo.size.width / CGFloat(totalButtons)) * CGFloat(indexOfProfileButton) +
+                                (geo.size.width / CGFloat(totalButtons) / 2),
+                            y: -55
+                        )
+                        .transition(.scale.combined(with: .opacity))
+                    }
+
+                    // Target Bubble Anzeige
+                    if showTargetBubble && state.useTargetButton {
+                        TargetBubbleView {
+                            if let tempTargetString = tempTargetString,
+                               !(fetchedPercent.first?.enabled ?? false)
+                            {
+                                Text(tempTargetString)
+                                    .foregroundStyle(Color.white)
+                            } else {
+                                Text("Kein TempTarget aktiv")
+                                    .foregroundStyle(Color.gray)
+                            }
+                        }
+                        .frame(width: 350)
+                        .offset(
+                            x: -geo.size.width / 2 +
+                                (geo.size.width / CGFloat(totalButtons)) * CGFloat(indexOfTargetButton) +
+                                (geo.size.width / CGFloat(totalButtons) / 2),
                             y: -55
                         )
                         .transition(.scale.combined(with: .opacity))

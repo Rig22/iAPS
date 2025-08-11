@@ -108,6 +108,7 @@
   "lightMode": LightMode.auto,
   "noCarbs": false,
   "hidePredictions": false,
+  "useCarbBars": false,
   "danaBar": false,
   "pumpIconRawValue": "nano200",
   "backgroundColorOptionRawValue": "darkBlue",

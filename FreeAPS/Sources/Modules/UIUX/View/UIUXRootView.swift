@@ -238,7 +238,7 @@ extension UIUX {
                                 // Toggle("Display Glucose Delta", isOn: $state.displayDelta)
 
                                 Section(header: Text("Button Panel")) {
-                                    //   Toggle("Display Temp Targets Button", isOn: $state.useTargetButton)
+                                    Toggle("Display Temp Targets Button", isOn: $state.useTargetButton)
                                     Toggle("Display Profile Override Button", isOn: $state.profileButton)
                                     Toggle("Display Meal Button", isOn: $state.carbButton)
                                     Section {

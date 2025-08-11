@@ -1540,7 +1540,6 @@
 		3811DE1325C9D39E00A708ED /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				CE7CA3422A064973004BE681 /* Shortcuts */,
 				3811DEDE25C9E2DD00A708ED /* Application */,
 				3811DF0A25CAAAA500A708ED /* APS */,
 				E00EEBFC27368630002FF094 /* Assemblies */,
@@ -1553,6 +1552,7 @@
 				3811DE0325C9D31700A708ED /* Modules */,
 				3811DE1425C9D40400A708ED /* Router */,
 				3811DE9125C9D88200A708ED /* Services */,
+				CE7CA3422A064973004BE681 /* Shortcuts */,
 				3883582E25EEAFC000E024B2 /* Views */,
 			);
 			path = Sources;
