@@ -23,8 +23,6 @@ struct CurrentGlucoseView: View {
     @State private var rotationDegrees: Double = 0
     @State private var bumpEffect: Double = 0
 
-    // var backgroundColor: Color // falls triangel während bolus in backgroundColor gewünscht ist
-
     // Bedingte Farbauswahl für das Dreieck
     private var currentTriangleColor: Color {
         if let progress = bolusProgress, progress < 1.0 {

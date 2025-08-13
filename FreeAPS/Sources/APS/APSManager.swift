@@ -146,7 +146,6 @@ final class BaseAPSManager: APSManager, Injectable {
     private var scriptExecutor: WebViewScriptExecutor!
 
     init(resolver: Resolver) {
-        // ... bestehender Code ...
         injectServices(resolver)
         Task { @MainActor in
             self.scriptExecutor = WebViewScriptExecutor()
@@ -157,7 +156,6 @@ final class BaseAPSManager: APSManager, Injectable {
                 scriptExecutor: scriptExecutor // Zugriff erst nach Initialisierung sicherstellen
             )
         }
-        // ... Rest des Codes ...
         subscribe()
         lastLoopDateSubject.send(lastLoopDate)
 

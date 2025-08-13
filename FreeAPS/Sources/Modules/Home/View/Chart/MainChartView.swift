@@ -117,6 +117,16 @@ struct MainChartView: View {
     @State private var horizontalGrid: [(CGFloat, Int)] = []
     @State private var lowThresholdLine: (CGFloat, Int)? = nil
     @State private var highThresholdLine: (CGFloat, Int)? = nil
+    @State private var glucoseLines: [(
+        yStart: CGFloat,
+        yEnd: CGFloat,
+        xStart: CGFloat,
+        xEnd: CGFloat,
+        textX: CGFloat,
+        textY: CGFloat,
+        glucose: Int,
+        type: ExtremumType
+    )] = []
 
     private let calculationQueue = DispatchQueue(label: "MainChartView.calculationQueue")
 
@@ -137,6 +147,23 @@ struct MainChartView: View {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.maximumFractionDigits = 1
+        return formatter
+    }
+
+    private var dotGlucoseFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 1
+        formatter.decimalSeparator = "."
+        return formatter
+    }
+
+    private var mmolDotGlucoseFormatter: NumberFormatter {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.maximumFractionDigits = 1
+        formatter.minimumFractionDigits = 1
+        formatter.decimalSeparator = "."
         return formatter
     }
 
@@ -280,19 +307,94 @@ struct MainChartView: View {
         }
     }
 
-    private func yGridView(fullSize: CGSize) -> some View {
-        let useColour = data.displayYgridLines ? Color.white : Color.clear
-        return ZStack {
-            Path { path in
-                for (line, _) in horizontalGrid {
-                    path.move(to: CGPoint(x: 0, y: line))
-                    path.addLine(to: CGPoint(x: fullSize.width, y: line))
-                }
-            }.stroke(useColour, lineWidth: 0.15)
+    /*    private func yGridView(fullSize: CGSize) -> some View {
+             let useColour = data.displayYgridLines ? Color.secondary : Color.clear
+             return ZStack {
+     //            Path { path in
+     //                for (line, _) in horizontalGrid {
+     //                    path.move(to: CGPoint(x: 0, y: line))
+     //                    path.addLine(to: CGPoint(x: fullSize.width, y: line))
+     //                }
+     //            }.stroke(useColour, lineWidth: 0.15)
+                 if data.thresholdLines {
+                     // Hintergrundbereich zwischen den Linien (NEU)
+                     if let (highLineY, _) = highThresholdLine, let (lowLineY, _) = lowThresholdLine {
+                         Path { path in
+                             path.move(to: CGPoint(x: 0, y: highLineY))
+                             path.addLine(to: CGPoint(x: fullSize.width, y: highLineY))
+                             path.addLine(to: CGPoint(x: fullSize.width, y: lowLineY))
+                             path.addLine(to: CGPoint(x: 0, y: lowLineY))
+                             path.closeSubpath()
+                         }
+                         // .fill(Color.green.opacity(0.1))
+                         .fill(
+                             RadialGradient(
+                                 gradient: Gradient(colors: [
+                                     Color(red: 0.88, green: 0.98, blue: 0.88).opacity(0.1),
+                                     Color(red: 0.78, green: 0.93, blue: 0.78).opacity(0.1)
+                                 ]),
+                                 center: .center,
+                                 startRadius: 0,
+                                 endRadius: 300
+                             )
+                         ) }
 
-            // horizontal limits
+                     // horizontal limits
+                     if data.thresholdLines {
+                         if let (highLineY, _) = highThresholdLine {
+                             Path { path in
+                                 path.move(to: CGPoint(x: 0, y: highLineY))
+                                 path.addLine(to: CGPoint(x: fullSize.width, y: highLineY))
+                             }.stroke(Color.green, lineWidth: 0.5)
+                         }
+                         if let (lowLineY, _) = lowThresholdLine {
+                             Path { path in
+                                 path.move(to: CGPoint(x: 0, y: lowLineY))
+                                 path.addLine(to: CGPoint(x: fullSize.width, y: lowLineY))
+                             }.stroke(Color.green, lineWidth: 0.5)
+                         }
+                     }
+
+                     if data.showInsulinActivity || data.showCobChart {
+                         // background for COB/activity
+                         Path { path in
+                             path.move(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding))
+                             path.addLine(to: CGPoint(x: fullSize.width, y: fullSize.height - Config.bottomPadding))
+                             path
+                                 .addLine(to: CGPoint(
+                                     x: fullSize.width,
+                                     y: fullSize.height - Config.bottomPadding - Config.activityChartHeight
+                                 ))
+                             path.addLine(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding - Config.activityChartHeight))
+                             path.addLine(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding))
+                         }.fill(Color(.systemGray5).opacity(0.0))
+                     }
+
+                     if data.showInsulinActivity, data.displayYgridLines {
+                         ForEach([(peakActivity_1unit, 1), (peakActivity_maxBolus, 2)], id: \.1) { activity, _ in
+                             let yCoord = activityToYCoordinate(Decimal(activity), fullSize: fullSize)
+                             Path { path in
+                                 path.move(to: CGPoint(x: 0, y: yCoord))
+                                 path.addLine(to: CGPoint(x: fullSize.width, y: yCoord))
+                             }.stroke(useColour, lineWidth: 0.15)
+                         }
+                     }
+
+                     // thicker zero guideline for activity/COB
+                     if data.showInsulinActivity, data.displayYgridLines, let yCoord = activityZeroPointY {
+                         Path { path in
+                             path.move(to: CGPoint(x: 0, y: yCoord))
+                             path.addLine(to: CGPoint(x: fullSize.width, y: yCoord))
+                         }.stroke(useColour, lineWidth: 0.4)
+                     }
+                 }
+             }
+         }*/
+    private func yGridView(fullSize: CGSize) -> some View {
+        let useColour = data.displayYgridLines ? Color.secondary : Color.clear
+        return ZStack {
             if data.thresholdLines {
-                // Hintergrundbereich zwischen den Linien (NEU)
+                // Hintergrundbereich zwischen den Linien - Glucose Zielbereich
                 if let (highLineY, _) = highThresholdLine, let (lowLineY, _) = lowThresholdLine {
                     Path { path in
                         path.move(to: CGPoint(x: 0, y: highLineY))
@@ -301,68 +403,109 @@ struct MainChartView: View {
                         path.addLine(to: CGPoint(x: 0, y: lowLineY))
                         path.closeSubpath()
                     }
-                    //  .fill(Color.green.opacity(0.2))
                     .fill(
                         LinearGradient(
                             gradient: Gradient(colors: [
-                                Color.green.opacity(0.7),
-                                Color.green.opacity(0.4),
-                                Color.black.opacity(0.3),
-                                Color.clear
+                                Color(red: 0.85, green: 0.98, blue: 0.85).opacity(0.15),
+                                Color(red: 0.92, green: 0.98, blue: 0.92).opacity(0.05),
+                                Color(red: 0.85, green: 0.98, blue: 0.85).opacity(0.15)
                             ]),
                             startPoint: .top,
                             endPoint: .bottom
-                        ),
-                        style: FillStyle(eoFill: false, antialiased: true)
+                        )
                     )
                 }
 
-                // Existierende Linien-Darstellung
-                if let (highLineY, _) = highThresholdLine {
-                    Path { path in
-                        path.move(to: CGPoint(x: 0, y: highLineY))
-                        path.addLine(to: CGPoint(x: fullSize.width, y: highLineY))
-                    }.stroke(Color.white, lineWidth: 0.4).opacity(1.0)
-                }
-                if let (lowLineY, _) = lowThresholdLine {
-                    Path { path in
-                        path.move(to: CGPoint(x: 0, y: lowLineY))
-                        path.addLine(to: CGPoint(x: fullSize.width, y: lowLineY))
-                    }.stroke(Color.white, lineWidth: 0.4).opacity(1.0)
-                }
-            }
+                // Horizontale Grenzlinien
+                if data.thresholdLines {
+                    // Obere Grenzlinie mit Schatteneffekt
+                    if let (highLineY, _) = highThresholdLine {
+                        ZStack {
+                            Path { path in
+                                path.move(to: CGPoint(x: 0, y: highLineY))
+                                path.addLine(to: CGPoint(x: fullSize.width, y: highLineY))
+                            }
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.green.opacity(0.4),
+                                        Color.clear
+                                    ]),
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                ),
+                                lineWidth: 1.0
+                            )
+                            .offset(y: -0.5)
 
-            if data.showInsulinActivity || data.showCobChart {
-                // background for COB/activity
-                Path { path in
-                    path.move(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding))
-                    path.addLine(to: CGPoint(x: fullSize.width, y: fullSize.height - Config.bottomPadding))
-                    path
-                        .addLine(to: CGPoint(
+                            Path { path in
+                                path.move(to: CGPoint(x: 0, y: highLineY))
+                                path.addLine(to: CGPoint(x: fullSize.width, y: highLineY))
+                            }
+                            .stroke(Color.green, lineWidth: 0.4)
+                        }
+                    }
+
+                    // Untere Grenzlinie mit Schatteneffekt
+                    if let (lowLineY, _) = lowThresholdLine {
+                        ZStack {
+                            Path { path in
+                                path.move(to: CGPoint(x: 0, y: lowLineY))
+                                path.addLine(to: CGPoint(x: fullSize.width, y: lowLineY))
+                            }
+                            .stroke(
+                                LinearGradient(
+                                    gradient: Gradient(colors: [
+                                        Color.green.opacity(0.4),
+                                        Color.clear
+                                    ]),
+                                    startPoint: .bottom,
+                                    endPoint: .top
+                                ),
+                                lineWidth: 1.0
+                            )
+                            .offset(y: 0.5)
+
+                            Path { path in
+                                path.move(to: CGPoint(x: 0, y: lowLineY))
+                                path.addLine(to: CGPoint(x: fullSize.width, y: lowLineY))
+                            }
+                            .stroke(Color.green, lineWidth: 0.4)
+                        }
+                    }
+                }
+
+                // COB/Insulin Aktivitätsbereich - Background
+                if data.showInsulinActivity || data.showCobChart {
+                    Path { path in
+                        path.move(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding))
+                        path.addLine(to: CGPoint(x: fullSize.width, y: fullSize.height - Config.bottomPadding))
+                        path.addLine(to: CGPoint(
                             x: fullSize.width,
                             y: fullSize.height - Config.bottomPadding - Config.activityChartHeight
                         ))
-                    path.addLine(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding - Config.activityChartHeight))
-                    path.addLine(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding))
-                }.fill(Color(.systemGray5).opacity(0.0))
-            }
+                        path.addLine(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding - Config.activityChartHeight))
+                        path.addLine(to: CGPoint(x: 0, y: fullSize.height - Config.bottomPadding))
+                    }
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(colors: [
+                                Color(.systemTeal).opacity(0.07),
+                                Color(.systemTeal).opacity(0.02)
+                            ]),
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                }
 
-            if data.showInsulinActivity, data.displayYgridLines {
-                ForEach([(peakActivity_1unit, 1), (peakActivity_maxBolus, 2)], id: \.1) { activity, _ in
-                    let yCoord = activityToYCoordinate(Decimal(activity), fullSize: fullSize)
+                // thicker zero guideline for activity/COB
+                if data.showInsulinActivity, data.displayYgridLines, let yCoord = activityZeroPointY {
                     Path { path in
                         path.move(to: CGPoint(x: 0, y: yCoord))
                         path.addLine(to: CGPoint(x: fullSize.width, y: yCoord))
-                    }.stroke(useColour, lineWidth: 0.2)
+                    }.stroke(useColour, lineWidth: 0.4)
                 }
-            }
-
-            // thicker zero guideline for activity/COB
-            if data.showInsulinActivity, data.displayYgridLines, let yCoord = activityZeroPointY {
-                Path { path in
-                    path.move(to: CGPoint(x: 0, y: yCoord))
-                    path.addLine(to: CGPoint(x: fullSize.width, y: yCoord))
-                }.stroke(useColour, lineWidth: 0.4)
             }
         }
     }
@@ -439,6 +582,7 @@ struct MainChartView: View {
                     glucoseView(fullSize: fullSize)
                     lowGlucoseView(fullSize: fullSize)
                     highGlucoseView(fullSize: fullSize)
+                    glucoseGridLinesView(fullSize: fullSize)
                     if data.showInsulinActivity {
                         activityView(fullSize: fullSize)
                     }
@@ -539,16 +683,18 @@ struct MainChartView: View {
                     path.addEllipse(in: rect.rect)
                 }
             }
-        }.fill(Color(.darkGreen))
-            .onChange(of: data.glucose) {
-                update(fullSize: fullSize)
-            }
-            .onChange(of: didAppearTrigger) {
-                update(fullSize: fullSize)
-            }
-            .onReceive(Foundation.NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
-                update(fullSize: fullSize)
-            }
+        }
+        .fill(Color(.darkGreen))
+
+        .onChange(of: data.glucose) {
+            update(fullSize: fullSize)
+        }
+        .onChange(of: didAppearTrigger) {
+            update(fullSize: fullSize)
+        }
+        .onReceive(Foundation.NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+            update(fullSize: fullSize)
+        }
     }
 
     private func highGlucoseView(fullSize: CGSize) -> some View {
@@ -569,6 +715,107 @@ struct MainChartView: View {
             .onReceive(Foundation.NotificationCenter.default.publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
                 update(fullSize: fullSize)
             }
+    }
+
+    /// Rig22
+    private struct DropShape: Shape {
+        func path(in rect: CGRect) -> Path {
+            var path = Path()
+            let width = rect.width
+            let height = rect.height
+            let topRadius = width * 0.45
+
+            let startPoint = CGPoint(x: width * 0.04, y: topRadius)
+            path.move(to: startPoint)
+
+            path.addArc(
+                center: CGPoint(x: width / 2, y: topRadius),
+                radius: topRadius,
+                startAngle: .degrees(180),
+                endAngle: .degrees(0),
+                clockwise: false
+            )
+
+            let rightControl1 = CGPoint(x: width * 0.95, y: topRadius + (height - topRadius) * 0.25)
+            let rightControl2 = CGPoint(x: width * 0.88, y: height * 0.65)
+            path.addCurve(
+                to: CGPoint(x: width * 0.62, y: height * 0.78),
+                control1: rightControl1,
+                control2: rightControl2
+            )
+
+            path.addLine(to: CGPoint(x: width / 2, y: height))
+
+            path.addCurve(
+                to: startPoint,
+                control1: CGPoint(x: width * 0.13, y: height * 0.7),
+                control2: CGPoint(x: width * 0.04, y: topRadius + (height - topRadius) * 0.3)
+            )
+
+            return path
+        }
+    }
+
+    /// Rig22
+    private func glucoseGridLinesView(fullSize _: CGSize) -> some View {
+        ForEach(glucoseLines, id: \.1) { yStart, yEnd, xStart, xEnd, textX, textY, glucose, _ in
+            let value = Double(glucose) *
+                (data.units == .mmolL ? Double(GlucoseUnits.exchangeRate) : 1)
+
+            let formatter = data.units == .mmolL ? mmolDotGlucoseFormatter : dotGlucoseFormatter
+
+            Group {
+                Path { path in
+                    path.move(to: CGPoint(x: xStart, y: yStart))
+                    path.addLine(to: CGPoint(x: xEnd, y: yEnd))
+                }
+                .stroke(Color.secondary, lineWidth: 0.75)
+                .opacity(0.5)
+                .mask(
+                    ZStack {
+                        Color.white
+                        Text(value == 0 ? "" : formatter.string(from: value as NSNumber) ?? "")
+                            .font(.glucoseDotFont)
+                            .padding(.horizontal, 3)
+                            .padding(.vertical, 1)
+                            .background(
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(Color.black) // cut out this area
+                            )
+                            .position(CGPoint(x: textX, y: textY))
+                            .blendMode(.destinationOut)
+                    }
+                    .compositingGroup()
+                )
+
+                let glucoseDecimal = Decimal(glucose)
+                let fillColour =
+                    glucoseDecimal < data.lowGlucose ? Color.loopRed.opacity(0.4)
+                        : glucoseDecimal > data.highGlucose ? Color.loopYellow.opacity(0.4)
+                        : colorScheme == .dark ? Color.darkGreen.opacity(0.6) : Color.darkGreen.opacity(0.4)
+
+                ZStack {
+                    Text(value == 0 ? "" : formatter.string(from: value as NSNumber) ?? "")
+                        .font(.glucoseDotFont)
+                        .foregroundColor(.white)
+                        .padding(3)
+                        .offset(y: -2)
+                        .background(
+                            DropShape()
+                                .fill(fillColour)
+                                .frame(width: 28, height: 34)
+                        )
+                        .overlay(
+                            DropShape()
+                                .stroke(Color.primary, lineWidth: 0.75)
+                                .opacity(0.8)
+                                .frame(width: 28, height: 34)
+                        )
+                }
+                .position(CGPoint(x: textX, y: textY))
+            }
+            .asAny()
+        }
     }
 
     private func activityView(fullSize: CGSize) -> some View {
@@ -1084,6 +1331,7 @@ extension MainChartView {
         return stride(from: from + step, through: through - step, by: step)
     }
 
+    /// Rig 22
     private func calculateHorizontalLines(fullSize: CGSize) {
         calculationQueue.async {
             var lines: [(CGFloat, Int)] = []
@@ -1094,29 +1342,89 @@ extension MainChartView {
             let lowLine = (glucoseToYCoordinate(lowGlucoseInt, fullSize: fullSize), lowGlucoseInt)
             let highLine = (glucoseToYCoordinate(highGlucoseInt, fullSize: fullSize), highGlucoseInt)
 
-            if let glucoseMin = data.glucose.compactMap(\.glucose).min(),
-               let glucoseMax = data.glucose.compactMap(\.glucose).max()
-            {
-                if glucoseMin < lowGlucoseInt {
-                    lines.append(lowLine)
-                    if glucoseMin < lowGlucoseInt - 18 {
-                        lines.append((glucoseToYCoordinate(glucoseMin, fullSize: fullSize), glucoseMin))
-                    }
-                } else {
-                    lines.append((glucoseToYCoordinate(glucoseMin, fullSize: fullSize), glucoseMin))
-                }
+            lines.append(lowLine)
+            lines.append(highLine)
 
-                if glucoseMax > highGlucoseInt {
-                    lines.append(highLine)
-                    if glucoseMax > highGlucoseInt + 18 {
-                        lines.append((glucoseToYCoordinate(glucoseMax, fullSize: fullSize), glucoseMax))
-                        for g in glucoseLines(from: highGlucoseInt, through: glucoseMax) {
-                            let nice = roundGlucoseToNearestNiceValue(g)
-                            lines.append((glucoseToYCoordinate(nice, fullSize: fullSize), nice))
-                        }
+            let (maxima, minima) = PeakPicker.pick(data: data.glucose, windowHours: Double(data.screenHours) / 2.5)
+            let maxVerticalOffset: CGFloat = 30 // Abstand für Maxima
+            let minVerticalOffset: CGFloat = 40 // Abstand für Minima
+
+            // y, x-start, x-end, glucose value
+            var glucoseLines: [(
+                yStart: CGFloat,
+                yEnd: CGFloat,
+                xStart: CGFloat,
+                xEnd: CGFloat,
+                textX: CGFloat,
+                textY: CGFloat,
+                glucose: Int,
+                type: ExtremumType
+            )] = []
+            var bolusIndex = 0
+
+            // Für MAXIMA
+            for peak in maxima {
+                if let glucose = peak.glucose {
+                    let point = glucoseToCoordinate(peak, fullSize: fullSize)
+                    var endX = point.x
+
+                    while bolusIndex < data.boluses.count,
+                          data.boluses[bolusIndex].timestamp < peak.dateString.addingTimeInterval(-5 * 60)
+                    {
+                        bolusIndex += 1
                     }
-                } else {
-                    lines.append((glucoseToYCoordinate(glucoseMax, fullSize: fullSize), glucoseMax))
+                    if bolusIndex < data.boluses.count,
+                       data.boluses[bolusIndex].timestamp < peak.dateString.addingTimeInterval(5 * 60)
+                    {
+                        endX = endX + 18
+                    }
+
+                    glucoseLines.append(
+                        (
+                            yStart: point.y,
+                            yEnd: point.y - maxVerticalOffset,
+                            xStart: point.x,
+                            xEnd: endX,
+                            textX: endX,
+                            textY: point.y - maxVerticalOffset,
+                            glucose: glucose,
+                            .max
+                        )
+                    )
+                }
+            }
+
+            var carbIndex = 0
+
+            // Für MINIMA
+            for peak in minima {
+                if let glucose = peak.glucose {
+                    let point = glucoseToCoordinate(peak, fullSize: fullSize)
+                    var endX = point.x
+
+                    while carbIndex < data.carbs.count,
+                          data.carbs[carbIndex].createdAt < peak.dateString.addingTimeInterval(-5 * 60)
+                    {
+                        carbIndex += 1
+                    }
+                    if carbIndex < data.carbs.count,
+                       data.carbs[carbIndex].createdAt < peak.dateString.addingTimeInterval(5 * 60)
+                    {
+                        endX = endX + 18
+                    }
+
+                    glucoseLines.append(
+                        (
+                            yStart: point.y,
+                            yEnd: point.y - minVerticalOffset,
+                            xStart: point.x,
+                            xEnd: endX,
+                            textX: endX,
+                            textY: point.y - minVerticalOffset,
+                            glucose: glucose,
+                            .min
+                        )
+                    )
                 }
             }
 
@@ -1124,6 +1432,7 @@ extension MainChartView {
                 horizontalGrid = lines
                 lowThresholdLine = lowLine
                 highThresholdLine = highLine
+                self.glucoseLines = glucoseLines
             }
         }
     }
