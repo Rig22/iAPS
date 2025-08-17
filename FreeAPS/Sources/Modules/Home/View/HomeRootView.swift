@@ -9,12 +9,6 @@ import SwiftUI
 import Swinject
 import UIKit
 
-struct TimePicker: Identifiable {
-    var active: Bool
-    let hours: Int16
-    var id: String { hours.description }
-}
-
 extension Home {
     struct RootView: BaseView {
         let resolver: Resolver
@@ -50,12 +44,6 @@ extension Home {
         @StateObject private var batteryAgePieSegmentViewModel = PieSegmentViewModel()
         @StateObject private var sensorAgeSegmentViewModel = PieSegmentViewModel()
         @State private var timerInterval: TimeInterval = 2 // Startet nach 2 Sekunden
-        @State var timeButtons: [TimePicker] = [
-            TimePicker(active: false, hours: 4),
-            TimePicker(active: false, hours: 6),
-            TimePicker(active: false, hours: 12),
-            TimePicker(active: false, hours: 24)
-        ]
 
         @Namespace var scrollSpace
 
@@ -1692,61 +1680,6 @@ extension Home {
                     }
                 }
                 .offset(x: 30)
-            }
-        }
-
-        func highlightButtons() {
-            for i in 0 ..< timeButtons.count {
-                timeButtons[i].active = timeButtons[i].hours == state.hours
-            }
-        }
-
-        var timeIntervalButtons: some View {
-            let buttonColor = (colorScheme == .dark ? Color.white : Color.black).opacity(0.8)
-
-            return HStack(alignment: .center) {
-                ForEach(timeButtons) { button in
-                    timeButtonView(button: button, buttonColor: buttonColor)
-                }
-            }
-            .padding(.vertical, 0)
-            .background(
-                TimeEllipse(
-                    button3D: state.button3D,
-                    button3DBackground: state.button3DBackground,
-                    incidenceOfLight: state.incidenceOfLight,
-                    lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
-                )
-            )
-        }
-
-        @ViewBuilder private func timeButtonView(button: TimePicker, buttonColor: Color) -> some View {
-            Button {
-                state.hours = Int(button.hours)
-                highlightButtons()
-            } label: {
-                Group {
-                    if button.active {
-                        Text("\(button.hours)\u{00A0}\(String(localized: "h", comment: "h"))")
-                    } else {
-                        Text("\(button.hours)")
-                    }
-                }
-                .font(.footnote)
-                .fontWeight(button.active ? .semibold : .regular)
-                .padding(.vertical, 5)
-                .padding(.horizontal, 10)
-                .foregroundColor(
-                    button.active
-                        ? (colorScheme == .dark ? Color.blue : Color.white)
-                        : buttonColor
-                )
-                .background(button.active ? buttonColor.opacity(colorScheme == .dark ? 1 : 0.8) : Color.clear)
-                .clipShape(Capsule())
-                .overlay(
-                    Capsule()
-                        .stroke(button.active ? buttonColor.opacity(0.4) : Color.clear, lineWidth: 2)
-                )
             }
         }
 
