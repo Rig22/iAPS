@@ -250,10 +250,10 @@ struct MainChartView: View {
                             .font(.system(size: 12, weight: .bold)).foregroundColor(.zt)
                     }
                     Group {
-                        Circle().fill(Color.loopYellow).frame(width: 8, height: 8)
+                        Circle().fill(Color.dynamicColorYellow).frame(width: 8, height: 8)
                             .padding(.leading, 8)
                         Text("COB")
-                            .font(.system(size: 12, weight: .bold)).foregroundColor(.loopYellow)
+                            .font(.system(size: 12, weight: .bold)).foregroundColor(.dynamicColorYellow)
                     }
                     Group {
                         Circle().fill(Color.uam).frame(width: 8, height: 8)
@@ -354,7 +354,7 @@ struct MainChartView: View {
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        Color.green.opacity(0.4),
+                                        Color.dynamicColorGreen.opacity(0.4),
                                         Color.clear
                                     ]),
                                     startPoint: .top,
@@ -368,7 +368,7 @@ struct MainChartView: View {
                                 path.move(to: CGPoint(x: 0, y: highLineY))
                                 path.addLine(to: CGPoint(x: fullSize.width, y: highLineY))
                             }
-                            .stroke(Color.green, lineWidth: 0.4)
+                            .stroke(Color.dynamicColorGreen, lineWidth: 0.4)
                         }
                     }
 
@@ -382,7 +382,7 @@ struct MainChartView: View {
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        Color.green.opacity(0.4),
+                                        Color.dynamicColorGreen.opacity(0.4),
                                         Color.clear
                                     ]),
                                     startPoint: .bottom,
@@ -396,7 +396,7 @@ struct MainChartView: View {
                                 path.move(to: CGPoint(x: 0, y: lowLineY))
                                 path.addLine(to: CGPoint(x: fullSize.width, y: lowLineY))
                             }
-                            .stroke(Color.green, lineWidth: 0.4)
+                            .stroke(Color.dynamicColorGreen, lineWidth: 0.4)
                         }
                     }
                 }
@@ -444,7 +444,7 @@ struct MainChartView: View {
             Text(value == 0 ? "" : glucoseFormatter.string(from: value as NSNumber) ?? "")
                 .position(CGPoint(x: fullSize.width - 12, y: lineY))
                 .font(.bolusDotFont)
-                .foregroundStyle(Color.secondary)
+                .foregroundStyle(Color.dynamicSecondaryText)
                 .asAny()
         }
     }
@@ -459,8 +459,9 @@ struct MainChartView: View {
             let value = bolus
 
             return HStack(spacing: 2) {
-                Text(glucoseFormatter.string(from: value as NSNumber) ?? "").font(.bolusDotFont).foregroundStyle(Color.secondary)
-                Text("U").font(.bolusDotFont.smallCaps()).foregroundStyle(Color.insulin)
+                Text(glucoseFormatter.string(from: value as NSNumber) ?? "").font(.bolusDotFont)
+                    .foregroundStyle(Color.dynamicSecondaryText)
+                Text("U").font(.bolusDotFont.smallCaps()).foregroundStyle(Color.dynamicSecondaryText)
 
             }.foregroundStyle(Color(.insulin).opacity(0.8))
                 .position(CGPoint(x: fullSize.width - 12, y: yCoord))
@@ -700,7 +701,7 @@ struct MainChartView: View {
                         Color.white
                         Text(value == 0 ? "" : formatter.string(from: value as NSNumber) ?? "")
                             .font(.glucoseDotFont)
-                            .foregroundStyle(Color.dynamicPrimaryText)
+                            .foregroundStyle(Color.dynamicSecondaryText)
                             .padding(.horizontal, 3)
                             .padding(.vertical, 1)
                             .background(
@@ -715,14 +716,17 @@ struct MainChartView: View {
 
                 let glucoseDecimal = Decimal(glucose)
                 let fillColour =
-                    glucoseDecimal < data.lowGlucose ? Color.loopRed.opacity(0.4)
-                        : glucoseDecimal > data.highGlucose ? Color.loopYellow.opacity(0.4)
-                        : colorScheme == .dark ? Color.darkGreen.opacity(0.6) : Color.darkGreen.opacity(0.4)
+                    glucoseDecimal < data.lowGlucose ?
+                    Color.dynamicColorRed.opacity(0.8)
+                    : glucoseDecimal > data.highGlucose ?
+                    Color.dynamicColorYellow.opacity(0.8)
+
+                    : Color.dynamicColorGreen.opacity(0.8)
 
                 ZStack {
                     Text(value == 0 ? "" : formatter.string(from: value as NSNumber) ?? "")
                         .font(.glucoseDotFont)
-                        .foregroundColor(Color.dynamicPrimaryText)
+                        .foregroundColor(Color.dynamicSecondaryText)
                         .padding(3)
                         .offset(y: -2)
                         .background(
@@ -849,11 +853,11 @@ struct MainChartView: View {
     private func cobView(fullSize: CGSize) -> some View {
         ZStack {
             cobStrokePath(closed: true)
-                .fill(Color.loopYellow.opacity(0.3))
+                .fill(Color.dynamicColorOrange.opacity(0.3))
             cobStrokePath(closed: false)
                 .stroke(
-                    colorScheme == .light ? Color.brown : Color.loopYellow,
-                    style: StrokeStyle(lineWidth: 0.5, lineCap: .round)
+                    /* colorScheme == .light ? Color.brown : Color.loopYellow,*/
+                    Color.dynamicColorOrange, style: StrokeStyle(lineWidth: 0.5, lineCap: .round)
                 )
         }
         .onChange(of: data.cob) {
@@ -962,7 +966,7 @@ struct MainChartView: View {
                     command.contains("bolus") ?
                     Command.bolus : ""
 
-                Text(type).font(.announcementSymbolFont).foregroundStyle(.orange)
+                Text(type).font(.announcementSymbolFont).foregroundColor(.dynamicColorOrange)
                     .offset(x: 0, y: -15)
                     .position(position).asAny()
             }
@@ -1061,8 +1065,8 @@ struct MainChartView: View {
     private func carbsView(fullSize: CGSize) -> some View {
         ZStack {
             let carbsPath = data.useCarbBars ? carbsBar(carbsDots) : carbsPath
-            carbsPath.fill(Color.loopYellow)
-            carbsPath.stroke(Color.white, lineWidth: 0.3)
+            carbsPath.fill(Color.dynamicColorOrange)
+            carbsPath.stroke(Color.white, lineWidth: 0.4)
             if data.useCarbBars {
                 ForEach(carbsDots, id: \.rect.minX) { info -> AnyView in
                     let string = carbsFormatter.string(from: info.value as NSNumber) ?? ""
@@ -1095,9 +1099,9 @@ struct MainChartView: View {
     private func fpuView(fullSize: CGSize) -> some View {
         ZStack {
             let fpuPath = data.useCarbBars ? carbsBar(fpuDots) : fpuPath
-            fpuPath.fill(data.useCarbBars ? .clear : Color.loopYellow)
+            fpuPath.fill(data.useCarbBars ? .clear : Color.dynamicColorOrange)
             fpuPath.stroke(
-                data.useCarbBars ? Color.loopYellow : Color.primary,
+                data.useCarbBars ? Color.dynamicColorOrange : Color.dynamicSecondaryText,
                 lineWidth: data.useCarbBars ? 1.5 : 0.3
             )
             if data.useCarbBars, data.fpuAmounts {
@@ -1119,7 +1123,7 @@ struct MainChartView: View {
                     let position = CGPoint(x: info.rect.midX, y: info.rect.maxY + 8)
                     return Text(carbsFormatter.string(from: info.value as NSNumber) ?? "")
                         .font(.system(size: 12))
-                        .foregroundStyle(.white)
+                        .foregroundColor(.dynamicSecondaryText)
                         .position(position)
                         .asAny()
                 }
@@ -1181,13 +1185,13 @@ struct MainChartView: View {
                 for rect in predictionDots[.iob] ?? [] {
                     path.addEllipse(in: rect)
                 }
-            }.fill(Color.insulin)
+            }.fill(Color.dynamicColorBlue)
 
             Path { path in
                 for rect in predictionDots[.cob] ?? [] {
                     path.addEllipse(in: rect)
                 }
-            }.fill(Color.loopYellow)
+            }.fill(Color.dynamicColorYellow)
 
             Path { path in
                 for rect in predictionDots[.zt] ?? [] {

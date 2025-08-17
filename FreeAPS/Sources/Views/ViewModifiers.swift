@@ -305,6 +305,32 @@ extension Color {
         dark: Color(red: 0.90, green: 0.90, blue: 0.90)
     )
 
+    // Dynamische Farben
+    static let dynamicColorBlue = Color(
+        light: Color(red: 0.45, green: 0.70, blue: 0.95),
+        dark: Color(red: 0.29, green: 0.55, blue: 0.91)
+    )
+
+    static let dynamicColorRed = Color(
+        light: Color(red: 0.95, green: 0.50, blue: 0.50),
+        dark: Color(red: 0.86, green: 0.32, blue: 0.32)
+    )
+
+    static let dynamicColorGreen = Color(
+        light: Color(red: 0.50, green: 0.85, blue: 0.60),
+        dark: Color(red: 0.25, green: 0.73, blue: 0.44)
+    )
+
+    static let dynamicColorYellow = Color(
+        light: Color(red: 1.00, green: 0.90, blue: 0.50),
+        dark: Color(red: 0.95, green: 0.77, blue: 0.25)
+    )
+
+    static let dynamicColorOrange = Color(
+        light: Color(red: 1.00, green: 0.70, blue: 0.40),
+        dark: Color(red: 0.95, green: 0.55, blue: 0.20)
+    )
+
     // Icons und Akzente
     static let dynamicIconBackground = Color(
         light: Color(red: 0.85, green: 0.85, blue: 0.85),

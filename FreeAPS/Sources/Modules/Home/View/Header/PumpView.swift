@@ -107,7 +107,7 @@ struct PumpView: View {
                 Text("Sim")
                     .font(.caption2)
                     .bold()
-                    .foregroundColor(.secondary)
+                    .foregroundColor(.dynamicSecondaryText)
                     .offset(y: 18)
             )
     }
@@ -141,7 +141,7 @@ struct PumpView: View {
                         )
                         Text("U")
                     }
-                    .foregroundStyle(.secondary)
+                    .foregroundColor(.dynamicSecondaryText)
                     .offset(x: 2, y: 0)
 
                     medtrumInsulinAmount(portion: 1 - portion)
@@ -163,6 +163,7 @@ struct PumpView: View {
             HStack(spacing: 4) {
                 remainingTimeMedtrum(time: date.timeIntervalSince(timerDate))
                     .font(.pumpFont)
+                    .foregroundColor(.dynamicSecondaryText)
 
                 /*    if battery != nil {
                      batteryIcon(for: .medtrum)
@@ -173,7 +174,7 @@ struct PumpView: View {
         } else {
             Text("No Pump")
                 .font(.statusFont)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.dynamicSecondaryText)
                 .offset(x: 0, y: -4)
         }
     }
@@ -208,7 +209,7 @@ struct PumpView: View {
                         )
                         Text("U")
                     }
-                    .foregroundStyle(.secondary)
+                    .foregroundColor(.dynamicSecondaryText)
                     .offset(x: 6, y: 0) // Horizontal adjustment
                     podInsulinAmount(portion: amountFraction)
                         .padding(.leading, showInsulinBadge ? 7 : 0)
@@ -229,12 +230,13 @@ struct PumpView: View {
             HStack(spacing: 4) {
                 remainingTime(time: date.timeIntervalSince(timerDate))
                     .font(.pumpFont)
+                    .foregroundColor(.dynamicSecondaryText)
             }
             .offset(x: -4, y: 0) // Vertical adjustment für time row
         } else {
             Text("No Patch")
                 .font(.statusFont)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.dynamicSecondaryText)
                 .offset(x: 0, y: -4)
         }
     }
@@ -252,7 +254,7 @@ struct PumpView: View {
                 Text("U")
                     .font(.statusFont)
             }
-            .foregroundStyle(.secondary)
+            .foregroundColor(.dynamicSecondaryText)
             .offset(y: 9)
 
             pumpInsulinAmount(portion: amountFraction)
@@ -272,16 +274,16 @@ struct PumpView: View {
         } else {
             Text("No Pump")
                 .font(.statusFont)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.dynamicSecondaryText)
         }
     }
 
     private func remainingTime(time: TimeInterval) -> some View {
         let color: Color = {
-            if time <= 0 { return .red }
-            else if time < 4 * 60 * 60 { return .red }
-            else if time < 24 * 60 * 60 { return .yellow }
-            else { return .secondary }
+            if time <= 0 { return .dynamicColorRed }
+            else if time < 4 * 60 * 60 { return .dynamicColorRed }
+            else if time < 24 * 60 * 60 { return .dynamicColorYellow }
+            else { return .dynamicSecondaryText }
         }()
 
         return HStack {
@@ -321,10 +323,10 @@ struct PumpView: View {
 
     private func remainingTimeMedtrum(time: TimeInterval) -> some View {
         let color: Color = {
-            if time <= 0 { return .green }
-            else if time < 4 * 60 * 60 { return .red }
-            else if time < 24 * 60 * 60 { return .yellow }
-            else { return .secondary }
+            if time <= 0 { return .dynamicColorGreen }
+            else if time < 4 * 60 * 60 { return .dynamicColorRed }
+            else if time < 24 * 60 * 60 { return .dynamicColorYellow }
+            else { return .dynamicIconBackground }
         }()
 
         return HStack {
@@ -368,26 +370,26 @@ struct PumpView: View {
         }
         switch percent {
         case ...10:
-            return .red
+            return .dynamicColorRed
         case ...20:
-            return .yellow
+            return .dynamicColorYellow
         default:
-            return .green
+            return .dynamicColorGreen
         }
     }
 
     private var reservoirColor: Color {
         guard let reservoir = reservoir else {
-            return .gray
+            return .clear
         }
 
         switch reservoir {
         case ...10:
-            return .red
+            return .dynamicColorRed
         case ...30:
-            return .yellow
+            return .dynamicColorYellow
         default:
-            return .blue
+            return .dynamicColorBlue
         }
     }
 
@@ -400,11 +402,11 @@ struct PumpView: View {
 
         switch time {
         case ...8.hours.timeInterval:
-            return .red
+            return .dynamicColorRed
         case ...1.days.timeInterval:
-            return .yellow
+            return .dynamicColorYellow
         default:
-            return .green
+            return .dynamicColorGreen
         }
     }
 
@@ -419,11 +421,12 @@ struct PumpView: View {
                 .symbolRenderingMode(.palette)
                 .offset(x: 0, y: -5)
                 .shadow(radius: 1, x: 2, y: 2)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.dynamicIconBackground)
                 .overlay {
                     let units = 50 * (concentration.last?.concentration ?? 1)
                     portion <= 0.3 ?
-                        Text((reservoirFormatter.string(from: units as NSNumber) ?? "") + "+").foregroundStyle(.white)
+                        Text((reservoirFormatter.string(from: units as NSNumber) ?? "") + "+")
+                        .foregroundColor(.dynamicSecondaryText)
                         .font(.system(size: 6))
                         .offset(y: -4)
                         : nil
@@ -440,20 +443,20 @@ struct PumpView: View {
                 .frame(maxWidth: 30, maxHeight: 30)
                 .symbolRenderingMode(.palette)
                 .shadow(radius: 1, x: 2, y: 2)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.dynamicIconBackground)
         }
     }
 
     private func medtrumInsulinAmount(portion: Double) -> some View {
         ZStack {
-            let medtrumpump = colorScheme == .dark ? "nano200dark" : "nano200light"
+            let medtrumpump = colorScheme == .dark ? "nano200light" : "nano200light"
             UIImage(imageLiteralResourceName: medtrumpump)
                 .fillImageUpToPortion(color: reservoirColor.opacity(0.8), portion: max(portion, 0.0))
                 .resizable()
                 .frame(maxWidth: 30, maxHeight: 30)
                 .symbolRenderingMode(.palette)
                 .shadow(radius: 1, x: 2, y: 2)
-                .foregroundStyle(.secondary)
+                .foregroundColor(.dynamicIconBackground)
         }
     }
 

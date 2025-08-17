@@ -138,7 +138,7 @@ struct LoopView: View {
         VStack {
             var textColor: Color { // Neue Berechnung für Textfarbe
                 guard actualSuggestion?.timestamp != nil else {
-                    return .white
+                    return .dynamicSecondaryText
                 }
                 guard manualTempBasal == false else {
                     return .loopManualTemp
@@ -147,13 +147,13 @@ struct LoopView: View {
 
                 if delta <= 6.minutes.timeInterval {
                     guard actualSuggestion?.deliverAt != nil else {
-                        return .white
+                        return .dynamicSecondaryText
                     }
-                    return .white
+                    return .dynamicPrimaryText
                 } else if delta <= 9.minutes.timeInterval {
-                    return .yellow
+                    return .dynamicColorYellow
                 } else {
-                    return .red
+                    return .dynamicColorRed
                 }
             }
 
@@ -229,9 +229,9 @@ struct LoopView: View {
             }
             return .dynamicIconForeground
         } else if delta <= 9.minutes.timeInterval {
-            return .orange
+            return .dynamicColorOrange
         } else {
-            return .red
+            return .dynamicColorRed
         }
     }
 
