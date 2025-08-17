@@ -107,7 +107,7 @@ struct PumpView: View {
                 Text("Sim")
                     .font(.caption2)
                     .bold()
-                    .foregroundColor(.white)
+                    .foregroundColor(.secondary)
                     .offset(y: 18)
             )
     }
@@ -141,7 +141,7 @@ struct PumpView: View {
                         )
                         Text("U")
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.secondary)
                     .offset(x: 2, y: 0)
 
                     medtrumInsulinAmount(portion: 1 - portion)
@@ -173,7 +173,7 @@ struct PumpView: View {
         } else {
             Text("No Pump")
                 .font(.statusFont)
-                .foregroundStyle(.white)
+                .foregroundStyle(.secondary)
                 .offset(x: 0, y: -4)
         }
     }
@@ -208,7 +208,7 @@ struct PumpView: View {
                         )
                         Text("U")
                     }
-                    .foregroundStyle(.white)
+                    .foregroundStyle(.secondary)
                     .offset(x: 6, y: 0) // Horizontal adjustment
                     podInsulinAmount(portion: amountFraction)
                         .padding(.leading, showInsulinBadge ? 7 : 0)
@@ -234,7 +234,7 @@ struct PumpView: View {
         } else {
             Text("No Patch")
                 .font(.statusFont)
-                .foregroundStyle(.white)
+                .foregroundStyle(.secondary)
                 .offset(x: 0, y: -4)
         }
     }
@@ -252,7 +252,7 @@ struct PumpView: View {
                 Text("U")
                     .font(.statusFont)
             }
-            .foregroundStyle(.white)
+            .foregroundStyle(.secondary)
             .offset(y: 9)
 
             pumpInsulinAmount(portion: amountFraction)
@@ -272,7 +272,7 @@ struct PumpView: View {
         } else {
             Text("No Pump")
                 .font(.statusFont)
-                .foregroundStyle(.white)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -281,7 +281,7 @@ struct PumpView: View {
             if time <= 0 { return .red }
             else if time < 4 * 60 * 60 { return .red }
             else if time < 24 * 60 * 60 { return .yellow }
-            else { return .white }
+            else { return .secondary }
         }()
 
         return HStack {
@@ -324,7 +324,7 @@ struct PumpView: View {
             if time <= 0 { return .green }
             else if time < 4 * 60 * 60 { return .red }
             else if time < 24 * 60 * 60 { return .yellow }
-            else { return .white }
+            else { return .secondary }
         }()
 
         return HStack {
@@ -419,7 +419,7 @@ struct PumpView: View {
                 .symbolRenderingMode(.palette)
                 .offset(x: 0, y: -5)
                 .shadow(radius: 1, x: 2, y: 2)
-                .foregroundStyle(.white)
+                .foregroundStyle(.secondary)
                 .overlay {
                     let units = 50 * (concentration.last?.concentration ?? 1)
                     portion <= 0.3 ?
@@ -440,19 +440,20 @@ struct PumpView: View {
                 .frame(maxWidth: 30, maxHeight: 30)
                 .symbolRenderingMode(.palette)
                 .shadow(radius: 1, x: 2, y: 2)
-                .foregroundStyle(.white)
+                .foregroundStyle(.secondary)
         }
     }
 
     private func medtrumInsulinAmount(portion: Double) -> some View {
         ZStack {
-            UIImage(imageLiteralResourceName: "nano200pumpview")
+            let medtrumpump = colorScheme == .dark ? "nano200dark" : "nano200light"
+            UIImage(imageLiteralResourceName: medtrumpump)
                 .fillImageUpToPortion(color: reservoirColor.opacity(0.8), portion: max(portion, 0.0))
                 .resizable()
                 .frame(maxWidth: 30, maxHeight: 30)
                 .symbolRenderingMode(.palette)
                 .shadow(radius: 1, x: 2, y: 2)
-                .foregroundStyle(.white)
+                .foregroundStyle(.secondary)
         }
     }
 
@@ -506,7 +507,7 @@ struct NonStandardInsulin: View {
                 .overlay {
                     Text("U" + (formatter.string(from: concentration * 100 as NSNumber) ?? ""))
                         .font(.system(size: 9))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(.secondary)
                 }
         }
         .offset(x: pod ? -15 : -15, y: pod ? -24 : -22) // Gleicher Offset für alle Pumpentypen

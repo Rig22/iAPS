@@ -28,7 +28,7 @@ struct CurrentGlucoseView: View {
         if let progress = bolusProgress, progress < 1.0 {
             return Color.clear
         } else {
-            return Color.white
+            return Color.secondary
         }
     }
 
@@ -95,7 +95,7 @@ struct CurrentGlucoseView: View {
         ZStack {
             if displayExpiration || displaySAGE {
                 sageView
-                    .offset(x: 117, y: 40)
+                    .offset(x: 122, y: 34)
             }
             // TriangleShape(color: triangleColor)
             TriangleShape(color: currentTriangleColor)
@@ -112,7 +112,7 @@ struct CurrentGlucoseView: View {
                             } ?? "--"
                     )
                     .font(.system(size: 30, weight: .bold))
-                    .foregroundColor(alwaysUseColors ? colourGlucoseText : .white)
+                    .foregroundColor(alwaysUseColors ? colourGlucoseText : .dynamicSecondaryText)
                 }
                 HStack {
                     let elapsedSeconds = -1 * (recentGlucose?.dateString.timeIntervalSinceNow ?? 0)
@@ -123,7 +123,7 @@ struct CurrentGlucoseView: View {
                         elapsedSeconds < 60 ? "Now" : "\(timeText) min"
                     )
                     .font(.caption2)
-                    .foregroundStyle(Color.white)
+                    .foregroundStyle(Color.dynamicSecondaryText)
 
                     Text(
                         delta
@@ -132,7 +132,7 @@ struct CurrentGlucoseView: View {
                             } ?? "--"
                     )
                     .font(.caption2)
-                    .foregroundStyle(Color.white)
+                    .foregroundStyle(Color.secondary)
                 }
             }
         }
@@ -226,7 +226,7 @@ struct CurrentGlucoseView: View {
                     } else if sensorAge >= sensordays - secondsOfDay * 2 {
                         return .orange
                     } else {
-                        return .gray
+                        return .dynamicIconForeground
                     }
                 }()
 
@@ -235,7 +235,7 @@ struct CurrentGlucoseView: View {
 
                 Sage(amount: sensorAge, expiration: expiration, lineColour: lineColour, sensordays: sensordays)
                     // .frame(width: 32, height: 32)
-                    .frame(width: 40, height: 40)
+                    .frame(width: 49, height: 49)
                     .overlay {
                         HStack {
                             Text(
@@ -245,8 +245,9 @@ struct CurrentGlucoseView: View {
                                     (remainingTimeFormatter.string(from: displayExpiration ? expiration : sensorAge) ?? "")
                                     .replacingOccurrences(of: ",", with: " ")
                             )
-                            .foregroundStyle(lineColour.isLightColor ? Color.white : Color.white)
-                            .font(.system(size: 12, weight: .bold))
+                            // .foregroundStyle(lineColour.isLightColor ? Color.gray : Color.secondary)
+                            .font(.system(size: 13))
+                            .foregroundStyle(Color.dynamicSecondaryText)
                         }
                     }
             }

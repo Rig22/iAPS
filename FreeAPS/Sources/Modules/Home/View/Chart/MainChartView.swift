@@ -194,6 +194,7 @@ struct MainChartView: View {
 
     @Environment(\.horizontalSizeClass) var hSizeClass
     @Environment(\.verticalSizeClass) var vSizeClass
+    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         GeometryReader { geo in
@@ -306,7 +307,8 @@ struct MainChartView: View {
             }
         }
     }
-    ///Rig22
+
+    /// Rig22
     private func yGridView(fullSize: CGSize) -> some View {
         let useColour = data.displayYgridLines ? Color.secondary : Color.clear
         return ZStack {
@@ -321,11 +323,18 @@ struct MainChartView: View {
                         path.closeSubpath()
                     }
                     .fill(
+                        // Dynamischer Gradient basierend auf ColorScheme
                         LinearGradient(
-                            gradient: Gradient(colors: [
+                            gradient: Gradient(colors: colorScheme == .dark ? [
+                                // Dark Mode Farben (original)
                                 Color(red: 0.85, green: 0.98, blue: 0.85).opacity(0.15),
                                 Color(red: 0.92, green: 0.98, blue: 0.92).opacity(0.05),
                                 Color(red: 0.85, green: 0.98, blue: 0.85).opacity(0.15)
+                            ] : [
+                                // Light Mode Farben (kräftiger)
+                                Color(red: 0.75, green: 0.95, blue: 0.75).opacity(0.25),
+                                Color(red: 0.85, green: 0.95, blue: 0.85).opacity(0.15),
+                                Color(red: 0.75, green: 0.95, blue: 0.75).opacity(0.25)
                             ]),
                             startPoint: .top,
                             endPoint: .bottom
@@ -435,7 +444,7 @@ struct MainChartView: View {
             Text(value == 0 ? "" : glucoseFormatter.string(from: value as NSNumber) ?? "")
                 .position(CGPoint(x: fullSize.width - 12, y: lineY))
                 .font(.bolusDotFont)
-                .foregroundStyle(Color.white)
+                .foregroundStyle(Color.secondary)
                 .asAny()
         }
     }
@@ -450,8 +459,8 @@ struct MainChartView: View {
             let value = bolus
 
             return HStack(spacing: 2) {
-                Text(glucoseFormatter.string(from: value as NSNumber) ?? "").font(.bolusDotFont).foregroundStyle(Color.white)
-                Text("U").font(.bolusDotFont.smallCaps()).foregroundStyle(Color.white)
+                Text(glucoseFormatter.string(from: value as NSNumber) ?? "").font(.bolusDotFont).foregroundStyle(Color.secondary)
+                Text("U").font(.bolusDotFont.smallCaps()).foregroundStyle(Color.insulin)
 
             }.foregroundStyle(Color(.insulin).opacity(0.8))
                 .position(CGPoint(x: fullSize.width - 12, y: yCoord))
@@ -519,10 +528,8 @@ struct MainChartView: View {
         .frame(width: fullGlucoseWidth(viewWidth: fullSize.width) + additionalWidth(viewWidth: fullSize.width))
     }
 
-    @Environment(\.colorScheme) var colorScheme
-
     private func xGridView(fullSize: CGSize) -> some View {
-        let useColour = data.displayXgridLines ? Color.white : Color.clear
+        let useColour = data.displayXgridLines ? Color.secondary : Color.clear
         return ZStack {
             Path { path in
                 for hour in 0 ..< data.hours + data.hours {
@@ -544,7 +551,7 @@ struct MainChartView: View {
                 path.addLine(to: CGPoint(x: x, y: fullSize.height - 20))
             }
             .stroke(
-                colorScheme == .dark ? IAPSconfig.chartBackgroundLight : IAPSconfig.chartBackgroundLight,
+                colorScheme == .dark ? Color.white : Color.black,
                 style: StrokeStyle(lineWidth: 0.5, dash: [5])
             )
         }
@@ -566,7 +573,7 @@ struct MainChartView: View {
                                 CGFloat(hour) * CGFloat(1.hours.timeInterval),
                             y: 10.0
                         )
-                        .foregroundColor(.white)
+                        .foregroundColor(.dynamicPrimaryText)
                 }
             }
         }.frame(maxHeight: 20)
@@ -693,6 +700,7 @@ struct MainChartView: View {
                         Color.white
                         Text(value == 0 ? "" : formatter.string(from: value as NSNumber) ?? "")
                             .font(.glucoseDotFont)
+                            .foregroundStyle(Color.dynamicPrimaryText)
                             .padding(.horizontal, 3)
                             .padding(.vertical, 1)
                             .background(
@@ -714,7 +722,7 @@ struct MainChartView: View {
                 ZStack {
                     Text(value == 0 ? "" : formatter.string(from: value as NSNumber) ?? "")
                         .font(.glucoseDotFont)
-                        .foregroundColor(.white)
+                        .foregroundColor(Color.dynamicPrimaryText)
                         .padding(3)
                         .offset(y: -2)
                         .background(
@@ -901,7 +909,7 @@ struct MainChartView: View {
             }
             path.addLines(lines)
         }
-        .stroke(Color.white, lineWidth: 0.25)
+        .stroke(Color.dynamicPrimaryText, lineWidth: 0.25)
         .onChange(of: data.glucose) {
             update(fullSize: fullSize)
         }
@@ -1024,7 +1032,7 @@ struct MainChartView: View {
                     Text(info.value >= data.minimumSMB ? string : "")
                         .rotationEffect(Angle(degrees: -90))
                         .font(bolusFont())
-                        .foregroundStyle(Color.white)
+                        .foregroundStyle(Color.dynamicSecondaryText)
                         .position(position)
                         .asAny()
                 }
@@ -1033,7 +1041,7 @@ struct MainChartView: View {
                     let position = CGPoint(x: info.rect.midX, y: info.rect.minY - 8)
                     return Text(info.value >= data.minimumSMB ? (bolusFormatter.string(from: info.value as NSNumber) ?? "") : "")
                         .font(.bolusDotFont)
-                        .foregroundStyle(Color.white)
+                        .foregroundStyle(Color.dynamicPrimaryText)
                         .position(position)
                         .asAny()
                 }
@@ -1063,6 +1071,7 @@ struct MainChartView: View {
                     Text(string)
                         .rotationEffect(Angle(degrees: -90))
                         .font(bolusFont())
+                        .foregroundStyle(Color.dynamicPrimaryText)
                         .position(position)
                         .asAny()
                 }

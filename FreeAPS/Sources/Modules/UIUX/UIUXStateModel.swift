@@ -36,10 +36,8 @@ extension UIUX {
         @Published var danaBar: Bool = false
         @Published var legendsSwitch: Bool = false
         @Published var timeSettings: Bool = false
-        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
-        @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = true
         @Published var topBarActive: Bool = true
         @Published var ttBarActive: Bool = false
@@ -47,13 +45,7 @@ extension UIUX {
         @Published var button3D: Bool = false
         @Published var incidenceOfLight: Bool = false
         @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview.rawValue
-        @Published var button3DBackground: Bool = false
         // Dana UI Toggels
-
-        // Computed property für die tatsächlich ausgewählte Hintergrundfarbe
-        var selectedBackgroundColor: Color {
-            BackgroundColorOption(rawValue: backgroundColorOptionRawValue)?.color ?? .clear
-        }
 
         var units: GlucoseUnits = .mmolL
 
@@ -92,9 +84,6 @@ extension UIUX {
             subscribeSetting(\.cannulaAgeOption, on: $cannulaAgeOption) { cannulaAgeOption = $0 }
             subscribeSetting(\.hideInsulinBadge, on: $hideInsulinBadge) { hideInsulinBadge = $0 }
             subscribeSetting(\.timeSettings, on: $timeSettings) { timeSettings = $0 }
-            subscribeSetting(\.backgroundColorOptionRawValue, on: $backgroundColorOptionRawValue) {
-                self.backgroundColorOptionRawValue = $0 }
-            subscribeSetting(\.chartBackgroundColored, on: $chartBackgroundColored) { chartBackgroundColored = $0 }
             subscribeSetting(\.carbInsulinLoopViewOption, on: $carbInsulinLoopViewOption) { carbInsulinLoopViewOption = $0 }
             subscribeSetting(\.topBarActive, on: $topBarActive) { topBarActive = $0 }
             subscribeSetting(\.ttBarActive, on: $ttBarActive) { ttBarActive = $0 }
@@ -102,7 +91,6 @@ extension UIUX {
             subscribeSetting(\.button3D, on: $button3D) { button3D = $0 }
             subscribeSetting(\.incidenceOfLight, on: $incidenceOfLight) { incidenceOfLight = $0 }
             subscribeSetting(\.lightGlowOverlaySelector, on: $lightGlowOverlaySelector) { lightGlowOverlaySelector = $0 }
-            subscribeSetting(\.button3DBackground, on: $button3DBackground) { button3DBackground = $0 }
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {

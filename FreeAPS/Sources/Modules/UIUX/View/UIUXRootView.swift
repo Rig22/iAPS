@@ -63,10 +63,10 @@ extension UIUX {
             switch option {
             case .atriumview: return "Moonlight"
             case .atriumview1: return "FullMoon"
-            case .atriumview2: return "MiddaySun"
-            case .atriumview3: return "EveningSun"
-            case .atriumview4: return "RedSun"
-            case .atriumview5: return "NortherLights" }
+            case .atriumview2: return "NewMoon"
+                /* case .atriumview3: return "EveningSun"
+                 case .atriumview4: return "RedSun"
+                 case .atriumview5: return "NortherLights"*/ }
         }
 
         var body: some View {
@@ -75,33 +75,6 @@ extension UIUX {
                     GeometryReader { geometry in
                         ScrollView {
                             Form {
-                                Section(
-                                    header: Text("Pump Settings"),
-                                    footer: Text("Configure pump display options")
-                                ) {
-                                    Toggle("Show Pump Icon", isOn: $state.showPumpIcon)
-
-                                    if state.showPumpIcon {
-                                        if #available(iOS 18.0, *) {
-                                            Picker("Select Icon", selection: $state.pumpIconRawValue) {
-                                                ForEach(PumpIconOption.allCases, id: \.rawValue) { option in
-                                                    HStack {
-                                                        Image(option.rawValue)
-                                                            .resizable()
-                                                            .scaledToFit()
-                                                            .frame(width: 60, height: 40)
-                                                        Text(option.displayName)
-                                                            .foregroundColor(.primary)
-                                                    }
-                                                    .tag(option.rawValue)
-                                                }
-                                            }
-                                            .pickerStyle(NavigationLinkPickerStyle())
-                                        }
-                                    }
-                                    Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
-                                }
-
                                 Section(
                                     header: Text("Bars"),
                                     footer: Text("Added Bars you want")
@@ -146,28 +119,14 @@ extension UIUX {
                                     header: Text("Visual Options"),
                                     footer: Text("According to your taste")
                                 ) {
-                                    Picker("Background Color", selection: $state.backgroundColorOptionRawValue) {
-                                        ForEach(BackgroundColorOption.allCases) { option in
-                                            HStack {
-                                                Rectangle()
-                                                    .fill(option.color)
-                                                    .frame(width: 25, height: 25)
-                                                    .cornerRadius(4)
-                                                Text(option.rawValue)
-                                                    .font(.caption)
+                                    Section {
+                                        Picker(selection: $state.lightMode, label: Text("Color Scheme")) {
+                                            ForEach(LightMode.allCases) { item in
+                                                Text(NSLocalizedString(item.rawValue, comment: "ColorScheme Selection"))
                                             }
-                                            .tag(option.rawValue)
                                         }
-                                    }
-                                    .pickerStyle(NavigationLinkPickerStyle())
-
-                                    Toggle("Chart Backgrounds ⇢ Dark", isOn: $state.chartBackgroundColored)
+                                    } header: { Text("Light / Dark Mode") }
                                     Toggle("3D Look", isOn: $state.button3D)
-                                    if state.button3D {
-                                        Toggle(
-                                            "Icons Backgrounds ⇢ Dark",
-                                            isOn: $state.button3DBackground
-                                        ) }
                                     Toggle("Atrium Light", isOn: $state.incidenceOfLight)
                                     if state.incidenceOfLight {
                                         Picker("Select your Atrium", selection: $state.lightGlowOverlaySelector) {
@@ -185,8 +144,33 @@ extension UIUX {
                                         }
                                         .pickerStyle(NavigationLinkPickerStyle())
                                     }
+                                    Toggle("Show Pump Icon", isOn: $state.showPumpIcon)
+
+                                    if state.showPumpIcon {
+                                        if #available(iOS 18.0, *) {
+                                            Picker("Select Icon", selection: $state.pumpIconRawValue) {
+                                                ForEach(PumpIconOption.allCases, id: \.rawValue) { option in
+                                                    HStack {
+                                                        Image(option.rawValue)
+                                                            .resizable()
+                                                            .scaledToFit()
+                                                            .frame(width: 60, height: 40)
+                                                        Text(option.displayName)
+                                                            .foregroundColor(.primary)
+                                                    }
+                                                    .tag(option.rawValue)
+                                                }
+                                            }
+                                            .pickerStyle(NavigationLinkPickerStyle())
+                                        }
+                                    }
+                                    Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
+                                    Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
+                                    Toggle(
+                                        "Never display the small glucose chart when scrolling",
+                                        isOn: $state.skipGlucoseChart
+                                    )
                                 }
-                                Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
 
                                 Section {
                                     Text("App Icons").navigationLink(to: .iconConfig, from: self)
@@ -241,13 +225,13 @@ extension UIUX {
                                     Toggle("Display Temp Targets Button", isOn: $state.useTargetButton)
                                     Toggle("Display Profile Override Button", isOn: $state.profileButton)
                                     Toggle("Display Meal Button", isOn: $state.carbButton)
-                                    Section {
-                                        Picker(selection: $state.lightMode, label: Text("Color Scheme")) {
-                                            ForEach(LightMode.allCases) { item in
-                                                Text(NSLocalizedString(item.rawValue, comment: "ColorScheme Selection"))
-                                            }
-                                        }
-                                    } header: { Text("Light / Dark Mode") }
+                                    /* Section {
+                                         Picker(selection: $state.lightMode, label: Text("Color Scheme")) {
+                                             ForEach(LightMode.allCases) { item in
+                                                 Text(NSLocalizedString(item.rawValue, comment: "ColorScheme Selection"))
+                                             }
+                                         }
+                                     } header: { Text("Light / Dark Mode") }*/
                                 }
 
                                 Section(header: Text("Statistics settings")) {

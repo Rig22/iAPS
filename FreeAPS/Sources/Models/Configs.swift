@@ -36,8 +36,9 @@ public enum IAPSconfig {
     static let chartBackgroundDark = Color.black
     static let previewBackgroundLight = Color.white
     static let previewBackgroundDark = Color.black
-    static let homeViewBackgroundLight: Color = .gray.opacity(IAPSconfig.backgroundOpacity * 2)
-    static let homeViewBackgrundDark: Color = .white.opacity(IAPSconfig.backgroundOpacity * 2)
+    static let homeViewBackgroundLight = Color(.systemGray5) // Color.gray.opacity(IAPSconfig.backgroundOpacity * 2)
+    static let homeViewBackgrundDark = Color(.systemGray5) // Color.header2.opacity(0.95)
+    static let activityBackground = Color(.systemGray5)
 }
 
 extension Font {

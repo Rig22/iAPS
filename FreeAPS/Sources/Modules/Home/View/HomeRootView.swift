@@ -217,32 +217,30 @@ extension Home {
 
         struct TimeEllipse: View {
             var button3D: Bool = false
-            var button3DBackground: Bool = false
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
             var body: some View {
                 GeometryReader { geometry in
                     ZStack {
-                        // Zentrierte Ellipse mit berechneter Breite
                         let ellipseWidth = max(geometry.size.width + 10, 80) // Mindestbreite 80
 
                         if button3D {
                             let glowColor1 = incidenceOfLight
                                 ? lightGlowOverlaySelector.highlightColor
-                                : Color.white.opacity(0.9)
+                                : .dynamicTopGlow
 
                             let glowColor2 = incidenceOfLight
                                 ? lightGlowOverlaySelector.highlightColor
-                                : Color.white.opacity(0.4)
+                                : .dynamicTopGlow.opacity(0.4)
 
-                            if button3DBackground {
-                                RoundedRectangle(cornerRadius: 15)
-                                    .fill(Color.black.opacity(0.2))
-                                    .frame(width: ellipseWidth, height: 25)
-                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                            }
+                            // Immer gefüllte Hintergrundfarbe (wie im glucoseView)
+                            RoundedRectangle(cornerRadius: 15)
+                                .fill(Color.dynamicIconBackground)
+                                .frame(width: ellipseWidth, height: 25)
+                                .shadow(color: Color.dynamicBottomShadow.opacity(0.3), radius: 5, x: 3, y: 3)
 
+                            // 3D-Rand-Glow
                             RoundedRectangle(cornerRadius: 15)
                                 .stroke(
                                     LinearGradient(
@@ -250,8 +248,8 @@ extension Home {
                                             glowColor1.opacity(0.5),
                                             glowColor2.opacity(0.3),
                                             Color.clear,
-                                            Color.black.opacity(0.3),
-                                            Color.black.opacity(0.6)
+                                            .dynamicBottomShadow.opacity(0.3),
+                                            .dynamicBottomShadow
                                         ]),
                                         startPoint: .top,
                                         endPoint: .bottom
@@ -261,10 +259,10 @@ extension Home {
                                 .frame(width: ellipseWidth, height: 25)
                         } else {
                             RoundedRectangle(cornerRadius: 15)
-                                .fill(Color.black.opacity(0.2))
+                                .fill(Color.dynamicIconBackground)
                                 .frame(width: ellipseWidth, height: 25)
                             RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color.white, lineWidth: 0)
+                                .stroke(Color.dynamicIconForeground, lineWidth: 0)
                                 .frame(width: ellipseWidth, height: 25)
                         }
                     }
@@ -297,10 +295,11 @@ extension Home {
                 switch selectedOverlay {
                 case .atriumview: LightGlowOverlay(color: .gray)
                 case .atriumview1: LightGlowOverlay(color: .white)
-                case .atriumview2: LightGlowOverlay(color: .loopYellow)
-                case .atriumview3: LightGlowOverlay(color: .orange)
-                case .atriumview4: LightGlowOverlay(color: .red)
-                case .atriumview5: LightGlowOverlay(color: .NorthernLights)
+                case .atriumview2: LightGlowOverlay(color: .black)
+                    /*  case .atriumview2: LightGlowOverlay(color: .loopYellow)
+                     case .atriumview3: LightGlowOverlay(color: .orange)
+                     case .atriumview4: LightGlowOverlay(color: .red)
+                     case .atriumview5: LightGlowOverlay(color: .NorthernLights)*/
                 }
             }
         }
@@ -361,7 +360,6 @@ extension Home {
             var symbol: String
             var animateProgress: Bool
             var button3D: Bool
-            var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
             var fillFraction: CGFloat
@@ -369,43 +367,29 @@ extension Home {
             var symbolBackgroundColor: Color = .clear
             var symbolColor: Color? = nil
 
-            let angularGradient = AngularGradient(
-                gradient: Gradient(colors: [
-                    Color.gray.opacity(0.3)
-                ]),
-                center: .center,
-                startAngle: .degrees(0),
-                endAngle: .degrees(360)
-            )
-
             var body: some View {
                 VStack {
                     ZStack {
                         if button3D {
+                            // Dynamische Glanzlichtfarben
                             let glowColor1 = incidenceOfLight
                                 ? lightGlowOverlaySelector.highlightColor
-                                : Color.white.opacity(0.7)
+                                : .dynamicTopGlow
 
                             let glowColor2 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor
-                                : Color.white.opacity(0.4)
+                                ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                                : .dynamicTopGlow.opacity(0.4)
 
-                            if button3DBackground {
-                                Circle()
-                                    .fill(Color.black.opacity(0.2))
-                                    .frame(width: 51, height: 51)
-                                    .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                            }
-
+                            // 3D-Ring mit dynamischen Farben
                             Circle()
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
                                             glowColor1.opacity(0.7),
                                             glowColor2.opacity(0.3),
-                                            Color.clear,
-                                            Color.black.opacity(0.3),
-                                            Color.black.opacity(0.6)
+                                            .clear,
+                                            .dynamicBottomShadow.opacity(0.3),
+                                            .dynamicBottomShadow
                                         ]),
                                         startPoint: .top,
                                         endPoint: .bottom
@@ -414,11 +398,13 @@ extension Home {
                                 )
                                 .frame(width: 51, height: 51)
                         } else {
+                            // Einfacher Kreis ohne 3D
                             Circle()
-                                .fill(Color.black.opacity(0.2))
+                                .fill(Color.dynamicBottomShadow)
                                 .frame(width: 50, height: 50)
                         }
 
+                        // Fortschrittsanzeige
                         PieSliceView(
                             startAngle: .degrees(-90),
                             endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
@@ -427,24 +413,26 @@ extension Home {
                         .frame(width: 50, height: 50)
                         .opacity(0.5)
 
-                        // Symbol-Hintergrund (NEU, 40x40)
+                        // Symbol-Hintergrund
                         if symbolBackgroundColor != .clear {
                             Circle()
-                                .fill(symbolBackgroundColor.opacity(0.0))
+                                .fill(symbolBackgroundColor)
                                 .frame(width: 50, height: 50)
                         }
 
+                        // Symbol mit dynamischer Farbe
                         Image(systemName: symbol)
                             .resizable()
                             .scaledToFit()
                             .frame(width: symbolSize, height: symbolSize)
-                            .foregroundColor(symbolColor ?? .white)
+                            .foregroundColor(symbolColor ?? .dynamicIconForeground) // Dynamische Icon-Farbe
                             .rotationEffect(.degrees(symbolRotation))
                     }
 
+                    // Text mit dynamischer Farbe
                     Text(displayText)
                         .font(.system(size: 15))
-                        .foregroundColor(.white)
+                        .foregroundColor(.dynamicSecondaryText)
                 }
                 .offset(y: 10)
                 .onAppear {
@@ -464,38 +452,40 @@ extension Home {
             var color: Color
             var animateProgress: Bool
             var button3D: Bool
-            var button3DBackground: Bool
             var incidenceOfLight: Bool
             var lightGlowOverlaySelector: LightGlowOverlaySelector
 
             var body: some View {
                 ZStack {
                     if button3D {
+                        // Dynamische Glanzlichtfarben
                         let glowColor1 = incidenceOfLight
                             ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.9)
+                            : .dynamicTopGlow
 
                         let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.4)
+                            ? lightGlowOverlaySelector.highlightColor.opacity(0.6)
+                            : .dynamicTopGlow.opacity(0.4)
 
+                        // 3D-Ring für große Anzeige
                         Circle()
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
                                         glowColor1.opacity(0.9),
                                         glowColor2.opacity(0.6),
-                                        Color.clear,
-                                        Color.black.opacity(0.3),
-                                        Color.black.opacity(0.6)
+                                        .clear,
+                                        .dynamicBottomShadow.opacity(0.3),
+                                        .dynamicBottomShadow
                                     ]),
                                     startPoint: .top,
                                     endPoint: .bottom
                                 ),
                                 lineWidth: 1
                             )
-                    } else {}
+                    }
 
+                    // Fortschrittsanzeige
                     PieSliceView(
                         startAngle: .degrees(-90),
                         endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
@@ -545,22 +535,19 @@ extension Home {
                 let incidenceOfLight = state.incidenceOfLight
                 let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                     .atriumview
+                let glowColor1 = incidenceOfLight
+                    ? lightGlowOverlaySelector.highlightColor
+                    : .dynamicTopGlow
+
+                let glowColor2 = incidenceOfLight
+                    ? lightGlowOverlaySelector.highlightColor.opacity(0.6)
+                    : .dynamicTopGlow.opacity(0.4)
 
                 if state.button3D {
-                    let glowColor1 = incidenceOfLight
-                        ? lightGlowOverlaySelector.highlightColor
-                        : Color.white.opacity(0.9)
-
-                    let glowColor2 = incidenceOfLight
-                        ? lightGlowOverlaySelector.highlightColor
-                        : Color.white.opacity(0.4)
-
-                    if state.button3DBackground {
-                        Circle()
-                            .fill(Color.black.opacity(0.2))
-                            .frame(width: 120, height: 120)
-                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                    }
+                    Circle()
+                        .fill(Color.dynamicIconBackground)
+                        .frame(width: 120, height: 120)
+                        .shadow(color: Color.dynamicBottomShadow.opacity(0.3), radius: 5, x: 3, y: 3)
 
                     Circle()
                         .stroke(
@@ -569,8 +556,8 @@ extension Home {
                                     glowColor1.opacity(0.9),
                                     glowColor2.opacity(0.6),
                                     Color.clear,
-                                    Color.black.opacity(0.3),
-                                    Color.black.opacity(0.6)
+                                    .dynamicBottomShadow.opacity(0.3),
+                                    .dynamicBottomShadow
                                 ]),
                                 startPoint: .top,
                                 endPoint: .bottom
@@ -580,9 +567,10 @@ extension Home {
                         .frame(width: 120, height: 120)
                 } else {
                     Circle()
-                        .fill(Color.black.opacity(0.2))
+                        .fill(Color.dynamicIconBackground)
                         .frame(width: 120, height: 120)
                 }
+
                 CurrentGlucoseView(
                     recentGlucose: $state.recentGlucose,
                     timerDate: $state.data.timerDate,
@@ -664,7 +652,6 @@ extension Home {
                         color: .blue,
                         animateProgress: true,
                         button3D: state.button3D,
-                        button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview
@@ -676,7 +663,7 @@ extension Home {
                         .frame(width: 120, height: 120)
 
                     Circle()
-                        .fill(backgroundColor.opacity(1.0))
+                        .fill(Color.dynamicIconBackground)
                         .frame(width: 100, height: 100)
 
                     ZStack {
@@ -686,7 +673,7 @@ extension Home {
                             .overlay(
                                 Image(systemName: "pause.fill")
                                     .font(.system(size: 20, weight: .bold))
-                                    .foregroundColor(.white)
+                                    .foregroundColor(.dynamicIconForeground)
                             )
                     }
                     .contentShape(Rectangle()) // Tappbare Fläche vergrößern
@@ -701,7 +688,7 @@ extension Home {
                             NSLocalizedString(" U", comment: " ")
                     )
                     .font(.system(size: 14))
-                    .foregroundStyle(Color.white)
+                    .foregroundStyle(Color.dynamicSecondaryText)
                     .offset(y: -86)
                 }
                 .frame(width: 120, height: 120)
@@ -717,10 +704,6 @@ extension Home {
 
         @ViewBuilder private var pumpIconContent: some View {
             ZStack {
-                Circle()
-                    .fill(backgroundColor)
-                    .frame(width: 60, height: 60)
-
                 FillablePieSegment(
                     pieSegmentViewModel: connectionPieSegmentViewModel,
                     color: Color.white.opacity(0.5),
@@ -730,11 +713,10 @@ extension Home {
                     symbol: "cross.vial",
                     animateProgress: false,
                     button3D: state.button3D,
-                    button3DBackground: state.button3DBackground,
                     incidenceOfLight: state.incidenceOfLight,
                     lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview,
                     fillFraction: 0.0,
-                    symbolBackgroundColor: backgroundColor
+                    symbolBackgroundColor: .dynamicIconBackground
                 )
                 .frame(width: 60, height: 60)
 
@@ -742,6 +724,7 @@ extension Home {
                     .resizable()
                     .frame(width: 30, height: 30)
                     .offset(y: 3)
+                    .foregroundColor(.dynamicIconForeground)
                     .loopingGradientMask(isActive: state.isLooping)
 
                     .onTapGesture {
@@ -781,7 +764,7 @@ extension Home {
                     HStack {
                         Image(systemName: "chart.xyaxis.line")
                             .font(.system(size: 12))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(Color.dynamicIconForeground)
 
                         if let tempRate = state.tempRate {
                             let rateString = tempRatenumberFormatter.string(from: tempRate as NSNumber) ?? "0"
@@ -792,27 +775,23 @@ extension Home {
                             HStack(spacing: 0) {
                                 Text(rateString)
                                     .font(.system(size: 16))
-                                    .foregroundColor(.white)
+                                    .foregroundColor(.dynamicSecondaryText)
 
                                 Text("\u{00A0}U/hr") // Ein geschütztes Leerzeichen
                                     .font(.system(size: 14))
-                                    .foregroundColor(.white)
-                                    +
+                                    .foregroundColor(.dynamicSecondaryText) +
                                     Text(manualBasalString)
                                     .font(.system(size: 14))
-                                    .foregroundColor(.white)
-                            }
+                                    .foregroundColor(.dynamicSecondaryText) }
                         } else {
                             Text("---")
                                 .font(.system(size: 16))
-                                .foregroundColor(.white)
-                        }
+                                .foregroundColor(.dynamicSecondaryText) }
                     }
                     .font(.timeSettingFont)
                     .background(
                         TimeEllipse(
                             button3D: state.button3D,
-                            button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview
@@ -834,7 +813,7 @@ extension Home {
                             HStack(spacing: 4) {
                                 Text("⇢")
                                     .font(.system(size: 14))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(.secondary)
 
                                 let eventualBGValue = state.data.units == .mmolL ? eventualBG.asMmolL : Decimal(eventualBG)
 
@@ -843,23 +822,23 @@ extension Home {
                                 {
                                     Text(formattedBG)
                                         .font(.system(size: 16))
-                                        .foregroundColor(.white)
+                                        .foregroundColor(.secondary)
                                 }
 
                                 Text(state.data.units.rawValue)
                                     .font(.system(size: 14))
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(.secondary)
                                     .padding(.leading, -1)
                             }
                         } else {
                             HStack(spacing: 4) {
                                 Text("⇢")
                                     .font(.statusFont)
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(.secondary)
 
                                 Text("---")
                                     .font(.system(size: 16))
-                                    .foregroundColor(.white)
+                                    .foregroundColor(.secondary)
                             }
                         }
                     }
@@ -867,7 +846,6 @@ extension Home {
                     .background(
                         TimeEllipse(
                             button3D: state.button3D,
-                            button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview
@@ -939,6 +917,7 @@ extension Home {
                 }
             }
             .frame(height: fontSize < .extraExtraLarge ? height + geo.safeAreaInsets.top : height + 10 + geo.safeAreaInsets.top)
+            .background(Color.dynamicBackground)
         }
 
         // Head Ende
@@ -971,19 +950,18 @@ extension Home {
                             symbol: "cross.vial",
                             animateProgress: true,
                             button3D: state.button3D,
-                            button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
                             fillFraction: animatedFill,
-                            symbolBackgroundColor: backgroundColor
+                            symbolBackgroundColor: .dynamicIconBackground
                         )
 
                         Image(systemName: "apple.logo")
                             .resizable()
                             .scaledToFit()
                             .frame(width: 27, height: 27)
-                            .foregroundColor(.white.opacity(0.8))
+                            .foregroundColor(.dynamicIconForeground)
                             .verticalFillMask(
                                 fillFraction: animatedFill,
                                 gradient: LinearGradient(
@@ -1034,19 +1012,18 @@ extension Home {
                                 symbol: "cross.vial",
                                 animateProgress: true,
                                 button3D: state.button3D,
-                                button3DBackground: state.button3DBackground,
                                 incidenceOfLight: state.incidenceOfLight,
                                 lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                     .atriumview,
                                 fillFraction: animatedInsulinFill,
-                                symbolBackgroundColor: backgroundColor
+                                symbolBackgroundColor: .dynamicIconBackground
                             )
 
                             Image(systemName: "drop.fill")
                                 .resizable()
                                 .scaledToFit()
                                 .frame(width: 27, height: 27)
-                                .foregroundColor(.white.opacity(0.8))
+                                .foregroundColor(.dynamicIconForeground)
                                 .verticalFillMask(
                                     fillFraction: animatedInsulinFill,
                                     gradient: isNegative
@@ -1087,33 +1064,29 @@ extension Home {
                 let incidenceOfLight = state.incidenceOfLight
                 let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                     .atriumview
+                let glowColor1 = incidenceOfLight
+                    ? lightGlowOverlaySelector.highlightColor
+                    : .dynamicTopGlow
+
+                let glowColor2 = incidenceOfLight
+                    ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
+                    : .dynamicTopGlow.opacity(0.4)
 
                 if state.button3D {
-                    let glowColor1 = incidenceOfLight
-                        ? lightGlowOverlaySelector.highlightColor
-                        : Color.white.opacity(0.9)
-
-                    let glowColor2 = incidenceOfLight
-                        ? lightGlowOverlaySelector.highlightColor
-                        : Color.white.opacity(0.4)
-
-                    if state.button3DBackground {
-                        Circle()
-                            .fill(Color.black.opacity(0.2))
-                            .frame(width: 50, height: 50)
-                            .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                            .offset(y: -2.5)
-                    }
+                    Circle()
+                        .fill(Color.dynamicIconBackground)
+                        .frame(width: 50, height: 50)
+                        .shadow(color: Color.dynamicBottomShadow.opacity(0.3), radius: 5, x: 3, y: 3)
 
                     Circle()
                         .stroke(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    glowColor1,
-                                    glowColor2.opacity(0.4),
+                                    glowColor1.opacity(0.9),
+                                    glowColor2.opacity(0.6),
                                     Color.clear,
-                                    Color.black.opacity(0.3),
-                                    Color.black.opacity(0.6)
+                                    .dynamicBottomShadow.opacity(0.3),
+                                    .dynamicBottomShadow
                                 ]),
                                 startPoint: .top,
                                 endPoint: .bottom
@@ -1121,18 +1094,11 @@ extension Home {
                             lineWidth: 1
                         )
                         .frame(width: 50, height: 50)
-                        .offset(y: -2.5)
                 } else {
                     Circle()
-                        .fill(Color.black.opacity(0.2))
+                        .fill(Color.dynamicIconBackground)
                         .frame(width: 50, height: 50)
-                        .offset(y: -1.5)
-                        .overlay(
-                            Circle()
-                                .stroke(Color.white, lineWidth: 0)
-                        )
                 }
-
                 LoopView(
                     suggestion: $state.data.suggestion,
                     enactedSuggestion: $state.enactedSuggestion,
@@ -1215,7 +1181,6 @@ extension Home {
                             symbol: "cross.vial.fill",
                             animateProgress: false,
                             button3D: state.button3D,
-                            button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
@@ -1296,7 +1261,6 @@ extension Home {
                         symbol: "cross.vial",
                         animateProgress: true,
                         button3D: state.button3D,
-                        button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview,
@@ -1402,7 +1366,6 @@ extension Home {
                         symbol: "cross.vial",
                         animateProgress: true,
                         button3D: state.button3D,
-                        button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview,
@@ -1461,7 +1424,6 @@ extension Home {
                         symbol: "battery.50percent",
                         animateProgress: false,
                         button3D: state.button3D,
-                        button3DBackground: state.button3DBackground,
                         incidenceOfLight: state.incidenceOfLight,
                         lightGlowOverlaySelector: LightGlowOverlaySelector(
                             rawValue: state.lightGlowOverlaySelector
@@ -1500,7 +1462,6 @@ extension Home {
                             symbol: "dot.radiowaves.left.and.right",
                             animateProgress: true,
                             button3D: state.button3D,
-                            button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
@@ -1554,38 +1515,22 @@ extension Home {
         // TopBars Ende
 
         var mainChart: some View {
-            let isChartBackgroundColored: Bool = state.settingsManager?.settings.chartBackgroundColored ?? false
-
-            return Group {
-                if isChartBackgroundColored {
-                    ZStack {
-                        ColouredBackground()
-
-                        if state.animatedBackground {
-                            SpriteView(scene: spriteScene, options: [.allowsTransparency])
-                                .ignoresSafeArea()
-                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                        }
-                        MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
+            Group {
+                ZStack {
+                    Rectangle().fill(Color.dynamicChartBackground)
+                    if state.animatedBackground {
+                        SpriteView(scene: spriteScene, options: [.allowsTransparency])
+                            .ignoresSafeArea()
+                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                     }
-                } else {
-                    ZStack {
-                        ColouredBackground2()
 
-                        if state.animatedBackground {
-                            SpriteView(scene: spriteScene, options: [.allowsTransparency])
-                                .ignoresSafeArea()
-                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
-                        }
-                        MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
-                    }
+                    MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
                 }
             }
             .padding(.bottom, 5)
             .padding(.leading, 15)
             .padding(.trailing, 15)
-            .modal(for: .dataTable, from: self)
-        }
+            .modal(for: .dataTable, from: self) }
 
         var chart: some View {
             VStack(spacing: 0) {
@@ -1602,7 +1547,7 @@ extension Home {
                     .padding(.top, 20)
                     .frame(width: UIScreen.main.bounds.width)
             }
-            .frame(minHeight: UIScreen.main.bounds.height / 1.82) // Je größer der Wert, desto kleiner der mainChart
+            .frame(minHeight: UIScreen.main.bounds.height / 1.81) // Je größer der Wert, desto kleiner der mainChart
         }
 
         // BottomInfoBar Start
@@ -1614,7 +1559,7 @@ extension Home {
                         Spacer()
                         HStack {
                             isfView
-                                .foregroundColor(.white)
+                                .foregroundColor(.secondary)
                         }
                         .padding(.leading, 0)
                         .frame(maxWidth: 100, alignment: .leading)
@@ -1632,13 +1577,15 @@ extension Home {
                         // Rechter Stack - TDD
                         HStack {
                             tddView
-                                .foregroundColor(.white)
+                                .foregroundColor(.secondary)
                         }
                         .padding(.trailing, 25)
                         .frame(maxWidth: 100, alignment: .trailing)
 
                         Spacer()
                     }
+                    .padding(.top, 10)
+
                 } else {
                     EmptyView()
                 }
@@ -1656,16 +1603,15 @@ extension Home {
                     HStack {
                         Text("ISF")
                             .font(.system(size: 14))
-                            .foregroundStyle(.white)
+                            .foregroundColor(.dynamicSecondaryText)
 
                         Text("\(sensitivityPercentage)%")
-                            .foregroundStyle(.white)
+                            .foregroundColor(.dynamicSecondaryText)
                             .font(.timeSettingFont)
                     }
                     .background(
                         TimeEllipse(
                             button3D: state.button3D,
-                            button3DBackground: state.button3DBackground,
                             incidenceOfLight: state.incidenceOfLight,
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview
@@ -1692,13 +1638,12 @@ extension Home {
                 Button("12 " + NSLocalizedString("hours", comment: ""), action: { state.hours = 12 })
                 Button("24 " + NSLocalizedString("hours", comment: ""), action: { state.hours = 24 })
             }
-            .foregroundStyle(Color.white)
+            .foregroundColor(.dynamicSecondaryText)
             .font(.timeSettingFont)
             .padding(.vertical, 15)
             .background(
                 TimeEllipse(
                     button3D: state.button3D,
-                    button3DBackground: state.button3DBackground,
                     incidenceOfLight: state.incidenceOfLight,
                     lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
                 )
@@ -1708,20 +1653,20 @@ extension Home {
             HStack(spacing: 4) {
                 Image(systemName: "circle.slash")
                     .font(.system(size: 13))
-                    .foregroundStyle(.white)
+                    .foregroundColor(.dynamicSecondaryText)
 
                 Text("\(targetFormatter.string(from: state.tddActualAverage as NSNumber) ?? "0") U")
-                    .foregroundStyle(.white)
+                    .foregroundColor(.dynamicSecondaryText)
                     .lineLimit(1)
                     .fixedSize()
             }
             .font(.timeSettingFont)
+            .foregroundColor(.dynamicSecondaryText)
             .padding(.horizontal, 10)
             .padding(.vertical, 4)
             .background(
                 TimeEllipse(
                     button3D: state.button3D,
-                    button3DBackground: state.button3DBackground,
                     incidenceOfLight: state.incidenceOfLight,
                     lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
                 )
@@ -1741,6 +1686,7 @@ extension Home {
 
         // ButtonPanel Start
         private static let heavyFeedback = UIImpactFeedbackGenerator(style: .heavy)
+
         // buttonWithCircle Funktion
         @ViewBuilder private func buttonWithCircle(
             iconName: String,
@@ -1761,45 +1707,40 @@ extension Home {
                     let incidenceOfLight = state.incidenceOfLight
                     let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                         .atriumview
+                    let glowColor1 = incidenceOfLight
+                        ? lightGlowOverlaySelector.highlightColor
+                        : .dynamicTopGlow
 
-                    // 3D-Button-Hintergrund
+                    let glowColor2 = incidenceOfLight
+                        ? lightGlowOverlaySelector.highlightColor.opacity(0.6)
+                        : .dynamicTopGlow.opacity(0.4)
+
                     if state.button3D {
-                        let glowColor1 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.9)
-
-                        let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : Color.white.opacity(0.4)
-
-                        if state.button3DBackground {
-                            Circle()
-                                .fill(Color.black.opacity(0.2))
-                                .frame(width: 50, height: 50)
-                                .shadow(color: Color.black.opacity(0.4), radius: 5, x: 3, y: 3)
-                        }
+                        Circle()
+                            .fill(Color.dynamicIconBackground)
+                            .frame(width: 50, height: 50)
+                            .shadow(color: Color.dynamicBottomShadow.opacity(0.3), radius: 5, x: 3, y: 3)
 
                         Circle()
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        glowColor1.opacity(0.5),
-                                        glowColor2.opacity(0.3),
+                                        glowColor1.opacity(0.9),
+                                        glowColor2.opacity(0.6),
                                         Color.clear,
-                                        Color.black.opacity(0.3),
-                                        Color.black.opacity(0.6)
+                                        .dynamicBottomShadow.opacity(0.3),
+                                        .dynamicBottomShadow
                                     ]),
                                     startPoint: .top,
                                     endPoint: .bottom
                                 ),
-                                lineWidth: 2
+                                lineWidth: 1
                             )
                             .frame(width: 50, height: 50)
                     } else {
                         Circle()
-                            .fill(Color.black.opacity(0.2))
+                            .fill(Color.dynamicIconBackground)
                             .frame(width: 50, height: 50)
-                            .overlay(Circle().stroke(Color.white, lineWidth: 0))
                     }
 
                     // SF Symbol Darstellung mit direkter Farbanwendung
@@ -1863,7 +1804,7 @@ extension Home {
                                 .fill(Color.black.opacity(0.3))
                         )
                         .foregroundColor(.white)
-                        .font(.caption) // vorher .caption
+                        .font(.caption)
 
                     Triangle()
                         .fill(Color.black.opacity(0.3))
@@ -1889,8 +1830,8 @@ extension Home {
 
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             ZStack {
-                backgroundColor
-                    .frame(height: 60 + geo.safeAreaInsets.bottom)
+                /*  backgroundColor
+                 .frame(height: 60 + geo.safeAreaInsets.bottom)*/
 
                 let isOverride = fetchedPercent.first?.enabled ?? false
                 let isTarget = (state.tempTarget != nil)
@@ -1917,13 +1858,17 @@ extension Home {
                                 buttonWithCircle(
                                     iconName: "apple.logo",
                                     symbolRenderingMode: .palette,
-                                    colors: [.orange, .clear],
-                                    circleColor: Color.black.opacity(1.0),
-                                    gradient: LinearGradient(
-                                        gradient: Gradient(colors: [.green, .yellow, .orange]),
-                                        startPoint: .bottom,
-                                        endPoint: .top
-                                    )
+                                    colors: [.dynamicIconForeground],
+                                    circleColor: Color.black.opacity(1.0)
+                                    /*  gradient: LinearGradient(
+                                         gradient: Gradient(colors: [
+                                             .green.opacity(0.7),
+                                             .yellow.opacity(0.7),
+                                             .orange.opacity(0.7)
+                                         ]),
+                                         startPoint: .bottom,
+                                         endPoint: .top
+                                     )*/
                                 ) {
                                     state.showModal(for: .addCarbs(editMode: false, override: false))
                                 }
@@ -1931,9 +1876,9 @@ extension Home {
                                 if let carbsReq = state.carbsRequired {
                                     Text(numberFormatter.string(from: carbsReq as NSNumber)!)
                                         .font(.caption)
-                                        .foregroundColor(.white)
+                                        .foregroundColor(.white.opacity(0.7))
                                         .padding(4)
-                                        .background(Capsule().fill(Color.red))
+                                        .background(Capsule().fill(Color.red.opacity(0.7)))
                                         .offset(x: 20, y: 10)
                                 }
                             }
@@ -1943,7 +1888,7 @@ extension Home {
                         // IOB Button
                         buttonWithCircle(
                             iconName: "drop.fill",
-                            colors: [.blue, .clear],
+                            colors: [.dynamicIconForeground],
                             circleColor: Color.black.opacity(1.0)
                         ) {
                             (state.bolusProgress != nil) ? showBolusActiveAlert = true :
@@ -1959,7 +1904,7 @@ extension Home {
                             buttonWithCircle(
                                 iconName: "speedometer",
                                 symbolRenderingMode: .monochrome,
-                                colors: [.gray],
+                                colors: [.dynamicIconForeground],
                                 circleColor: Color.black.opacity(1.0)
                             ) {
                                 state.showModal(for: .manualTempBasal)
@@ -1972,35 +1917,37 @@ extension Home {
                             buttonWithCircle(
                                 iconName: isOverride ? "person.crop.circle.fill.badge.checkmark" : "person.crop.circle",
                                 symbolRenderingMode: .palette,
-                                colors: [.purple, isOverride ? .green : .gray],
+                                // colors: [.purple.opacity(0.7), isOverride ? .green.opacity(0.7) : .gray.opacity(0.7)],
+                                colors: [.dynamicIconForeground, isOverride ? .red.opacity(0.7) : .clear],
                                 circleColor: Color.black.opacity(1.0)
-                            ) {
-                                // Leere Aktion: Tap / LongPress werden per Gesten gesteuert
-                            }
-                            .simultaneousGesture(
-                                LongPressGesture(minimumDuration: 0.5)
-                                    .onEnded { _ in
-                                        withAnimation {
-                                            showProfileBubble = true
-                                        }
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                            )
+                                {
+                                    // Leere Aktion: Tap / LongPress werden per Gesten gesteuert
+                                }
+                                .simultaneousGesture(
+                                    LongPressGesture(minimumDuration: 0.5)
+                                        .onEnded { _ in
                                             withAnimation {
-                                                showProfileBubble = false
+                                                showProfileBubble = true
+                                            }
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                                withAnimation {
+                                                    showProfileBubble = false
+                                                }
                                             }
                                         }
-                                    }
-                            )
-                            .simultaneousGesture(
-                                TapGesture()
-                                    .onEnded {
-                                        if isOverride {
-                                            showCancelAlert.toggle()
-                                        } else {
-                                            state.showModal(for: .overrideProfilesConfig)
+                                )
+                                .simultaneousGesture(
+                                    TapGesture()
+                                        .onEnded {
+                                            if isOverride {
+                                                showCancelAlert.toggle()
+                                            } else {
+                                                state.showModal(for: .overrideProfilesConfig)
+                                            }
                                         }
-                                    }
-                            )
-                            .frame(maxWidth: .infinity)
+                                )
+                                .frame(maxWidth: .infinity)
                         }
 
                         // Target Button
@@ -2008,7 +1955,8 @@ extension Home {
                             buttonWithCircle(
                                 iconName: "scope",
                                 symbolRenderingMode: .palette,
-                                colors: [isTarget ? .red : .white, .clear],
+                                /* colors: [isTarget ? .red.opacity(0.7) : .white.opacity(0.7), .clear], */
+                                colors: [isTarget ? .red.opacity(0.7) : .dynamicIconForeground, .clear],
                                 circleColor: Color.black.opacity(1.0)
                             ) {
                                 // Leere Aktion: Tap / LongPress werden per Gesten gesteuert
@@ -2043,7 +1991,8 @@ extension Home {
                         buttonWithCircle(
                             iconName: "square.3.layers.3d",
                             symbolRenderingMode: .palette,
-                            colors: [.purple, .blue],
+                            /* colors: [.purple.opacity(0.7), .blue.opacity(0.7)],*/
+                            colors: [.dynamicIconForeground],
                             circleColor: Color.black.opacity(1.0)
                         ) {
                             state.showModal(for: .statisticsConfig)
@@ -2054,7 +2003,7 @@ extension Home {
                         buttonWithCircle(
                             iconName: "gearshape.fill",
                             symbolRenderingMode: .hierarchical,
-                            colors: [.gray],
+                            colors: [.dynamicIconForeground],
                             circleColor: Color.black.opacity(1.0)
                         ) {
                             if !didLongPress {
@@ -2082,7 +2031,7 @@ extension Home {
                                !(fetchedPercent.first?.enabled ?? false)
                             {
                                 Text(tempTargetString)
-                                    .foregroundStyle(Color.white)
+                                    .foregroundStyle(Color.dynamicPrimaryText)
                             } else {
                                 profileView
                             }
@@ -2104,10 +2053,10 @@ extension Home {
                                !(fetchedPercent.first?.enabled ?? false)
                             {
                                 Text(tempTargetString)
-                                    .foregroundStyle(Color.white)
+                                    .foregroundStyle(Color.dynamicPrimaryText)
                             } else {
                                 Text("No TempTarget activ")
-                                    .foregroundStyle(Color.white)
+                                    .foregroundStyle(Color.dynamicPrimaryText)
                             }
                         }
                         .frame(width: 350)
@@ -2203,37 +2152,34 @@ extension Home {
         // ButtonPanel End
 
         var DayView: some View {
-            let isChartBackgroundColored: Bool = state.settingsManager?.settings.chartBackgroundColored ?? false
-            let backgroundView = isChartBackgroundColored ? AnyView(ColouredBackground()) : AnyView(ColouredBackground2())
-
-            return Group {
+            Group {
                 ZStack {
                     if !state.skipGlucoseChart {
-                        backgroundView
                         glucoseHeaderView().padding(.top, 8).padding(.bottom, 10)
+                        // Rectangle().fill(Color.dynamicChartBackground)
                     } else {
                         EmptyView()
                     }
                 }
 
                 ZStack {
-                    backgroundView
+                    Rectangle().fill(Color.dynamicChartBackground)
                     preview.padding(.top, 15)
                 }
 
                 ZStack {
-                    backgroundView
+                    Rectangle().fill(Color.dynamicChartBackground)
                     loopPreview
                 }
 
                 if !state.iobData.isEmpty {
                     ZStack {
-                        backgroundView
+                        Rectangle().fill(Color.dynamicChartBackground)
                         activeCOBView.padding(.bottom, 20)
                     }
 
                     ZStack {
-                        backgroundView
+                        Rectangle().fill(Color.dynamicChartBackground)
                         activeIOBView.padding(.bottom, 20)
                     }
                 }
@@ -2242,14 +2188,14 @@ extension Home {
         }
 
         @ViewBuilder private func glucoseHeaderView() -> some View {
-            ColouredBackground2()
+            Rectangle().fill(Color.dynamicChartBackground)
                 .frame(maxHeight: 200)
 
             VStack {
                 glucosePreview
             }
             .clipShape(Rectangle())
-            .foregroundStyle(Color.white)
+            .foregroundStyle(Color.dynamicSecondaryText)
         }
 
         var glucosePreview: some View {
@@ -2275,16 +2221,16 @@ extension Home {
             }
             .chartYAxis {
                 AxisMarks(values: .automatic(desiredCount: 3)) { _ in
-                    AxisGridLine().foregroundStyle(Color.white)
-                    AxisTick().foregroundStyle(Color.white)
-                    AxisValueLabel().foregroundStyle(Color.white)
+                    AxisGridLine().foregroundStyle(Color.dynamicSecondaryText)
+                    AxisTick().foregroundStyle(Color.dynamicSecondaryText)
+                    AxisValueLabel().foregroundStyle(Color.dynamicSecondaryText)
                 }
             }
             .chartXAxis {
                 AxisMarks(values: .automatic(desiredCount: 5)) { _ in
-                    AxisGridLine().foregroundStyle(Color.white)
-                    AxisTick().foregroundStyle(Color.white)
-                    AxisValueLabel().foregroundStyle(Color.white)
+                    AxisGridLine().foregroundStyle(Color.dynamicSecondaryText)
+                    AxisTick().foregroundStyle(Color.dynamicSecondaryText)
+                    AxisValueLabel().foregroundStyle(Color.dynamicSecondaryText)
                 }
             }
             .chartYScale(
@@ -2295,51 +2241,46 @@ extension Home {
                 domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
             )
             .frame(height: 100)
-            .padding(.horizontal, 20)
+            .padding(.horizontal, 0)
             .padding(.top, 15)
+            .addShadows()
             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
         }
 
         var preview: some View {
-            VStack {
-                Text("Time In Range")
-                    .font(.previewHeadline)
-                    .foregroundColor(.white)
-
-                ZStack {
-                    VStack {
-                        PreviewChart(
-                            readings: $state.readings,
-                            lowLimit: $state.data.lowGlucose,
-                            highLimit: $state.data.highGlucose
-                        )
-                        .padding()
-                    }
+            Rectangle().fill(Color.dynamicChartBackground)
+                .frame(minHeight: 200)
+                .overlay {
+                    PreviewChart(
+                        readings: $state.readings,
+                        lowLimit: $state.data.lowGlucose,
+                        highLimit: $state.data.highGlucose
+                    )
                 }
-                .padding(.vertical, 5)
-            }
-            .onTapGesture {
-                state.showModal(for: .statistics)
-            }
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                // .addShadows()
+                .padding(.horizontal, 10)
+                .onTapGesture {
+                    state.showModal(for: .statistics)
+                }
         }
 
         var loopPreview: some View {
-            ColouredBackground2()
-                .frame(minHeight: 190)
+            Rectangle().fill(Color.dynamicChartBackground)
+                .frame(minHeight: 160)
                 .overlay {
                     LoopsView(loopStatistics: $state.loopStatistics)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 15))
+                // .addShadows()
                 .padding(.horizontal, 10)
-                .foregroundStyle(Color.white)
                 .onTapGesture {
                     state.showModal(for: .statistics)
                 }
         }
 
         var activeIOBView: some View {
-            ColouredBackground2()
-                .frame(minHeight: 430)
+            Rectangle().fill(Color.dynamicChartBackground).frame(minHeight: 430)
                 .overlay {
                     ActiveIOBView(
                         data: $state.iobData,
@@ -2354,22 +2295,17 @@ extension Home {
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 15))
                 .padding(.horizontal, 10)
-                .foregroundStyle(Color.white)
+                .foregroundStyle(Color.dynamicSecondaryText)
         }
 
         var activeCOBView: some View {
-            ColouredBackground2()
-                .frame(minHeight: 230)
+            Rectangle().fill(Color.dynamicChartBackground).frame(minHeight: 230)
                 .overlay {
                     ActiveCOBView(data: $state.iobData)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 15))
-                .foregroundStyle(Color.white)
+                .foregroundStyle(Color.dynamicSecondaryText)
                 .padding(.horizontal, 10)
-        }
-
-        var backgroundColor: Color {
-            BackgroundColorOption(rawValue: state.backgroundColorOptionRawValue)?.color ?? .black
         }
 
         var body: some View {
@@ -2382,8 +2318,8 @@ extension Home {
                         ScrollView {
                             ScrollViewReader { _ in
                                 LazyVStack {
-                                    chart.padding(.top, 10)
-                                    DayView.padding(.bottom, 40).padding(.top, 30)
+                                    chart.padding(.top, 10).padding(.bottom, 10)
+                                    DayView.padding(.bottom, 20).padding(.top, 30)
                                 }
                                 .background(
                                     GeometryReader { proxy in
@@ -2405,7 +2341,7 @@ extension Home {
                         buttonPanel(geo)
                             .frame(height: 60)
                     }
-                    .background(backgroundColor) // Kompletter Homeview BG
+                    .background(Color.dynamicBackground)
                     .ignoresSafeArea(edges: .vertical)
                     .onAppear {
                         startProgress()
@@ -2455,19 +2391,19 @@ extension Home {
 
         var popup: some View {
             VStack(alignment: .leading, spacing: 4) {
-                Text(state.statusTitle).font(.suggestionHeadline).foregroundStyle(Color.white)
+                Text(state.statusTitle).font(.suggestionHeadline).foregroundStyle(Color.dynamicPrimaryText)
                     .padding(.bottom, 4)
                 if let suggestion = state.data.suggestion {
                     TagCloudView(tags: suggestion.reasonParts).animation(.none, value: false)
 
                     Text(suggestion.reasonConclusion.capitalizingFirstLetter()).font(.suggestionSmallParts)
-                        .foregroundStyle(Color.white)
+                        .foregroundStyle(Color.dynamicPrimaryText)
                 } else {
-                    Text("No sugestion found").font(.suggestionHeadline).foregroundStyle(Color.white)
+                    Text("No sugestion found").font(.suggestionHeadline).foregroundStyle(Color.dynamicPrimaryText)
                 }
                 if let errorMessage = state.errorMessage, let date = state.errorDate {
                     Text(NSLocalizedString("Error at", comment: "") + " " + dateFormatter.string(from: date))
-                        .foregroundStyle(Color.white)
+                        .foregroundStyle(Color.dynamicPrimaryText)
                         .font(.suggestionError)
                         .padding(.bottom, 4)
                         .padding(.top, 8)
@@ -2475,7 +2411,7 @@ extension Home {
                 } else if let suggestion = state.data.suggestion, (suggestion.bg ?? 100) == 400 {
                     Text("Invalid CGM reading (HIGH).").font(.suggestionError).bold().foregroundColor(.loopRed)
                         .padding(.top, 8)
-                    Text("SMBs and High Temps Disabled.").font(.suggestionParts).foregroundStyle(Color.white)
+                    Text("SMBs and High Temps Disabled.").font(.suggestionParts).foregroundStyle(Color.dynamicPrimaryText)
                         .padding(.bottom, 4)
                 }
             }

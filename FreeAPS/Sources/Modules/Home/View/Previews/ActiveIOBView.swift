@@ -29,10 +29,20 @@ struct ActiveIOBView: View {
 
     var body: some View {
         VStack {
-            Text("Active Insulin").font(.previewHeadline).padding(.top, 20).padding(.bottom, 15)
-            iobView().frame(maxHeight: 130).padding(.horizontal, 20).padding(.top, 10)
-            sumView().frame(maxHeight: 250).padding(.top, 20).padding(.bottom, 10)
-        }.dynamicTypeSize(...DynamicTypeSize.xLarge)
+            Text("Insulin on Board")
+                .font(.previewHeadline)
+                .foregroundColor(Color.dynamicPrimaryText)
+                .padding(.top, 20)
+                .padding(.bottom, 15)
+            iobView()
+                .frame(maxHeight: 130)
+                .padding(.horizontal, 20)
+            sumView()
+                .frame(maxHeight: 250)
+                .padding(.top, 20)
+                .padding(.bottom, 10)
+        }
+        .dynamicTypeSize(...DynamicTypeSize.xLarge)
     }
 
     @ViewBuilder private func iobView() -> some View {
@@ -96,22 +106,13 @@ struct ActiveIOBView: View {
             AxisMarks(values: .stride(by: .hour, count: 2)) { _ in
                 AxisValueLabel(
                     format: .dateTime.hour(.defaultDigits(amPM: .omitted))
-                        .locale(Locale(identifier: "sv"))
+                        .locale(Locale(identifier: "sv")) // Force 24h. Not pretty.
                 )
-                .foregroundStyle(Color.white) // Achsenbeschriftung auf Weiß setzen
                 AxisGridLine()
-                    .foregroundStyle(Color.white) // Achsenbeschriftung auf Weiß setzen
             }
         }
-
         .chartYAxis {
-            AxisMarks(values: .automatic(desiredCount: 3)) { _ in
-                AxisValueLabel()
-                    .foregroundStyle(Color.white) // Y-Achsenbeschriftung auf Weiß setzen
-
-                AxisGridLine()
-                    .foregroundStyle(Color.white) // Gitterlinien auf Weiß setzen
-            }
+            AxisMarks(values: .automatic(desiredCount: 3))
         }
         .chartYScale(
             domain: minimumRange ... max(minimumRange, maximum, minimumRange + 1)
@@ -120,7 +121,6 @@ struct ActiveIOBView: View {
             domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
         )
         .chartLegend(.hidden)
-        .foregroundStyle(Color.white) // Allgemeiner Stil auf Weiß setzen
     }
 
     @ViewBuilder private func sumView() -> some View {
@@ -153,7 +153,7 @@ struct ActiveIOBView: View {
                 variable: NSLocalizedString("Average Insulin 10 days", comment: ""),
                 formula: NSLocalizedString(" U", comment: ""),
                 insulin: tddActualAverage,
-                color: .white
+                color: .secondary
             ),
             BolusSummary(
                 variable: "",
@@ -165,19 +165,19 @@ struct ActiveIOBView: View {
                 variable: NSLocalizedString("TDD yesterday", comment: ""),
                 formula: NSLocalizedString(" U", comment: ""),
                 insulin: tddYesterday,
-                color: .white
+                color: .secondary
             ),
             BolusSummary(
                 variable: NSLocalizedString("TDD 2 days ago", comment: ""),
                 formula: NSLocalizedString(" U", comment: ""),
                 insulin: tdd2DaysAgo,
-                color: .white
+                color: .secondary
             ),
             BolusSummary(
                 variable: NSLocalizedString("TDD 3 days ago", comment: ""),
                 formula: NSLocalizedString(" U", comment: ""),
                 insulin: tdd3DaysAgo,
-                color: .white
+                color: .secondary
             )
         ]
 
@@ -185,22 +185,18 @@ struct ActiveIOBView: View {
 
         Grid {
             ForEach(insulinData) { entry in
+
                 GridRow(alignment: .firstTextBaseline) {
-                    // Schriftfarbe für alle Variablen setzen
-                    Text(entry.variable)
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Text(entry.variable).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
                     Text("")
                     if entry.insulin != 0 {
                         Text(
                             ((isTDD(entry.insulin) ? tddFormatter : formatter).string(for: entry.insulin) ?? "") + entry
                                 .formula
                         )
-                        .bold(entry == entries.first)
-                        .foregroundStyle(entry.color)
+                        .bold(entry == entries.first).foregroundStyle(entry.color)
                     } else if entry.variable != "" {
-                        Text("0")
-                            .foregroundColor(.white)
+                        Text("0").foregroundStyle(.secondary)
                     }
                 }
             }

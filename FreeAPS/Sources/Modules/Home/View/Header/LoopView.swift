@@ -38,14 +38,15 @@ struct PieSliceView: Shape {
 class PieSegmentViewModel: ObservableObject {
     @Published var progress: Double = 0.0
 
-    func updateProgress(to newValue: CGFloat, animate: Bool) {
-        if animate {
-            withAnimation(.easeInOut(duration: 2.5)) { // Dauer der Animation
-                self.progress = Double(newValue)
-            }
-        } else {
-            progress = Double(newValue)
-        }
+    func updateProgress(to newValue: CGFloat, animate _: Bool) {
+        /* if animate {
+             withAnimation(.easeInOut(duration: 2.5)) { // Dauer der Animation
+                 self.progress = Double(newValue)
+             }
+         } else {
+             progress = Double(newValue)
+         }*/
+        progress = Double(newValue)
     }
 }
 
@@ -86,7 +87,7 @@ struct FillablePieSegment: View {
                 if symbolBackgroundColor != .clear {
                     Circle()
                         .fill(symbolBackgroundColor.opacity(0.0))
-                        .frame(width: 42, height: 42)
+                        .frame(width: 50, height: 50)
                 }
 
                 Image(systemName: symbol)
@@ -94,11 +95,12 @@ struct FillablePieSegment: View {
                     .scaledToFit()
                     .frame(width: symbolSize, height: symbolSize)
                     .foregroundColor(symbolColor)
+                    .offset(y: 2)
             }
 
             Text(displayText)
                 .font(.system(size: 15))
-                .foregroundColor(.white)
+                .foregroundColor(.dynamicSecondaryText)
         }
         .offset(y: 10)
         .onAppear {
@@ -172,9 +174,8 @@ struct LoopView: View {
 
                     if isLooping {
                         Circle()
-                            .fill(backgroundColor)
+                            .fill(Color.dynamicBackground)
                             .frame(width: 40, height: 40)
-                            .offset(y: -1.5)
                     }
 
                     if isLooping {
@@ -202,7 +203,6 @@ struct LoopView: View {
                 .frame(width: 20, height: 20)
                 .foregroundColor(color)
                 .rotationEffect(.degrees(rotation))
-                .offset(y: -1.5)
                 .onAppear {
                     withAnimation(
                         Animation.linear(duration: 1.0)
@@ -216,7 +216,7 @@ struct LoopView: View {
 
     private var color: Color {
         guard actualSuggestion?.timestamp != nil else {
-            return .white
+            return .dynamicIconForeground
         }
         guard manualTempBasal == false else {
             return .loopManualTemp
@@ -225,11 +225,11 @@ struct LoopView: View {
 
         if delta <= 6.minutes.timeInterval {
             guard actualSuggestion?.deliverAt != nil else {
-                return .white
+                return .dynamicIconForeground
             }
-            return .white
+            return .dynamicIconForeground
         } else if delta <= 9.minutes.timeInterval {
-            return .yellow
+            return .orange
         } else {
             return .red
         }
@@ -244,13 +244,13 @@ struct LoopView: View {
         let delta = timerDate.timeIntervalSince(lastLoopDate) - Config.lag
 
         if delta < 1.minutes.timeInterval {
-            return .white.opacity(0.5) // unter 1 Minute
+            return .secondary.opacity(0.5) // unter 1 Minute
         } else if delta <= 6.minutes.timeInterval {
-            return .white.opacity(0.5) // grün für 1-5 Minuten
+            return .secondary.opacity(0.5) // grün für 1-5 Minuten
         } else if delta < 10.minutes.timeInterval {
-            return .white.opacity(0.5) // Gelb für 6-9 Minuten
+            return .secondary.opacity(0.5) // Gelb für 6-9 Minuten
         } else {
-            return .white.opacity(0.5) // Rot ab Minute 10
+            return .secondary.opacity(0.5) // Rot ab Minute 10
         }
     }
 

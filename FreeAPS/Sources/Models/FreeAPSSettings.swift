@@ -142,11 +142,8 @@ struct FreeAPSSettings: JSON, Equatable {
     var showPumpIcon: Bool = false
     var pumpIconRawValue: String = "nano200"
     var danaBar: Bool = false
-    var backgroundColorOption: BackgroundColorOption = .darkBlue
-    var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
     var insulinAgeOption: String = "Drei_Tage"
     var cannulaAgeOption: String = "Drei_Tage"
-    var chartBackgroundColored: Bool = false
     var carbInsulinLoopViewOption: Bool = false
     var topBarActive: Bool = false
     var ttBarActive: Bool = false
@@ -155,7 +152,6 @@ struct FreeAPSSettings: JSON, Equatable {
     var incidenceOfLight = false
     var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview.rawValue
     var insulinHours: Double?
-    var button3DBackground: Bool = false
     var batteryIconOption: Bool = false
 }
 
@@ -710,24 +706,19 @@ extension FreeAPSSettings: Decodable {
             settings.danaBar = danaBar
         }
 
-        if let backgroundColorOptionRawValue = try? container.decode(String.self, forKey: .backgroundColorOptionRawValue) {
-            settings.backgroundColorOptionRawValue = backgroundColorOptionRawValue
-        }
-
         if let insulinAgeOption = try? container.decode(String.self, forKey: .insulinAgeOption) {
             settings.insulinAgeOption = insulinAgeOption
         }
         if let cannulaAgeOption = try? container.decode(String.self, forKey: .cannulaAgeOption) {
             settings.cannulaAgeOption = cannulaAgeOption
         }
-        if let chartBackgroundColored = try? container.decode(Bool.self, forKey: .chartBackgroundColored) {
-            settings.chartBackgroundColored = chartBackgroundColored
-        }
+
         if let carbInsulinLoopViewOption = try? container.decode(
             Bool.self,
             forKey: .carbInsulinLoopViewOption
         ) { settings.carbInsulinLoopViewOption = carbInsulinLoopViewOption
         }
+
         if let topBarActive
             = try? container.decode(
                 Bool.self,
@@ -756,9 +747,7 @@ extension FreeAPSSettings: Decodable {
         if let insulinHours = try? container.decode(Double.self, forKey: .insulinHours) {
             settings.insulinHours = insulinHours
         }
-        if let button3DBackground = try? container.decode(Bool.self, forKey: .button3DBackground) {
-            settings.button3DBackground = button3DBackground
-        }
+
         if let batteryIconOption = try? container.decode(Bool.self, forKey: .batteryIconOption) {
             settings.batteryIconOption = batteryIconOption
         }

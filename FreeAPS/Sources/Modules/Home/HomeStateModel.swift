@@ -90,8 +90,6 @@ extension Home {
         @Published var cannulaAgeOption: String = "Drei_Tage"
         @Published var legendsSwitch: Bool = false
         @Published var timeSettings: Bool = false
-        @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
-        @Published var chartBackgroundColored: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = false
         @Published var button3D: Bool = false
         @Published var incidenceOfLight: Bool = false
@@ -100,7 +98,6 @@ extension Home {
         @Published var insulinAge: String = "--"
         @Published var batteryHours: Double?
         @Published var batteryAge: String = "--"
-        @Published var button3DBackground: Bool = false
         // Dana UI Toggels
         // specialDanaKitFunction
         @Published var pumpBatteryChargeRemaining: String?
@@ -160,16 +157,6 @@ extension Home {
             hidePredictions: false,
             useCarbBars: false
         )
-        /*  var backgroundColor: Color {
-             BackgroundColorOption(rawValue: backgroundColorOptionRawValue)?.color ?? .clear
-         }*/ // falls das triangel während des bolus progress die backgroundColor annehmen soll
-
-        var selectedBackgroundColor: Color {
-            switch BackgroundColorOption(rawValue: backgroundColorOptionRawValue) {
-            default:
-                return .blue // Standardfarbe, falls keine Übereinstimmung gefunden wird
-            }
-        }
 
         override func subscribe() {
             setupGlucose()
@@ -256,15 +243,12 @@ extension Home {
             pumpIconRawValue = settingsManager.settings.pumpIconRawValue
             hideInsulinBadge = settingsManager.settings.hideInsulinBadge
             timeSettings = settingsManager.settings.timeSettings
-            backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
             insulinAgeOption = settingsManager.settings.insulinAgeOption
             cannulaAgeOption = settingsManager.settings.cannulaAgeOption
-            chartBackgroundColored = settingsManager.settings.chartBackgroundColored
             carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
             button3D = settingsManager.settings.button3D
             incidenceOfLight = settingsManager.settings.incidenceOfLight
             lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
-            button3DBackground = settingsManager.settings.button3DBackground
             // Dana UI Toggels
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -894,13 +878,10 @@ extension Home.StateModel:
         insulinAgeOption = settingsManager.settings.insulinAgeOption
         cannulaAgeOption = settingsManager.settings.cannulaAgeOption
         timeSettings = settingsManager.settings.timeSettings
-        backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
-        chartBackgroundColored = settingsManager.settings.chartBackgroundColored
         carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
         button3D = settingsManager.settings.button3D
         incidenceOfLight = settingsManager.settings.incidenceOfLight
         lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
-        button3DBackground = settingsManager.settings.button3DBackground
         // Dana UI Toggels
     }
 

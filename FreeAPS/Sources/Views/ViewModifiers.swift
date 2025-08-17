@@ -1,10 +1,12 @@
 import Combine
 import SwiftUI
 
+// MARK: - ViewModifier mit dynamischen Farben
+
 struct RoundedBackground: ViewModifier {
     private let color: Color
 
-    init(color: Color = Color("CapsuleColor")) {
+    init(color: Color = .dynamicBackground) { // Dynamische Farbe
         self.color = color
     }
 
@@ -13,21 +15,9 @@ struct RoundedBackground: ViewModifier {
             .padding()
             .background(
                 Rectangle()
-                    // RoundedRectangle(cornerRadius: 8, style: .continuous)
                     .fill()
                     .foregroundColor(color)
             )
-    }
-}
-
-struct BoolTag: ViewModifier {
-    let bool: Bool
-    @Environment(\.colorScheme) var colorScheme
-    func body(content: Content) -> some View {
-        content
-            .padding(.vertical, 4).padding(.horizontal, 6)
-            .background((bool ? Color.green : Color.red).opacity(colorScheme == .light ? 0.8 : 0.5))
-            .clipShape(RoundedRectangle(cornerRadius: 6)).padding(.vertical, 3).padding(.trailing, 3)
     }
 }
 
@@ -38,15 +28,25 @@ struct CompactSectionSpacing: ViewModifier {
     }
 }
 
-struct CarveOrDrop: ViewModifier {
-    let carve: Bool
-    func body(content: Content) -> some View {
-        if carve {
-            return content
-                .foregroundStyle(.shadow(.inner(color: .black, radius: 0.01, y: 1)))
-        } else {
-            return content
-                .foregroundStyle(.shadow(.drop(color: .black, radius: 0.02, y: 1)))
+struct FrostedGlass: View {
+    let opacity: CGFloat
+    var body: some View {
+        UnevenRoundedRectangle.testTube
+            .fill(.ultraThinMaterial.opacity(opacity))
+    }
+}
+
+struct ClockOffset: View {
+    let mdtPump: Bool
+    var body: some View {
+        ZStack {
+            Image(systemName: "clock.fill")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxHeight: 20)
+                .symbolRenderingMode(.palette)
+                .foregroundStyle(Color(.warning))
+                .offset(x: !mdtPump ? 10 : 12, y: !mdtPump ? -20 : -22)
         }
     }
 }
@@ -72,27 +72,87 @@ struct ScrollPositionModifier: ViewModifier {
     }
 }
 
-struct AddShadow: ViewModifier {
+struct CarveOrDrop: ViewModifier {
+    let carve: Bool
+    func body(content: Content) -> some View {
+        if carve {
+            return content
+                .foregroundStyle(.shadow(.inner(color: .black, radius: 0.01, y: 1)))
+        } else {
+            return content
+                .foregroundStyle(.shadow(.drop(color: .black, radius: 0.02, y: 1)))
+        }
+    }
+}
+
+struct BoolTag: ViewModifier {
+    let bool: Bool
     @Environment(\.colorScheme) var colorScheme
     func body(content: Content) -> some View {
         content
-            .shadow(
-                color: Color.white
-                    .opacity(
-                        colorScheme == .dark ? IAPSconfig.shadowOpacity : IAPSconfig.shadowOpacity / IAPSconfig
-                            .shadowFraction
-                    ),
-                radius: colorScheme == .dark ? 3 : 2.5
+            .padding(.vertical, 4).padding(.horizontal, 6)
+            .background((bool ? Color.green : Color.red).opacity(colorScheme == .light ? 0.8 : 0.5))
+            .clipShape(RoundedRectangle(cornerRadius: 6)).padding(.vertical, 3).padding(.trailing, 3)
+    }
+}
+
+struct AddShadow: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .shadow(color: .dynamicButtonShadow, radius: 3) // Dynamischer Schatten
+    }
+}
+
+struct ColouredBackground: View {
+    @Environment(\.colorScheme) var colorScheme
+    var body: some View {
+        Rectangle()
+            .fill(
+                colorScheme == .dark ? IAPSconfig.chartBackgroundDark :
+                    IAPSconfig.chartBackgroundLight
             )
     }
 }
 
-struct RaisedRectangle: View {
-    @Environment(\.colorScheme) var colorScheme
+struct ChartBackground: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .background(Color.dynamicChartBackground) // Dynamischer Hintergrund
+    }
+}
+
+struct HeaderBackground: View {
     var body: some View {
-        Rectangle().fill(colorScheme == .dark ? .white : .white)
-            .frame(height: 1)
-            .addShadows()
+        Rectangle()
+            .fill(Color.dynamicHeaderBackground) // Dynamischer Header-Hintergrund
+    }
+}
+
+struct ColouredRoundedBackground: View {
+    var body: some View {
+        Rectangle()
+            .fill(Color.dynamicCardBackground) // Dynamische Kartenhintergrundfarbe
+    }
+}
+
+struct InfoPanelBackground: View {
+    var body: some View {
+        Rectangle()
+            .stroke(Color.dynamicSecondaryText, lineWidth: 2) // Dynamischer Rand
+            .fill(Color.dynamicCardBackground) // Dynamischer Hintergrund
+            .frame(height: 24)
+    }
+}
+
+struct LoopEllipse: View {
+    let stroke: Color
+    var body: some View {
+        RoundedRectangle(cornerRadius: 15)
+            .stroke(stroke, lineWidth: 1)
+            .background(
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.dynamicBackground)
+            )
     }
 }
 
@@ -101,14 +161,13 @@ struct TestTube: View {
     let amount: CGFloat
     let colourOfSubstance: Color
     let materialOpacity: CGFloat
-    @Environment(\.colorScheme) var colorScheme
 
     var body: some View {
         UnevenRoundedRectangle.testTube
             .fill(
                 LinearGradient(
                     gradient: Gradient(stops: [
-                        Gradient.Stop(color: .white.opacity(opacity), location: amount),
+                        Gradient.Stop(color: .dynamicTopGlow.opacity(opacity), location: amount),
                         Gradient.Stop(color: colourOfSubstance, location: amount)
                     ]),
                     startPoint: .top,
@@ -118,192 +177,149 @@ struct TestTube: View {
             .overlay {
                 FrostedGlass(opacity: materialOpacity)
             }
-            .shadow(
-                color: Color.white
-                    .opacity(
-                        colorScheme == .dark ? IAPSconfig.glassShadowOpacity : IAPSconfig.glassShadowOpacity / IAPSconfig
-                            .shadowFraction
-                    ),
-                radius: colorScheme == .dark ? 2.2 : 3
-            )
+            .shadow(color: .dynamicButtonShadow, radius: 3) // Dynamischer Schatten
     }
 }
 
-struct FrostedGlass: View {
-    let opacity: CGFloat
+struct Sage: View {
+    let amount: Double
+    let expiration: Double
+    let lineColour: Color
+    let sensordays: TimeInterval
+
+    private let strokeColor = Color.dynamicIconBackground.opacity(0.4)
+    private let normalFillColor = Color.dynamicIconForeground.opacity(0.4)
+    private let backgroundFillColor = Color.dynamicIconBackground
+
     var body: some View {
-        UnevenRoundedRectangle.testTube
-            .fill(.ultraThinMaterial.opacity(opacity))
-    }
-}
+        let fill = min(max(expiration / amount, 0.15), 1.0)
 
-struct TooOldValue: View {
-    var body: some View {
-        ZStack {
-            Image(systemName: "circle.fill")
-                .resizable()
-                .frame(maxHeight: 20)
-                .symbolRenderingMode(.palette)
-                .foregroundStyle(Color(.warning).opacity(0.5))
-                .offset(x: 5, y: -13)
-                .overlay {
-                    Text("Old").font(.caption)
-                }
-        }
-    }
-}
+        let fillColor: Color = {
+            switch expiration {
+            case ..<(0.5 * 8.64E4):
+                return .red.opacity(0.9)
+            case ..<(2 * 8.64E4):
+                return .yellow.opacity(0.8)
+            default:
+                return normalFillColor
+            }
+        }()
 
-// Atrium Lights START
-
-extension Color {
-    static let NorthernLights = Color(red: 0.50, green: 1.00, blue: 0.00)
-}
-
-// Atrium Lights ENDE
-
-extension Color {
-    static let rig22Background = Color(red: 0.10, green: 0.10, blue: 0.10)
-}
-
-extension Color {
-    static let rig22BGGlucoseWheel = Color(red: 0.17, green: 0.21, blue: 0.24)
-}
-
-extension Color {
-    static let iconColor = (red: 0.49, green: 0.55, blue: 0.96, alpha: 1.00)
-}
-
-extension Color {
-    static let connectionStatusOff = Color(red: 1.00, green: 0.00, blue: 0.00)
-}
-
-extension Color {
-    static let connectionStatusConnected = Color(red: 0.00, green: 1.00, blue: 0.00)
-}
-
-struct ColouredRoundedBackground: View {
-    var body: some View {
-        Rectangle() // Oder RoundedRectangle für gerundete Ecken
-            .fill(Color.rig22Background)
-    }
-}
-
-/* struct ColouredRoundedBackground: View {
-  @Environment(\.colorScheme) var colorScheme
-  var body: some View {
-      Rectangle()
-          .fill(
-              colorScheme == .dark ? IAPSconfig.previewBackgroundDark :
-                  IAPSconfig.previewBackgroundLight
-          )
-  }
- } */
-
-struct addColouredBackground: View {
-    var body: some View {
-        RoundedRectangle(cornerRadius: 15)
-            .fill(Color.rig22Background)
-        // .shadow(color: Color.black.opacity(0.5), radius: 10, x: 5, y: 5) // Kräftigerer Schatten
-    }
-}
-
-/* struct ColouredBackground: View {
-     var body: some View {
-         RoundedRectangle(cornerRadius: 10)
-             .fill(Color.rig22Background)
-             // .fill(Color.darkGray.opacity(1.0))
-             .shadow(color: Color.black.opacity(0.3), radius: 5, x: 5, y: 5)
-             .shadow(color: Color.black.opacity(0.3), radius: 10, x: 3, y: 3)
-     }
- } */
-
-struct ColouredBackground: View {
-    var body: some View {
-        RoundedRectangle(cornerRadius: 10)
-            .fill(Color.black.opacity(0.3))
-    }
-}
-
-/* struct ColouredBackground: View {
-  @Environment(\.colorScheme) var colorScheme
-  var body: some View {
-      Rectangle()
-          .fill(
-              colorScheme == .dark ? IAPSconfig.chartBackgroundDark :
-                  IAPSconfig.chartBackgroundLight
-          )
-  }
- } */
-
-struct ColouredBackground2: View {
-    var body: some View {
-        RoundedRectangle(cornerRadius: 15)
-            .fill(Color.clear)
-    }
-}
-
-struct LoopEllipse: View {
-    @Environment(\.colorScheme) var colorScheme
-    let stroke: Color
-    var body: some View {
-        RoundedRectangle(cornerRadius: 15)
-            .stroke(stroke, lineWidth: colorScheme == .light ? 2 : 1)
+        Circle()
+            .stroke(strokeColor, lineWidth: 2)
             .background(
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(Color.rig22Background)
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            gradient: Gradient(stops: [
+                                Gradient.Stop(color: fillColor, location: 0),
+                                Gradient.Stop(color: fillColor, location: fill),
+                                Gradient.Stop(color: backgroundFillColor, location: fill),
+                                Gradient.Stop(color: backgroundFillColor, location: 1)
+                            ]),
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                // .shadow(radius: 4)
             )
     }
 }
 
-extension View {
-    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
-        if condition {
-            transform(self)
-        } else {
-            self
+// MARK: - Dynamische Farben
+
+// Initializer für dynamische Farben
+extension Color {
+    init(light: Color, dark: Color) {
+        self.init(UIColor(
+            light: UIColor(light),
+            dark: UIColor(dark)
+        ))
+    }
+}
+
+extension UIColor {
+    convenience init(light: UIColor, dark: UIColor) {
+        self.init { traitCollection in
+            switch traitCollection.userInterfaceStyle {
+            case .dark,
+                 .unspecified:
+                return dark
+            case .light:
+                return light
+            @unknown default:
+                return light
+            }
         }
     }
 }
 
-struct HeaderBackground: View {
-    var body: some View {
-        Rectangle()
-            .fill(Color.rig22Background)
-    }
-}
+extension Color {
+    // 3D-Effekte
+    static let dynamicTopGlow = Color(
+        light: Color(red: 1.00, green: 1.00, blue: 1.00, opacity: 0.8),
+        dark: Color(red: 1.00, green: 1.00, blue: 1.00, opacity: 0.7)
+    )
 
-/* struct HeaderBackground: View {
-  @Environment(\.colorScheme) var colorScheme
-  var body: some View {
-      Rectangle()
-          .fill(
-              colorScheme == .light ? IAPSconfig.headerBackgroundLight : IAPSconfig.headerBackgroundDark
-          )
-  }
- } */
+    static let dynamicBottomShadow = Color(
+        light: Color(red: 0.00, green: 0.00, blue: 0.00, opacity: 0.3),
+        dark: Color(red: 0.00, green: 0.00, blue: 0.00, opacity: 0.6)
+    )
 
-struct ClockOffset: View {
-    let mdtPump: Bool
-    var body: some View {
-        ZStack {
-            Image(systemName: "clock.fill")
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(maxHeight: 20)
-                .symbolRenderingMode(.palette)
-                .foregroundStyle(Color(.warning))
-                .offset(x: 10, y: !mdtPump ? -20 : -13)
-        }
-    }
-}
+    static let dynamicButtonShadow = Color(
+        light: Color(red: 0.00, green: 0.00, blue: 0.00, opacity: 0.3),
+        dark: Color(red: 0.00, green: 0.00, blue: 0.00, opacity: 0.5)
+    )
 
-struct ChartBackground: ViewModifier {
-    func body(content: Content) -> some View {
-        content
-            .background(
-                Color.rig22Background
-            )
-    }
+    /// Alle Chart und App Hintergründe
+
+    /// Hintergrund für mainchart und alle dayViews
+    static let dynamicChartBackground = Color(
+        light: Color(red: 0.9, green: 0.9, blue: 0.9),
+        dark: Color(red: 0.2, green: 0.2, blue: 0.2)
+    )
+    /// Der Haupt App Hintergrund
+    static let dynamicBackground = Color(
+        light: Color(red: 0.92, green: 0.92, blue: 0.92),
+        dark: Color(red: 0.15, green: 0.15, blue: 0.15)
+    )
+
+    static let dynamicCardBackground = Color(
+        light: Color(red: 1.00, green: 1.00, blue: 1.00),
+        dark: Color(red: 0.20, green: 0.20, blue: 0.20)
+    )
+
+    static let dynamicHeaderBackground = Color(
+        light: Color(red: 0.98, green: 0.98, blue: 0.98),
+        dark: Color(red: 0.15, green: 0.15, blue: 0.15)
+    )
+
+    /// Texte
+    static let dynamicPrimaryText = Color(
+        light: Color(red: 0.10, green: 0.10, blue: 0.10),
+        dark: Color(red: 0.95, green: 0.95, blue: 0.95)
+    )
+
+    static let dynamicSecondaryText = Color(
+        light: Color(red: 0.40, green: 0.40, blue: 0.40),
+        dark: Color(red: 0.90, green: 0.90, blue: 0.90)
+    )
+
+    // Icons und Akzente
+    static let dynamicIconBackground = Color(
+        light: Color(red: 0.85, green: 0.85, blue: 0.85),
+        dark: Color(red: 0.25, green: 0.25, blue: 0.25)
+    )
+
+    static let dynamicIconForeground = Color(
+        light: Color(red: 0.50, green: 0.50, blue: 0.50),
+        dark: Color(red: 0.90, green: 0.90, blue: 0.90)
+    )
+
+    static let dynamicAccent = Color(
+        light: Color(red: 0.00, green: 0.47, blue: 0.85),
+        dark: Color(red: 0.00, green: 0.60, blue: 1.00)
+    )
 }
 
 private let navigationCache = LRUCache<Screen.ID, AnyView>(capacity: 10)
@@ -381,9 +397,9 @@ extension View {
         modifier(BoolTag(bool: bool))
     }
 
-    /*  func addColouredBackground() -> some View {
-         ColouredBackground()
-     }*/
+    func addColouredBackground() -> some View {
+        ColouredBackground()
+    }
 
     func addHeaderBackground() -> some View {
         HeaderBackground()
@@ -474,68 +490,51 @@ extension UIImage {
     }
 }
 
-extension Color {
-    var isLightColor: Bool {
-        // Convert SwiftUI Color to UIColor
-        guard let components = UIColor(self).cgColor.components else {
-            return false
-        }
+/* struct Sage: View {
+     let amount: Double
+     let expiration: Double
+     let lineColour: Color
+     let sensordays: TimeInterval
 
-        // Calculate relative luminance (per ITU-R BT.709)
-        let red = components[0]
-        let green = components[1]
-        let blue = components[2]
-        let luminance = (0.2126 * red) + (0.7152 * green) + (0.0722 * blue)
+     // Fixed colors configuration
+     private let strokeColor = Color.white.opacity(0.4)
+     private let normalFillColor = Color.secondary.opacity(0.4)
+     private let backgroundFillColor = Color.gray.opacity(0.0)
 
-        return luminance > 0.6
-    }
-}
+     var body: some View {
+         let fill = min(max(expiration / amount, 0.15), 1.0)
 
-struct Sage: View {
-    let amount: Double
-    let expiration: Double
-    let lineColour: Color
-    let sensordays: TimeInterval
+         let fillColor: Color = {
+             switch expiration {
+             case ..<(0.5 * 8.64E4): // Less than 12 hours
+                 return .red.opacity(0.9)
+             case ..<(2 * 8.64E4): // Less than 2 days
+                 return .orange.opacity(0.8)
+             default: // Normal state
+                 return normalFillColor
+             }
+         }()
 
-    // Fixed colors configuration
-    private let strokeColor = Color.white.opacity(0.4)
-    private let normalFillColor = Color.blue.opacity(0.4)
-    private let backgroundFillColor = Color.gray.opacity(0.0)
-
-    var body: some View {
-        let fill = min(max(expiration / amount, 0.15), 1.0)
-
-        let fillColor: Color = {
-            switch expiration {
-            case ..<(0.5 * 8.64E4): // Less than 12 hours
-                return .red.opacity(0.9)
-            case ..<(2 * 8.64E4): // Less than 2 days
-                return .orange.opacity(0.8)
-            default: // Normal state
-                return normalFillColor
-            }
-        }()
-
-        Circle()
-            .stroke(strokeColor, lineWidth: 2)
-            .background(
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            gradient: Gradient(stops: [
-                                Gradient.Stop(color: fillColor, location: 0),
-                                Gradient.Stop(color: fillColor, location: fill),
-                                Gradient.Stop(color: backgroundFillColor, location: fill),
-                                Gradient.Stop(color: backgroundFillColor, location: 1)
-                            ]),
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .shadow(radius: 4)
-            )
-    }
-}
+         Circle()
+             .stroke(strokeColor, lineWidth: 2)
+             .background(
+                 Circle()
+                     .fill(
+                         LinearGradient(
+                             gradient: Gradient(stops: [
+                                 Gradient.Stop(color: fillColor, location: 0),
+                                 Gradient.Stop(color: fillColor, location: fill),
+                                 Gradient.Stop(color: backgroundFillColor, location: fill),
+                                 Gradient.Stop(color: backgroundFillColor, location: 1)
+                             ]),
+                             startPoint: .top,
+                             endPoint: .bottom
+                         )
+                     )
+                     .shadow(radius: 4)
+             )
+     }
+ } */
 
 func colorForRemainingHours(_ remainingHours: CGFloat) -> Color {
     switch remainingHours {
