@@ -283,7 +283,7 @@ struct PumpView: View {
             if time <= 0 { return .dynamicColorRed }
             else if time < 4 * 60 * 60 { return .dynamicColorRed }
             else if time < 24 * 60 * 60 { return .dynamicColorYellow }
-            else { return .dynamicSecondaryText }
+            else { return .secondary }
         }()
 
         return HStack {
@@ -326,7 +326,7 @@ struct PumpView: View {
             if time <= 0 { return .dynamicColorGreen }
             else if time < 4 * 60 * 60 { return .dynamicColorRed }
             else if time < 24 * 60 * 60 { return .dynamicColorYellow }
-            else { return .dynamicIconBackground }
+            else { return .secondary }
         }()
 
         return HStack {
