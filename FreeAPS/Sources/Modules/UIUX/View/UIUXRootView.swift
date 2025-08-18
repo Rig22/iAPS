@@ -126,9 +126,12 @@ extension UIUX {
                                             }
                                         }
                                     } header: { Text("Light / Dark Mode") }
-                                    Toggle("3D Look", isOn: $state.button3D)
-                                    Toggle("Atrium Light", isOn: $state.incidenceOfLight)
-                                    if state.incidenceOfLight {
+
+                                    if state.lightMode == .dark {
+                                        Toggle("Atrium Light", isOn: $state.incidenceOfLight)
+                                    } else {}
+
+                                    if state.lightMode == .dark && state.incidenceOfLight {
                                         Picker("Select your Atrium", selection: $state.lightGlowOverlaySelector) {
                                             ForEach(LightGlowOverlaySelector.allCases) { option in
                                                 HStack {
@@ -144,6 +147,9 @@ extension UIUX {
                                         }
                                         .pickerStyle(NavigationLinkPickerStyle())
                                     }
+
+                                    Toggle("3D Look", isOn: $state.button3D)
+
                                     Toggle("Show Pump Icon", isOn: $state.showPumpIcon)
 
                                     if state.showPumpIcon {

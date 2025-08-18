@@ -238,7 +238,6 @@ extension Home {
                             RoundedRectangle(cornerRadius: 15)
                                 .fill(Color.dynamicIconBackground)
                                 .frame(width: ellipseWidth, height: 25)
-                                .shadow(color: Color.dynamicBottomShadow.opacity(0.3), radius: 5, x: 3, y: 3)
 
                             // 3D-Rand-Glow
                             RoundedRectangle(cornerRadius: 15)
@@ -394,9 +393,9 @@ extension Home {
                                         startPoint: .top,
                                         endPoint: .bottom
                                     ),
-                                    lineWidth: 2
+                                    lineWidth: 1
                                 )
-                                .frame(width: 51, height: 51)
+                                .frame(width: 50, height: 50)
                         } else {
                             // Einfacher Kreis ohne 3D
                             Circle()
@@ -813,7 +812,7 @@ extension Home {
                             HStack(spacing: 4) {
                                 Text("⇢")
                                     .font(.system(size: 14))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundColor(.dynamicSecondaryText)
 
                                 let eventualBGValue = state.data.units == .mmolL ? eventualBG.asMmolL : Decimal(eventualBG)
 
@@ -822,23 +821,23 @@ extension Home {
                                 {
                                     Text(formattedBG)
                                         .font(.system(size: 16))
-                                        .foregroundColor(.secondary)
+                                        .foregroundColor(.dynamicSecondaryText)
                                 }
 
                                 Text(state.data.units.rawValue)
                                     .font(.system(size: 14))
-                                    .foregroundStyle(.secondary)
+                                    .foregroundColor(.dynamicSecondaryText)
                                     .padding(.leading, -1)
                             }
                         } else {
                             HStack(spacing: 4) {
                                 Text("⇢")
                                     .font(.statusFont)
-                                    .foregroundStyle(.secondary)
+                                    .foregroundColor(.dynamicSecondaryText)
 
                                 Text("---")
                                     .font(.system(size: 16))
-                                    .foregroundColor(.secondary)
+                                    .foregroundColor(.dynamicSecondaryText)
                             }
                         }
                     }
@@ -1131,7 +1130,6 @@ extension Home {
                         insulinAgeView.frame(width: 60)
                         cannulaAgeView.frame(width: 60)
                         batteryAgeView.frame(width: 60)
-                        // sensorConditionalView
                         BluetoothConnectionView.frame(width: 60)
                     }
                 }
@@ -1152,11 +1150,11 @@ extension Home {
 
                     let reservoirColor: Color = {
                         if reservoir < 20 {
-                            return .red
+                            return .dynamicColorRed
                         } else if reservoir < 50 {
-                            return .yellow
+                            return .dynamicColorYellow
                         } else {
-                            return .white.opacity(0.5)
+                            return .dynamicIconForeground.opacity(0.5)
                         }
                     }()
 
@@ -1265,7 +1263,7 @@ extension Home {
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview,
                         fillFraction: insulinFraction,
-                        symbolBackgroundColor: backgroundColor,
+                        symbolBackgroundColor: Color.dynamicIconBackground,
                         symbolColor: insulinColor
                     )
                     .frame(width: 60, height: 60)
@@ -1370,7 +1368,7 @@ extension Home {
                         lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                             .atriumview,
                         fillFraction: cannulaFraction,
-                        symbolBackgroundColor: backgroundColor,
+                        symbolBackgroundColor: Color.dynamicIconBackground,
                         symbolColor: cannulaColor
                     )
                     .frame(width: 60, height: 60)
@@ -1388,14 +1386,14 @@ extension Home {
                     if let batteryHours = state.batteryHours {
                         switch batteryHours {
                         case 192...: // >8 Tage = Rot
-                            return .white.opacity(0.5)
+                            return Color.dynamicIconForeground.opacity(0.5)
                         case 168 ..< 192: // 7-8 Tage = Gelb
-                            return .white.opacity(0.5)
+                            return Color.dynamicIconForeground.opacity(0.5)
                         default: // <7 Tage = Weiß/Transparent
-                            return .white.opacity(0.5)
+                            return Color.dynamicIconForeground.opacity(0.5)
                         }
                     } else {
-                        return .white.opacity(0.5)
+                        return .dynamicIconForeground.opacity(0.5)
                     }
                 }
 
@@ -1430,15 +1428,15 @@ extension Home {
                         ) ?? .atriumview,
                         fillFraction: 1.0,
                         symbolRotation: -90,
-                        symbolBackgroundColor: backgroundColor,
-                        symbolColor: .white
+                        symbolBackgroundColor: Color.dynamicIconBackground,
+                        symbolColor: Color.dynamicIconForeground
                     )
                     .frame(width: 60, height: 60)
 
                     Image(systemName: "clock.fill")
                         .resizable()
                         // .rotationEffect(.degrees(-50))
-                        .foregroundStyle(Color(.white))
+                        .foregroundColor(Color.dynamicIconForeground)
                         .frame(width: 15, height: 15)
                         .offset(x: 13, y: -17)
                 }
@@ -1454,8 +1452,7 @@ extension Home {
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: connectionPieSegmentViewModel,
-                            // color: Color.white.opacity(0.5),
-                            color: Color.blue,
+                            color: Color.dynamicColorBlue,
                             backgroundColor: .clear,
                             displayText: displayText,
                             symbolSize: 25,
@@ -1466,8 +1463,8 @@ extension Home {
                             lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
                                 .atriumview,
                             fillFraction: connectionFraction,
-                            symbolBackgroundColor: backgroundColor,
-                            symbolColor: .white
+                            symbolBackgroundColor: Color.dynamicIconBackground,
+                            symbolColor: Color.dynamicIconForeground
                         )
                         .frame(width: 60, height: 60)
                     }
@@ -1493,6 +1490,28 @@ extension Home {
                 return "\(hours)h"
             } else {
                 return "\(minutes)m"
+            }
+        }
+
+        func colorForRemainingHours(_ remainingHours: CGFloat) -> Color {
+            switch remainingHours {
+            case ..<2:
+                return Color.dynamicColorRed
+            case ..<6:
+                return Color.dynamicColorYellow
+            default:
+                return Color.dynamicIconForeground
+            }
+        }
+
+        func colorForRemainingMinutes(_ remainingMinutes: CGFloat) -> Color {
+            switch remainingMinutes {
+            case ..<120:
+                return Color.dynamicColorRed
+            case ..<360:
+                return Color.dynamicColorYellow
+            default:
+                return Color.dynamicIconForeground
             }
         }
 
@@ -2243,12 +2262,12 @@ extension Home {
             .frame(height: 100)
             .padding(.horizontal, 0)
             .padding(.top, 15)
-            .addShadows()
             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
         }
 
         var preview: some View {
-            Rectangle().fill(Color.dynamicChartBackground)
+            Rectangle()
+                .fill(Color.dynamicChartBackground)
                 .frame(minHeight: 200)
                 .overlay {
                     PreviewChart(
@@ -2416,7 +2435,7 @@ extension Home {
                 }
             }
             .padding()
-            .background(backgroundColor)
+            .background(Color.dynamicBackground)
             .cornerRadius(10)
             .shadow(radius: 2)
         }
