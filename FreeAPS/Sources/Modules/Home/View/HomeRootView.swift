@@ -217,8 +217,6 @@ extension Home {
 
         struct TimeEllipse: View {
             var button3D: Bool = false
-            var incidenceOfLight: Bool
-            var lightGlowOverlaySelector: LightGlowOverlaySelector
 
             var body: some View {
                 GeometryReader { geometry in
@@ -226,15 +224,7 @@ extension Home {
                         let ellipseWidth = max(geometry.size.width + 10, 80) // Mindestbreite 80
 
                         if button3D {
-                            let glowColor1 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor
-                                : .dynamicTopGlow
-
-                            let glowColor2 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor
-                                : .dynamicTopGlow.opacity(0.4)
-
-                            // Immer gefüllte Hintergrundfarbe (wie im glucoseView)
+                            // Immer gefüllte Hintergrundfarbe
                             RoundedRectangle(cornerRadius: 15)
                                 .fill(Color.dynamicIconBackground)
                                 .frame(width: ellipseWidth, height: 25)
@@ -244,8 +234,8 @@ extension Home {
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            glowColor1.opacity(0.5),
-                                            glowColor2.opacity(0.3),
+                                            .dynamicTopGlow.opacity(0.5),
+                                            .dynamicTopGlow.opacity(0.3),
                                             Color.clear,
                                             .dynamicBottomShadow.opacity(0.3),
                                             .dynamicBottomShadow
@@ -256,6 +246,8 @@ extension Home {
                                     lineWidth: 1
                                 )
                                 .frame(width: ellipseWidth, height: 25)
+                                .shadow(color: .dynamicTopGlow.opacity(0.3), radius: 1, x: -1, y: -1)
+                                .shadow(color: .dynamicBottomShadow.opacity(0.6), radius: 1, x: 1, y: 1)
                         } else {
                             RoundedRectangle(cornerRadius: 15)
                                 .fill(Color.dynamicIconBackground)
@@ -268,38 +260,6 @@ extension Home {
                     .frame(width: geometry.size.width, height: 25, alignment: .center)
                 }
                 .frame(height: 25)
-            }
-        }
-
-        struct LightGlowOverlay: View {
-            let color: Color
-            // let offsetY: CGFloat
-
-            var body: some View {
-                RadialGradient(
-                    gradient: Gradient(colors: [color.opacity(0.7), .clear]),
-                    center: .top,
-                    startRadius: 50,
-                    endRadius: 200
-                )
-                .ignoresSafeArea()
-                .offset(y: -130)
-                .allowsHitTesting(false) // 👈 Touch-Events durchlassen
-                .accessibility(hidden: true) // Für VoiceOver unsichtbar
-            }
-        }
-
-        @ViewBuilder private func lightGlowOverlayContent() -> some View {
-            if state.incidenceOfLight, let selectedOverlay = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) {
-                switch selectedOverlay {
-                case .atriumview: LightGlowOverlay(color: .gray)
-                case .atriumview1: LightGlowOverlay(color: .white)
-                case .atriumview2: LightGlowOverlay(color: .black)
-                    /*  case .atriumview2: LightGlowOverlay(color: .loopYellow)
-                     case .atriumview3: LightGlowOverlay(color: .orange)
-                     case .atriumview4: LightGlowOverlay(color: .red)
-                     case .atriumview5: LightGlowOverlay(color: .NorthernLights)*/
-                }
             }
         }
 
@@ -359,8 +319,6 @@ extension Home {
             var symbol: String
             var animateProgress: Bool
             var button3D: Bool
-            var incidenceOfLight: Bool
-            var lightGlowOverlaySelector: LightGlowOverlaySelector
             var fillFraction: CGFloat
             var symbolRotation: Double = 0
             var symbolBackgroundColor: Color = .clear
@@ -370,37 +328,23 @@ extension Home {
                 VStack {
                     ZStack {
                         if button3D {
-                            // Dynamische Glanzlichtfarben
-                            let glowColor1 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor
-                                : .dynamicTopGlow
-
-                            let glowColor2 = incidenceOfLight
-                                ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
-                                : .dynamicTopGlow.opacity(0.4)
-
-                            // 3D-Ring mit dynamischen Farben
                             Circle()
                                 .stroke(
                                     LinearGradient(
                                         gradient: Gradient(colors: [
-                                            glowColor1.opacity(0.7),
-                                            glowColor2.opacity(0.3),
-                                            .clear,
+                                            .dynamicTopGlow.opacity(0.9),
+                                            .dynamicTopGlow.opacity(0.4),
                                             .dynamicBottomShadow.opacity(0.3),
                                             .dynamicBottomShadow
                                         ]),
                                         startPoint: .top,
                                         endPoint: .bottom
                                     ),
-                                    lineWidth: 1
+                                    lineWidth: 2
                                 )
                                 .frame(width: 50, height: 50)
-                        } else {
-                            // Einfacher Kreis ohne 3D
-                            Circle()
-                                .fill(Color.dynamicBottomShadow)
-                                .frame(width: 50, height: 50)
+                                .shadow(color: .dynamicTopGlow.opacity(0.6), radius: 2, x: -1, y: -1)
+                                .shadow(color: .dynamicBottomShadow.opacity(0.8), radius: 2, x: 1, y: 1)
                         }
 
                         // Fortschrittsanzeige
@@ -419,16 +363,16 @@ extension Home {
                                 .frame(width: 50, height: 50)
                         }
 
-                        // Symbol mit dynamischer Farbe
+                        // Symbol
                         Image(systemName: symbol)
                             .resizable()
                             .scaledToFit()
                             .frame(width: symbolSize, height: symbolSize)
-                            .foregroundColor(symbolColor ?? .dynamicIconForeground) // Dynamische Icon-Farbe
+                            .foregroundColor(symbolColor ?? .dynamicIconForeground)
                             .rotationEffect(.degrees(symbolRotation))
                     }
 
-                    // Text mit dynamischer Farbe
+                    // Text
                     Text(displayText)
                         .font(.system(size: 15))
                         .foregroundColor(.dynamicSecondaryText)
@@ -451,28 +395,16 @@ extension Home {
             var color: Color
             var animateProgress: Bool
             var button3D: Bool
-            var incidenceOfLight: Bool
-            var lightGlowOverlaySelector: LightGlowOverlaySelector
 
             var body: some View {
                 ZStack {
                     if button3D {
-                        // Dynamische Glanzlichtfarben
-                        let glowColor1 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor
-                            : .dynamicTopGlow
-
-                        let glowColor2 = incidenceOfLight
-                            ? lightGlowOverlaySelector.highlightColor.opacity(0.6)
-                            : .dynamicTopGlow.opacity(0.4)
-
-                        // 3D-Ring für große Anzeige
                         Circle()
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        glowColor1.opacity(0.9),
-                                        glowColor2.opacity(0.6),
+                                        .dynamicTopGlow.opacity(0.9),
+                                        .dynamicTopGlow.opacity(0.6),
                                         .clear,
                                         .dynamicBottomShadow.opacity(0.3),
                                         .dynamicBottomShadow
@@ -480,8 +412,10 @@ extension Home {
                                     startPoint: .top,
                                     endPoint: .bottom
                                 ),
-                                lineWidth: 1
+                                lineWidth: 2
                             )
+                            .shadow(color: .dynamicTopGlow.opacity(0.6), radius: 2, x: -1, y: -1)
+                            .shadow(color: .dynamicBottomShadow.opacity(0.8), radius: 2, x: 1, y: 1)
                     }
 
                     // Fortschrittsanzeige
@@ -531,17 +465,6 @@ extension Home {
             }
 
             return ZStack(alignment: .center) {
-                let incidenceOfLight = state.incidenceOfLight
-                let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                    .atriumview
-                let glowColor1 = incidenceOfLight
-                    ? lightGlowOverlaySelector.highlightColor
-                    : .dynamicTopGlow
-
-                let glowColor2 = incidenceOfLight
-                    ? lightGlowOverlaySelector.highlightColor.opacity(0.6)
-                    : .dynamicTopGlow.opacity(0.4)
-
                 if state.button3D {
                     Circle()
                         .fill(Color.dynamicIconBackground)
@@ -552,10 +475,8 @@ extension Home {
                         .stroke(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    glowColor1.opacity(0.9),
-                                    glowColor2.opacity(0.6),
-                                    Color.clear,
-                                    .dynamicBottomShadow.opacity(0.3),
+                                    .dynamicTopGlow.opacity(0.9),
+                                    .dynamicTopGlow.opacity(0.4), .dynamicBottomShadow.opacity(0.3),
                                     .dynamicBottomShadow
                                 ]),
                                 startPoint: .top,
@@ -650,10 +571,7 @@ extension Home {
                         backgroundColor: backgroundColor,
                         color: .blue,
                         animateProgress: true,
-                        button3D: state.button3D,
-                        incidenceOfLight: state.incidenceOfLight,
-                        lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                            .atriumview
+                        button3D: state.button3D
                     )
                     .frame(width: 120, height: 120)
 
@@ -712,8 +630,6 @@ extension Home {
                     symbol: "cross.vial",
                     animateProgress: false,
                     button3D: state.button3D,
-                    incidenceOfLight: state.incidenceOfLight,
-                    lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview,
                     fillFraction: 0.0,
                     symbolBackgroundColor: .dynamicIconBackground
                 )
@@ -790,10 +706,7 @@ extension Home {
                     .font(.timeSettingFont)
                     .background(
                         TimeEllipse(
-                            button3D: state.button3D,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
+                            button3D: state.button3D
                         )
                     )
                 }
@@ -844,10 +757,7 @@ extension Home {
                     .font(.timeSettingFont)
                     .background(
                         TimeEllipse(
-                            button3D: state.button3D,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
+                            button3D: state.button3D
                         )
                     )
                 }
@@ -856,22 +766,11 @@ extension Home {
 
         // eventualBG Ende
 
-        @ViewBuilder private func glucoseAndLoopView() -> some View {
-            VStack {
-                glucoseView
-                    .frame(width: 120, height: 120)
-            }
-        }
-
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             let height: CGFloat = display ? 170 : 243
-            let overlayOffset: CGFloat = display ? -50 : -15
-            let topCorrectionOn: CGFloat = display ? 10 : 20 // Bei aktiviertem Light
-            let topCorrectionOff: CGFloat = display ? -10 : -10 // Bei deaktiviertem Light
 
             ZStack(alignment: .top) {
-                // Hauptcontainer mit dynamischem Korrektur-Padding
-                HStack(spacing: 0) {
+                HStack {
                     if !display {
                         stackedLeftTopView
                             .transition(.opacity)
@@ -879,22 +778,20 @@ extension Home {
                             .padding(.leading, 20)
                     }
 
-                    VStack(spacing: display ? 8 : 20) {
+                    VStack {
                         Group {
-                            if display {
-                                glucoseView
+                            if let progress = state.bolusProgress, progress > 0 {
+                                bolusProgressView()
+                                    .padding(.top, 40)
                             } else {
-                                if let progress = state.bolusProgress, progress > 0 {
-                                    bolusProgressView()
-                                } else {
-                                    glucoseAndLoopView()
-                                }
+                                glucoseView
                             }
                         }
 
                         if !display {
                             pumpView
                                 .frame(maxWidth: .infinity)
+                                .padding(.bottom, 22)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -906,16 +803,14 @@ extension Home {
                             .padding(.trailing, 20)
                     }
                 }
-                .padding(.top, geo.safeAreaInsets.top + (state.incidenceOfLight ? topCorrectionOn : topCorrectionOff))
+                .padding(.top, geo.safeAreaInsets.top)
                 .animation(.easeInOut(duration: 1.2), value: display)
-
-                // Overlay nur wenn aktiviert
-                if state.incidenceOfLight {
-                    lightGlowOverlayContent()
-                        .padding(.top, geo.safeAreaInsets.top + overlayOffset)
-                }
             }
-            .frame(height: fontSize < .extraExtraLarge ? height + geo.safeAreaInsets.top : height + 10 + geo.safeAreaInsets.top)
+            .frame(
+                height: fontSize < .extraExtraLarge
+                    ? height + geo.safeAreaInsets.top
+                    : height + 10 + geo.safeAreaInsets.top
+            )
             .background(Color.dynamicBackground)
         }
 
@@ -949,9 +844,6 @@ extension Home {
                             symbol: "cross.vial",
                             animateProgress: true,
                             button3D: state.button3D,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview,
                             fillFraction: animatedFill,
                             symbolBackgroundColor: .dynamicIconBackground
                         )
@@ -1011,9 +903,6 @@ extension Home {
                                 symbol: "cross.vial",
                                 animateProgress: true,
                                 button3D: state.button3D,
-                                incidenceOfLight: state.incidenceOfLight,
-                                lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                    .atriumview,
                                 fillFraction: animatedInsulinFill,
                                 symbolBackgroundColor: .dynamicIconBackground
                             )
@@ -1060,17 +949,6 @@ extension Home {
 
         var loopView: some View {
             ZStack {
-                let incidenceOfLight = state.incidenceOfLight
-                let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                    .atriumview
-                let glowColor1 = incidenceOfLight
-                    ? lightGlowOverlaySelector.highlightColor
-                    : .dynamicTopGlow
-
-                let glowColor2 = incidenceOfLight
-                    ? lightGlowOverlaySelector.highlightColor.opacity(0.4)
-                    : .dynamicTopGlow.opacity(0.4)
-
                 if state.button3D {
                     Circle()
                         .fill(Color.dynamicIconBackground)
@@ -1081,8 +959,8 @@ extension Home {
                         .stroke(
                             LinearGradient(
                                 gradient: Gradient(colors: [
-                                    glowColor1.opacity(0.9),
-                                    glowColor2.opacity(0.6),
+                                    .dynamicTopGlow.opacity(0.9),
+                                    .dynamicTopGlow.opacity(0.6),
                                     Color.clear,
                                     .dynamicBottomShadow.opacity(0.3),
                                     .dynamicBottomShadow
@@ -1098,6 +976,7 @@ extension Home {
                         .fill(Color.dynamicIconBackground)
                         .frame(width: 50, height: 50)
                 }
+
                 LoopView(
                     suggestion: $state.data.suggestion,
                     enactedSuggestion: $state.enactedSuggestion,
@@ -1106,7 +985,7 @@ extension Home {
                     isLooping: $state.isLooping,
                     lastLoopDate: $state.lastLoopDate,
                     manualTempBasal: $state.manualTempBasal,
-                    backgroundColor: backgroundColor,
+                    backgroundColor: backgroundColor
                 )
                 .onTapGesture {
                     state.isStatusPopupPresented.toggle()
@@ -1179,9 +1058,6 @@ extension Home {
                             symbol: "cross.vial.fill",
                             animateProgress: false,
                             button3D: state.button3D,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview,
                             fillFraction: fill,
                             symbolColor: reservoirColor
                         )
@@ -1259,9 +1135,6 @@ extension Home {
                         symbol: "cross.vial",
                         animateProgress: true,
                         button3D: state.button3D,
-                        incidenceOfLight: state.incidenceOfLight,
-                        lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                            .atriumview,
                         fillFraction: insulinFraction,
                         symbolBackgroundColor: Color.dynamicIconBackground,
                         symbolColor: insulinColor
@@ -1364,9 +1237,6 @@ extension Home {
                         symbol: "cross.vial",
                         animateProgress: true,
                         button3D: state.button3D,
-                        incidenceOfLight: state.incidenceOfLight,
-                        lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                            .atriumview,
                         fillFraction: cannulaFraction,
                         symbolBackgroundColor: Color.dynamicIconBackground,
                         symbolColor: cannulaColor
@@ -1422,10 +1292,6 @@ extension Home {
                         symbol: "battery.50percent",
                         animateProgress: false,
                         button3D: state.button3D,
-                        incidenceOfLight: state.incidenceOfLight,
-                        lightGlowOverlaySelector: LightGlowOverlaySelector(
-                            rawValue: state.lightGlowOverlaySelector
-                        ) ?? .atriumview,
                         fillFraction: 1.0,
                         symbolRotation: -90,
                         symbolBackgroundColor: Color.dynamicIconBackground,
@@ -1459,9 +1325,6 @@ extension Home {
                             symbol: "dot.radiowaves.left.and.right",
                             animateProgress: true,
                             button3D: state.button3D,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview,
                             fillFraction: connectionFraction,
                             symbolBackgroundColor: Color.dynamicIconBackground,
                             symbolColor: Color.dynamicIconForeground
@@ -1537,14 +1400,15 @@ extension Home {
             Group {
                 ZStack {
                     Rectangle().fill(Color.dynamicChartBackground)
+
                     if state.animatedBackground {
                         SpriteView(scene: spriteScene, options: [.allowsTransparency])
                             .ignoresSafeArea()
                             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                     }
-
                     MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 10))
             }
             .padding(.bottom, 5)
             .padding(.leading, 15)
@@ -1558,10 +1422,8 @@ extension Home {
                         .padding(.vertical, 10)
                         .padding(.top, 20)
                 }
-
                 mainChart
                     .padding(.top, 35)
-
                 bottomBar
                     .padding(.top, 20)
                     .frame(width: UIScreen.main.bounds.width)
@@ -1630,10 +1492,7 @@ extension Home {
                     }
                     .background(
                         TimeEllipse(
-                            button3D: state.button3D,
-                            incidenceOfLight: state.incidenceOfLight,
-                            lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                                .atriumview
+                            button3D: state.button3D
                         )
                     )
                     .onTapGesture {
@@ -1662,9 +1521,7 @@ extension Home {
             .padding(.vertical, 15)
             .background(
                 TimeEllipse(
-                    button3D: state.button3D,
-                    incidenceOfLight: state.incidenceOfLight,
-                    lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
+                    button3D: state.button3D
                 )
             ) }
 
@@ -1685,9 +1542,7 @@ extension Home {
             .padding(.vertical, 4)
             .background(
                 TimeEllipse(
-                    button3D: state.button3D,
-                    incidenceOfLight: state.incidenceOfLight,
-                    lightGlowOverlaySelector: LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ?? .atriumview
+                    button3D: state.button3D
                 )
             )
             .overlay(
@@ -1707,6 +1562,8 @@ extension Home {
         private static let heavyFeedback = UIImpactFeedbackGenerator(style: .heavy)
 
         // buttonWithCircle Funktion
+
+        // buttonWithCircle Funktion
         @ViewBuilder private func buttonWithCircle(
             iconName: String,
             isSFSymbol: Bool = true,
@@ -1723,17 +1580,6 @@ extension Home {
                 action()
             }) {
                 ZStack {
-                    let incidenceOfLight = state.incidenceOfLight
-                    let lightGlowOverlaySelector = LightGlowOverlaySelector(rawValue: state.lightGlowOverlaySelector) ??
-                        .atriumview
-                    let glowColor1 = incidenceOfLight
-                        ? lightGlowOverlaySelector.highlightColor
-                        : .dynamicTopGlow
-
-                    let glowColor2 = incidenceOfLight
-                        ? lightGlowOverlaySelector.highlightColor.opacity(0.6)
-                        : .dynamicTopGlow.opacity(0.4)
-
                     if state.button3D {
                         Circle()
                             .fill(Color.dynamicIconBackground)
@@ -1744,8 +1590,8 @@ extension Home {
                             .stroke(
                                 LinearGradient(
                                     gradient: Gradient(colors: [
-                                        glowColor1.opacity(0.9),
-                                        glowColor2.opacity(0.6),
+                                        .dynamicTopGlow.opacity(0.9),
+                                        .dynamicTopGlow.opacity(0.6),
                                         Color.clear,
                                         .dynamicBottomShadow.opacity(0.3),
                                         .dynamicBottomShadow
@@ -2197,38 +2043,43 @@ extension Home {
         }
 
         // ButtonPanel End
-
         var DayView: some View {
             Group {
                 ZStack {
                     if !state.skipGlucoseChart {
-                        glucoseHeaderView().padding(.top, 8).padding(.bottom, 10)
-                        // Rectangle().fill(Color.dynamicChartBackground)
+                        glucoseHeaderView()
+                            .padding(.top, 8)
+                            .padding(.bottom, 10)
                     } else {
                         EmptyView()
                     }
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 10)) // <-- hier
 
                 ZStack {
                     Rectangle().fill(Color.dynamicChartBackground)
                     preview.padding(.top, 15)
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 10)) // <-- hier
 
                 ZStack {
                     Rectangle().fill(Color.dynamicChartBackground)
                     loopPreview
                 }
+                .clipShape(RoundedRectangle(cornerRadius: 10)) // <-- hier
 
                 if !state.iobData.isEmpty {
                     ZStack {
                         Rectangle().fill(Color.dynamicChartBackground)
                         activeCOBView.padding(.bottom, 20)
                     }
+                    .clipShape(RoundedRectangle(cornerRadius: 10)) // <-- hier
 
                     ZStack {
                         Rectangle().fill(Color.dynamicChartBackground)
                         activeIOBView.padding(.bottom, 20)
                     }
+                    .clipShape(RoundedRectangle(cornerRadius: 10)) // <-- hier
                 }
             }
             .padding(.horizontal, 15)

@@ -149,8 +149,6 @@ struct FreeAPSSettings: JSON, Equatable {
     var ttBarActive: Bool = false
     var bottomBarActive: Bool = false
     var button3D: Bool = false
-    var incidenceOfLight = false
-    var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview.rawValue
     var insulinHours: Double?
     var batteryIconOption: Bool = false
 }
@@ -737,12 +735,6 @@ extension FreeAPSSettings: Decodable {
         }
         if let button3D = try? container.decode(Bool.self, forKey: .button3D) {
             settings.button3D = button3D
-        }
-        if let incidenceOfLight = try? container.decode(Bool.self, forKey: .incidenceOfLight) {
-            settings.incidenceOfLight = incidenceOfLight
-        }
-        if let lightGlowOverlaySelector = try? container.decode(String.self, forKey: .lightGlowOverlaySelector) {
-            settings.lightGlowOverlaySelector = lightGlowOverlaySelector
         }
         if let insulinHours = try? container.decode(Double.self, forKey: .insulinHours) {
             settings.insulinHours = insulinHours

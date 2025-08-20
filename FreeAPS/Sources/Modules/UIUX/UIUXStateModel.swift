@@ -43,8 +43,6 @@ extension UIUX {
         @Published var ttBarActive: Bool = false
         @Published var bottomBarActive: Bool = false
         @Published var button3D: Bool = false
-        @Published var incidenceOfLight: Bool = false
-        @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview.rawValue
         // Dana UI Toggels
 
         var units: GlucoseUnits = .mmolL
@@ -89,8 +87,6 @@ extension UIUX {
             subscribeSetting(\.ttBarActive, on: $ttBarActive) { ttBarActive = $0 }
             subscribeSetting(\.bottomBarActive, on: $bottomBarActive) { bottomBarActive = $0 }
             subscribeSetting(\.button3D, on: $button3D) { button3D = $0 }
-            subscribeSetting(\.incidenceOfLight, on: $incidenceOfLight) { incidenceOfLight = $0 }
-            subscribeSetting(\.lightGlowOverlaySelector, on: $lightGlowOverlaySelector) { lightGlowOverlaySelector = $0 }
             // Dana Toggels
 
             subscribeSetting(\.low, on: $low, initial: {

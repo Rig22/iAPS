@@ -118,8 +118,6 @@
   "topBarActive": false,
   "ttBarActive": false,
   "bottomBarActive": false,
-  "button3D": false,
-  "lightGlowOverlaySelector": "atriumview",
-  "incidenceOfLight": "false"
+  "button3D": false
 }
 

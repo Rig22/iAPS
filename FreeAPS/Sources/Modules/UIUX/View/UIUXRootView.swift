@@ -59,16 +59,6 @@ extension UIUX {
             return formatter.string(from: date)
         }
 
-        private func imageName(for option: LightGlowOverlaySelector) -> String {
-            switch option {
-            case .atriumview: return "Moonlight"
-            case .atriumview1: return "FullMoon"
-            case .atriumview2: return "NewMoon"
-                /* case .atriumview3: return "EveningSun"
-                 case .atriumview4: return "RedSun"
-                 case .atriumview5: return "NortherLights"*/ }
-        }
-
         var body: some View {
             VStack(spacing: 0) {
                 ZStack {
@@ -126,28 +116,6 @@ extension UIUX {
                                             }
                                         }
                                     } header: { Text("Light / Dark Mode") }
-
-                                    if state.lightMode == .dark {
-                                        Toggle("Atrium Light", isOn: $state.incidenceOfLight)
-                                    } else {}
-
-                                    if state.lightMode == .dark && state.incidenceOfLight {
-                                        Picker("Select your Atrium", selection: $state.lightGlowOverlaySelector) {
-                                            ForEach(LightGlowOverlaySelector.allCases) { option in
-                                                HStack {
-                                                    Image(imageName(for: option))
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .frame(width: 30, height: 30)
-                                                    Text(option.rawValue)
-                                                        .font(.caption)
-                                                }
-                                                .tag(option)
-                                            }
-                                        }
-                                        .pickerStyle(NavigationLinkPickerStyle())
-                                    }
-
                                     Toggle("3D Look", isOn: $state.button3D)
 
                                     Toggle("Show Pump Icon", isOn: $state.showPumpIcon)
@@ -170,6 +138,7 @@ extension UIUX {
                                             .pickerStyle(NavigationLinkPickerStyle())
                                         }
                                     }
+
                                     Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
                                     Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
                                     Toggle(
@@ -206,7 +175,6 @@ extension UIUX {
                                 Section(header: Text("Chart settings")) {
                                     Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
                                     Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
-                                    // Toggle("Display Chart Threshold lines for Low and High", isOn: $state.rulerMarks)
                                     Toggle("Mark Glucose Target Range", isOn: $state.rulerMarks)
                                     Toggle("Display Insulin Activity Chart", isOn: $state.showInsulinActivity)
                                     Toggle("Display COB Chart", isOn: $state.showCobChart)
@@ -231,13 +199,6 @@ extension UIUX {
                                     Toggle("Display Temp Targets Button", isOn: $state.useTargetButton)
                                     Toggle("Display Profile Override Button", isOn: $state.profileButton)
                                     Toggle("Display Meal Button", isOn: $state.carbButton)
-                                    /* Section {
-                                         Picker(selection: $state.lightMode, label: Text("Color Scheme")) {
-                                             ForEach(LightMode.allCases) { item in
-                                                 Text(NSLocalizedString(item.rawValue, comment: "ColorScheme Selection"))
-                                             }
-                                         }
-                                     } header: { Text("Light / Dark Mode") }*/
                                 }
 
                                 Section(header: Text("Statistics settings")) {

@@ -92,8 +92,6 @@ extension Home {
         @Published var timeSettings: Bool = false
         @Published var carbInsulinLoopViewOption: Bool = false
         @Published var button3D: Bool = false
-        @Published var incidenceOfLight: Bool = false
-        @Published var lightGlowOverlaySelector: String = LightGlowOverlaySelector.atriumview.rawValue
         @Published var insulinHours: Double?
         @Published var insulinAge: String = "--"
         @Published var batteryHours: Double?
@@ -247,8 +245,6 @@ extension Home {
             cannulaAgeOption = settingsManager.settings.cannulaAgeOption
             carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
             button3D = settingsManager.settings.button3D
-            incidenceOfLight = settingsManager.settings.incidenceOfLight
-            lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
             // Dana UI Toggels
             broadcaster.register(GlucoseObserver.self, observer: self)
             broadcaster.register(SuggestionObserver.self, observer: self)
@@ -880,8 +876,6 @@ extension Home.StateModel:
         timeSettings = settingsManager.settings.timeSettings
         carbInsulinLoopViewOption = settingsManager.settings.carbInsulinLoopViewOption
         button3D = settingsManager.settings.button3D
-        incidenceOfLight = settingsManager.settings.incidenceOfLight
-        lightGlowOverlaySelector = settingsManager.settings.lightGlowOverlaySelector
         // Dana UI Toggels
     }
 
