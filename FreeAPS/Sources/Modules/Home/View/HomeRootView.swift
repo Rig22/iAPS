@@ -832,7 +832,7 @@ extension Home {
                         } else {
                             HStack(spacing: 4) {
                                 Text("⇢")
-                                    .font(.statusFont)
+                                    .font(.system(size: 16))
                                     .foregroundColor(.dynamicSecondaryText)
 
                                 Text("---")
@@ -1806,7 +1806,7 @@ extension Home {
             .contentShape(Circle())
         }
 
-        struct TargetBubbleView<Content: View>: View {
+        struct bubbleView<Content: View>: View {
             let content: Content
 
             init(@ViewBuilder content: () -> Content) {
@@ -1820,13 +1820,13 @@ extension Home {
                         .padding(.vertical, 6)
                         .background(
                             RoundedRectangle(cornerRadius: 10)
-                                .fill(Color.black.opacity(0.3))
+                                .fill(Color.dynamicIconBackground)
                         )
-                        .foregroundColor(.white)
+                        .foregroundColor(.dynamicIconForeground)
                         .font(.caption)
 
                     Triangle()
-                        .fill(Color.black.opacity(0.3))
+                        .fill(Color.dynamicIconBackground)
                         .frame(width: 20, height: 12)
                         .offset(y: 2)
                 }
@@ -2045,14 +2045,13 @@ extension Home {
 
                     // Profile Bubble Anzeige
                     if showProfileBubble && state.profileButton {
-                        TargetBubbleView {
-                            if let tempTargetString = tempTargetString,
-                               !(fetchedPercent.first?.enabled ?? false)
-                            {
-                                Text(tempTargetString)
+                        bubbleView {
+                            if let overrideString = overrideString {
+                                Text(overrideString)
                                     .foregroundStyle(Color.dynamicPrimaryText)
                             } else {
-                                profileView
+                                Text("No Profile Override")
+                                    .foregroundStyle(Color.dynamicPrimaryText)
                             }
                         }
                         .frame(width: 350)
@@ -2067,14 +2066,12 @@ extension Home {
 
                     // Target Bubble Anzeige
                     if showTargetBubble && state.useTargetButton {
-                        TargetBubbleView {
-                            if let tempTargetString = tempTargetString,
-                               !(fetchedPercent.first?.enabled ?? false)
-                            {
+                        bubbleView {
+                            if let tempTargetString = tempTargetString {
                                 Text(tempTargetString)
                                     .foregroundStyle(Color.dynamicPrimaryText)
                             } else {
-                                Text("No TempTarget activ")
+                                Text("No Temp Target")
                                     .foregroundStyle(Color.dynamicPrimaryText)
                             }
                         }
@@ -2125,6 +2122,37 @@ extension Home {
                 return nil
             }
             return tempTarget.displayName
+        }
+
+        var overrideString: String? {
+            guard let override = fetchedPercent.first, override.enabled else {
+                return nil
+            }
+
+            if override.isPreset {
+                let profile = fetchedProfiles.first(where: { $0.id == override.id })
+                if let currentProfile = profile {
+                    if let name = currentProfile.name, name != "EMPTY", name.nonEmpty != nil, name != "",
+                       name != "\u{0022}\u{0022}"
+                    {
+                        if name.count > 15 {
+                            let shortened = name.prefix(15)
+                            return String(shortened)
+                        } else {
+                            return name
+                        }
+                    }
+                }
+                return "📉" // Fallback wenn kein Profilname gefunden wird
+            } else if override.percentage != 100 {
+                return "\(override.percentage.formatted()) %"
+            } else if override.smbIsOff, !override.smbIsAlwaysOff {
+                return "No SMB"
+            } else if override.smbIsOff {
+                return "SMB Paused"
+            } else {
+                return "Override"
+            }
         }
 
         var profileView: some View {

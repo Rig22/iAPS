@@ -95,7 +95,7 @@ struct CurrentGlucoseView: View {
         ZStack {
             if displayExpiration || displaySAGE {
                 sageView
-                    .offset(x: 122, y: 40)
+                    .offset(x: 121, y: 37)
             }
             // TriangleShape(color: triangleColor)
             TriangleShape(color: currentTriangleColor)

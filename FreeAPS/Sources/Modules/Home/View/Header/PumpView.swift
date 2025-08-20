@@ -105,8 +105,7 @@ struct PumpView: View {
             .foregroundColor(.gray)
             .overlay(
                 Text("Sim")
-                    .font(.caption2)
-                    .bold()
+                    .font(.system(size: 16, weight: .light))
                     .foregroundColor(.dynamicSecondaryText)
                     .offset(y: 18)
             )
@@ -139,7 +138,9 @@ struct PumpView: View {
                             reservoirFormatter
                                 .string(from: (insulin * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ?? ""
                         )
+                        .font(.system(size: 16, weight: .light))
                         Text("U")
+                            .font(.system(size: 16, weight: .light))
                     }
                     .foregroundColor(.dynamicSecondaryText)
                     .offset(x: 2, y: 0)
@@ -162,9 +163,8 @@ struct PumpView: View {
 
             HStack(spacing: 4) {
                 remainingTimeMedtrum(time: date.timeIntervalSince(timerDate))
-                    .font(.pumpFont)
+                    .font(.system(size: 16, weight: .light))
                     .foregroundColor(.dynamicSecondaryText)
-
                 /*    if battery != nil {
                      batteryIcon(for: .medtrum)
                          .offset(x: -6, y: 0)
@@ -173,7 +173,7 @@ struct PumpView: View {
             .offset(x: -4, y: 0)
         } else {
             Text("No Pump")
-                .font(.statusFont)
+                .font(.system(size: 16, weight: .light))
                 .foregroundColor(.dynamicSecondaryText)
                 .offset(x: 0, y: -4)
         }
@@ -208,6 +208,7 @@ struct PumpView: View {
                                 ""
                         )
                         Text("U")
+                            .font(.system(size: 16, weight: .light))
                     }
                     .foregroundColor(.dynamicSecondaryText)
                     .offset(x: 6, y: 0) // Horizontal adjustment
@@ -229,13 +230,13 @@ struct PumpView: View {
 
             HStack(spacing: 4) {
                 remainingTime(time: date.timeIntervalSince(timerDate))
-                    .font(.pumpFont)
+                    .font(.system(size: 16, weight: .light))
                     .foregroundColor(.dynamicSecondaryText)
             }
             .offset(x: -4, y: 0) // Vertical adjustment für time row
         } else {
             Text("No Patch")
-                .font(.statusFont)
+                .font(.system(size: 16, weight: .light))
                 .foregroundColor(.dynamicSecondaryText)
                 .offset(x: 0, y: -4)
         }
@@ -250,9 +251,9 @@ struct PumpView: View {
                     reservoirFormatter
                         .string(from: (reservoir * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ?? ""
                 )
-                .font(.statusFont)
+                .font(.system(size: 16, weight: .light))
                 Text("U")
-                    .font(.statusFont)
+                    .font(.system(size: 16, weight: .light))
             }
             .foregroundColor(.dynamicSecondaryText)
             .offset(y: 9)
@@ -273,7 +274,7 @@ struct PumpView: View {
             }
         } else {
             Text("No Pump")
-                .font(.statusFont)
+                .font(.system(size: 16, weight: .light))
                 .foregroundColor(.dynamicSecondaryText)
         }
     }
@@ -282,8 +283,8 @@ struct PumpView: View {
         let color: Color = {
             if time <= 0 { return .dynamicColorRed }
             else if time < 4 * 60 * 60 { return .dynamicColorRed }
-            else if time < 24 * 60 * 60 { return .dynamicColorYellow }
-            else { return .secondary }
+            else if time < 24 * 60 * 60 { return .brown }
+            else { return .dynamicSecondaryText }
         }()
 
         return HStack {
@@ -297,25 +298,30 @@ struct PumpView: View {
                     HStack(spacing: 0) {
                         Text(" \(days)")
                         Text(NSLocalizedString("d", comment: "abbreviation for days"))
+                            .font(.system(size: 16, weight: .light))
                         if adjustedHours >= 0 {
                             Text(" ")
                             Text("\(adjustedHours)")
                             Text(NSLocalizedString("h", comment: "abbreviation for hours"))
+                                .font(.system(size: 16, weight: .light))
                         }
                     }
                 } else if hours >= 1 {
                     HStack(spacing: 0) {
                         Text("\(hours)")
                         Text(NSLocalizedString("h", comment: "abbreviation for hours"))
+                            .font(.system(size: 16, weight: .light))
                     }
                 } else {
                     HStack(spacing: 0) {
                         Text(" \(minutes)")
                         Text(NSLocalizedString("m", comment: "abbreviation for minutes"))
+                            .font(.system(size: 16, weight: .light))
                     }
                 }
             } else {
                 Text(NSLocalizedString("Replace", comment: "View/Header when pod expired"))
+                    .font(.system(size: 16, weight: .light))
             }
         }
         .foregroundStyle(color)
@@ -325,8 +331,8 @@ struct PumpView: View {
         let color: Color = {
             if time <= 0 { return .dynamicColorGreen }
             else if time < 4 * 60 * 60 { return .dynamicColorRed }
-            else if time < 24 * 60 * 60 { return .dynamicColorYellow }
-            else { return .secondary }
+            else if time < 24 * 60 * 60 { return .brown }
+            else { return .dynamicSecondaryText }
         }()
 
         return HStack {
@@ -339,26 +345,34 @@ struct PumpView: View {
                 if days >= 1 {
                     HStack(spacing: 0) {
                         Text(" \(days)")
+                            .font(.system(size: 16, weight: .light))
+
                         Text(NSLocalizedString("d", comment: "abbreviation for days"))
+                            .font(.system(size: 16, weight: .light))
+
                         if adjustedHours >= 0 {
                             Text(" ")
                             Text("\(adjustedHours)")
                             Text(NSLocalizedString("h", comment: "abbreviation for hours"))
+                                .font(.system(size: 16, weight: .light))
                         }
                     }
                 } else if hours >= 1 {
                     HStack(spacing: 0) {
                         Text("\(hours)")
                         Text(NSLocalizedString("h", comment: "abbreviation for hours"))
+                            .font(.system(size: 16, weight: .light))
                     }
                 } else {
                     HStack(spacing: 0) {
                         Text(" \(minutes)")
                         Text(NSLocalizedString("m", comment: "abbreviation for minutes"))
+                            .font(.system(size: 16, weight: .light))
                     }
                 }
             } else {
                 Text(NSLocalizedString("Power Mode", comment: "View/Header when pod expired"))
+                    .font(.system(size: 16, weight: .light))
             }
         }
         .foregroundStyle(color)
