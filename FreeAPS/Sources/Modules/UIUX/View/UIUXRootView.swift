@@ -173,9 +173,9 @@ extension UIUX {
                                 }
 
                                 Section(header: Text("Chart settings")) {
-                                    Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
-                                    Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
-                                    Toggle("Mark Glucose Target Range", isOn: $state.rulerMarks)
+                                    //   Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
+                                    //  Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
+                                    Toggle("Mark Glucose Target Range green", isOn: $state.rulerMarks)
                                     Toggle("Display Insulin Activity Chart", isOn: $state.showInsulinActivity)
                                     Toggle("Display COB Chart", isOn: $state.showCobChart)
                                     HStack {

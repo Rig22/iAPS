@@ -107,7 +107,6 @@ struct PumpView: View {
                 Text("Sim")
                     .font(.system(size: 16, weight: .light))
                     .foregroundColor(.dynamicSecondaryText)
-                    .offset(y: 18)
             )
     }
 

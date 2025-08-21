@@ -767,7 +767,14 @@ extension Home {
         // eventualBG Ende
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-            let height: CGFloat = display ? 170 : 243
+            // Basis-Höhe zentral definieren
+            let baseHeight: CGFloat = display ? 170 : 243
+            let safeTop = geo.safeAreaInsets.top
+
+            // Gesamthöhe berechnen (inkl. Font-Größe)
+            let totalHeight: CGFloat = fontSize < .extraExtraLarge
+                ? baseHeight + safeTop
+                : baseHeight + 10 + safeTop
 
             ZStack(alignment: .top) {
                 HStack {
@@ -778,11 +785,10 @@ extension Home {
                             .padding(.leading, 20)
                     }
 
-                    VStack {
+                    VStack(spacing: 20) {
                         Group {
                             if let progress = state.bolusProgress, progress > 0 {
                                 bolusProgressView()
-                                    .padding(.top, 40)
                             } else {
                                 glucoseView
                             }
@@ -791,7 +797,6 @@ extension Home {
                         if !display {
                             pumpView
                                 .frame(maxWidth: .infinity)
-                                .padding(.bottom, 22)
                         }
                     }
                     .frame(maxWidth: .infinity)
@@ -803,14 +808,10 @@ extension Home {
                             .padding(.trailing, 20)
                     }
                 }
-                .padding(.top, geo.safeAreaInsets.top)
+                .padding(.top, safeTop)
                 .animation(.easeInOut(duration: 1.2), value: display)
             }
-            .frame(
-                height: fontSize < .extraExtraLarge
-                    ? height + geo.safeAreaInsets.top
-                    : height + 10 + geo.safeAreaInsets.top
-            )
+            .frame(height: totalHeight)
             .background(Color.dynamicBackground)
         }
 
@@ -1682,9 +1683,14 @@ extension Home {
         struct Triangle: Shape {
             func path(in rect: CGRect) -> Path {
                 var path = Path()
+
                 path.move(to: CGPoint(x: rect.midX, y: rect.minY))
                 path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-                path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
+                path.addQuadCurve(
+                    to: CGPoint(x: rect.minX, y: rect.maxY),
+                    control: CGPoint(x: rect.midX, y: rect.maxY - 3)
+                )
+
                 path.closeSubpath()
                 return path
             }

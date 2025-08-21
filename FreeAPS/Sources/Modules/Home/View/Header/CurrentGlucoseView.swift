@@ -93,10 +93,10 @@ struct CurrentGlucoseView: View {
 
     var body: some View {
         ZStack {
-            if displayExpiration || displaySAGE {
-                sageView
-                    .offset(x: 78, y: 73)
-            }
+            /*  if displayExpiration || displaySAGE {
+                 sageView
+                     .position(x: 78, y: 73)
+             }*/
             // TriangleShape(color: triangleColor)
             TriangleShape(color: currentTriangleColor)
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))
@@ -133,6 +133,14 @@ struct CurrentGlucoseView: View {
                     )
                     .font(.caption2)
                     .foregroundStyle(Color.dynamicSecondaryText)
+                }
+                .overlay(alignment: .trailing) {
+                    if displayExpiration || displaySAGE {
+                        sageView
+                            .padding(.trailing, -150)
+                            .padding(.top, -28)
+                        // .position(x: 78, y: 73)
+                    }
                 }
             }
         }
