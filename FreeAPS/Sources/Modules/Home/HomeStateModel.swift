@@ -76,7 +76,6 @@ extension Home {
         @Published var maxCOB: Decimal = 0
         @Published var autoisf = false
         @Published var displayExpiration = false
-        // @Published var displayExpiration2 = false
         @Published var displaySAGE = true
         @Published var cgm: CGMType = .nightscout
         @Published var sensorDays: Double = 10
@@ -90,7 +89,6 @@ extension Home {
         @Published var insulinAgeOption: String = "Drei_Tage"
         @Published var cannulaAgeOption: String = "Drei_Tage"
         @Published var legendsSwitch: Bool = false
-        @Published var tempTargetbar: Bool = false
         @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
         @Published var chartBackgroundColored: Bool = false
@@ -149,6 +147,7 @@ extension Home {
             insulinPeak: 75,
             maxBolus: 0,
             maxBolusValue: 1,
+            maxCarbsValue: 1,
             maxIOB: 0,
             maxCOB: 1,
             useInsulinBars: true,
@@ -157,7 +156,9 @@ extension Home {
             fpuAmounts: false,
             showInsulinActivity: true,
             showCobChart: true,
-            iob: nil
+            iob: nil,
+            hidePredictions: false,
+            useCarbBars: false
         )
         /*  var backgroundColor: Color {
              BackgroundColorOption(rawValue: backgroundColorOptionRawValue)?.color ?? .clear
@@ -226,6 +227,8 @@ extension Home {
             data.useInsulinBars = settingsManager.settings.useInsulinBars
             data.fpus = settingsManager.settings.fpus
             data.fpuAmounts = settingsManager.settings.fpuAmounts
+            data.hidePredictions = settingsManager.settings.hidePredictions
+            data.useCarbBars = settingsManager.settings.useCarbBars
             displayDelta = settingsManager.settings.displayDelta
             skipGlucoseChart = settingsManager.settings.skipGlucoseChart
             maxIOB = settingsManager.preferences.maxIOB
@@ -234,7 +237,6 @@ extension Home {
             autoisf = settingsManager.settings.autoisf
             hours = settingsManager.settings.hours
             displayExpiration = settingsManager.settings.displayExpiration
-            // displayExpiration2 = settingsManager.settings.displayExpiration2
             displaySAGE = settingsManager.settings.displaySAGE
             cgm = settingsManager.settings.cgm
             sensorDays = switch settingsManager.settings.cgm {
@@ -253,7 +255,6 @@ extension Home {
             showPumpIcon = settingsManager.settings.showPumpIcon
             pumpIconRawValue = settingsManager.settings.pumpIconRawValue
             hideInsulinBadge = settingsManager.settings.hideInsulinBadge
-            tempTargetbar = settingsManager.settings.tempTargetbar
             timeSettings = settingsManager.settings.timeSettings
             backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
             insulinAgeOption = settingsManager.settings.insulinAgeOption
@@ -638,6 +639,7 @@ extension Home {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.data.carbs = self.provider.carbs(hours: self.filteredHours)
+                self.data.maxCarbsValue = self.data.carbs.compactMap(\.carbs).max() ?? 1
             }
         }
 
@@ -859,6 +861,8 @@ extension Home.StateModel:
         data.useInsulinBars = settingsManager.settings.useInsulinBars
         data.fpus = settingsManager.settings.fpus
         data.fpuAmounts = settingsManager.settings.fpuAmounts
+        data.hidePredictions = settingsManager.settings.hidePredictions
+        data.useCarbBars = settingsManager.settings.useCarbBars
         skipGlucoseChart = settingsManager.settings.skipGlucoseChart
         displayDelta = settingsManager.settings.displayDelta
         maxIOB = settingsManager.preferences.maxIOB
@@ -889,7 +893,6 @@ extension Home.StateModel:
         pumpIconRawValue = settingsManager.settings.pumpIconRawValue
         insulinAgeOption = settingsManager.settings.insulinAgeOption
         cannulaAgeOption = settingsManager.settings.cannulaAgeOption
-        tempTargetbar = settingsManager.settings.tempTargetbar
         timeSettings = settingsManager.settings.timeSettings
         backgroundColorOptionRawValue = settingsManager.settings.backgroundColorOptionRawValue
         chartBackgroundColored = settingsManager.settings.chartBackgroundColored

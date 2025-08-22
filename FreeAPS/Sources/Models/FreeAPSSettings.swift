@@ -58,6 +58,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var alwaysUseColors: Bool = false
     var timeSettings: Bool = true
     var disable15MinTrend: Bool = false
+    var hidePredictions: Bool = false
     // Sounds
     var hypoSound: String = "Default"
     var hyperSound: String = "Default"
@@ -104,6 +105,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var glucoseOverrideThresholdActiveDown: Bool = false
     var glucoseOverrideThresholdDown: Decimal = 100
     var noCarbs: Bool = false
+    var useCarbBars: Bool = false
     // ColorScheme
     var lightMode: LightMode = .auto
     // Auto ISF
@@ -140,7 +142,6 @@ struct FreeAPSSettings: JSON, Equatable {
     var showPumpIcon: Bool = false
     var pumpIconRawValue: String = "nano200"
     var danaBar: Bool = false
-    var tempTargetbar: Bool = false
     var backgroundColorOption: BackgroundColorOption = .darkBlue
     var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
     var insulinAgeOption: String = "Drei_Tage"
@@ -198,6 +199,14 @@ extension FreeAPSSettings: Decodable {
 
         if let fpus = try? container.decode(Bool.self, forKey: .fpus) {
             settings.fpus = fpus
+        }
+
+        if let hidePredictions = try? container.decode(Bool.self, forKey: .hidePredictions) {
+            settings.hidePredictions = hidePredictions
+        }
+
+        if let useCarbBars = try? container.decode(Bool.self, forKey: .useCarbBars) {
+            settings.useCarbBars = useCarbBars
         }
 
         if let fpuAmounts = try? container.decode(Bool.self, forKey: .fpuAmounts) {
@@ -700,9 +709,7 @@ extension FreeAPSSettings: Decodable {
         if let danaBar = try? container.decode(Bool.self, forKey: .danaBar) {
             settings.danaBar = danaBar
         }
-        if let tempTargetbar = try? container.decode(Bool.self, forKey: .tempTargetbar) {
-            settings.tempTargetbar = tempTargetbar
-        }
+
         if let backgroundColorOptionRawValue = try? container.decode(String.self, forKey: .backgroundColorOptionRawValue) {
             settings.backgroundColorOptionRawValue = backgroundColorOptionRawValue
         }

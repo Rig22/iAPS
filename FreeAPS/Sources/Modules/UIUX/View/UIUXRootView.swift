@@ -139,7 +139,6 @@ extension UIUX {
                                         }
                                         .pickerStyle(NavigationLinkPickerStyle())
                                     }
-                                    Toggle("TT Bar", isOn: $state.tempTargetBar)
                                     Toggle("Bottom Bar", isOn: $state.timeSettings)
                                 }
 
@@ -217,7 +216,8 @@ extension UIUX {
                                 Section(header: Text("Chart settings")) {
                                     Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
                                     Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
-                                    Toggle("Display Chart Threshold lines for Low and High", isOn: $state.rulerMarks)
+                                    // Toggle("Display Chart Threshold lines for Low and High", isOn: $state.rulerMarks)
+                                    Toggle("Glucose Zielbereich grün einfärben", isOn: $state.rulerMarks)
                                     Toggle("Display Insulin Activity Chart", isOn: $state.showInsulinActivity)
                                     Toggle("Display COB Chart", isOn: $state.showCobChart)
                                     HStack {
@@ -228,10 +228,12 @@ extension UIUX {
                                     }
                                     Toggle("Standing / Laying TIR Chart", isOn: $state.oneDimensionalGraph)
                                     Toggle("Use insulin bars", isOn: $state.useInsulinBars)
+                                    Toggle("Use carb bars", isOn: $state.useCarbBars)
                                     Toggle("Display carb equivalents", isOn: $state.fpus)
                                     if state.fpus {
                                         Toggle("Display carb equivalent amount", isOn: $state.fpuAmounts)
                                     }
+                                    Toggle("Hide oref0 Predictions", isOn: $state.hidePredictions)
                                 }
                                 // Toggle("Display Glucose Delta", isOn: $state.displayDelta)
 

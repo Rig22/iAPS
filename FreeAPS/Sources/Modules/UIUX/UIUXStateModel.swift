@@ -19,7 +19,6 @@ extension UIUX {
         @Published var skipGlucoseChart: Bool = false
         @Published var displayDelta: Bool = false
         @Published var displayExpiration: Bool = false
-        // @Published var displayExpiration2 = false
         @Published var displaySAGE: Bool = true
         @Published var fpus: Bool = true
         @Published var fpuAmounts: Bool = false
@@ -29,12 +28,13 @@ extension UIUX {
         @Published var showInsulinActivity: Bool = true
         @Published var showCobChart: Bool = true
         @Published var hideInsulinBadge: Bool = false
+        @Published var hidePredictions: Bool = false
+        @Published var useCarbBars: Bool = false
         // Dana UI Toggels
         @Published var showPumpIcon: Bool = false
         @Published var pumpIconRawValue: String = "nano200"
         @Published var danaBar: Bool = false
         @Published var legendsSwitch: Bool = false
-        @Published var tempTargetBar: Bool = false
         @Published var timeSettings: Bool = false
         @Published var backgroundColorOptionRawValue: String = BackgroundColorOption.darkBlue.rawValue
         @Published var insulinAgeOption: String = "Drei_Tage"
@@ -82,6 +82,8 @@ extension UIUX {
             subscribeSetting(\.lightMode, on: $lightMode) { lightMode = $0 }
             subscribeSetting(\.showInsulinActivity, on: $showInsulinActivity) { showInsulinActivity = $0 }
             subscribeSetting(\.showCobChart, on: $showCobChart) { showCobChart = $0 }
+            subscribeSetting(\.hidePredictions, on: $hidePredictions) { hidePredictions = $0 }
+            subscribeSetting(\.useCarbBars, on: $useCarbBars) { useCarbBars = $0 }
             // Dana Toggels
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
             subscribeSetting(\.showPumpIcon, on: $showPumpIcon) { showPumpIcon = $0 }
@@ -89,7 +91,6 @@ extension UIUX {
             subscribeSetting(\.insulinAgeOption, on: $insulinAgeOption) { insulinAgeOption = $0 }
             subscribeSetting(\.cannulaAgeOption, on: $cannulaAgeOption) { cannulaAgeOption = $0 }
             subscribeSetting(\.hideInsulinBadge, on: $hideInsulinBadge) { hideInsulinBadge = $0 }
-            subscribeSetting(\.tempTargetbar, on: $tempTargetBar) { tempTargetBar = $0 }
             subscribeSetting(\.timeSettings, on: $timeSettings) { timeSettings = $0 }
             subscribeSetting(\.backgroundColorOptionRawValue, on: $backgroundColorOptionRawValue) {
                 self.backgroundColorOptionRawValue = $0 }

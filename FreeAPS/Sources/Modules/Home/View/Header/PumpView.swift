@@ -118,7 +118,6 @@ struct PumpView: View {
                 let adjustedReservoir = Double(insulin) * (concentration.last?.concentration ?? 1)
                 let maxReservoir: Double = 200
                 let portion = max(0.0, min(1.0, adjustedReservoir / maxReservoir))
-                let color = reservoirColor
 
                 if insulin == 0xDEAD_BEEF {
                     medtrumInsulinAmount(portion: 1 - portion)
@@ -140,7 +139,6 @@ struct PumpView: View {
                             reservoirFormatter
                                 .string(from: (insulin * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ?? ""
                         )
-                        // Text("U").foregroundStyle(.white)
                         Text("U")
                     }
                     .foregroundStyle(.white)
@@ -163,10 +161,10 @@ struct PumpView: View {
             }
 
             HStack(spacing: 4) {
-                remainingTime(time: date.timeIntervalSince(timerDate))
+                remainingTimeMedtrum(time: date.timeIntervalSince(timerDate))
                     .font(.pumpFont)
 
-                /* if battery != nil {
+                /*    if battery != nil {
                      batteryIcon(for: .medtrum)
                          .offset(x: -6, y: 0)
                  }*/
@@ -232,9 +230,9 @@ struct PumpView: View {
                 remainingTime(time: date.timeIntervalSince(timerDate))
                     .font(.pumpFont)
             }
-            .offset(x: -4, y: 0) // Vertical adjustment für Omnipod time row
+            .offset(x: -4, y: 0) // Vertical adjustment für time row
         } else {
-            Text("No Pod")
+            Text("No Patch")
                 .font(.statusFont)
                 .foregroundStyle(.white)
                 .offset(x: 0, y: -4)
@@ -321,42 +319,48 @@ struct PumpView: View {
         .foregroundStyle(color)
     }
 
-    /*  private func remainingTime(time: TimeInterval) -> some View {
-         HStack {
-             if time > 0 {
-                 let days = Int(time / 1.days.timeInterval)
-                 let hours = Int(time / 1.hours.timeInterval)
-                 let minutes = Int(time / 1.minutes.timeInterval)
-                 let adjustedHours = Int(hours - days * 24)
+    private func remainingTimeMedtrum(time: TimeInterval) -> some View {
+        let color: Color = {
+            if time <= 0 { return .green }
+            else if time < 4 * 60 * 60 { return .red }
+            else if time < 24 * 60 * 60 { return .yellow }
+            else { return .white }
+        }()
 
-                 if days >= 1 {
-                     HStack(spacing: 0) {
-                         Text(" \(days)")
-                         Text(NSLocalizedString("d", comment: "abbreviation for days")).foregroundStyle(.white)
-                         if adjustedHours >= 0 {
-                             Text(" ")
-                             Text("\(adjustedHours)")
-                             Text(NSLocalizedString("h", comment: "abbreviation for hours")).foregroundStyle(.white)
-                         }
-                     }
-                 } else if hours >= 1 {
-                     HStack(spacing: 0) {
-                         Text("\(hours)")
-                         Text(NSLocalizedString("h", comment: "abbreviation for hours"))
-                             .foregroundStyle(time < 4 * 60 * 60 ? .red : .white)
-                     }
-                 } else {
-                     HStack(spacing: 0) {
-                         Text(" \(minutes)")
-                         Text(NSLocalizedString("m", comment: "abbreviation for minutes"))
-                             .foregroundStyle(time < 4 * 60 * 60 ? .red : .white)
-                     }
-                 }
-             } else {
-                 Text(NSLocalizedString("Replace", comment: "View/Header when pod expired")).foregroundStyle(.red)
-             }
-         }
-     }*/
+        return HStack {
+            if time > 0 {
+                let days = Int(time / 1.days.timeInterval)
+                let hours = Int(time / 1.hours.timeInterval)
+                let minutes = Int(time / 1.minutes.timeInterval)
+                let adjustedHours = Int(hours - days * 24)
+
+                if days >= 1 {
+                    HStack(spacing: 0) {
+                        Text(" \(days)")
+                        Text(NSLocalizedString("d", comment: "abbreviation for days"))
+                        if adjustedHours >= 0 {
+                            Text(" ")
+                            Text("\(adjustedHours)")
+                            Text(NSLocalizedString("h", comment: "abbreviation for hours"))
+                        }
+                    }
+                } else if hours >= 1 {
+                    HStack(spacing: 0) {
+                        Text("\(hours)")
+                        Text(NSLocalizedString("h", comment: "abbreviation for hours"))
+                    }
+                } else {
+                    HStack(spacing: 0) {
+                        Text(" \(minutes)")
+                        Text(NSLocalizedString("m", comment: "abbreviation for minutes"))
+                    }
+                }
+            } else {
+                Text(NSLocalizedString("Power Mode", comment: "View/Header when pod expired"))
+            }
+        }
+        .foregroundStyle(color)
+    }
 
     private var batteryColor: Color {
         guard let battery = battery, let percent = battery.percent else {
@@ -442,8 +446,7 @@ struct PumpView: View {
 
     private func medtrumInsulinAmount(portion: Double) -> some View {
         ZStack {
-            let pump = colorScheme == .dark ? "nano200pumpview" : "nano200pumpview"
-            UIImage(imageLiteralResourceName: pump)
+            UIImage(imageLiteralResourceName: "nano200pumpview")
                 .fillImageUpToPortion(color: reservoirColor.opacity(0.8), portion: max(portion, 0.0))
                 .resizable()
                 .frame(maxWidth: 30, maxHeight: 30)
