@@ -2183,7 +2183,8 @@ extension Home {
                                     .offset(y: -1)
                             }
                         } else if override.percentage != 100 {
-                            Text(override.percentage.formatted() + " %").font(.statusFont).foregroundStyle(.secondary)
+                            Text((tirFormatter.string(from: override.percentage as NSNumber) ?? "") + " %").font(.statusFont)
+                                .foregroundStyle(.secondary)
                         } else if override.smbIsOff, !override.smbIsAlwaysOff {
                             Text("No ").font(.statusFont).foregroundStyle(.secondary)
                             Image(systemName: "syringe")

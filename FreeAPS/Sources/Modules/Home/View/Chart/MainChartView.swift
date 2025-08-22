@@ -306,7 +306,8 @@ struct MainChartView: View {
             }
         }
     }
-    ///Rig22
+
+    /// Rig22
     private func yGridView(fullSize: CGSize) -> some View {
         let useColour = data.displayYgridLines ? Color.secondary : Color.clear
         return ZStack {
