@@ -1400,21 +1400,27 @@ extension Home {
         var mainChart: some View {
             Group {
                 ZStack {
-                    Rectangle().fill(Color.dynamicChartBackground)
-
-                    if state.animatedBackground {
-                        SpriteView(scene: spriteScene, options: [.allowsTransparency])
-                            .ignoresSafeArea()
-                            .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                    if state.button3D {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.dynamicIconBackground)
+                            .shadow(color: .dynamicBottomShadow, radius: 3, x: 2, y: 3)
                     }
-                    MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
+
+                    ZStack {
+                        if state.animatedBackground {
+                            SpriteView(scene: spriteScene, options: [.allowsTransparency])
+                                .ignoresSafeArea()
+                                .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
+                        }
+                        MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
+                    }
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 10))
+                .padding(.horizontal, 15)
+                .padding(.bottom, 5)
             }
-            .padding(.bottom, 5)
-            .padding(.leading, 15)
-            .padding(.trailing, 15)
-            .modal(for: .dataTable, from: self) }
+            .modal(for: .dataTable, from: self)
+        }
 
         var chart: some View {
             VStack(spacing: 0) {
@@ -2031,7 +2037,8 @@ extension Home {
                                     .offset(y: -1)
                             }
                         } else if override.percentage != 100 {
-                            Text(override.percentage.formatted() + " %").font(.statusFont).foregroundStyle(.secondary)
+                            Text((tirFormatter.string(from: override.percentage as NSNumber) ?? "") + " %").font(.statusFont)
+                                                            .foregroundStyle(.secondary)
                         } else if override.smbIsOff, !override.smbIsAlwaysOff {
                             Text("No ").font(.statusFont).foregroundStyle(.secondary)
                             Image(systemName: "syringe")
@@ -2049,57 +2056,83 @@ extension Home {
         }
 
         // ButtonPanel End
+
         var DayView: some View {
             Group {
-                ZStack {
-                    if !state.skipGlucoseChart {
+                // Glucose Chart Header
+                if !state.skipGlucoseChart {
+                    ZStack {
+                        if state.button3D {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.dynamicIconBackground)
+                                .shadow(color: .dynamicBottomShadow, radius: 3, x: 2, y: 3)
+                        }
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.dynamicIconBackground)
+
                         glucoseHeaderView()
                             .padding(.top, 8)
                             .padding(.bottom, 10)
-                    } else {
-                        EmptyView()
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
+                    .padding(.horizontal, 10)
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 10)) // <-- hier
 
+                // Preview
                 ZStack {
-                    Rectangle().fill(Color.dynamicChartBackground)
-                    preview.padding(.top, 15)
+                    if state.button3D {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.dynamicIconBackground)
+                            .shadow(color: .dynamicBottomShadow, radius: 3, x: 2, y: 3) }
+                    preview
+                        .padding(10)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 10)) // <-- hier
+                .padding(.horizontal, 10)
 
+                // Loop Preview
                 ZStack {
-                    Rectangle().fill(Color.dynamicChartBackground)
+                    if state.button3D {
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.dynamicIconBackground)
+                            .shadow(color: .dynamicBottomShadow, radius: 3, x: 2, y: 3) }
                     loopPreview
+                        .padding(10)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 10)) // <-- hier
+                .padding(.horizontal, 10)
 
                 if !state.iobData.isEmpty {
                     ZStack {
-                        Rectangle().fill(Color.dynamicChartBackground)
-                        activeCOBView.padding(.bottom, 20)
+                        if state.button3D {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.dynamicIconBackground)
+                                .shadow(color: .dynamicBottomShadow, radius: 3, x: 2, y: 3) }
+                        activeCOBView
+                            .padding(.bottom, 20)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 10)) // <-- hier
+                    .padding(.horizontal, 10)
 
                     ZStack {
-                        Rectangle().fill(Color.dynamicChartBackground)
-                        activeIOBView.padding(.bottom, 20)
+                        if state.button3D {
+                            RoundedRectangle(cornerRadius: 12)
+                                .fill(Color.dynamicIconBackground)
+                                .shadow(color: .dynamicBottomShadow, radius: 3, x: 2, y: 3) }
+                        activeIOBView
+                            .padding(.bottom, 20)
+                            .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
-                    .clipShape(RoundedRectangle(cornerRadius: 10)) // <-- hier
+                    .padding(.horizontal, 10)
                 }
             }
             .padding(.horizontal, 15)
         }
 
         @ViewBuilder private func glucoseHeaderView() -> some View {
-            Rectangle().fill(Color.dynamicChartBackground)
-                .frame(maxHeight: 200)
-
             VStack {
                 glucosePreview
             }
-            .clipShape(Rectangle())
-            .foregroundStyle(Color.dynamicSecondaryText)
         }
 
         var glucosePreview: some View {
@@ -2152,7 +2185,7 @@ extension Home {
 
         var preview: some View {
             Rectangle()
-                .fill(Color.dynamicChartBackground)
+                .fill(Color.dynamicIconBackground)
                 .frame(minHeight: 200)
                 .overlay {
                     PreviewChart(
@@ -2162,7 +2195,6 @@ extension Home {
                     )
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 15))
-                // .addShadows()
                 .padding(.horizontal, 10)
                 .onTapGesture {
                     state.showModal(for: .statistics)
@@ -2170,13 +2202,13 @@ extension Home {
         }
 
         var loopPreview: some View {
-            Rectangle().fill(Color.dynamicChartBackground)
+            Rectangle()
+                .fill(Color.dynamicIconBackground)
                 .frame(minHeight: 160)
                 .overlay {
                     LoopsView(loopStatistics: $state.loopStatistics)
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 15))
-                // .addShadows()
                 .padding(.horizontal, 10)
                 .onTapGesture {
                     state.showModal(for: .statistics)
@@ -2184,7 +2216,9 @@ extension Home {
         }
 
         var activeIOBView: some View {
-            Rectangle().fill(Color.dynamicChartBackground).frame(minHeight: 430)
+            Rectangle()
+                .fill(Color.dynamicIconBackground)
+                .frame(minHeight: 430)
                 .overlay {
                     ActiveIOBView(
                         data: $state.iobData,
@@ -2203,7 +2237,9 @@ extension Home {
         }
 
         var activeCOBView: some View {
-            Rectangle().fill(Color.dynamicChartBackground).frame(minHeight: 230)
+            Rectangle()
+                .fill(Color.dynamicIconBackground)
+                .frame(minHeight: 230)
                 .overlay {
                     ActiveCOBView(data: $state.iobData)
                 }
@@ -2222,8 +2258,8 @@ extension Home {
                         ScrollView {
                             ScrollViewReader { _ in
                                 LazyVStack {
-                                    chart.padding(.top, 10).padding(.bottom, 10)
-                                    DayView.padding(.bottom, 20).padding(.top, 30)
+                                    chart.padding(.top, 10).padding(.bottom, 30)
+                                    DayView.padding(.bottom, 30).padding(.top, 30)
                                 }
                                 .background(
                                     GeometryReader { proxy in

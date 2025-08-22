@@ -51,7 +51,9 @@ extension Settings {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 45, height: 45)
-                            .offset(x: 290, y: -65)
+                            .padding(.trailing, 20)
+                            .padding(.top, 15)
+                            .padding(.bottom, 15)
                     }
                 }
 

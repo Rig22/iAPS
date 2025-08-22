@@ -103,11 +103,11 @@ struct PumpView: View {
             .scaledToFit()
             .frame(width: 36, height: 36)
             .foregroundColor(.gray)
-            .overlay(
-                Text("Sim")
-                    .font(.system(size: 16, weight: .light))
-                    .foregroundColor(.dynamicSecondaryText)
-            )
+        /* .overlay(
+             Text("Sim")
+                 .font(.system(size: 16, weight: .light))
+                 .foregroundColor(.dynamicSecondaryText)
+         )*/
     }
 
     @ViewBuilder private func medtrumContent() -> some View {

@@ -61,6 +61,13 @@ extension OverrideProfilesConfig {
             return formatter
         }
 
+        private var promilleFormatter: NumberFormatter {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.maximumFractionDigits = 3
+            return formatter
+        }
+
         private var dateFormatter: DateComponentsFormatter {
             let formatter = DateComponentsFormatter()
             formatter.allowedUnits = [.hour, .minute]
@@ -418,8 +425,7 @@ extension OverrideProfilesConfig {
                                 DecimalTextField(
                                     "0",
                                     value: $state.autoISFsettings.postMealISFweight,
-                                    formatter: higherPrecisionFormatter,
-                                    liveEditing: true
+                                    formatter: promilleFormatter, liveEditing: true
                                 )
                             }
 
