@@ -273,15 +273,16 @@ extension Color {
 
     /// Alle Chart und App Hintergründe
 
-    /// Hintergrund für mainchart und alle dayViews
-    static let dynamicChartBackground = Color(
-        light: Color(red: 0.9, green: 0.9, blue: 0.9),
-        dark: Color(red: 0.2, green: 0.2, blue: 0.2)
-    )
     /// Der Haupt App Hintergrund
     static let dynamicBackground = Color(
         light: Color(red: 0.92, green: 0.92, blue: 0.92),
-        dark: Color(red: 0.15, green: 0.15, blue: 0.15)
+        // dark: Color(red: 0.15, green: 0.15, blue: 0.15)
+        dark: Color(red: 0.11, green: 0.11, blue: 0.12)
+    )
+
+    static let dynamicChartBackground = Color(
+        light: Color(red: 0.9, green: 0.9, blue: 0.9),
+        dark: Color(red: 0.2, green: 0.2, blue: 0.2)
     )
 
     static let dynamicCardBackground = Color(
@@ -305,15 +306,15 @@ extension Color {
         dark: Color(red: 0.90, green: 0.90, blue: 0.90)
     )
 
-    // Dynamische Farben
+    /// Dynamische Farben
     static let dynamicColorBlue = Color(
         light: Color(red: 0.45, green: 0.70, blue: 0.95),
         dark: Color(red: 0.29, green: 0.55, blue: 0.91)
     )
 
     static let dynamicColorRed = Color(
-        light: Color(red: 0.95, green: 0.50, blue: 0.50),
-        dark: Color(red: 0.86, green: 0.32, blue: 0.32)
+        light: Color(red: 1.0, green: 0.65, blue: 0.65),
+        dark: Color(red: 0.96, green: 0.47, blue: 0.47)
     )
 
     static let dynamicColorGreen = Color(
@@ -326,15 +327,20 @@ extension Color {
         dark: Color(red: 0.95, green: 0.77, blue: 0.25)
     )
 
+    static let dynamicColorBrown = Color(
+        light: Color(red: 0.80, green: 0.65, blue: 0.54),
+        dark: Color(red: 0.60, green: 0.50, blue: 0.42)
+    )
+
     static let dynamicColorOrange = Color(
         light: Color(red: 1.00, green: 0.70, blue: 0.40),
         dark: Color(red: 0.95, green: 0.55, blue: 0.20)
     )
 
-    // Icons und Akzente
+    /// Icons und Akzente
     static let dynamicIconBackground = Color(
         light: Color(red: 0.85, green: 0.85, blue: 0.85),
-        dark: Color(red: 0.25, green: 0.25, blue: 0.25)
+        dark: Color(red: 0.17, green: 0.17, blue: 0.18)
     )
 
     static let dynamicIconForeground = Color(

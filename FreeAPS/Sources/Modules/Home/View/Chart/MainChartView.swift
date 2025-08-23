@@ -719,8 +719,7 @@ struct MainChartView: View {
                     glucoseDecimal < data.lowGlucose ?
                     Color.dynamicColorRed.opacity(0.8)
                     : glucoseDecimal > data.highGlucose ?
-                    Color.dynamicColorYellow.opacity(0.8)
-
+                    Color.dynamicColorBrown.opacity(0.8)
                     : Color.dynamicColorGreen.opacity(0.8)
 
                 ZStack {

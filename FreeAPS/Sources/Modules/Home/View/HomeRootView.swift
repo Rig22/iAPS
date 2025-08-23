@@ -359,7 +359,9 @@ extension Home {
                         // Symbol-Hintergrund
                         if symbolBackgroundColor != .clear {
                             Circle()
-                                .fill(symbolBackgroundColor)
+                                // .fill(symbolBackgroundColor)
+                                .fill(Color.dynamicIconBackground)
+
                                 .frame(width: 50, height: 50)
                         }
 
@@ -455,6 +457,111 @@ extension Home {
             .offset(y: 1)
         }
 
+        struct SageView: View {
+            let recentGlucose: BloodGlucose?
+            let displayExpiration: Bool
+            let displaySAGE: Bool
+            let sensordays: Double
+            let button3D: Bool
+
+            @State private var animatedFill: CGFloat = 0.0
+
+            var body: some View {
+                HStack {
+                    if let date = recentGlucose?.sessionStartDate {
+                        let sensorAge: TimeInterval = (-1 * date.timeIntervalSinceNow)
+                        let expiration = sensordays - sensorAge
+                        let secondsOfDay = 8.64E4
+
+                        // Farbe abhängig vom Alter
+                        let lineColour: Color = {
+                            if sensorAge >= sensordays - secondsOfDay * 1 {
+                                return .red.opacity(0.9)
+                            } else if sensorAge >= sensordays - secondsOfDay * 2 {
+                                return .orange
+                            } else {
+                                return .dynamicIconForeground
+                            }
+                        }()
+
+                        // Füllgrad = aktuelles Alter / Gesamtdauer
+                        let targetFill = CGFloat(sensorAge / sensordays)
+
+                        ZStack {
+                            FillablePieSegment(
+                                pieSegmentViewModel: PieSegmentViewModel(),
+                                color: lineColour,
+                                backgroundColor: .clear,
+                                displayText: {
+                                    let minutesAndHours = (displayExpiration && expiration < 1 * secondsOfDay) ||
+                                        (displaySAGE && sensorAge < 1 * secondsOfDay)
+
+                                    return !minutesAndHours ?
+                                        (
+                                            remainingTimeFormatterDays
+                                                .string(from: displayExpiration ? expiration : sensorAge) ?? ""
+                                        )
+                                        .replacingOccurrences(of: ",", with: " ")
+                                        :
+                                        (
+                                            remainingTimeFormatter
+                                                .string(from: displayExpiration ? expiration : sensorAge) ?? ""
+                                        )
+                                        .replacingOccurrences(of: ",", with: " ")
+                                }(),
+                                symbolSize: 0,
+                                symbol: "sensor.tag.radiowaves.forward.fill",
+                                animateProgress: true,
+                                button3D: button3D,
+                                fillFraction: animatedFill,
+                                symbolBackgroundColor: .dynamicIconBackground
+                            )
+
+                            Image(systemName: "sensor.tag.radiowaves.forward.fill")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 27, height: 27)
+                                .foregroundColor(.dynamicIconForeground)
+                                .verticalFillMask(
+                                    fillFraction: animatedFill,
+                                    gradient: LinearGradient(
+                                        gradient: Gradient(colors: [.dynamicIconForeground, lineColour]),
+                                        startPoint: .bottom,
+                                        endPoint: .top
+                                    )
+                                )
+                                .offset(y: -1.5)
+                        }
+                        .onAppear {
+                            withAnimation(.easeOut(duration: 5.6)) {
+                                animatedFill = max(min(targetFill, 1.0), 0.0)
+                            }
+                        }
+                        .onChange(of: targetFill) { _, newValue in
+                            withAnimation(.easeInOut(duration: 10.6)) {
+                                animatedFill = max(min(newValue, 1.0), 0.0)
+                            }
+                        }
+                    }
+                }
+                .frame(width: 50, height: 50)
+            }
+
+            private var remainingTimeFormatter: DateComponentsFormatter {
+                let formatter = DateComponentsFormatter()
+                formatter.allowedUnits = [.day, .hour]
+                formatter.unitsStyle = .abbreviated
+                return formatter
+            }
+
+            private var remainingTimeFormatterDays: DateComponentsFormatter {
+                let formatter = DateComponentsFormatter()
+                formatter.allowedUnits = [.day]
+                formatter.unitsStyle = .short
+                return formatter
+            }
+        }
+
         var glucoseView: some View {
             let doubleBolusProgress = Binding<Double?> {
                 state.bolusProgress.map { Double(truncating: $0 as NSNumber) }
@@ -476,7 +583,8 @@ extension Home {
                             LinearGradient(
                                 gradient: Gradient(colors: [
                                     .dynamicTopGlow.opacity(0.9),
-                                    .dynamicTopGlow.opacity(0.4), .dynamicBottomShadow.opacity(0.3),
+                                    .dynamicTopGlow.opacity(0.4),
+                                    .dynamicBottomShadow.opacity(0.3),
                                     .dynamicBottomShadow
                                 ]),
                                 startPoint: .top,
@@ -491,6 +599,7 @@ extension Home {
                         .frame(width: 120, height: 120)
                 }
 
+                // Glucose-Anzeige
                 CurrentGlucoseView(
                     recentGlucose: $state.recentGlucose,
                     timerDate: $state.data.timerDate,
@@ -502,25 +611,28 @@ extension Home {
                     bolusProgress: doubleBolusProgress,
                     displayDelta: $state.displayDelta,
                     alwaysUseColors: $state.alwaysUseColors,
-                    scrolling: $displayGlucose, displaySAGE: $state.displaySAGE, displayExpiration: $state.displayExpiration,
-                    cgm: $state.cgm, sensordays: $state.sensorDays
+                    scrolling: $displayGlucose,
+                    displaySAGE: $state.displaySAGE,
+                    displayExpiration: $state.displayExpiration,
+                    cgm: $state.cgm,
+                    sensordays: $state.sensorDays
                 )
                 .zIndex(2)
-                .onTapGesture {
-                    if state.alarm == nil {
-                        state.openCGM()
-                    } else {
-                        state.showModal(for: .snooze)
-                    }
+            }
+            .onTapGesture {
+                if state.alarm == nil {
+                    state.openCGM()
+                } else {
+                    state.showModal(for: .snooze)
                 }
-                .onLongPressGesture {
-                    let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                    impactHeavy.impactOccurred()
-                    if state.alarm == nil {
-                        state.showModal(for: .snooze)
-                    } else {
-                        state.openCGM()
-                    }
+            }
+            .onLongPressGesture {
+                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                impactHeavy.impactOccurred()
+                if state.alarm == nil {
+                    state.showModal(for: .snooze)
+                } else {
+                    state.openCGM()
                 }
             }
         }
@@ -606,7 +718,7 @@ extension Home {
                     )
                     .font(.system(size: 14))
                     .foregroundStyle(Color.dynamicSecondaryText)
-                    .offset(y: -86)
+                    .offset(y: -80)
                 }
                 .frame(width: 120, height: 120)
                 .compositingGroup() // Verhindert Überlagerungsprobleme
@@ -768,7 +880,7 @@ extension Home {
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             // Basis-Höhe zentral definieren
-            let baseHeight: CGFloat = display ? 170 : 243
+            let baseHeight: CGFloat = display ? 170 : 233
             let safeTop = geo.safeAreaInsets.top
 
             // Gesamthöhe berechnen (inkl. Font-Größe)
@@ -809,10 +921,23 @@ extension Home {
                     }
                 }
                 .padding(.top, safeTop)
-                .animation(.easeInOut(duration: 1.2), value: display)
+
+                // SageView
+                if !display && (state.displayExpiration || state.displaySAGE) {
+                    SageView(
+                        recentGlucose: state.recentGlucose,
+                        displayExpiration: state.displayExpiration,
+                        displaySAGE: state.displaySAGE,
+                        sensordays: state.sensorDays,
+                        button3D: state.button3D
+                    )
+                    .position(x: geo.size.width - 63, y: safeTop + 85)
+                    .transition(.opacity)
+                }
             }
             .frame(height: totalHeight)
             .background(Color.dynamicBackground)
+            .animation(.easeInOut(duration: 1.2), value: display)
         }
 
         // Head Ende
@@ -1406,6 +1531,9 @@ extension Home {
                             .shadow(color: .dynamicBottomShadow, radius: 3, x: 2, y: 3)
                     }
 
+                    RoundedRectangle(cornerRadius: 12)
+                        .fill(Color.dynamicIconBackground)
+
                     ZStack {
                         if state.animatedBackground {
                             SpriteView(scene: spriteScene, options: [.allowsTransparency])
@@ -1427,7 +1555,7 @@ extension Home {
                 if state.danaBar {
                     danaBarMax
                         .padding(.vertical, 10)
-                        .padding(.top, 20)
+                        .padding(.top, 10)
                 }
                 mainChart
                     .padding(.top, 35)
@@ -2038,7 +2166,7 @@ extension Home {
                             }
                         } else if override.percentage != 100 {
                             Text((tirFormatter.string(from: override.percentage as NSNumber) ?? "") + " %").font(.statusFont)
-                                                            .foregroundStyle(.secondary)
+                                .foregroundStyle(.secondary)
                         } else if override.smbIsOff, !override.smbIsAlwaysOff {
                             Text("No ").font(.statusFont).foregroundStyle(.secondary)
                             Image(systemName: "syringe")
@@ -2254,7 +2382,7 @@ extension Home {
                     importResetSettingsView(settings: openAPSSettings)
                 } else {
                     VStack(spacing: 0) {
-                        headerView(geo)
+                        headerView(geo).padding(.top, 10)
                         ScrollView {
                             ScrollViewReader { _ in
                                 LazyVStack {

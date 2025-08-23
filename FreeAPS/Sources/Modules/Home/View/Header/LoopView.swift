@@ -39,13 +39,6 @@ class PieSegmentViewModel: ObservableObject {
     @Published var progress: Double = 0.0
 
     func updateProgress(to newValue: CGFloat, animate _: Bool) {
-        /* if animate {
-             withAnimation(.easeInOut(duration: 2.5)) { // Dauer der Animation
-                 self.progress = Double(newValue)
-             }
-         } else {
-             progress = Double(newValue)
-         }*/
         progress = Double(newValue)
     }
 }
@@ -165,7 +158,7 @@ struct LoopView: View {
                         color: pieColor,
                         backgroundColor: .clear,
                         displayText: "\(minutesAgo)min",
-                        symbolSize: 20,
+                        symbolSize: 25,
                         symbol: "arrow.trianglehead.2.clockwise.rotate.90",
                         animateProgress: true,
                         symbolBackgroundColor: backgroundColor,
@@ -200,7 +193,7 @@ struct LoopView: View {
             Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 20, height: 20)
+                .frame(width: 25, height: 25)
                 .foregroundColor(color)
                 .rotationEffect(.degrees(rotation))
                 .onAppear {

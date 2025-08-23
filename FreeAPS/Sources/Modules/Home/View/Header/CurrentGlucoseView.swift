@@ -93,10 +93,6 @@ struct CurrentGlucoseView: View {
 
     var body: some View {
         ZStack {
-            /*  if displayExpiration || displaySAGE {
-                 sageView
-                     .position(x: 78, y: 73)
-             }*/
             // TriangleShape(color: triangleColor)
             TriangleShape(color: currentTriangleColor)
                 .rotationEffect(.degrees(rotationDegrees + bumpEffect))
@@ -133,14 +129,6 @@ struct CurrentGlucoseView: View {
                     )
                     .font(.caption2)
                     .foregroundStyle(Color.dynamicSecondaryText)
-                }
-                .overlay(alignment: .trailing) {
-                    if displayExpiration || displaySAGE {
-                        sageView
-                            .padding(.trailing, -150)
-                            .padding(.top, -28)
-                        // .position(x: 78, y: 73)
-                    }
                 }
             }
         }
@@ -218,50 +206,6 @@ struct CurrentGlucoseView: View {
         default:
             return (2, 0)
         }
-    }
-
-    private var sageView: some View {
-        ZStack {
-            if let date = recentGlucose?.sessionStartDate {
-                let sensorAge: TimeInterval = (-1 * date.timeIntervalSinceNow)
-                let expiration = sensordays - sensorAge
-                let secondsOfDay = 8.64E4
-
-                // Determine line color based on sensor age
-                let lineColour: Color = {
-                    if sensorAge >= sensordays - secondsOfDay * 1 {
-                        return .red.opacity(0.9)
-                    } else if sensorAge >= sensordays - secondsOfDay * 2 {
-                        return .orange
-                    } else {
-                        return .dynamicIconForeground
-                    }
-                }()
-
-                let minutesAndHours = (displayExpiration && expiration < 1 * 8.64E4) ||
-                    (displaySAGE && sensorAge < 1 * 8.64E4)
-
-                Sage(amount: sensorAge, expiration: expiration, lineColour: lineColour, sensordays: sensordays)
-                    // .frame(width: 32, height: 32)
-                    .frame(width: 49, height: 49)
-                    .overlay {
-                        HStack {
-                            Text(
-                                !minutesAndHours ?
-                                    (remainingTimeFormatterDays.string(from: displayExpiration ? expiration : sensorAge) ?? "")
-                                    .replacingOccurrences(of: ",", with: " ") :
-                                    (remainingTimeFormatter.string(from: displayExpiration ? expiration : sensorAge) ?? "")
-                                    .replacingOccurrences(of: ",", with: " ")
-                            )
-                            // .foregroundStyle(lineColour.isLightColor ? Color.gray : Color.secondary)
-                            .font(.system(size: 13))
-                            .foregroundStyle(Color.dynamicSecondaryText)
-                        }
-                    }
-            }
-        }
-        .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing)
     }
 
     var colourGlucoseText: Color {
