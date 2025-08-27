@@ -23,7 +23,7 @@
 	<key>com.loopkit.Loop.PumpManagerDisplayName</key>
 	<string>Medtrum Nano Touch 200U/300U</string>
 	<key>com.loopkit.Loop.PumpManagerIdentifier</key>
-	<string>MedtrumKit</string>
+	<string>Medtrum</string>
 	<key>NSPrincipalClass</key>
 	<string>MedtrumKitPlugin.MedtrumKitPlugin</string>
 </dict>

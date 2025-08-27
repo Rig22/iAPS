@@ -525,7 +525,7 @@ extension Home {
                                 .verticalFillMask(
                                     fillFraction: animatedFill,
                                     gradient: LinearGradient(
-                                        gradient: Gradient(colors: [.dynamicIconForeground, lineColour]),
+                                        gradient: Gradient(colors: [.dynamicIconBackground, lineColour]),
                                         startPoint: .bottom,
                                         endPoint: .top
                                     )

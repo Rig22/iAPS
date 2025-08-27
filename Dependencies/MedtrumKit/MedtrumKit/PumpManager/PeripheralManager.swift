@@ -53,7 +53,7 @@ class PeripheralManager: NSObject {
 
             let packages = packet.encode(sequenceNumber: self.writeSequence)
             self.writeSequence = UInt8(self.writeSequence + 1)
-            if self.writeSequence >= 254 {
+            if self.writeSequence >= 250 {
                 self.writeSequence = 0
             }
 

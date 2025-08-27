@@ -5,10 +5,10 @@ import LoopKit
 public class MedtrumPumpManager: DeviceManager {
     public static let pluginIdentifier = "Medtrum"
     public var localizedTitle: String {
-        LocalizedString("Medtrum", comment: "Generic title of the Medtrum pump manager") + " " + state.pumpName
+        LocalizedString("Medtrum TouchCare Nano", comment: "Generic title of the Medtrum pump manager")
     }
 
-    public let managerIdentifier: String = "MedtrumKit"
+    public let managerIdentifier: String = "Medtrum"
 
     private let log = MedtrumLogger(category: "MedtrumPumpManager")
 
@@ -213,20 +213,21 @@ public extension MedtrumPumpManager {
         }
 
         syncPumpData(completion: completion)
+        log.info("Sync pump data")
     }
 
     func syncPumpData(completion: ((Date?) -> Void)?) {
         #if targetEnvironment(simulator)
             pumpDelegate.notify { delegate in
+                self.state.reservoir = Double(Int.random(in: 10..<200))
                 delegate?.pumpManager(self, didReadReservoirValue: self.state.reservoir, at: Date.now) { _ in }
 
                 self.state.lastSync = Date.now
                 self.notifyStateDidChange()
+                completion?(nil)
             }
             return
         #endif
-
-        log.info("Sync pump data")
 
         bluetooth.ensureConnected { error in
             if let error = error {
@@ -640,27 +641,10 @@ public extension MedtrumPumpManager {
     }
 
     func syncDeliveryLimits(
-        limits _: LoopKit.DeliveryLimits,
+        limits: LoopKit.DeliveryLimits,
         completion: @escaping (Result<LoopKit.DeliveryLimits, any Error>) -> Void
-    ) {
-        log
-            .warning(
-                "Skipping sync delivery limits (not supported by Medtrum). Limits are always -> maxBolus: 30u, maxBasal: 25u/hr"
-            )
-        completion(
-            .success(
-                DeliveryLimits(
-                    maximumBasalRate: HKQuantity(
-                        unit: HKUnit.internationalUnit().unitDivided(by: .hour()),
-                        doubleValue: 25
-                    ),
-                    maximumBolus: HKQuantity(
-                        unit: .internationalUnit(),
-                        doubleValue: 30
-                    )
-                )
-            )
-        )
+    ) {log.warning("Skipping sync delivery limits (not supported by Medtrum)")
+        completion(.success(limits))
     }
 
     func primePatch(_ completion: @escaping (MedtrumPrimePatchResult) -> Void) {
@@ -870,6 +854,8 @@ public extension MedtrumPumpManager {
             let dose = doseEntry.toDoseEntry()
             self.doseEntry = nil
             doseReporter = nil
+            
+            notifyStateDidChange()
 
             pumpDelegate.notify { delegate in
                 delegate?.pumpManager(

@@ -9,9 +9,9 @@ public enum MedtrumActivatePatchError: LocalizedError {
     
     public var errorDescription: String? {
         switch self {
-            case .connectionFailure(reason: let reason):
+            case let .connectionFailure(reason: reason):
             return "Connection failure: \(reason)"
-        case .unknownError(reason: let reason):
+        case let .unknownError(reason: reason):
             return "Unknown error: \(reason)"
         }
     }

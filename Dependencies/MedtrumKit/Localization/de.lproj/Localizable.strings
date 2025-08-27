@@ -236,16 +236,16 @@
 "Fill the patch with insulin. NOTE: A minimum of 70U is required for activation." = "Füllen Sie den Patch mit Insulin. HINWEIS: Mindestens 70U ist für die Aktivierung erforderlich.";
 
 /* Label for pressing needle button step 2.5 */
-"Press the needle button and start the priming process." = "Drücken Sie die Nadel Taste und starten Sie den Prämierungsprozess.";
+"Press the needle button and start the priming process." = "Drücken Sie die Nadel Taste und starten Sie den Füllprozess.";
 
 /* Label for warning priming */
 "Do not attach the patch to the body yet" = "Den Patch noch nicht an den Körper anhängen";
 
 /* label for prime start action */
-"Start priming" = "Beginne zu primen";
+"Start priming" = "Beginne zu füllen";
 
 /* Priming header */
-"Patch priming" = "Patch-Priming";
+"Patch priming" = "Patch Füllen";
 
 /* Label for inserting needle step 1 */
 "Remove the safety cover from the patch." = "Entfernen Sie die Sicherheitsabdeckung aus dem Patch.";
@@ -276,3 +276,18 @@
 
 /* Body expire reminder notification */
 "Your patch has %i hours left" = "Ihr Patch hat noch %i Stunden";
+
+/* Force remove */
+"Force remove" = "Entfernen erzwingen";
+
+/* title force remove */
+"Are you sure?" = "Sind Sie sicher?";
+
+/* body force remove */
+"It is recommended to deactivate first" = "Es wird empfohlen, den Patch zuerst zu deaktivieren";
+
+/* confirm force remove */
+"Confirm" = "Bestätigen Sie";
+
+/* cancel force remove */
+"Cancel" = "Abbrechen";

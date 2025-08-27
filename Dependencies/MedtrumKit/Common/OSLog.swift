@@ -64,7 +64,7 @@ class MedtrumLogger {
     }
 
     private var logFile: String {
-        getDocumentsDirectory().appendingPathComponent("medtrumkit/log.txt").path
+        getDocumentsDirectory().appendingPathComponent("medtrumkit/medtrumkit_log.txt").path
     }
 
     private var logDir: String {
@@ -72,7 +72,7 @@ class MedtrumLogger {
     }
 
     private var logFilePrev: String {
-        getDocumentsDirectory().appendingPathComponent("medtrumkit/log_prev.txt").path
+        getDocumentsDirectory().appendingPathComponent("medtrumkit/medtrumkit_log_prev.txt").path
     }
 
     private func getDocumentsDirectory() -> URL {
