@@ -121,12 +121,7 @@
 	</array>
 	<key>NSContactsUsageDescription</key>
 	<string>To enable the Contact Image feature: to get live updates from iAPS to your Apple Watch Contact complication</string>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>iAPS needs camera access to scan barcodes on food packages for accurate carbohydrate counting and nutritional information.</string>
 </dict>
 </plist>

@@ -4,12 +4,14 @@ enum PumpType {
     case omnipod
     case medtrum
     case mdtDana
+    case simulator
 
     var maxCapacity: Double {
         switch self {
         case .medtrum,
              .omnipod: return 200
-        case .mdtDana: return 300
+        case .mdtDana,
+             .simulator: return 300
         }
     }
 }
@@ -61,6 +63,8 @@ struct PumpView: View {
             return .omnipod
         } else if state.pumpName.contains("Medtrum") {
             return .medtrum
+        } else if state.pumpName.contains("Simulator") {
+            return .simulator
         } else {
             return .mdtDana
         }
@@ -76,20 +80,26 @@ struct PumpView: View {
 
     var body: some View {
         HStack(spacing: 5) {
-            // Common layout for Omnipod and Medtrum (pod-style)
             if usePodLayout {
-                // Container für Medtrum mit Offset
                 if pumpType == .medtrum {
                     medtrumContent()
-                    // .offset(x: 15) // Medtrum-spezifischer Offset
                 } else {
                     omnipodContent()
                 }
             }
             // MDT/Dana/Simulator layout
             else {
-                mdtDanaContent()
-                simulatorContent()
+                switch pumpType {
+                case .mdtDana:
+                    mdtDanaContent()
+                case .simulator:
+                    HStack(spacing: 5) {
+                        mdtDanaContent()
+                        simulatorContent()
+                    }
+                default:
+                    EmptyView()
+                }
             }
         }
         .offset(x: 0, y: 15) // Overall vertical adjustment
@@ -103,11 +113,6 @@ struct PumpView: View {
             .scaledToFit()
             .frame(width: 36, height: 36)
             .foregroundColor(.gray)
-        /* .overlay(
-             Text("Sim")
-                 .font(.system(size: 17))
-                 .foregroundColor(.dynamicSecondaryText)
-         )*/
     }
 
     @ViewBuilder private func medtrumContent() -> some View {

@@ -1935,7 +1935,7 @@ extension Home {
                                             withAnimation {
                                                 showProfileBubble = true
                                             }
-                                            DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                                 withAnimation {
                                                     showProfileBubble = false
                                                 }
@@ -1972,7 +1972,7 @@ extension Home {
                                         withAnimation {
                                             showTargetBubble = true
                                         }
-                                        DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                                             withAnimation {
                                                 showTargetBubble = false
                                             }
@@ -2429,6 +2429,7 @@ extension Home {
                         DynamicHistoryView(units: state.data.units)
                             .environment(\.colorScheme, colorScheme)
                     }
+
                     .popup(isPresented: state.isStatusPopupPresented, alignment: .center, direction: .bottom) {
                         popup
                             .padding(10)
