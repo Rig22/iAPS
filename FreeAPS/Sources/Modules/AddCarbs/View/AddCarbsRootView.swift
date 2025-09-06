@@ -62,18 +62,21 @@ extension AddCarbs {
 
         var body: some View {
             Form {
-                // AI Food Search Section
                 foodSearchSection
 
                 Section {
                     VStack(alignment: .leading, spacing: 8) {
-                        Text("ℹ️ Attention")
-                            .font(.headline)
+                        HStack {
+                            Image(systemName: "exclamationmark.circle")
+                            Text("Notice")
+                        }
+                        .font(.headline)
+                        .foregroundColor(.blue)
                         Text(
-                            "The food data is automatically loaded via OpenFoodFacts and the values always refer to 100g/100ml of the food item. This does not apply to values provided by AI Food Analysis."
+                            "The food data loaded via OpenFoodFacts always refer to 100g/100ml. This does not apply to values provided by AI Food Analysis."
                         )
                         .font(.subheadline)
-                        .foregroundColor(.secondary)
+                        .foregroundColor(.blue)
                     }
                     .padding(.vertical, 4)
                 }
@@ -750,7 +753,7 @@ struct FoodSearchView: View {
             VStack {
                 // Suchfeld + Buttons
                 HStack(spacing: 8) {
-                    TextField("Nahrung suchen...", text: $state.foodSearchText)
+                    TextField("Food Search...", text: $state.foodSearchText)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         .autocapitalization(.none)
                         .disableAutocorrection(true)

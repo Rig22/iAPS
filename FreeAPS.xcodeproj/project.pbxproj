@@ -1961,7 +1961,6 @@
 		388E5A5925B6F0250019842D /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				79BF523F2E62BD2D00F3F647 /* UserDefaults+Loop.swift */,
 				795CBE132D3F942B0044854B /* AutoISFsettings.swift */,
 				CE82E02628E869DF00473A9C /* AlertEntry.swift */,
 				385CEAC025F2EA52002D6D5B /* Announcement.swift */,
@@ -2010,6 +2009,7 @@
 				798BC9162D6F9AAF00ADABFD /* TemporaryData.swift */,
 				3871F39B25ED892B0013ECB5 /* TempTarget.swift */,
 				3811DE8E25C9D80400A708ED /* User.swift */,
+				79BF523F2E62BD2D00F3F647 /* UserDefaults+Loop.swift */,
 				191A9D152BED00A500028D48 /* Version.swift */,
 			);
 			path = Models;

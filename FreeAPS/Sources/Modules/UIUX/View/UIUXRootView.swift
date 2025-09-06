@@ -115,7 +115,8 @@ extension UIUX {
                                                 Text(NSLocalizedString(item.rawValue, comment: "ColorScheme Selection"))
                                             }
                                         }
-                                    } header: { Text("Light / Dark Mode") }
+                                    }
+
                                     Toggle("3D Look", isOn: $state.button3D)
 
                                     Toggle("Show Pump Icon", isOn: $state.showPumpIcon)
