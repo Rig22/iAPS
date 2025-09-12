@@ -3,8 +3,6 @@ import SwiftUI
 
 struct PatchDeactivationView: View {
     @ObservedObject var viewModel: DeactivatePatchViewModel
-    
-    @State var showingConfirmationPrompt = false
 
     var body: some View {
         VStack {
@@ -21,13 +19,6 @@ struct PatchDeactivationView: View {
 
             Text(viewModel.deactivationError)
                 .foregroundStyle(.red)
-            
-            Button(action: { showingConfirmationPrompt = true }) {
-                           Text(LocalizedString("Force remove", comment: "Force remove"))
-                       }
-                       .buttonStyle(ActionButtonStyle(.secondary))
-                       .disabled(viewModel.isDeactivating)
-                       .padding([.bottom, .horizontal])
 
             Button(action: { viewModel.deactivate() }) {
                 if viewModel.isDeactivating {
@@ -40,11 +31,6 @@ struct PatchDeactivationView: View {
             .disabled(viewModel.isDeactivating)
             .padding([.bottom, .horizontal])
         }
-        .alert(LocalizedString("Are you sure?", comment: "title force remove"), isPresented: $showingConfirmationPrompt) {
-                   Button(LocalizedString("Confirm", comment: "confirm force remove"), role: .destructive) { viewModel.forceDeactivate() }
-               } message: {
-                   Text(LocalizedString("It is recommended to deactivate first", comment: "body force remove"))
-               }
         .listStyle(InsetGroupedListStyle())
         .edgesIgnoringSafeArea(.bottom)
         .navigationTitle(LocalizedString("Deactivate patch", comment: "deactive patch"))

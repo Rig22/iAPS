@@ -5,10 +5,10 @@ import LoopKit
 public class MedtrumPumpManager: DeviceManager {
     public static let pluginIdentifier = "Medtrum"
     public var localizedTitle: String {
-        LocalizedString("Medtrum TouchCare Nano", comment: "Generic title of the Medtrum pump manager")
+        LocalizedString("Medtrum", comment: "Generic title of the Medtrum pump manager") + " " + state.pumpName
     }
 
-    public let managerIdentifier: String = "Medtrum"
+    public let managerIdentifier: String = "MedtrumKit"
 
     private let log = MedtrumLogger(category: "MedtrumPumpManager")
 
@@ -213,21 +213,20 @@ public extension MedtrumPumpManager {
         }
 
         syncPumpData(completion: completion)
-        log.info("Sync pump data")
     }
 
     func syncPumpData(completion: ((Date?) -> Void)?) {
         #if targetEnvironment(simulator)
             pumpDelegate.notify { delegate in
-                self.state.reservoir = Double(Int.random(in: 10..<200))
                 delegate?.pumpManager(self, didReadReservoirValue: self.state.reservoir, at: Date.now) { _ in }
 
                 self.state.lastSync = Date.now
                 self.notifyStateDidChange()
-                completion?(nil)
             }
             return
         #endif
+
+        log.info("Sync pump data")
 
         bluetooth.ensureConnected { error in
             if let error = error {
@@ -641,10 +640,27 @@ public extension MedtrumPumpManager {
     }
 
     func syncDeliveryLimits(
-        limits: LoopKit.DeliveryLimits,
+        limits _: LoopKit.DeliveryLimits,
         completion: @escaping (Result<LoopKit.DeliveryLimits, any Error>) -> Void
-    ) {log.warning("Skipping sync delivery limits (not supported by Medtrum)")
-        completion(.success(limits))
+    ) {
+        log
+            .warning(
+                "Skipping sync delivery limits (not supported by Medtrum). Limits are always -> maxBolus: 30u, maxBasal: 25u/hr"
+            )
+        completion(
+            .success(
+                DeliveryLimits(
+                    maximumBasalRate: HKQuantity(
+                        unit: HKUnit.internationalUnit().unitDivided(by: .hour()),
+                        doubleValue: 25
+                    ),
+                    maximumBolus: HKQuantity(
+                        unit: .internationalUnit(),
+                        doubleValue: 30
+                    )
+                )
+            )
+        )
     }
 
     func primePatch(_ completion: @escaping (MedtrumPrimePatchResult) -> Void) {
@@ -664,7 +680,7 @@ public extension MedtrumPumpManager {
         bluetooth.ensureConnected(autoDisconnect: false) { error in
             if let error = error {
                 self.log.error("Failed to connect to pump: \(error)")
-                completion(.failure(error: .connectionFailure(reason: error.errorDescription ?? "EMPTY")))
+                completion(.failure(error: .connectionFailure))
                 return
             }
 
@@ -678,7 +694,7 @@ public extension MedtrumPumpManager {
             let primeResult = await self.bluetooth.write(packet)
             if case let .failure(error) = primeResult {
                 self.log.error("Failed to start priming pump: \(error)")
-                completion(.failure(error: .unknownError(reason: error.errorDescription ?? "EMPTY")))
+                completion(.failure(error: .unknownError(reason: error.localizedDescription)))
                 return
             }
 
@@ -693,7 +709,7 @@ public extension MedtrumPumpManager {
         bluetooth.ensureConnected { error in
             if let error = error {
                 self.log.error("Failed to connect to pump: \(error)")
-                completion(.failure(error: .connectionFailure(reason: error.errorDescription ?? "EMPTY")))
+                completion(.failure(error: .connectionFailure))
                 return
             }
 
@@ -715,7 +731,7 @@ public extension MedtrumPumpManager {
             switch result {
             case let .failure(error):
                 self.log.error("Failed to activate pump: \(error)")
-                completion(.failure(error: .unknownError(reason: error.errorDescription ?? "EMPTY")))
+                completion(.failure(error: .unknownError(reason: error.localizedDescription)))
                 return
 
             case let .success(data):
@@ -854,8 +870,6 @@ public extension MedtrumPumpManager {
             let dose = doseEntry.toDoseEntry()
             self.doseEntry = nil
             doseReporter = nil
-            
-            notifyStateDidChange()
 
             pumpDelegate.notify { delegate in
                 delegate?.pumpManager(

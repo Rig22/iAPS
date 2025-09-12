@@ -138,9 +138,7 @@ class MedtrumKitUICoordinator: UINavigationController, PumpManagerOnboarding, Co
                     return
                 }
                 pumpManager.notifyDelegateOfDeactivation {
-                    DispatchQueue.main.async {
-                                           completionDelegate.completionNotifyingDidComplete(self)
-                                       }
+                    completionDelegate.completionNotifyingDidComplete(self)
                 }
             }
 

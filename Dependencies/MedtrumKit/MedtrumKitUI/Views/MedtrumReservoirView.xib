@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="23504" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -18,7 +18,7 @@
                     <rect key="frame" x="0.0" y="5" width="42" height="34"/>
                     <subviews>
                         <view contentMode="scaleAspectFit" horizontalHuggingPriority="1000" verticalHuggingPriority="1000" translatesAutoresizingMaskIntoConstraints="NO" id="UOD-1q-wHA" customClass="LevelMaskView" customModule="LoopKitUI">
-                            <rect key="frame" x="10" y="2" width="22" height="29"/>
+                            <rect key="frame" x="10" y="5" width="22" height="29"/>
                             <constraints>
                                 <constraint firstAttribute="height" constant="29" id="gdu-Kp-mV8"/>
                             </constraints>
@@ -38,7 +38,7 @@
                         <constraint firstItem="UOD-1q-wHA" firstAttribute="centerX" secondItem="zcH-tM-6Pm" secondAttribute="centerX" id="2qh-7U-U7N"/>
                         <constraint firstItem="UOD-1q-wHA" firstAttribute="width" secondItem="zcH-tM-6Pm" secondAttribute="width" id="PWW-DH-nVr"/>
                         <constraint firstItem="zcH-tM-6Pm" firstAttribute="centerX" secondItem="sSE-Jz-j8k" secondAttribute="centerX" id="WDC-Uo-EVH"/>
-                        <constraint firstItem="UOD-1q-wHA" firstAttribute="top" secondItem="zcH-tM-6Pm" secondAttribute="top" constant="2" id="hKN-SU-NsT"/>
+                        <constraint firstItem="UOD-1q-wHA" firstAttribute="top" secondItem="zcH-tM-6Pm" secondAttribute="top" constant="5" id="hKN-SU-NsT"/>
                         <constraint firstItem="zcH-tM-6Pm" firstAttribute="centerY" secondItem="sSE-Jz-j8k" secondAttribute="centerY" id="orx-zV-Uqu"/>
                         <constraint firstAttribute="height" constant="34" id="r0H-AZ-Q6h"/>
                     </constraints>

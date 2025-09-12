@@ -32,6 +32,10 @@ extension AddCarbs {
         @State private var isLoading = false
         @State private var errorMessage: String?
         @State private var showingBarcodeScanner = false
+        @State private var showFloatingInfo = false
+        @State private var selectedFoodItem: AIFoodItem? = nil
+        @State private var portionMultiplier: Double = 1.0
+        @State private var showMultiplierEditor: Bool = false
 
         init(resolver: Resolver, editMode: Bool, override: Bool) {
             self.resolver = resolver
@@ -64,21 +68,154 @@ extension AddCarbs {
             Form {
                 foodSearchSection
 
-                Section {
-                    VStack(alignment: .leading, spacing: 8) {
+                if let selectedFood = selectedFoodItem {
+                    VStack(alignment: .leading, spacing: 12) {
+                        // Header mit AI-Badge
                         HStack {
-                            Image(systemName: "exclamationmark.circle")
-                            Text("Notice")
+                            Text("Choosen Food")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(.primary)
+
+                            Spacer()
+
+                            // AI oder 100g Badge
+                            HStack(spacing: 4) {
+                                Image(systemName: isAIAnalysisProduct(selectedFood) ? "brain" : "scalemass")
+                                    .font(.caption)
+                                Text(isAIAnalysisProduct(selectedFood) ? "AI Analysis" : "100g/ml")
+                                    .font(.caption)
+                            }
+                            .fontWeight(.semibold)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 4)
+                            .background(isAIAnalysisProduct(selectedFood) ? Color.purple.opacity(0.2) : Color.blue.opacity(0.2))
+                            .foregroundColor(isAIAnalysisProduct(selectedFood) ? .purple : .blue)
+                            .cornerRadius(6)
                         }
-                        .font(.headline)
-                        .foregroundColor(.blue)
-                        Text(
-                            "The food data loaded via OpenFoodFacts always refer to 100g/100ml. This does not apply to values provided by AI Food Analysis."
-                        )
-                        .font(.subheadline)
-                        .foregroundColor(.blue)
+
+                        // Produktname
+                        Text(selectedFood.name)
+                            .font(.headline)
+                            .fontWeight(.medium)
+                            .foregroundColor(.primary)
+                            .lineLimit(2)
+
+                        // Multiplikator-Anzeige und Editor
+                        HStack {
+                            Text("Amount:")
+                                .font(.subheadline)
+                                .foregroundColor(.secondary)
+
+                            Button(action: {
+                                showMultiplierEditor = true
+                            }) {
+                                HStack(spacing: 4) {
+                                    Text("×\(portionMultiplier, specifier: "%.2f")")
+                                        .font(.subheadline)
+                                        .fontWeight(.semibold)
+                                    Image(systemName: "pencil")
+                                        .font(.caption)
+                                }
+                                .foregroundColor(.blue)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(Color.blue.opacity(0.1))
+                                .cornerRadius(6)
+                            }
+                            .buttonStyle(PlainButtonStyle())
+
+                            Spacer()
+
+                            // Berechnete Gesamtwerte anzeigen
+                            if portionMultiplier != 1.0 {
+                                Text("Complete: \(selectedFood.carbs * portionMultiplier, specifier: "%.1f")g")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+
+                        // Nährwert-Badges (bereits mit Multiplikator)
+                        HStack(spacing: 8) {
+                            NutritionBadge(
+                                value: selectedFood.carbs * portionMultiplier,
+                                unit: "g",
+                                label: "Carbs",
+                                color: .orange
+                            )
+                            NutritionBadge(
+                                value: selectedFood.fat * portionMultiplier,
+                                unit: "g",
+                                label: "Fat",
+                                color: .blue
+                            )
+                            NutritionBadge(
+                                value: selectedFood.protein * portionMultiplier,
+                                unit: "g",
+                                label: "Protein",
+                                color: .green
+                            )
+                            if selectedFood.calories > 0 {
+                                NutritionBadge(value: selectedFood.calories, unit: "kcal", label: "energy", color: .red)
+                            }
+                        }
+
+                        // Button-Row
+                        HStack(spacing: 12) {
+                            // Ändern-Button
+                            Button {
+                                selectedFoodItem = nil
+                                showingFoodSearch = true
+                            } label: {
+                                HStack {
+                                    Image(systemName: "arrow.clockwise")
+                                    Text("Change Food")
+                                }
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                            }
+                            .buttonStyle(.bordered)
+                            .tint(.gray)
+
+                            // Add-Button
+                            Button {
+                                // Werte in State übernehmen
+                                state.carbs = Decimal(selectedFood.carbs * portionMultiplier)
+                                state.fat = Decimal(selectedFood.fat * portionMultiplier)
+                                state.protein = Decimal(selectedFood.protein * portionMultiplier)
+
+                                // Optional: Erfolgsfeedback
+                                let generator = UINotificationFeedbackGenerator()
+                                generator.notificationOccurred(.success)
+
+                            } label: {
+                                HStack {
+                                    Image(systemName: "checkmark.circle.fill")
+                                    Text("Take over")
+                                }
+                                .font(.subheadline)
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 8)
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .tint(.green)
+                        }
                     }
-                    .padding(.vertical, 4)
+                    .padding()
+                    /* .background(
+                         RoundedRectangle(cornerRadius: 12)
+                             .fill(Color(.systemBackground))
+                             .shadow(color: .black.opacity(0.1), radius: 3, x: 0, y: 2)
+                     )
+                     .overlay(
+                         RoundedRectangle(cornerRadius: 12)
+                             .stroke(Color.gray.opacity(0.2), lineWidth: 1)
+                     )*/
+                    .padding(.vertical, 8)
+                    .sheet(isPresented: $showMultiplierEditor) {
+                        MultiplierEditorView(multiplier: $portionMultiplier)
+                    }
                 }
 
                 if let carbsReq = state.carbsRequired, state.carbs < carbsReq {
@@ -96,7 +233,7 @@ extension AddCarbs {
                     mealPresets.padding(.vertical, 9)
 
                     HStack {
-                        Text("Carbs").fontWeight(.semibold)
+                        Text("Carbs").fontWeight(.semibold).foregroundColor(.orange)
                         Spacer()
                         DecimalTextField(
                             "0",
@@ -193,7 +330,6 @@ extension AddCarbs {
             .navigationTitle("Add Meal")
             .navigationBarTitleDisplayMode(.inline)
             .navigationBarItems(
-                // leading: foodSearchButton,
                 trailing: Button("Cancel", action: {
                     state.hideModal()
                     if editMode { state.apsManager.determineBasalSync() }
@@ -203,12 +339,14 @@ extension AddCarbs {
                 AICameraView(
                     onFoodAnalyzed: { _, _ in
                         Task { @MainActor in
-                            // TODO: Ergebnis in dein StateModel übertragen
                             showingAICamera = false
                         }
                     },
                     onCancel: { showingAICamera = false }
                 )
+            }
+            .sheet(isPresented: $showFloatingInfo) {
+                InfoPopupView()
             }
             .sheet(isPresented: $presentPresets, content: { presetView })
             .sheet(isPresented: $showingFoodSearch) {
@@ -225,7 +363,7 @@ extension AddCarbs {
 
         @ViewBuilder private func proteinAndFat() -> some View {
             HStack {
-                Text("Fat").foregroundColor(.orange)
+                Text("Fat").foregroundColor(.blue)
                 Spacer()
                 DecimalTextField(
                     "0",
@@ -237,7 +375,7 @@ extension AddCarbs {
                 Text("grams").foregroundColor(.secondary)
             }
             HStack {
-                Text("Protein").foregroundColor(.red)
+                Text("Protein").foregroundColor(.green)
                 Spacer()
                 DecimalTextField(
                     "0",
@@ -254,18 +392,6 @@ extension AddCarbs {
 
         private var foodSearchSection: some View {
             Section(header: Text("AI Food Search")) {
-                Button {
-                    showingFoodSearch = true
-                } label: {
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                        Text("Search Food Database")
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                    }
-                    .foregroundColor(.blue)
-                }
-
                 NavigationLink(destination: AISettingsView()) {
                     HStack {
                         Image(systemName: "gearshape")
@@ -274,28 +400,60 @@ extension AddCarbs {
                     }
                     .foregroundColor(.blue)
                 }
-                .overlay(
-                    Image(systemName: "chevron.right")
-                        .foregroundColor(.blue)
-                        .font(.system(size: 14, weight: .semibold)),
-                    alignment: .trailing
-                )
+                .buttonStyle(PlainButtonStyle())
+
+                // Suche in der Food-Datenbank
+                Button {
+                    showingFoodSearch = true
+                } label: {
+                    HStack {
+                        Image(systemName: "magnifyingglass")
+                        Text("Search Food Database")
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .foregroundColor(.popUpGray)
+                            .font(.system(size: 14, weight: .semibold))
+                    }
+                    .foregroundColor(.blue)
+                }
+                .buttonStyle(PlainButtonStyle())
             }
         }
 
-        private var foodSearchButton: some View {
-            Button {
-                showingFoodSearch.toggle()
-            } label: {
-                Image(systemName: "magnifyingglass")
-                    .font(.title3)
-            }
-        }
+        /*  private var foodSearchButton: some View {
+         Button {
+             showingFoodSearch.toggle()
+         } label: {
+             Image(systemName: "magnifyingglass")
+                 .font(.title3)
+         }*/
 
-        private func handleSelectedFood(_ food: FoodItem) {
-            state.carbs = food.carbs
-            state.fat = food.fat
-            state.protein = food.protein
+        /*   private func handleSelectedFood(_ food: FoodItem) {
+             state.carbs = food.carbs
+             state.fat = food.fat
+             state.protein = food.protein
+         }*/
+
+        private func handleSelectedFood(_ foodItem: FoodItem) {
+            let calculatedCalories = Double(truncating: foodItem.carbs as NSNumber) * 4 +
+                Double(truncating: foodItem.protein as NSNumber) * 4 +
+                Double(truncating: foodItem.fat as NSNumber) * 9
+
+            let aiFoodItem = AIFoodItem(
+                name: foodItem.name,
+                brand: foodItem.source,
+                calories: calculatedCalories,
+                carbs: Double(truncating: foodItem.carbs as NSNumber),
+                protein: Double(truncating: foodItem.protein as NSNumber),
+                fat: Double(truncating: foodItem.fat as NSNumber)
+            )
+
+            selectedFoodItem = aiFoodItem
+
+            // Multiplikator zurücksetzen
+            portionMultiplier = isAIAnalysisProduct(aiFoodItem) ? 1.0 : 1.0
+
+            showingFoodSearch = false
         }
 
         private var empty: Bool {
@@ -866,17 +1024,15 @@ struct FoodSearchView: View {
     }
 
     private func handleAIAnalysis(_ analysisResult: AIFoodAnalysisResult, image _: UIImage?) {
-        // Speichere das vollständige Analyse-Ergebnis
         aiAnalysisResult = analysisResult
         showingAIAnalysisResults = true
 
-        // Füge auch die einfachen Ergebnisse zum State hinzu (für Rückwärtskompatibilität)
         let aiFoodItems = analysisResult.foodItemsDetailed.map { foodItem in
             AIFoodItem(
                 name: foodItem.name,
                 brand: nil,
                 calories: foodItem.calories ?? 0,
-                carbs: foodItem.carbohydrates ?? analysisResult.totalCarbohydrates,
+                carbs: foodItem.carbohydrates,
                 protein: foodItem.protein ?? analysisResult.totalProtein ?? 0,
                 fat: foodItem.fat ?? analysisResult.totalFat ?? 0
             )
@@ -923,7 +1079,7 @@ struct FoodItemCard: View {
                     HStack {
                         Image(systemName: "plus.circle.fill")
                             .foregroundColor(.green)
-                        Text("Hinzufügen")
+                        Text("Add")
                             .font(.subheadline)
                             .fontWeight(.medium)
                     }
@@ -951,16 +1107,15 @@ struct FoodItemCard: View {
                 }
                 .foregroundColor(.secondary)
 
-                // Nährwert-Badges (immer sichtbar)
                 HStack(spacing: 8) {
-                    NutritionBadge(value: foodItem.carbohydrates, unit: "g", label: "KH", color: .blue)
+                    NutritionBadge(value: foodItem.carbohydrates, unit: "g", label: "KH", color: .orange)
 
                     if let protein = foodItem.protein, protein > 0 {
                         NutritionBadge(value: protein, unit: "g", label: "P", color: .green)
                     }
 
                     if let fat = foodItem.fat, fat > 0 {
-                        NutritionBadge(value: fat, unit: "g", label: "F", color: .orange)
+                        NutritionBadge(value: fat, unit: "g", label: "F", color: .blue)
                     }
                 }
             }
@@ -1029,26 +1184,38 @@ struct FoodItemCard: View {
     }
 }
 
-struct NutritionBadge: View {
-    let value: Double
-    let unit: String
-    let label: String
-    let color: Color
+private func isAIAnalysisProduct(_ foodItem: AIFoodItem) -> Bool {
+    if let brand = foodItem.brand, brand.contains("AI") || brand.contains("Analysis") {
+        return true
+    }
+    return foodItem.brand == nil || foodItem.brand == "AI Analysis"
+}
+
+struct InfoPopupView: View {
+    @Environment(\.dismiss) var dismiss
 
     var body: some View {
-        VStack(spacing: 2) {
-            Text("\(value, specifier: "%.0f")\(unit)")
-                .font(.system(size: 12, weight: .bold))
-                .minimumScaleFactor(0.8)
-            Text(label)
-                .font(.system(size: 9, weight: .medium))
-                .minimumScaleFactor(0.7)
+        NavigationView {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .foregroundColor(.blue)
+                        .font(.title2)
+                    Text("Important Notice")
+                        .font(.headline)
+                }
+
+                Text(
+                    "The food data loaded via OpenFoodFacts always refer to 100g/100ml. This does not apply to values provided by AI Food Analysis."
+                )
+                .font(.body)
+                .foregroundColor(.primary)
+
+                Spacer()
+            }
+            .padding()
+            .navigationBarItems(trailing: Button("Done") { dismiss() })
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 6)
-        .background(color.opacity(0.15))
-        .foregroundColor(color)
-        .cornerRadius(8)
     }
 }
 
@@ -1061,7 +1228,7 @@ struct AIAnalysisResultsView: View {
         VStack(alignment: .leading, spacing: 20) {
             // Header mit Gesamtübersicht
             VStack(alignment: .leading, spacing: 12) {
-                Text("🧠 AI Lebensmittelanalyse")
+                Text("🧠 AI Food analysis")
                     .font(.title2)
                     .fontWeight(.bold)
 
@@ -1073,11 +1240,11 @@ struct AIAnalysisResultsView: View {
 
                 // Konfidenz-Level
                 HStack {
-                    Text("Konfidenz:")
+                    Text("Confidence level:")
                     ConfidenceBadge(level: analysisResult.confidence)
                     Spacer()
                     if let portions = analysisResult.totalFoodPortions {
-                        Text("\(portions) Portionen")
+                        Text("\(portions) Portions")
                             .font(.caption)
                     }
                 }
@@ -1088,7 +1255,7 @@ struct AIAnalysisResultsView: View {
             // Gesamt-Nährwerte der Mahlzeit
             VStack(alignment: .leading, spacing: 16) {
                 HStack {
-                    Text("📊 Gesamtnährwerte der Mahlzeit")
+                    Text("📊 Total nutritional values of the meal")
                         .font(.headline)
 
                     Spacer()
@@ -1096,15 +1263,15 @@ struct AIAnalysisResultsView: View {
                     // ERWEITERTER Gesamtmahlzeit-Button (HIER EINFÜGEN)
                     Button(action: {
                         let mealName = analysisResult.foodItemsDetailed.count == 1 ?
-                            analysisResult.foodItemsDetailed.first?.name ?? "Mahlzeit" :
-                            "Komplette Mahlzeit"
+                            analysisResult.foodItemsDetailed.first?.name ?? "Meal" :
+                            "Complete Meal"
 
                         let totalMeal = FoodItem(
                             name: mealName,
                             carbs: Decimal(analysisResult.totalCarbohydrates),
                             fat: Decimal(analysisResult.totalFat ?? 0),
                             protein: Decimal(analysisResult.totalProtein ?? 0),
-                            source: "AI Gesamtanalyse • \(analysisResult.foodItemsDetailed.count) Lebensmittel"
+                            source: "AI overall analysis • \(analysisResult.foodItemsDetailed.count) Food"
                         )
                         onCompleteMealSelected(totalMeal)
                     }) {
@@ -1112,10 +1279,10 @@ struct AIAnalysisResultsView: View {
                             Image(systemName: "plus.circle.fill")
                                 .foregroundColor(.green)
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Gesamt hinzufügen")
+                                Text("Add all")
                                     .font(.subheadline)
                                     .fontWeight(.medium)
-                                Text("\(analysisResult.foodItemsDetailed.count) Lebensmittel")
+                                Text("\(analysisResult.foodItemsDetailed.count) Food")
                                     .font(.caption2)
                                     .foregroundColor(.secondary)
                             }
@@ -1132,8 +1299,8 @@ struct AIAnalysisResultsView: View {
                     NutritionSummaryBadge(
                         value: analysisResult.totalCarbohydrates,
                         unit: "g",
-                        label: "Kohlenhydrate",
-                        color: .blue
+                        label: "Carbs",
+                        color: .orange
                     )
 
                     if let protein = analysisResult.totalProtein {
@@ -1141,19 +1308,19 @@ struct AIAnalysisResultsView: View {
                     }
 
                     if let fat = analysisResult.totalFat {
-                        NutritionSummaryBadge(value: fat, unit: "g", label: "Fett", color: .orange)
+                        NutritionSummaryBadge(value: fat, unit: "g", label: "Fat", color: .blue)
                     }
 
                     if let fiber = analysisResult.totalFiber {
-                        NutritionSummaryBadge(value: fiber, unit: "g", label: "Ballaststoffe", color: .purple)
+                        NutritionSummaryBadge(value: fiber, unit: "g", label: "Fiber", color: .purple)
                     }
 
                     if let calories = analysisResult.totalCalories {
-                        NutritionSummaryBadge(value: calories, unit: "kcal", label: "Kalorien", color: .red)
+                        NutritionSummaryBadge(value: calories, unit: "kcal", label: "Calories", color: .red)
                     }
 
                     if let servings = analysisResult.totalUsdaServings {
-                        NutritionSummaryBadge(value: servings, unit: "", label: "USDA Portionen", color: .indigo)
+                        NutritionSummaryBadge(value: servings, unit: "", label: "USDA Portions", color: .indigo)
                     }
                 }
             }
@@ -1163,7 +1330,7 @@ struct AIAnalysisResultsView: View {
             .padding(.horizontal)
 
             // Einzelne Lebensmittel
-            Text("🍽️ Einzelne Lebensmittel")
+            Text("🍽️ Seperat Foods")
                 .font(.headline)
                 .padding(.horizontal)
 
@@ -1176,7 +1343,7 @@ struct AIAnalysisResultsView: View {
                             carbs: Decimal(foodItem.carbohydrates),
                             fat: Decimal(foodItem.fat ?? 0),
                             protein: Decimal(foodItem.protein ?? 0),
-                            source: "AI Analyse"
+                            source: "AI Analysis"
                         )
                         onFoodItemSelected(selectedFood)
                     }
@@ -1186,7 +1353,7 @@ struct AIAnalysisResultsView: View {
             // Diabetes-spezifische Empfehlungen
             if let diabetesInfo = analysisResult.diabetesConsiderations {
                 VStack(alignment: .leading, spacing: 8) {
-                    Label("💉 Diabetes Empfehlungen", systemImage: "cross.case.fill")
+                    Label("💉 Diabetes recommendations", systemImage: "cross.case.fill")
                         .font(.headline)
                     Text(diabetesInfo)
                         .font(.subheadline)
@@ -1200,7 +1367,7 @@ struct AIAnalysisResultsView: View {
             // Zusätzliche Hinweise
             if let notes = analysisResult.notes {
                 VStack(alignment: .leading, spacing: 8) {
-                    Label("📝 Hinweise", systemImage: "note.text")
+                    Label("📝 Notes", systemImage: "note.text")
                         .font(.headline)
                     Text(notes)
                         .font(.subheadline)
@@ -1317,6 +1484,57 @@ extension FoodItem {
     }
 }
 
+// Multiplier Editor View
+struct MultiplierEditorView: View {
+    @Binding var multiplier: Double
+    @Environment(\.dismiss) var dismiss
+
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Adjust quantity")) {
+                    Stepper(value: $multiplier, in: 0.1 ... 10.0, step: 0.1) {
+                        HStack {
+                            Text("Multiplier:")
+                            Spacer()
+                            Text("×\(multiplier, specifier: "%.2f")")
+                                .font(.body.monospacedDigit())
+                                .foregroundColor(.blue)
+                        }
+                    }
+
+                    TextField("Enter manually", value: $multiplier, format: .number)
+                        .keyboardType(.decimalPad)
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                }
+
+                Section(header: Text("Preferences")) {
+                    ForEach([0.5, 1.0, 2.0, 3.0], id: \.self) { value in
+                        Button {
+                            multiplier = value
+                        } label: {
+                            HStack {
+                                Text("×\(value, specifier: "%.1f")")
+                                Spacer()
+                                if multiplier == value {
+                                    Image(systemName: "checkmark")
+                                        .foregroundColor(.blue)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .navigationTitle("Adjust quantity")
+            .navigationBarItems(
+                trailing: Button("Ready") {
+                    dismiss()
+                }
+            )
+        }
+    }
+}
+
 extension AIFoodItem {
     func toCarbsEntry(servingSize: Double = 100.0) -> CarbsEntry {
         // Berechne die Nährwerte basierend auf der Portionsgröße
@@ -1336,27 +1554,39 @@ extension AIFoodItem {
     }
 }
 
-struct NutrientBadge: View {
-    let value: Decimal
+// Alternative mit Icons
+private struct NutritionBadge: View {
+    let value: Double
     let unit: String
     let label: String
     let color: Color
+    let icon: String
+
+    init(value: Double, unit: String, label: String, color: Color, icon: String? = nil) {
+        self.value = value
+        self.unit = unit
+        self.label = label
+        self.color = color
+        self.icon = icon ?? ""
+    }
 
     var body: some View {
-        VStack(spacing: 2) {
-            // Text("\(value, specifier: "%.1f")\(unit)")
-            Text("\(Double(truncating: value as NSNumber), specifier: "%.1f")\(unit)")
-                .font(.system(.subheadline, design: .rounded))
-                .fontWeight(.semibold)
-                .foregroundColor(color)
-
-            Text(label)
-                .font(.caption2)
-                .foregroundColor(.secondary)
+        HStack(spacing: 4) {
+            if !icon.isEmpty {
+                Image(systemName: icon)
+                    .font(.system(size: 10))
+            }
+            VStack(spacing: 2) {
+                Text("\(value, specifier: "%.1f")\(unit)")
+                    .font(.system(size: 12, weight: .bold))
+                Text(label)
+                    .font(.system(size: 10, weight: .medium))
+            }
         }
-        .frame(minWidth: 50)
-        .padding(6)
-        .background(color.opacity(0.1))
+        .foregroundColor(color)
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(color.opacity(0.15))
         .cornerRadius(8)
     }
 }

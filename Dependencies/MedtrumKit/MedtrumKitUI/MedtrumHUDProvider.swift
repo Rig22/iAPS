@@ -14,13 +14,7 @@ internal class MedtrumKitHUDProvider: NSObject, HUDProvider {
     private let allowedInsulinTypes: [InsulinType]
     private var reservoirView: MedtrumReservoirView?
 
-    var visible: Bool = true {
-            didSet {
-                if oldValue != visible, visible {
-                    hudDidAppear()
-                }
-            }
-        }
+    var visible: Bool = true
 
     public init(
         pumpManager: MedtrumPumpManager,
@@ -43,13 +37,6 @@ internal class MedtrumKitHUDProvider: NSObject, HUDProvider {
 
         return reservoirView
     }
-    
-    private func hudDidAppear() {
-            updateReservoirView()
-            pumpManager.ensureCurrentPumpData { _ in
-                self.updateReservoirView()
-            }
-        }
 
     func didTapOnHUDView(_: LoopKitUI.BaseHUDView, allowDebugFeatures _: Bool) -> LoopKitUI.HUDTapAction? {
         nil
@@ -89,13 +76,11 @@ internal class MedtrumKitHUDProvider: NSObject, HUDProvider {
             return
         }
 
-        DispatchQueue.main.async {
-                    reservoirView.update(
-                        level: self.pumpManager.state.reservoir,
-                        at: self.pumpManager.state.lastSync,
-                        max: self.pumpManager.state.pumpName.contains("300u") ? 300 : 200
-                    )
-                }
+        reservoirView.update(
+            level: pumpManager.state.reservoir,
+            at: pumpManager.state.lastSync,
+            max: pumpManager.state.pumpName.contains("300u") ? 300 : 200
+        )
     }
 }
 
