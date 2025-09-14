@@ -258,7 +258,6 @@ struct FoodSearchResultsView: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .frame(maxHeight: 400)
     }
 }
 

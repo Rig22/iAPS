@@ -72,8 +72,8 @@ extension AddCarbs {
                     VStack(alignment: .leading, spacing: 12) {
                         // Header mit AI-Badge
                         HStack {
-                            Text("Choosen Food")
-                                .font(.system(size: 14, weight: .medium))
+                            Text("Selected Food")
+                                .font(.system(size: 15, weight: .medium))
                                 .foregroundColor(.primary)
 
                             Spacer()
@@ -114,7 +114,7 @@ extension AddCarbs {
                                         .font(.subheadline)
                                         .fontWeight(.semibold)
                                     Image(systemName: "pencil")
-                                        .font(.caption)
+                                        .font(.system(size: 18, weight: .bold))
                                 }
                                 .foregroundColor(.blue)
                                 .padding(.horizontal, 8)
@@ -125,16 +125,9 @@ extension AddCarbs {
                             .buttonStyle(PlainButtonStyle())
 
                             Spacer()
-
-                            // Berechnete Gesamtwerte anzeigen
-                            if portionMultiplier != 1.0 {
-                                Text("Complete: \(selectedFood.carbs * portionMultiplier, specifier: "%.1f")g")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
                         }
 
-                        // Nährwert-Badges (bereits mit Multiplikator)
+                        // Nährwert-Badges
                         HStack(spacing: 8) {
                             NutritionBadge(
                                 value: selectedFood.carbs * portionMultiplier,
@@ -155,7 +148,12 @@ extension AddCarbs {
                                 color: .green
                             )
                             if selectedFood.calories > 0 {
-                                NutritionBadge(value: selectedFood.calories, unit: "kcal", label: "energy", color: .red)
+                                NutritionBadge(
+                                    value: selectedFood.calories * portionMultiplier,
+                                    unit: "kcal",
+                                    label: "Energy",
+                                    color: .red
+                                )
                             }
                         }
 
@@ -1492,7 +1490,7 @@ struct MultiplierEditorView: View {
     var body: some View {
         NavigationView {
             Form {
-                Section(header: Text("Adjust quantity")) {
+                Section(header: Text("")) {
                     Stepper(value: $multiplier, in: 0.1 ... 10.0, step: 0.1) {
                         HStack {
                             Text("Multiplier:")
@@ -1508,8 +1506,8 @@ struct MultiplierEditorView: View {
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                 }
 
-                Section(header: Text("Preferences")) {
-                    ForEach([0.5, 1.0, 2.0, 3.0], id: \.self) { value in
+                Section(header: Text("")) {
+                    ForEach([0.5, 1.0, 2.0, 3.0, 4.0, 5.0], id: \.self) { value in
                         Button {
                             multiplier = value
                         } label: {
