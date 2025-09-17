@@ -38,8 +38,8 @@ struct FreeAPSSettings: JSON, Equatable {
     var low: Decimal = 70
     var uploadStats: Bool = false
     var hours: Int = 6
-    var xGridLines: Bool = true
-    var yGridLines: Bool = true
+    var xGridLines: Bool = false
+    var yGridLines: Bool = false
     var oneDimensionalGraph: Bool = false
     var rulerMarks: Bool = false
     var maxCarbs: Decimal = 1000
