@@ -65,6 +65,8 @@
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
 	<true/>
+	<key>UIDesignRequiresCompatibility</key>
+	<false/>
 	<key>NFCReaderUsageDescription</key>
 	<string>NFC is used to scan Libre sensors.</string>
 	<key>NSAppTransportSecurity</key>
@@ -84,6 +86,8 @@
 	<string>For authorized acces to bolus</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Health App is used to store blood glucose, carbs and insulin</string>
+	<key>MinimumOSVersion</key>
+	<string>18.0</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Health App is used to store blood glucose, carbs and insulin</string>
 	<key>NSHumanReadableCopyright</key>

@@ -25,13 +25,10 @@ extension AddCarbs {
 
         // Food Search States
         @State private var showingFoodSearch = false
-        @State private var showAISettings = false
-        @State private var showingAICamera = false
         @State private var foodSearchText = ""
         @State private var searchResults: [FoodItem] = []
         @State private var isLoading = false
         @State private var errorMessage: String?
-        @State private var showingBarcodeScanner = false
         @State private var selectedFoodItem: AIFoodItem? = nil
         @State private var showMultiplierEditor: Bool = false
         @State private var portionGrams: Double = 100.0
@@ -210,16 +207,6 @@ extension AddCarbs {
                     if editMode { state.apsManager.determineBasalSync() }
                 })
             )
-            .sheet(isPresented: $showingAICamera) {
-                AICameraView(
-                    onFoodAnalyzed: { _, _ in
-                        Task { @MainActor in
-                            showingAICamera = false
-                        }
-                    },
-                    onCancel: { showingAICamera = false }
-                )
-            }
             .sheet(isPresented: $presentPresets, content: { presetView })
             .sheet(isPresented: $showingFoodSearch) {
                 FoodSearchView(
@@ -766,6 +753,154 @@ private func searchFoodProducts(query: String, completion: @escaping ([AIFoodIte
     }
 }
 
+/* struct FoodSearchView: View {
+     @ObservedObject var state: FoodSearchStateModel
+     var onSelect: (FoodItem) -> Void
+     @Environment(\.dismiss) var dismiss
+
+     // Navigation States
+     @State private var navigateToBarcode = false
+     @State private var navigateToAICamera = false
+     @State private var showingAIAnalysisResults = false
+     @State private var aiAnalysisResult: AIFoodAnalysisResult?
+
+     var body: some View {
+         NavigationView {
+             VStack {
+                 // Suchfeld + Buttons
+                 HStack(spacing: 8) {
+                     TextField("Food Search...", text: $state.foodSearchText)
+                         .textFieldStyle(RoundedBorderTextFieldStyle())
+                         .autocapitalization(.none)
+                         .disableAutocorrection(true)
+                         .submitLabel(.search)
+                         .onSubmit {
+                             state.performSearch(query: state.foodSearchText)
+                         }
+                     // Barcode Button
+                     Button {
+                         navigateToBarcode = true
+                     } label: {
+                         Image(systemName: "barcode.viewfinder")
+                             .font(.title2)
+                             .foregroundColor(.blue)
+                             .padding(8)
+                             .background(Color.blue.opacity(0.1))
+                             .cornerRadius(8)
+                     }
+
+                     // AI Kamera Button
+                     Button {
+                         navigateToAICamera = true
+                     } label: {
+                         AICameraIcon()
+                             .frame(width: 24, height: 24)
+                             .padding(8)
+                             .background(Color.purple.opacity(0.1))
+                             .cornerRadius(8)
+                     }
+                 }
+                 .padding(.horizontal)
+                 .padding(.top, 8)
+
+                 ScrollView {
+                     // Zeige entweder normale Suchergebnisse oder AI-Analyse-Ergebnisse an
+                     if showingAIAnalysisResults, let result = aiAnalysisResult {
+                         AIAnalysisResultsView(
+                             analysisResult: result,
+                             onFoodItemSelected: { foodItem in
+                                 onSelect(foodItem)
+                                 dismiss()
+                             },
+                             onCompleteMealSelected: { totalMeal in
+                                 onSelect(totalMeal)
+                                 dismiss()
+                             }
+                         ) // <-- Hier endete der View-Initialisierer
+                     } else {
+                         FoodSearchResultsView(
+                             searchResults: state.searchResults,
+                             aiSearchResults: state.aiSearchResults,
+                             isSearching: state.isLoading,
+                             errorMessage: state.errorMessage,
+                             onProductSelected: { selectedProduct in
+                                 let foodItem = selectedProduct.toFoodItem()
+                                 onSelect(foodItem)
+                                 dismiss()
+                             },
+                             onAIProductSelected: { aiProduct in
+                                 let foodItem = FoodItem(
+                                     name: aiProduct.name,
+                                     carbs: Decimal(aiProduct.carbs),
+                                     fat: Decimal(aiProduct.fat),
+                                     protein: Decimal(aiProduct.protein),
+                                     source: "AI Analyse",
+                                     imageURL: aiProduct.imageURL
+                                 )
+                                 onSelect(foodItem)
+                                 dismiss()
+                             }
+                         )
+                     }
+                 }
+                 .padding(.top, 8)
+                 // Navigation-Ziele
+                 NavigationLink(
+                     destination: BarcodeScannerView(
+                         onBarcodeScanned: { barcode in
+                             handleBarcodeScan(barcode)
+                             navigateToBarcode = false
+                         },
+                         onCancel: { navigateToBarcode = false }
+                     ),
+                     isActive: $navigateToBarcode,
+                     label: { EmptyView() }
+                 )
+
+                 NavigationLink(
+                     destination: AICameraView(
+                         onFoodAnalyzed: { analysisResult, image in
+                             handleAIAnalysis(analysisResult, image: image)
+                             navigateToAICamera = false
+                         },
+                         onCancel: { navigateToAICamera = false }
+                     ),
+                     isActive: $navigateToAICamera,
+                     label: { EmptyView() }
+                 )
+             }
+             .navigationTitle("Food Search")
+             .navigationBarItems(trailing: Button("Fertig") { dismiss() })
+         }
+     }
+
+     private func handleBarcodeScan(_ barcode: String) {
+         print("📦 Barcode gescannt: \(barcode)")
+         navigateToBarcode = false
+         state.foodSearchText = barcode
+         state.performSearch(query: barcode)
+         print("🔍 Suche nach Barcode: \(barcode)")
+     }
+
+     private func handleAIAnalysis(_ analysisResult: AIFoodAnalysisResult, image _: UIImage?) {
+         aiAnalysisResult = analysisResult
+         showingAIAnalysisResults = true
+
+         let aiFoodItems = analysisResult.foodItemsDetailed.map { foodItem in
+             AIFoodItem(
+                 name: foodItem.name,
+                 brand: nil,
+                 calories: foodItem.calories ?? 0,
+                 carbs: foodItem.carbohydrates,
+                 protein: foodItem.protein ?? analysisResult.totalProtein ?? 0,
+                 fat: foodItem.fat ?? analysisResult.totalFat ?? 0,
+                 imageURL: nil
+             )
+         }
+         state.aiSearchResults = aiFoodItems
+     }
+ } */
+
 struct FoodSearchView: View {
     @ObservedObject var state: FoodSearchStateModel
     var onSelect: (FoodItem) -> Void
@@ -778,7 +913,7 @@ struct FoodSearchView: View {
     @State private var aiAnalysisResult: AIFoodAnalysisResult?
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             VStack {
                 // Suchfeld + Buttons
                 HStack(spacing: 8) {
@@ -790,6 +925,7 @@ struct FoodSearchView: View {
                         .onSubmit {
                             state.performSearch(query: state.foodSearchText)
                         }
+
                     // Barcode Button
                     Button {
                         navigateToBarcode = true
@@ -806,11 +942,14 @@ struct FoodSearchView: View {
                     Button {
                         navigateToAICamera = true
                     } label: {
-                        AICameraIcon()
+                        Image(systemName: "camera")
+                            .resizable()
+                            .scaledToFit()
                             .frame(width: 24, height: 24)
                             .padding(8)
                             .background(Color.purple.opacity(0.1))
                             .cornerRadius(8)
+                            .foregroundColor(.purple)
                     }
                 }
                 .padding(.horizontal)
@@ -829,7 +968,7 @@ struct FoodSearchView: View {
                                 onSelect(totalMeal)
                                 dismiss()
                             }
-                        ) // <-- Hier endete der View-Initialisierer
+                        )
                     } else {
                         FoodSearchResultsView(
                             searchResults: state.searchResults,
@@ -857,33 +996,30 @@ struct FoodSearchView: View {
                     }
                 }
                 .padding(.top, 8)
-                // Navigation-Ziele
-                NavigationLink(
-                    destination: BarcodeScannerView(
-                        onBarcodeScanned: { barcode in
-                            handleBarcodeScan(barcode)
-                            navigateToBarcode = false
-                        },
-                        onCancel: { navigateToBarcode = false }
-                    ),
-                    isActive: $navigateToBarcode,
-                    label: { EmptyView() }
-                )
-
-                NavigationLink(
-                    destination: AICameraView(
-                        onFoodAnalyzed: { analysisResult, image in
-                            handleAIAnalysis(analysisResult, image: image)
-                            navigateToAICamera = false
-                        },
-                        onCancel: { navigateToAICamera = false }
-                    ),
-                    isActive: $navigateToAICamera,
-                    label: { EmptyView() }
-                )
             }
             .navigationTitle("Food Search")
             .navigationBarItems(trailing: Button("Fertig") { dismiss() })
+            .navigationDestination(isPresented: $navigateToBarcode) {
+                BarcodeScannerView(
+                    onBarcodeScanned: { barcode in
+                        handleBarcodeScan(barcode)
+                        navigateToBarcode = false
+                    },
+                    onCancel: { navigateToBarcode = false }
+                )
+            }
+            .navigationDestination(isPresented: $navigateToAICamera) {
+                AICameraView(
+                    onFoodAnalyzed: { analysisResult, image in
+                        // ✅ STABILER: Verzögerung vor Rücknavigation
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                            handleAIAnalysis(analysisResult, image: image)
+                            navigateToAICamera = false
+                        }
+                    },
+                    onCancel: { navigateToAICamera = false }
+                )
+            }
         }
     }
 
@@ -1377,7 +1513,7 @@ struct MultiplierEditorView: View {
                                 .multilineTextAlignment(.center)
                                 .frame(maxWidth: 150)
 
-                            Text("g/ml")
+                            Text("g")
                                 .font(.title2)
                                 .foregroundColor(.secondary)
                         }
@@ -1539,7 +1675,7 @@ struct SelectedFoodView: View {
                             Text("AI Analysis")
                                 .font(.caption)
                         } else if portionGrams == 100.0 {
-                            Text("100g/ml")
+                            Text("100g")
                                 .font(.caption)
                         }
                     }
@@ -1577,7 +1713,7 @@ struct SelectedFoodView: View {
                         showMultiplierEditor = true
                     } label: {
                         HStack(spacing: 4) {
-                            Text("\(portionGrams, specifier: "%.0f") g/ml")
+                            Text("\(portionGrams, specifier: "%.0f")g")
                                 .font(.subheadline)
                                 .fontWeight(.semibold)
                             Image(systemName: "pencil")
@@ -1630,14 +1766,14 @@ struct SelectedFoodView: View {
                 Button(action: onChange) {
                     HStack {
                         Image(systemName: "arrow.clockwise")
-                        Text("Change Food")
+                        Text("Food")
                     }
                     .font(.subheadline)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 2)
                 }
                 .buttonStyle(.bordered)
-                .tint(.gray)
+                .tint(.blue)
 
                 Button {
                     let adjustedFood = AIFoodItem(
@@ -1661,7 +1797,7 @@ struct SelectedFoodView: View {
                     .font(.subheadline)
                     .fontWeight(.semibold)
                     .frame(maxWidth: .infinity)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 2)
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.green)
