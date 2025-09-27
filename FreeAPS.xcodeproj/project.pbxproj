@@ -2006,7 +2006,6 @@
 				192424CA2B7A64E70063CBF0 /* NIghtscoutExercise.swift */,
 				385CEA8125F23DFD002D6D5B /* NightscoutStatus.swift */,
 				389442CA25F65F7100FA1F27 /* NightscoutTreatment.swift */,
-				79BF52462E62BE5400F3F647 /* OpenFoodFactsModels.swift */,
 				3895E4C525B9E00D00214B37 /* Preferences.swift */,
 				38A13D3125E28B4B00EAA382 /* PumpHistoryEvent.swift */,
 				3883583325EEB38000E024B2 /* PumpSettings.swift */,
@@ -2019,7 +2018,6 @@
 				798BC9162D6F9AAF00ADABFD /* TemporaryData.swift */,
 				3871F39B25ED892B0013ECB5 /* TempTarget.swift */,
 				3811DE8E25C9D80400A708ED /* User.swift */,
-				79BF523F2E62BD2D00F3F647 /* UserDefaults+Loop.swift */,
 				191A9D152BED00A500028D48 /* Version.swift */,
 			);
 			path = Models;
@@ -2405,7 +2403,7 @@
 				618E62C9757B2F95431B5DC0 /* AddCarbsProvider.swift */,
 				39E7C997E56DAF8D28D09014 /* AddCarbsStateModel.swift */,
 				7987D48C2E855BB20049FD24 /* Components */,
-				7987D48D2E855BCC0049FD24 /* Model */,
+				7987D48D2E855BCC0049FD24 /* Models */,
 				7987D49E2E85699C0049FD24 /* Services */,
 				50E85421406582CF9D321A20 /* View */,
 			);
@@ -2472,14 +2470,16 @@
 			path = Components;
 			sourceTree = "<group>";
 		};
-		7987D48D2E855BCC0049FD24 /* Model */ = {
+		7987D48D2E855BCC0049FD24 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				7987D4A12E857CE70049FD24 /* Extensions */,
 				7987D4982E85607E0049FD24 /* FoodSearchStateModel.swift */,
 				7987D48E2E855C230049FD24 /* FoodItem.swift */,
+				79BF52462E62BE5400F3F647 /* OpenFoodFactsModels.swift */,
+				79BF523F2E62BD2D00F3F647 /* UserDefaults+Loop.swift */,
 			);
-			path = Model;
+			path = Models;
 			sourceTree = "<group>";
 		};
 		7987D49E2E85699C0049FD24 /* Services */ = {

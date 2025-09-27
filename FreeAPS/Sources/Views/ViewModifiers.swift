@@ -273,13 +273,9 @@ extension Color {
 
     /// Alle Chart und App Hintergründe
 
-    /// Der Haupt App Hintergrund
     static let dynamicBackground = Color(
-        // light: Color(red: 0.92, green: 0.92, blue: 0.92),
-        light: Color(red: 1.0, green: 1.0, blue: 1.0),
-
-        // dark: Color(red: 0.15, green: 0.15, blue: 0.15)
-        dark: Color(red: 0.11, green: 0.11, blue: 0.12)
+        light: Color(red: 0.90, green: 0.90, blue: 0.93),
+        dark: Color(red: 0.00, green: 0.00, blue: 0.00)
     )
 
     static let dynamicChartBackground = Color(
@@ -340,10 +336,10 @@ extension Color {
     )
 
     /// Icons und Akzente
+
     static let dynamicIconBackground = Color(
-        // light: Color(red: 0.85, green: 0.85, blue: 0.85),
-        light: Color(red: 0.90, green: 0.90, blue: 0.93),
-        dark: Color(red: 0.17, green: 0.17, blue: 0.18)
+        light: Color(red: 254 / 255, green: 254 / 255, blue: 254 / 255),
+        dark: Color(red: 0.11, green: 0.11, blue: 0.12)
     )
 
     static let dynamicIconForeground = Color(
