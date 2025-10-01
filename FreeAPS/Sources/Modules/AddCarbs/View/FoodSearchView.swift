@@ -18,7 +18,13 @@ struct FoodSearchView: View {
             VStack {
                 HStack(spacing: 8) {
                     TextField("Food Search...", text: $state.foodSearchText)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                        .padding(10) // Innenabstand für bessere Optik
+                        .background(Color(uiColor: UIColor { traitCollection in
+                            traitCollection.userInterfaceStyle == .dark
+                                ? UIColor.darkGray // dunkler Hintergrund im Dark Mode
+                                : UIColor.systemGray6 // heller Hintergrund im Light Mode
+                        }))
+                        .cornerRadius(10) // abgerundete Ecken
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .submitLabel(.search)
@@ -99,7 +105,6 @@ struct FoodSearchView: View {
                 }
                 .padding(.top, 8)
             }
-
             .navigationTitle("Food Search")
             .navigationBarItems(trailing: Button("Fertig") { dismiss() })
             .navigationDestination(isPresented: $navigateToBarcode) {

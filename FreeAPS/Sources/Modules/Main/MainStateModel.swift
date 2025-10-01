@@ -13,8 +13,6 @@ extension Main {
         @Published var lightMode = LightMode.auto
 
         override func subscribe() {
-            lightMode = settingsManager.settings.lightMode
-
             router.mainModalScreen
                 .map { $0?.modal(resolver: self.resolver!) }
                 .removeDuplicates { $0?.id == $1?.id }
@@ -121,7 +119,5 @@ extension Main.StateModel: CompletionDelegate {
 }
 
 extension Main.StateModel: SettingsObserver {
-    func settingsDidChange(_: FreeAPSSettings) {
-        lightMode = settingsManager.settings.lightMode
-    }
+    func settingsDidChange(_: FreeAPSSettings) {}
 }

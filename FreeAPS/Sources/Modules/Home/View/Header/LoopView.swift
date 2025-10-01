@@ -6,105 +6,6 @@ import UIKit
 
 var backgroundColor: Color = .clear
 
-struct PieSliceView: Shape {
-    var startAngle: Angle
-    var endAngle: Angle
-    var animatableData: AnimatablePair<Double, Double> {
-        get {
-            AnimatablePair(startAngle.degrees, endAngle.degrees)
-        }
-        set {
-            startAngle = Angle(degrees: newValue.first)
-            endAngle = Angle(degrees: newValue.second)
-        }
-    }
-
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let center = CGPoint(x: rect.midX, y: rect.midY)
-        path.move(to: center)
-        path.addArc(
-            center: center,
-            radius: rect.width / 2,
-            startAngle: startAngle,
-            endAngle: endAngle,
-            clockwise: false
-        )
-        path.closeSubpath()
-        return path
-    }
-}
-
-class PieSegmentViewModel: ObservableObject {
-    @Published var progress: Double = 0.0
-
-    func updateProgress(to newValue: CGFloat, animate _: Bool) {
-        progress = Double(newValue)
-    }
-}
-
-struct FillablePieSegment: View {
-    @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
-
-    var fillFraction: CGFloat
-    var color: Color
-    var backgroundColor: Color
-    var displayText: String
-    var symbolSize: CGFloat
-    var symbol: String
-    var animateProgress: Bool
-    var symbolBackgroundColor: Color = .clear
-    var symbolColor: Color = .clear
-
-    let angularGradient = AngularGradient(
-        gradient: Gradient(colors: [
-            Color.gray.opacity(0.3)
-        ]),
-        center: .center,
-        startAngle: .degrees(0),
-        endAngle: .degrees(360)
-    )
-
-    var body: some View {
-        VStack {
-            ZStack {
-                PieSliceView(
-                    startAngle: .degrees(-90),
-                    endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                )
-                .fill(color.opacity(0.0))
-                .frame(width: 50, height: 50)
-                .opacity(0.5)
-
-                // Symbol-Hintergrund (NEU, 40x40)
-                if symbolBackgroundColor != .clear {
-                    Circle()
-                        .fill(symbolBackgroundColor.opacity(0.0))
-                        .frame(width: 50, height: 50)
-                }
-
-                Image(systemName: symbol)
-                    .resizable()
-                    .scaledToFit()
-                    .frame(width: symbolSize, height: symbolSize)
-                    .foregroundColor(symbolColor)
-                    .offset(y: 2)
-            }
-
-            Text(displayText)
-                .font(.system(size: 15))
-                .foregroundColor(.dynamicSecondaryText)
-        }
-        .offset(y: 10)
-        .onAppear {
-            pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-        }
-        .onChange(of: fillFraction) { _, newValue in
-            pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-        }
-    }
-}
-
 struct LoopView: View {
     private enum Config {
         static let lag: TimeInterval = 30
@@ -161,6 +62,7 @@ struct LoopView: View {
                         symbolSize: 25,
                         symbol: "arrow.trianglehead.2.clockwise.rotate.90",
                         animateProgress: true,
+                        button3D: false,
                         symbolBackgroundColor: backgroundColor,
                         symbolColor: color
                     )

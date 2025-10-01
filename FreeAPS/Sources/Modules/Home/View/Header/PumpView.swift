@@ -79,219 +79,232 @@ struct PumpView: View {
     }
 
     var body: some View {
-        HStack(spacing: 5) {
-            if usePodLayout {
-                if pumpType == .medtrum {
-                    medtrumContent()
-                } else {
-                    omnipodContent()
-                }
-            }
-            // MDT/Dana/Simulator layout
-            else {
-                switch pumpType {
-                case .mdtDana:
-                    mdtDanaContent()
-                case .simulator:
-                    HStack(spacing: 5) {
-                        mdtDanaContent()
-                        simulatorContent()
+        ZStack {
+            HStack(spacing: 8) {
+                if usePodLayout {
+                    if pumpType == .medtrum {
+                        medtrumContent()
+                    } else {
+                        omnipodContent()
                     }
-                default:
-                    EmptyView()
+                } else {
+                    switch pumpType {
+                    case .mdtDana:
+                        mdtDanaContent()
+                    case .simulator:
+                        HStack(spacing: 8) {
+                            mdtDanaContent()
+                            simulatorContent()
+                        }
+                    default:
+                        EmptyView()
+                    }
                 }
             }
+            .padding(.horizontal, 7)
+            .padding(.vertical, 4)
+            .background(
+                TimeEllipse(
+                    button3D: state.button3D,
+                    minHeight: 40,
+                    cornerRadius: 20,
+                    horizontalPadding: 6
+                )
+            )
         }
-        .offset(x: 0, y: 15) // Overall vertical adjustment
+        .offset(x: 0, y: 10) // Overall vertical adjustment
     }
 
     // MARK: - Simulator
 
     @ViewBuilder private func simulatorContent() -> some View {
-        Image(systemName: "gearshape.2.fill")
-            .resizable()
-            .scaledToFit()
-            .frame(width: 36, height: 36)
-            .foregroundColor(.gray)
+        // Empty for now
     }
+
+    // MARK: - Medtrum Content
 
     @ViewBuilder private func medtrumContent() -> some View {
         if let date = expiresAtDate {
-            if let insulin = reservoir {
-                let adjustedReservoir = Double(insulin) * (concentration.last?.concentration ?? 1)
-                let maxReservoir: Double = 200
-                let portion = max(0.0, min(1.0, adjustedReservoir / maxReservoir))
+            HStack(spacing: 8) {
+                if let insulin = reservoir {
+                    let adjustedReservoir = Double(insulin) * (concentration.last?.concentration ?? 1)
+                    let maxReservoir: Double = 200
+                    let portion = max(0.0, min(1.0, adjustedReservoir / maxReservoir))
 
-                if insulin == 0xDEAD_BEEF {
-                    medtrumInsulinAmount(portion: 1 - portion)
-                        .padding(.leading, showInsulinBadge ? 7 : 0)
-                        .overlay {
-                            if let timeZone = timeZone,
-                               timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
-                            {
-                                ClockOffset(mdtPump: false)
+                    if insulin == 0xDEAD_BEEF {
+                        medtrumInsulinAmount(portion: 1 - portion)
+                            .overlay(alignment: .topLeading) {
+                                if showInsulinBadge {
+                                    NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
+                                }
                             }
-                            if showInsulinBadge {
-                                NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
+                            .overlay(alignment: .topTrailing) {
+                                if let timeZone = timeZone,
+                                   timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
+                                {
+                                    ClockOffset(mdtPump: false)
+                                }
                             }
-                        }
-                        .offset(y: -5)
-                } else {
-                    HStack(spacing: 0) {
-                        Text(
-                            reservoirFormatter
-                                .string(from: (insulin * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ?? ""
-                        )
-                        .font(.system(size: 17))
-                        Text("U")
-                            .font(.system(size: 17))
+                    } else {
+                        medtrumInsulinAmount(portion: 1 - portion)
+                            .overlay(alignment: .center) {
+                                HStack(spacing: 1) {
+                                    Text(
+                                        reservoirFormatter
+                                            .string(from: (
+                                                insulin *
+                                                    Decimal(concentration.last?.concentration ?? 1)
+                                            ) as NSNumber) ?? ""
+                                    )
+                                    .font(.system(size: 11, weight: .medium))
+                                   // Text("U")
+                                    Text("")
+                                        .font(.system(size: 7, weight: .medium))
+                                }
+
+                                .foregroundColor(.white)
+                                .shadow(color: .black.opacity(0.3), radius: 1, x: 0.5, y: 0.5) // Leichter Schatten für Kontrast
+                            }
+                            .overlay(alignment: .topLeading) {
+                                if showInsulinBadge {
+                                    NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
+                                }
+                            }
+                            .overlay(alignment: .topTrailing) {
+                                if let timeZone = timeZone,
+                                   timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
+                                {
+                                    ClockOffset(mdtPump: false)
+                                }
+                            }
                     }
-                    .foregroundColor(.dynamicSecondaryText)
-                    .offset(x: 2, y: 0)
+                }
 
-                    medtrumInsulinAmount(portion: 1 - portion)
-                        .padding(.leading, showInsulinBadge ? 7 : 0)
-                        .overlay {
-                            if let timeZone = timeZone,
-                               timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
-                            {
-                                ClockOffset(mdtPump: false)
-                            }
-                            if showInsulinBadge {
-                                NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
-                            }
-                        }
-                        .offset(y: -5)
+                // Time remaining
+                VStack(spacing: 2) {
+                    remainingTimeMedtrum(time: date.timeIntervalSince(timerDate))
+                        .font(.system(size: 17, weight: .medium))
+                        .foregroundColor(.dynamicSecondaryText)
                 }
             }
-
-            HStack(spacing: 4) {
-                remainingTimeMedtrum(time: date.timeIntervalSince(timerDate))
-                    .font(.system(size: 17))
-                    .foregroundColor(.dynamicSecondaryText)
-                /*    if battery != nil {
-                     batteryIcon(for: .medtrum)
-                         .offset(x: -6, y: 0)
-                 }*/
-            }
-            .offset(x: -4, y: 0)
         } else {
             Text("No Pump")
-                .font(.system(size: 17))
+                .font(.system(size: 17, weight: .medium))
                 .foregroundColor(.dynamicSecondaryText)
-                .offset(x: 0, y: -4)
         }
     }
 
-    // Omnipod-spezifischer Content
+    // MARK: - Omnipod Content
+
     @ViewBuilder private func omnipodContent() -> some View {
         if let date = expiresAtDate {
-            // Insulin amount (U)
-            if let insulin = reservoir {
-                // 120 % due to being non rectangular. +10 because of bottom inserter
-                let amountFraction = 1.0 - (Double(insulin + 10) * 1.2 / 200)
-                if insulin == 0xDEAD_BEEF {
-                    podInsulinAmount(portion: amountFraction)
-                        .padding(.leading, showInsulinBadge ? 7 : 0)
-                        .overlay {
-                            if let timeZone = timeZone,
-                               timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
-                            {
-                                ClockOffset(mdtPump: false)
-                            }
-                            if showInsulinBadge {
-                                NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
-                            }
-                        }
-                        .offset(y: -3) // Pod insulin vertical adjustment
-                } else {
-                    HStack(spacing: 0) {
-                        Text(
-                            reservoirFormatter
-                                .string(from: (insulin * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ??
-                                ""
-                        )
-                        Text("U")
-                            .font(.system(size: 17))
-                    }
-                    .foregroundColor(.dynamicSecondaryText)
-                    .offset(x: 6, y: 0) // Horizontal adjustment
-                    podInsulinAmount(portion: amountFraction)
-                        .padding(.leading, showInsulinBadge ? 7 : 0)
-                        .overlay {
-                            if let timeZone = timeZone,
-                               timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
-                            {
-                                ClockOffset(mdtPump: false)
-                            }
-                            if showInsulinBadge {
-                                NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
-                            }
-                        }
-                        .offset(y: -5) // Pod insulin vertical adjustment
-                }
-            }
+            HStack(spacing: 8) {
+                if let insulin = reservoir {
+                    let amountFraction = 1.0 - (Double(insulin + 10) * 1.2 / 200)
 
-            HStack(spacing: 4) {
+                    if insulin == 0xDEAD_BEEF {
+                        podInsulinAmount(portion: amountFraction)
+                            .overlay(alignment: .topLeading) {
+                                if showInsulinBadge {
+                                    NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
+                                }
+                            }
+                            .overlay(alignment: .topTrailing) {
+                                if let timeZone = timeZone,
+                                   timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
+                                {
+                                    ClockOffset(mdtPump: false)
+                                }
+                            }
+                    } else {
+                        HStack(spacing: 2) {
+                            Text(
+                                reservoirFormatter
+                                    .string(from: (insulin * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ??
+                                    ""
+                            )
+                            .font(.system(size: 17, weight: .medium))
+                            Text("U")
+                                .font(.system(size: 17, weight: .medium))
+                        }
+                        .foregroundColor(.dynamicSecondaryText)
+
+                        podInsulinAmount(portion: amountFraction)
+                            .overlay(alignment: .topLeading) {
+                                if showInsulinBadge {
+                                    NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: true)
+                                }
+                            }
+                            .overlay(alignment: .topTrailing) {
+                                if let timeZone = timeZone,
+                                   timeZone.secondsFromGMT() != TimeZone.current.secondsFromGMT()
+                                {
+                                    ClockOffset(mdtPump: false)
+                                }
+                            }
+                    }
+                }
+
+                // Time remaining
                 remainingTime(time: date.timeIntervalSince(timerDate))
-                    .font(.system(size: 17))
+                    .font(.system(size: 17, weight: .medium))
                     .foregroundColor(.dynamicSecondaryText)
             }
-            .offset(x: -4, y: 0) // Vertical adjustment für time row
         } else {
             Text("No Patch")
-                .font(.system(size: 17))
+                .font(.system(size: 17, weight: .medium))
                 .foregroundColor(.dynamicSecondaryText)
-                .offset(x: 0, y: -4)
         }
     }
+
+    // MARK: - MDT/Dana Content
 
     @ViewBuilder private func mdtDanaContent() -> some View {
         if let reservoir = reservoir {
             let amountFraction = 1.0 - (Double(reservoir) / 300.0)
 
-            HStack(spacing: 0) {
-                Text(
-                    reservoirFormatter
-                        .string(from: (reservoir * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ?? ""
-                )
-                .font(.system(size: 17))
-                Text("U")
-                    .font(.system(size: 17))
-            }
-            .foregroundColor(.dynamicSecondaryText)
-            .offset(y: 9)
-
-            pumpInsulinAmount(portion: amountFraction)
-                .padding(.leading, showInsulinBadge ? 7 : 0)
-                .overlay {
-                    /* if let timeZone, timeZone != TimeZone.current {
-                         ClockOffset(mdtPump: false)
-                     }*/
-                    if showInsulinBadge {
-                        NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: false)
-                    }
+            HStack(spacing: 8) {
+                HStack(spacing: 2) {
+                    Text(
+                        reservoirFormatter
+                            .string(from: (reservoir * Decimal(concentration.last?.concentration ?? 1)) as NSNumber) ?? ""
+                    )
+                    .font(.system(size: 17, weight: .medium))
+                    Text("U")
+                        .font(.system(size: 17, weight: .medium))
                 }
+                .foregroundColor(.dynamicSecondaryText)
 
-            if battery != nil {
-                batteryIcon(for: .mdtDana)
+                pumpInsulinAmount(portion: amountFraction)
+                    .overlay(alignment: .topLeading) {
+                        if showInsulinBadge {
+                            NonStandardInsulin(concentration: concentration.last?.concentration ?? 1, pod: false)
+                        }
+                    }
+
+                // Battery icon right next to pump symbol
+                if battery != nil {
+                    batteryIcon(for: .mdtDana)
+                }
             }
         } else {
             Text("No Pump")
-                .font(.system(size: 17))
+                .font(.system(size: 17, weight: .medium))
                 .foregroundColor(.dynamicSecondaryText)
         }
     }
 
+    // MARK: - Remaining Time Views
+
     private func remainingTime(time: TimeInterval) -> some View {
         let color: Color = {
-            if time <= 0 { return .dynamicColorRed }
-            else if time < 4 * 60 * 60 { return .dynamicColorRed }
-            else if time < 24 * 60 * 60 { return .brown }
+            if time <= 0 { return .red }
+            else if time < 4 * 60 * 60 { return .red }
+            else if time < 24 * 60 * 60 { return .orange }
             else { return .dynamicSecondaryText }
         }()
 
-        return HStack {
+        return Group {
             if time > 0 {
                 let days = Int(time / 1.days.timeInterval)
                 let hours = Int(time / 1.hours.timeInterval)
@@ -299,33 +312,27 @@ struct PumpView: View {
                 let adjustedHours = Int(hours - days * 24)
 
                 if days >= 1 {
-                    HStack(spacing: 0) {
-                        Text(" \(days)")
-                        Text(NSLocalizedString("d", comment: "abbreviation for days"))
-                            .font(.system(size: 17))
+                    HStack(spacing: 2) {
+                        Text("\(days)")
+                        Text("d")
                         if adjustedHours >= 0 {
-                            Text(" ")
                             Text("\(adjustedHours)")
-                            Text(NSLocalizedString("h", comment: "abbreviation for hours"))
-                                .font(.system(size: 17))
+                            Text("h")
                         }
                     }
                 } else if hours >= 1 {
-                    HStack(spacing: 0) {
+                    HStack(spacing: 2) {
                         Text("\(hours)")
-                        Text(NSLocalizedString("h", comment: "abbreviation for hours"))
-                            .font(.system(size: 17))
+                        Text("h")
                     }
                 } else {
-                    HStack(spacing: 0) {
-                        Text(" \(minutes)")
-                        Text(NSLocalizedString("m", comment: "abbreviation for minutes"))
-                            .font(.system(size: 17))
+                    HStack(spacing: 2) {
+                        Text("\(minutes)")
+                        Text("m")
                     }
                 }
             } else {
-                Text(NSLocalizedString("Replace", comment: "View/Header when pod expired"))
-                    .font(.system(size: 17))
+                Text("Replace")
             }
         }
         .foregroundStyle(color)
@@ -333,13 +340,13 @@ struct PumpView: View {
 
     private func remainingTimeMedtrum(time: TimeInterval) -> some View {
         let color: Color = {
-            if time <= 0 { return .dynamicColorGreen }
-            else if time < 4 * 60 * 60 { return .dynamicColorRed }
-            else if time < 24 * 60 * 60 { return .brown }
+            if time <= 0 { return .green }
+            else if time < 4 * 60 * 60 { return .red }
+            else if time < 24 * 60 * 60 { return .orange }
             else { return .dynamicSecondaryText }
         }()
 
-        return HStack {
+        return Group {
             if time > 0 {
                 let days = Int(time / 1.days.timeInterval)
                 let hours = Int(time / 1.hours.timeInterval)
@@ -347,87 +354,34 @@ struct PumpView: View {
                 let adjustedHours = Int(hours - days * 24)
 
                 if days >= 1 {
-                    HStack(spacing: 0) {
-                        Text(" \(days)")
-                            .font(.system(size: 17))
-
-                        Text(NSLocalizedString("d", comment: "abbreviation for days"))
-                            .font(.system(size: 17))
-
+                    HStack(spacing: 2) {
+                        Text("\(days)")
+                        Text("d")
                         if adjustedHours >= 0 {
-                            Text(" ")
                             Text("\(adjustedHours)")
-                            Text(NSLocalizedString("h", comment: "abbreviation for hours"))
-                                .font(.system(size: 17))
+                            Text("h")
                         }
                     }
                 } else if hours >= 1 {
-                    HStack(spacing: 0) {
+                    HStack(spacing: 2) {
                         Text("\(hours)")
-                        Text(NSLocalizedString("h", comment: "abbreviation for hours"))
-                            .font(.system(size: 17))
+                        Text("h")
                     }
                 } else {
-                    HStack(spacing: 0) {
-                        Text(" \(minutes)")
-                        Text(NSLocalizedString("m", comment: "abbreviation for minutes"))
-                            .font(.system(size: 17))
+                    HStack(spacing: 2) {
+                        Text("\(minutes)")
+                        Text("m")
                     }
                 }
             } else {
-                Text(NSLocalizedString("Battery Mode", comment: "View/Header when pod expired"))
-                    .font(.system(size: 17))
+                Text("Battery Mode")
                     .foregroundStyle(Color.dynamicSecondaryText)
             }
         }
         .foregroundStyle(color)
     }
 
-    private var batteryColor: Color {
-        guard let battery = battery, let percent = battery.percent else {
-            return .gray
-        }
-        switch percent {
-        case ...10:
-            return .dynamicColorRed
-        case ...20:
-            return .dynamicColorYellow
-        default:
-            return .dynamicColorGreen
-        }
-    }
-
-    private var reservoirColor: Color {
-        guard let reservoir = reservoir else {
-            return .clear
-        }
-
-        switch reservoir {
-        case ...10:
-            return .dynamicColorRed
-        case ...30:
-            return .dynamicColorYellow
-        default:
-            return .dynamicColorBlue
-        }
-    }
-
-    private var timerColor: Color {
-        guard let expisesAt = expiresAtDate else {
-            return .gray
-        }
-
-        let time = expisesAt.timeIntervalSince(timerDate)
-
-        switch time {
-        case ...8.hours.timeInterval:
-            return .dynamicColorRed
-        case ...1.days.timeInterval:
-            return .dynamicColorYellow
-        default:
-            return .dynamicColorGreen
-        }
-    }
+    // MARK: - Icon Views
 
     private func podInsulinAmount(portion: Double) -> some View {
         ZStack {
@@ -438,14 +392,13 @@ struct PumpView: View {
                 .aspectRatio(0.72, contentMode: .fit)
                 .frame(width: IAPSconfig.iconSize, height: IAPSconfig.iconSize)
                 .symbolRenderingMode(.palette)
-                .offset(x: 0, y: -5)
                 .shadow(radius: 1, x: 2, y: 2)
                 .foregroundColor(.dynamicIconBackground)
                 .overlay {
                     let units = 50 * (concentration.last?.concentration ?? 1)
                     portion <= 0.3 ?
                         Text((reservoirFormatter.string(from: units as NSNumber) ?? "") + "+")
-                        .foregroundColor(.dynamicSecondaryText)
+                        .foregroundColor(.white)
                         .font(.system(size: 6))
                         .offset(y: -4)
                         : nil
@@ -459,7 +412,7 @@ struct PumpView: View {
             UIImage(imageLiteralResourceName: pump)
                 .fillImageUpToPortion(color: reservoirColor.opacity(0.8), portion: max(portion, 0.0))
                 .resizable()
-                .frame(maxWidth: 30, maxHeight: 30)
+                .frame(width: 30, height: 30)
                 .symbolRenderingMode(.palette)
                 .shadow(radius: 1, x: 2, y: 2)
                 .foregroundColor(.dynamicIconBackground)
@@ -472,30 +425,63 @@ struct PumpView: View {
             UIImage(imageLiteralResourceName: medtrumpump)
                 .fillImageUpToPortion(color: reservoirColor.opacity(0.8), portion: max(portion, 0.0))
                 .resizable()
-                .frame(maxWidth: 30, maxHeight: 30)
+                .frame(width: 34, height: 34)
                 .symbolRenderingMode(.palette)
                 .shadow(radius: 1, x: 2, y: 2)
                 .foregroundColor(.dynamicIconBackground)
+                .overlay {
+                    // Zusätzlicher Overlay für niedrigen Füllstand (wie bei Omnipod)
+                    if portion >= 0.7 { // Wenn nur noch wenig Insulin (portion ist 1 - Füllstand)
+                        let units = 50 * (concentration.last?.concentration ?? 1)
+                        Text((reservoirFormatter.string(from: units as NSNumber) ?? "") + "+")
+                            .foregroundColor(.white)
+                            .font(.system(size: 6))
+                            .offset(y: -8) // Position an Medtrum-Icon anpassen
+                    }
+                }
         }
     }
 
-    @ViewBuilder private func batteryIcon(for type: PumpType) -> some View {
+    @ViewBuilder private func batteryIcon(for _: PumpType) -> some View {
         if let battery = battery {
             let percent = batteryLevel(for: battery.percent ?? 100)
-            let offsetY: CGFloat = {
-                switch type {
-                case .medtrum: return -8 // Offset für Medtrum
-                case .mdtDana: return 0 // Offset für MDT/Dana
-                default: return -1 // Leichter Offset für Omnipod (wird im Moment nicht verwendet)
-                }
-            }()
 
             Image(systemName: "battery.\(percent)")
                 .resizable()
                 .rotationEffect(.degrees(-90))
                 .frame(maxWidth: 31, maxHeight: 14)
                 .foregroundColor(batteryColor)
-                .offset(y: offsetY)
+        }
+    }
+
+    // MARK: - Helper Properties
+
+    private var batteryColor: Color {
+        guard let battery = battery, let percent = battery.percent else {
+            return .gray
+        }
+        switch percent {
+        case ...10:
+            return .red
+        case ...20:
+            return .yellow
+        default:
+            return .green
+        }
+    }
+
+    private var reservoirColor: Color {
+        guard let reservoir = reservoir else {
+            return .clear
+        }
+
+        switch reservoir {
+        case ...10:
+            return .red
+        case ...30:
+            return .yellow
+        default:
+            return .blue
         }
     }
 
@@ -523,15 +509,15 @@ struct NonStandardInsulin: View {
 
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: 8)
                 .fill(.red)
-                .frame(width: 33, height: 15)
+                .frame(width: 28, height: 12)
                 .overlay {
                     Text("U" + (formatter.string(from: concentration * 100 as NSNumber) ?? ""))
-                        .font(.system(size: 9))
-                        .foregroundStyle(.secondary)
+                        .font(.system(size: 8, weight: .medium))
+                        .foregroundColor(.white)
                 }
         }
-        .offset(x: pod ? -15 : -15, y: pod ? -24 : -22) // Gleicher Offset für alle Pumpentypen
+        .offset(x: -12, y: -12)
     }
 }

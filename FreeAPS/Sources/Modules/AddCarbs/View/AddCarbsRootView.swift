@@ -147,7 +147,8 @@ extension AddCarbs {
                         if !pushed {
                             Button {
                                 pushed = true
-                            } label: { Text("Now") }.buttonStyle(.borderless).foregroundColor(.secondary).padding(.trailing, 5)
+                            } label: { Text("Now") }.buttonStyle(.borderless).foregroundColor(.secondary)
+                                .padding(.trailing, 5)
                         } else {
                             Button { state.date = state.date.addingTimeInterval(-15.minutes.timeInterval) }
                             label: { Image(systemName: "minus.circle") }.tint(.blue).buttonStyle(.borderless)
@@ -192,7 +193,7 @@ extension AddCarbs {
                         ) }
                         .disabled(empty)
                         .frame(maxWidth: .infinity, alignment: .center)
-                }.listRowBackground(!empty ? Color(.systemBlue) : Color(.systemGray4))
+                }.listRowBackground(!empty ? Color(.systemBlue) : Color(.clear))
                     .tint(.white)
             }
             .compactSectionSpacing()
@@ -211,14 +212,6 @@ extension AddCarbs {
                 })
             )
             .sheet(isPresented: $presentPresets, content: { presetView })
-            /* .sheet(isPresented: $showingFoodSearch) {
-                 FoodSearchView(
-                     state: foodSearchState,
-                     onSelect: { selectedFood in
-                         handleSelectedFood(selectedFood)
-                     }
-                 )
-             }*/
             .sheet(isPresented: $showingFoodSearch) {
                 FoodSearchView(
                     state: foodSearchState,
@@ -270,7 +263,6 @@ extension AddCarbs {
                     }
                     .foregroundColor(.blue)
                 }
-                .buttonStyle(PlainButtonStyle())
 
                 // Suche in der Food-Datenbank
                 Button {
@@ -286,15 +278,8 @@ extension AddCarbs {
                     }
                     .foregroundColor(.blue)
                 }
-                .buttonStyle(PlainButtonStyle())
             }
         }
-
-        /*   private func handleSelectedFood(_ food: FoodItem) {
-             state.carbs = food.carbs
-             state.fat = food.fat
-             state.protein = food.protein
-         }*/
 
         private func handleSelectedFood(_ foodItem: FoodItem) {
             let calculatedCalories = Double(truncating: foodItem.carbs as NSNumber) * 4 +
@@ -556,7 +541,7 @@ extension AddCarbs {
                     Button { save() }
                     label: { Text("Save") }
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .listRowBackground(!disabled ? Color(.systemBlue) : Color(.systemGray4))
+                        .listRowBackground(!disabled ? Color(.systemBlue) : Color(.clear))
                         .tint(.white)
                         .disabled(disabled)
                 }

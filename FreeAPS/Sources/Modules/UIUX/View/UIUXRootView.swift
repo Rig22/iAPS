@@ -109,14 +109,6 @@ extension UIUX {
                                     header: Text("Visual Options"),
                                     footer: Text("According to your taste")
                                 ) {
-                                    Section {
-                                        Picker(selection: $state.lightMode, label: Text("Color Scheme")) {
-                                            ForEach(LightMode.allCases) { item in
-                                                Text(NSLocalizedString(item.rawValue, comment: "ColorScheme Selection"))
-                                            }
-                                        }
-                                    }
-
                                     Toggle("3D Look", isOn: $state.button3D)
 
                                     Toggle("Show Pump Icon", isOn: $state.showPumpIcon)

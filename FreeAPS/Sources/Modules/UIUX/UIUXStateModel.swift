@@ -24,7 +24,6 @@ extension UIUX {
         @Published var fpuAmounts: Bool = false
         @Published var carbButton: Bool = true
         @Published var profileButton: Bool = true
-        @Published var lightMode: LightMode = .auto
         @Published var showInsulinActivity: Bool = true
         @Published var showCobChart: Bool = true
         @Published var hideInsulinBadge: Bool = false
@@ -69,7 +68,6 @@ extension UIUX {
             subscribeSetting(\.fpuAmounts, on: $fpuAmounts) { fpuAmounts = $0 }
             subscribeSetting(\.carbButton, on: $carbButton) { carbButton = $0 }
             subscribeSetting(\.profileButton, on: $profileButton) { profileButton = $0 }
-            subscribeSetting(\.lightMode, on: $lightMode) { lightMode = $0 }
             subscribeSetting(\.showInsulinActivity, on: $showInsulinActivity) { showInsulinActivity = $0 }
             subscribeSetting(\.showCobChart, on: $showCobChart) { showCobChart = $0 }
             subscribeSetting(\.hidePredictions, on: $hidePredictions) { hidePredictions = $0 }

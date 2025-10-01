@@ -211,9 +211,7 @@ struct SelectedFoodView: View {
             }
         }
         .padding()
-        .background(Color(.systemBackground))
         .cornerRadius(12)
-        // .shadow(color: .black.opacity(0.1), radius: 5, x: 0, y: 2)
         .sheet(isPresented: $showMultiplierEditor) {
             MultiplierEditorView(grams: $portionGrams)
         }

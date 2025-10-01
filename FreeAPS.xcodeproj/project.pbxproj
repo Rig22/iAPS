@@ -332,6 +332,11 @@
 		795CBE122D3F60B20044854B /* BGTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE112D3F60A30044854B /* BGTextField.swift */; };
 		795CBE142D3F943A0044854B /* AutoISFsettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE132D3F942B0044854B /* AutoISFsettings.swift */; };
 		795CBE162D3F949D0044854B /* ChartModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 795CBE152D3F94900044854B /* ChartModel.swift */; };
+		7971A4622E8D583500AEE228 /* TimeEllipse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7971A4612E8D583500AEE228 /* TimeEllipse.swift */; };
+		7971A4682E8D594100AEE228 /* BigFillablePieSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7971A4632E8D594100AEE228 /* BigFillablePieSegment.swift */; };
+		7971A4692E8D594100AEE228 /* FillablePieSegment.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7971A4642E8D594100AEE228 /* FillablePieSegment.swift */; };
+		7971A46A2E8D594100AEE228 /* PieSegmentViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7971A4652E8D594100AEE228 /* PieSegmentViewModel.swift */; };
+		7971A46B2E8D594100AEE228 /* PieSliceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7971A4662E8D594100AEE228 /* PieSliceView.swift */; };
 		798421512E082FCF003A7410 /* PumpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798421502E082FC8003A7410 /* PumpView.swift */; };
 		7985ADB32E2E1D1900BC1C80 /* MainChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7985ADB12E2E1D1900BC1C80 /* MainChartView.swift */; };
 		7987D48F2E855C230049FD24 /* FoodItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987D48E2E855C230049FD24 /* FoodItem.swift */; };
@@ -1004,6 +1009,11 @@
 		795CBE112D3F60A30044854B /* BGTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BGTextField.swift; sourceTree = "<group>"; };
 		795CBE132D3F942B0044854B /* AutoISFsettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoISFsettings.swift; sourceTree = "<group>"; };
 		795CBE152D3F94900044854B /* ChartModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChartModel.swift; sourceTree = "<group>"; };
+		7971A4612E8D583500AEE228 /* TimeEllipse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TimeEllipse.swift; sourceTree = "<group>"; };
+		7971A4632E8D594100AEE228 /* BigFillablePieSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigFillablePieSegment.swift; sourceTree = "<group>"; };
+		7971A4642E8D594100AEE228 /* FillablePieSegment.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FillablePieSegment.swift; sourceTree = "<group>"; };
+		7971A4652E8D594100AEE228 /* PieSegmentViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieSegmentViewModel.swift; sourceTree = "<group>"; };
+		7971A4662E8D594100AEE228 /* PieSliceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PieSliceView.swift; sourceTree = "<group>"; };
 		798421502E082FC8003A7410 /* PumpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PumpView.swift; sourceTree = "<group>"; };
 		7985ADB12E2E1D1900BC1C80 /* MainChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainChartView.swift; sourceTree = "<group>"; };
 		7987D48E2E855C230049FD24 /* FoodItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoodItem.swift; sourceTree = "<group>"; };
@@ -1643,6 +1653,8 @@
 		3811DE2C25C9D49500A708ED /* View */ = {
 			isa = PBXGroup;
 			children = (
+				7971A4572E8CF13900AEE228 /* Components */,
+				7971A4612E8D583500AEE228 /* TimeEllipse.swift */,
 				7985ADB22E2E1D1900BC1C80 /* Chart */,
 				3833B51F260264B6003021B3 /* Header */,
 				194D7E6C2B974EA4007A38C1 /* Previews */,
@@ -2449,6 +2461,25 @@
 			path = Restore;
 			sourceTree = "<group>";
 		};
+		7971A4572E8CF13900AEE228 /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				7971A4672E8D594100AEE228 /* PieCharts */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		7971A4672E8D594100AEE228 /* PieCharts */ = {
+			isa = PBXGroup;
+			children = (
+				7971A4632E8D594100AEE228 /* BigFillablePieSegment.swift */,
+				7971A4642E8D594100AEE228 /* FillablePieSegment.swift */,
+				7971A4652E8D594100AEE228 /* PieSegmentViewModel.swift */,
+				7971A4662E8D594100AEE228 /* PieSliceView.swift */,
+			);
+			path = PieCharts;
+			sourceTree = "<group>";
+		};
 		7985ADB22E2E1D1900BC1C80 /* Chart */ = {
 			isa = PBXGroup;
 			children = (
@@ -3196,6 +3227,10 @@
 				3811DE3025C9D49500A708ED /* HomeStateModel.swift in Sources */,
 				38BF021725E7CBBC00579895 /* PumpManagerExtensions.swift in Sources */,
 				19F95FF529F10FCF00314DDC /* StatProvider.swift in Sources */,
+				7971A4682E8D594100AEE228 /* BigFillablePieSegment.swift in Sources */,
+				7971A4692E8D594100AEE228 /* FillablePieSegment.swift in Sources */,
+				7971A46A2E8D594100AEE228 /* PieSegmentViewModel.swift in Sources */,
+				7971A46B2E8D594100AEE228 /* PieSliceView.swift in Sources */,
 				38F3B2EF25ED8E2A005C48AA /* TempTargetsStorage.swift in Sources */,
 				19B0EF2128F6D66200069496 /* Statistics.swift in Sources */,
 				3811DF1025CAAAE200A708ED /* APSManager.swift in Sources */,
@@ -3446,6 +3481,7 @@
 				19DC678129CA676A00FD9EC4 /* OverrideProfilesProvider.swift in Sources */,
 				9702FF92A09C53942F20D7EA /* TargetsEditorRootView.swift in Sources */,
 				1967DFBE29D052C200759F30 /* Icons.swift in Sources */,
+				7971A4622E8D583500AEE228 /* TimeEllipse.swift in Sources */,
 				38E8754F275556FA00975559 /* WatchManager.swift in Sources */,
 				A228DF96647338139F152B15 /* PreferencesEditorDataFlow.swift in Sources */,
 				19229B962AFBB84800CD91CA /* Predictions.swift in Sources */,

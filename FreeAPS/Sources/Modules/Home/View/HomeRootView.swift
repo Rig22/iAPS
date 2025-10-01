@@ -215,231 +215,6 @@ extension Home {
             }
         }
 
-        struct TimeEllipse: View {
-            var button3D: Bool = false
-
-            var body: some View {
-                GeometryReader { geometry in
-                    ZStack {
-                        let ellipseWidth = max(geometry.size.width + 10, 80) // Mindestbreite 80
-
-                        if button3D {
-                            // Immer gefüllte Hintergrundfarbe
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color.dynamicIconBackground)
-                                .frame(width: ellipseWidth, height: 25)
-
-                            // 3D-Rand-Glow
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            .dynamicTopGlow.opacity(0.5),
-                                            .dynamicTopGlow.opacity(0.3),
-                                            Color.clear,
-                                            .dynamicBottomShadow.opacity(0.3),
-                                            .dynamicBottomShadow
-                                        ]),
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    ),
-                                    lineWidth: 1
-                                )
-                                .frame(width: ellipseWidth, height: 25)
-                                .shadow(color: .dynamicTopGlow.opacity(0.3), radius: 1, x: -1, y: -1)
-                                .shadow(color: .dynamicBottomShadow.opacity(0.6), radius: 1, x: 1, y: 1)
-                        } else {
-                            RoundedRectangle(cornerRadius: 15)
-                                .fill(Color.dynamicIconBackground)
-                                .frame(width: ellipseWidth, height: 25)
-                            RoundedRectangle(cornerRadius: 15)
-                                .stroke(Color.dynamicIconForeground, lineWidth: 0)
-                                .frame(width: ellipseWidth, height: 25)
-                        }
-                    }
-                    .frame(width: geometry.size.width, height: 25, alignment: .center)
-                }
-                .frame(height: 25)
-            }
-        }
-
-        // Pie Animation Anfang
-
-        struct PieSliceView: Shape {
-            var startAngle: Angle
-            var endAngle: Angle
-            var animatableData: AnimatablePair<Double, Double> {
-                get {
-                    AnimatablePair(startAngle.degrees, endAngle.degrees)
-                }
-                set {
-                    startAngle = Angle(degrees: newValue.first)
-                    endAngle = Angle(degrees: newValue.second)
-                }
-            }
-
-            func path(in rect: CGRect) -> Path {
-                var path = Path()
-                let center = CGPoint(x: rect.midX, y: rect.midY)
-                path.move(to: center)
-                path.addArc(
-                    center: center,
-                    radius: rect.width / 2,
-                    startAngle: startAngle,
-                    endAngle: endAngle,
-                    clockwise: false
-                )
-                path.closeSubpath()
-                return path
-            }
-        }
-
-        // Fillable PieSegments Anfang
-        class PieSegmentViewModel: ObservableObject {
-            @Published var progress: Double = 0.0
-
-            func updateProgress(to newValue: CGFloat, animate: Bool) {
-                if animate {
-                    withAnimation(.easeInOut(duration: 2.5)) {
-                        self.progress = Double(newValue)
-                    }
-                } else {
-                    progress = Double(newValue)
-                }
-            }
-        }
-
-        struct FillablePieSegment: View {
-            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
-
-            var color: Color
-            var backgroundColor: Color
-            var displayText: String
-            var symbolSize: CGFloat
-            var symbol: String
-            var animateProgress: Bool
-            var button3D: Bool
-            var fillFraction: CGFloat
-            var symbolRotation: Double = 0
-            var symbolBackgroundColor: Color = .clear
-            var symbolColor: Color? = nil
-
-            var body: some View {
-                VStack {
-                    ZStack {
-                        if button3D {
-                            Circle()
-                                .stroke(
-                                    LinearGradient(
-                                        gradient: Gradient(colors: [
-                                            .dynamicTopGlow.opacity(0.9),
-                                            .dynamicTopGlow.opacity(0.4),
-                                            .dynamicBottomShadow.opacity(0.3),
-                                            .dynamicBottomShadow
-                                        ]),
-                                        startPoint: .top,
-                                        endPoint: .bottom
-                                    ),
-                                    lineWidth: 2
-                                )
-                                .frame(width: 50, height: 50)
-                                .shadow(color: .dynamicTopGlow.opacity(0.6), radius: 2, x: -1, y: -1)
-                                .shadow(color: .dynamicBottomShadow.opacity(0.8), radius: 2, x: 1, y: 1)
-                        }
-
-                        // Fortschrittsanzeige
-                        PieSliceView(
-                            startAngle: .degrees(-90),
-                            endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                        )
-                        .fill(color.opacity(0.0))
-                        .frame(width: 50, height: 50)
-                        .opacity(0.5)
-
-                        // Symbol-Hintergrund
-                        if symbolBackgroundColor != .clear {
-                            Circle()
-                                // .fill(symbolBackgroundColor)
-                                .fill(Color.dynamicIconBackground)
-
-                                .frame(width: 50, height: 50)
-                        }
-
-                        // Symbol
-                        Image(systemName: symbol)
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: symbolSize, height: symbolSize)
-                            .foregroundColor(symbolColor ?? .dynamicIconForeground)
-                            .rotationEffect(.degrees(symbolRotation))
-                    }
-
-                    // Text
-                    Text(displayText)
-                        .font(.system(size: 15))
-                        .foregroundColor(.dynamicSecondaryText)
-                }
-                .offset(y: 10)
-                .onAppear {
-                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-                }
-                .onChange(of: fillFraction) { _, newValue in
-                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-                }
-            }
-        }
-
-        struct BigFillablePieSegment: View {
-            @ObservedObject var pieSegmentViewModel: PieSegmentViewModel
-
-            var fillFraction: CGFloat
-            var backgroundColor: Color?
-            var color: Color
-            var animateProgress: Bool
-            var button3D: Bool
-
-            var body: some View {
-                ZStack {
-                    if button3D {
-                        Circle()
-                            .stroke(
-                                LinearGradient(
-                                    gradient: Gradient(colors: [
-                                        .dynamicTopGlow.opacity(0.9),
-                                        .dynamicTopGlow.opacity(0.6),
-                                        .clear,
-                                        .dynamicBottomShadow.opacity(0.3),
-                                        .dynamicBottomShadow
-                                    ]),
-                                    startPoint: .top,
-                                    endPoint: .bottom
-                                ),
-                                lineWidth: 2
-                            )
-                            .shadow(color: .dynamicTopGlow.opacity(0.6), radius: 2, x: -1, y: -1)
-                            .shadow(color: .dynamicBottomShadow.opacity(0.8), radius: 2, x: 1, y: 1)
-                    }
-
-                    // Fortschrittsanzeige
-                    PieSliceView(
-                        startAngle: .degrees(-90),
-                        endAngle: .degrees(-90 + Double(pieSegmentViewModel.progress * 360))
-                    )
-                    .fill(color)
-                    .frame(width: 120, height: 120)
-                    .opacity(1.0)
-                }
-                .onAppear {
-                    pieSegmentViewModel.updateProgress(to: fillFraction, animate: animateProgress)
-                }
-                .onChange(of: fillFraction) { _, newValue in
-                    pieSegmentViewModel.updateProgress(to: newValue, animate: true)
-                }
-            }
-        }
-
-        // Fillable PieSegments Ende
-
         var pumpView: some View {
             PumpView(
                 reservoir: $state.reservoir,
@@ -465,6 +240,7 @@ extension Home {
             let button3D: Bool
 
             @State private var animatedFill: CGFloat = 0.0
+            @StateObject private var pieSegmentViewModel = PieSegmentViewModel() // Hier instanziieren
 
             var body: some View {
                 HStack {
@@ -473,7 +249,6 @@ extension Home {
                         let expiration = sensordays - sensorAge
                         let secondsOfDay = 8.64E4
 
-                        // Farbe abhängig vom Alter
                         let lineColour: Color = {
                             if sensorAge >= sensordays - secondsOfDay * 1 {
                                 return .red.opacity(0.9)
@@ -484,12 +259,12 @@ extension Home {
                             }
                         }()
 
-                        // Füllgrad = aktuelles Alter / Gesamtdauer
                         let targetFill = CGFloat(sensorAge / sensordays)
 
                         ZStack {
                             FillablePieSegment(
-                                pieSegmentViewModel: PieSegmentViewModel(),
+                                pieSegmentViewModel: pieSegmentViewModel,
+                                fillFraction: animatedFill,
                                 color: lineColour,
                                 backgroundColor: .clear,
                                 displayText: {
@@ -513,10 +288,8 @@ extension Home {
                                 symbol: "sensor.tag.radiowaves.forward.fill",
                                 animateProgress: true,
                                 button3D: button3D,
-                                fillFraction: animatedFill,
                                 symbolBackgroundColor: .dynamicIconBackground
                             )
-
                             Image(systemName: "sensor.tag.radiowaves.forward.fill")
                                 .resizable()
                                 .scaledToFit()
@@ -525,7 +298,10 @@ extension Home {
                                 .verticalFillMask(
                                     fillFraction: animatedFill,
                                     gradient: LinearGradient(
-                                        gradient: Gradient(colors: [.dynamicIconBackground, lineColour]),
+                                        gradient: Gradient(colors: [
+                                            .dynamicIconForeground,
+                                            lineColour
+                                        ]),
                                         startPoint: .bottom,
                                         endPoint: .top
                                     )
@@ -547,17 +323,17 @@ extension Home {
                 .frame(width: 50, height: 50)
             }
 
-            private var remainingTimeFormatter: DateComponentsFormatter {
+            private var remainingTimeFormatterDays: DateComponentsFormatter {
                 let formatter = DateComponentsFormatter()
-                formatter.allowedUnits = [.day, .hour]
+                formatter.allowedUnits = [.day]
                 formatter.unitsStyle = .abbreviated
                 return formatter
             }
 
-            private var remainingTimeFormatterDays: DateComponentsFormatter {
+            private var remainingTimeFormatter: DateComponentsFormatter {
                 let formatter = DateComponentsFormatter()
-                formatter.allowedUnits = [.day]
-                formatter.unitsStyle = .short
+                formatter.allowedUnits = [.day, .hour, .minute]
+                formatter.unitsStyle = .abbreviated
                 return formatter
             }
         }
@@ -735,15 +511,16 @@ extension Home {
             ZStack {
                 FillablePieSegment(
                     pieSegmentViewModel: connectionPieSegmentViewModel,
-                    color: Color.white.opacity(0.5),
-                    backgroundColor: .clear,
+                    fillFraction: 1.0,
+                    color: Color.dynamicIconForeground.opacity(0.5), backgroundColor: .clear,
                     displayText: "",
-                    symbolSize: 0,
-                    symbol: "cross.vial",
+                    symbolSize: 25,
+                    symbol: "battery.50percent",
                     animateProgress: false,
                     button3D: state.button3D,
-                    fillFraction: 0.0,
-                    symbolBackgroundColor: .dynamicIconBackground
+                    symbolRotation: -90,
+                    symbolBackgroundColor: Color.dynamicIconBackground,
+                    symbolColor: Color.dynamicIconForeground
                 )
                 .frame(width: 60, height: 60)
 
@@ -936,7 +713,6 @@ extension Home {
                 }
             }
             .frame(height: totalHeight)
-            .background(Color.dynamicBackground)
             .animation(.easeInOut(duration: 1.2), value: display)
         }
 
@@ -954,6 +730,7 @@ extension Home {
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: carbsPieSegmentViewModel,
+                            fillFraction: animatedFill,
                             color: .orange,
                             backgroundColor: .clear,
                             displayText: {
@@ -968,10 +745,11 @@ extension Home {
                             }(),
                             symbolSize: 0,
                             symbol: "cross.vial",
-                            animateProgress: true,
+                            animateProgress: false,
                             button3D: state.button3D,
-                            fillFraction: animatedFill,
-                            symbolBackgroundColor: .dynamicIconBackground
+                            symbolRotation: -90,
+                            symbolBackgroundColor: Color.dynamicIconBackground,
+                            symbolColor: Color.dynamicIconForeground
                         )
 
                         Image(systemName: "apple.logo")
@@ -1022,6 +800,7 @@ extension Home {
                         ZStack {
                             FillablePieSegment(
                                 pieSegmentViewModel: insulinPieSegmentViewModel,
+                                fillFraction: animatedInsulinFill,
                                 color: pieColor,
                                 backgroundColor: .clear,
                                 displayText: "\(insulinnumberFormatter.string(from: (state.data.suggestion?.iob ?? 0) as NSNumber) ?? "0")U",
@@ -1029,7 +808,6 @@ extension Home {
                                 symbol: "cross.vial",
                                 animateProgress: true,
                                 button3D: state.button3D,
-                                fillFraction: animatedInsulinFill,
                                 symbolBackgroundColor: .dynamicIconBackground
                             )
 
@@ -1177,17 +955,18 @@ extension Home {
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: reservoirPieSegmentViewModel,
+                            fillFraction: 1.0,
                             color: reservoirColor,
                             backgroundColor: .clear,
                             displayText: displayText,
-                            symbolSize: 21,
-                            symbol: "cross.vial.fill",
+                            symbolSize: 25,
+                            symbol: "battery.50percent",
                             animateProgress: false,
                             button3D: state.button3D,
-                            fillFraction: fill,
-                            symbolColor: reservoirColor
-                        )
-                        .frame(width: 60, height: 60)
+                            symbolRotation: -90,
+                            symbolBackgroundColor: Color.dynamicIconBackground,
+                            symbolColor: Color.dynamicIconForeground
+                        ).frame(width: 60, height: 60)
                         // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
                     }
                 }
@@ -1254,16 +1033,17 @@ extension Home {
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: insulinAgePieSegmentViewModel,
-                        color: .white,
+                        fillFraction: insulinFraction,
+                        color: insulinColor,
                         backgroundColor: .clear,
                         displayText: insulinDisplayText,
                         symbolSize: 25,
                         symbol: "cross.vial",
-                        animateProgress: true,
+                        animateProgress: false,
                         button3D: state.button3D,
-                        fillFraction: insulinFraction,
+                        symbolRotation: -90,
                         symbolBackgroundColor: Color.dynamicIconBackground,
-                        symbolColor: insulinColor
+                        symbolColor: Color.dynamicIconForeground
                     )
                     .frame(width: 60, height: 60)
                     // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
@@ -1355,17 +1135,18 @@ extension Home {
 
                 ZStack {
                     FillablePieSegment(
-                        pieSegmentViewModel: cannulaPieSegmentViewModel,
-                        color: .white,
+                        pieSegmentViewModel: batteryAgePieSegmentViewModel,
+                        fillFraction: cannulaFraction,
+                        color: cannulaColor,
                         backgroundColor: .clear,
                         displayText: cannulaDisplayText,
-                        symbolSize: 0,
-                        symbol: "cross.vial",
-                        animateProgress: true,
+                        symbolSize: 25,
+                        symbol: "battery.50percent",
+                        animateProgress: false,
                         button3D: state.button3D,
-                        fillFraction: cannulaFraction,
+                        symbolRotation: -90,
                         symbolBackgroundColor: Color.dynamicIconBackground,
-                        symbolColor: cannulaColor
+                        symbolColor: Color.dynamicIconForeground
                     )
                     .frame(width: 60, height: 60)
 
@@ -1411,6 +1192,7 @@ extension Home {
                 ZStack {
                     FillablePieSegment(
                         pieSegmentViewModel: batteryAgePieSegmentViewModel,
+                        fillFraction: 1.0, // ✅ Korrekt - als eigener Parameter
                         color: batteryAgeColor,
                         backgroundColor: .clear,
                         displayText: batteryAgeText,
@@ -1418,12 +1200,10 @@ extension Home {
                         symbol: "battery.50percent",
                         animateProgress: false,
                         button3D: state.button3D,
-                        fillFraction: 1.0,
                         symbolRotation: -90,
                         symbolBackgroundColor: Color.dynamicIconBackground,
                         symbolColor: Color.dynamicIconForeground
-                    )
-                    .frame(width: 60, height: 60)
+                    ).frame(width: 60, height: 60)
 
                     Image(systemName: "clock.fill")
                         .resizable()
@@ -1444,14 +1224,13 @@ extension Home {
                     ZStack {
                         FillablePieSegment(
                             pieSegmentViewModel: connectionPieSegmentViewModel,
-                            color: Color.dynamicColorBlue,
+                            fillFraction: connectionFraction, color: Color.dynamicColorBlue,
                             backgroundColor: .clear,
                             displayText: displayText,
                             symbolSize: 25,
                             symbol: "dot.radiowaves.left.and.right",
                             animateProgress: true,
                             button3D: state.button3D,
-                            fillFraction: connectionFraction,
                             symbolBackgroundColor: Color.dynamicIconBackground,
                             symbolColor: Color.dynamicIconForeground
                         )
@@ -1554,16 +1333,15 @@ extension Home {
             VStack(spacing: 0) {
                 if state.danaBar {
                     danaBarMax
-                        .padding(.vertical, 10)
-                        .padding(.top, 10)
+                        .padding(.bottom, 10)
                 }
                 mainChart
-                    .padding(.top, 35)
+                    .padding(.top, 15)
                 bottomBar
                     .padding(.top, 20)
                     .frame(width: UIScreen.main.bounds.width)
             }
-            .frame(minHeight: UIScreen.main.bounds.height / 1.81) // Je größer der Wert, desto kleiner der mainChart
+            .frame(minHeight: UIScreen.main.bounds.height / 1.85) // Je größer der Wert, desto kleiner der mainChart
         }
 
         // BottomInfoBar Start
@@ -1653,7 +1431,6 @@ extension Home {
             }
             .foregroundColor(.dynamicSecondaryText)
             .font(.timeSettingFont)
-            .padding(.vertical, 15)
             .background(
                 TimeEllipse(
                     button3D: state.button3D
@@ -2424,10 +2201,12 @@ extension Home {
                     .sheet(isPresented: $displayAutoHistory) {
                         AutoISFHistoryView(units: state.data.units)
                             .environment(\.colorScheme, colorScheme)
+                            .background(Color.dynamicBackground)
                     }
                     .sheet(isPresented: $displayDynamicHistory) {
                         DynamicHistoryView(units: state.data.units)
                             .environment(\.colorScheme, colorScheme)
+                            .background(Color.dynamicBackground)
                     }
 
                     .popup(isPresented: state.isStatusPopupPresented, alignment: .center, direction: .bottom) {

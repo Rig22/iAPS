@@ -106,8 +106,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var glucoseOverrideThresholdDown: Decimal = 100
     var noCarbs: Bool = false
     var useCarbBars: Bool = false
-    // ColorScheme
-    var lightMode: LightMode = .auto
+
     // Auto ISF
     var autoisf: Bool = false
     var smbDeliveryRatioBGrange: Decimal = 0
@@ -362,10 +361,6 @@ extension FreeAPSSettings: Decodable {
             forKey: .addSourceInfoToGlucoseNotifications
         ) {
             settings.addSourceInfoToGlucoseNotifications = addSourceInfoToGlucoseNotifications
-        }
-
-        if let lightMode = try? container.decode(LightMode.self, forKey: .lightMode) {
-            settings.lightMode = lightMode
         }
 
         if let lowGlucose = try? container.decode(Decimal.self, forKey: .lowGlucose) {

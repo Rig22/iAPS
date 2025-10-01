@@ -3,6 +3,7 @@ import SwiftUI
 struct MultiplierEditorView: View {
     @Binding var grams: Double
     @Environment(\.dismiss) var dismiss
+    @Environment(\.colorScheme) var colorScheme
     @State private var inputText: String = ""
     @FocusState private var isInputFocused: Bool
 
@@ -85,6 +86,7 @@ struct MultiplierEditorView: View {
                     .padding(.bottom, 30)
                 }
             }
+            .background(Color.dynamicBackground)
             .onAppear {
                 inputText = String(format: "%.0f", grams)
                 isInputFocused = true
