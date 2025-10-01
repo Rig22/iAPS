@@ -157,7 +157,7 @@ struct PumpView: View {
                                             ) as NSNumber) ?? ""
                                     )
                                     .font(.system(size: 11, weight: .medium))
-                                   // Text("U")
+                                    // Text("U")
                                     Text("")
                                         .font(.system(size: 7, weight: .medium))
                                 }
