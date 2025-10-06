@@ -161,7 +161,6 @@ struct PumpView: View {
                                     Text("")
                                         .font(.system(size: 7, weight: .medium))
                                 }
-
                                 .foregroundColor(.white)
                                 .shadow(color: .black.opacity(0.3), radius: 1, x: 0.5, y: 0.5) // Leichter Schatten für Kontrast
                             }
@@ -429,16 +428,16 @@ struct PumpView: View {
                 .symbolRenderingMode(.palette)
                 .shadow(radius: 1, x: 2, y: 2)
                 .foregroundColor(.dynamicIconBackground)
-                .overlay {
-                    // Zusätzlicher Overlay für niedrigen Füllstand (wie bei Omnipod)
-                    if portion >= 0.7 { // Wenn nur noch wenig Insulin (portion ist 1 - Füllstand)
-                        let units = 50 * (concentration.last?.concentration ?? 1)
-                        Text((reservoirFormatter.string(from: units as NSNumber) ?? "") + "+")
-                            .foregroundColor(.white)
-                            .font(.system(size: 6))
-                            .offset(y: -8) // Position an Medtrum-Icon anpassen
-                    }
-                }
+            /*  .overlay {
+                 // Zusätzlicher Overlay für niedrigen Füllstand (wie bei Omnipod)
+                 if portion >= 0.7 { // Wenn nur noch wenig Insulin (portion ist 1 - Füllstand)
+                     let units = 50 * (concentration.last?.concentration ?? 1)
+                     Text((reservoirFormatter.string(from: units as NSNumber) ?? "") + "+")
+                         .foregroundColor(.white)
+                         .font(.system(size: 6))
+                         .offset(y: -8) // Position an Medtrum-Icon anpassen
+                 }
+             }*/
         }
     }
 

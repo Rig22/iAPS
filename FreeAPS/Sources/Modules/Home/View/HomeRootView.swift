@@ -744,7 +744,7 @@ extension Home {
                                 }
                             }(),
                             symbolSize: 0,
-                            symbol: "cross.vial",
+                            symbol: "",
                             animateProgress: false,
                             button3D: state.button3D,
                             symbolRotation: -90,
@@ -902,392 +902,33 @@ extension Home {
             }
         }
 
-        // Top Bars
-
-        // danaBarMax
+        private var danaBarViewModel: DanaBarViewModel {
+            DanaBarViewModel(
+                reservoirLevel: state.reservoirLevel,
+                insulinHours: state.insulinHours,
+                cannulaHours: state.cannulaHours,
+                batteryHours: state.batteryHours,
+                isConnected: state.isConnected,
+                button3D: state.button3D,
+                insulinAgeOption: state.insulinAgeOption,
+                cannulaAgeOption: state.cannulaAgeOption,
+                reservoirFormatter: reservoirFormatter,
+                concentration: concentration
+            )
+        }
 
         @ViewBuilder var danaBarMax: some View {
             if state.danaBar {
-                VStack(spacing: 20) {
-                    HStack(spacing: 20) {
-                        insulinAgeView.frame(width: 60)
-                        cannulaAgeView.frame(width: 60)
-                        batteryAgeView.frame(width: 60)
-                        BluetoothConnectionView.frame(width: 60)
-                    }
-                }
+                DanaBarView(viewModel: danaBarViewModel)
             } else {
                 EmptyView()
             }
         }
 
-        // Top Bar Modules Start
-
-        private var reservoirView: some View {
-            Group {
-                if let reservoir = state.reservoirLevel {
-                    let maxValue = Decimal(300)
-                    let reservoirDecimal = Decimal(reservoir)
-                    let fractionDecimal = reservoirDecimal / maxValue
-                    let fill = max(min(CGFloat(NSDecimalNumber(decimal: fractionDecimal).doubleValue), 1.0), 0.0)
-
-                    let reservoirColor: Color = {
-                        if reservoir < 20 {
-                            return .dynamicColorRed
-                        } else if reservoir < 50 {
-                            return .dynamicColorYellow
-                        } else {
-                            return .dynamicIconForeground.opacity(0.5)
-                        }
-                    }()
-
-                    let displayText: String = {
-                        if reservoir == 0 {
-                            return "--"
-                        } else {
-                            let concentrationValue = Decimal(concentration.last?.concentration ?? 1.0)
-                            let adjustedReservoir = reservoirDecimal * concentrationValue
-                            return (reservoirFormatter.string(from: adjustedReservoir as NSNumber) ?? "") + "U"
-                        }
-                    }()
-
-                    // let shouldBlink = reservoirColor == .red
-                    ZStack {
-                        FillablePieSegment(
-                            pieSegmentViewModel: reservoirPieSegmentViewModel,
-                            fillFraction: 1.0,
-                            color: reservoirColor,
-                            backgroundColor: .clear,
-                            displayText: displayText,
-                            symbolSize: 25,
-                            symbol: "battery.50percent",
-                            animateProgress: false,
-                            button3D: state.button3D,
-                            symbolRotation: -90,
-                            symbolBackgroundColor: Color.dynamicIconBackground,
-                            symbolColor: Color.dynamicIconForeground
-                        ).frame(width: 60, height: 60)
-                        // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
-                    }
-                }
-            }
-            .onTapGesture {
-                if state.pumpDisplayState != nil {
-                    state.setupPump = true
-                }
-            }
-        }
-
-        private var insulinAgeView: some View {
-            Group {
-                let insulinDisplayText: String = {
-                    guard let insulinHours = state.insulinHours,
-                          let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption)
-                    else {
-                        return "--"
-                    }
-
-                    let remainingHours = max(insulinAgeOption.maxInsulinAge - insulinHours, 0)
-                    let totalRemainingMinutes = Int(remainingHours * 60)
-                    let days = totalRemainingMinutes / (24 * 60)
-                    let hours = (totalRemainingMinutes % (24 * 60)) / 60
-                    let minutes = totalRemainingMinutes % 60
-
-                    if days >= 1 {
-                        return "\(days)d\(hours)h"
-                    } else if hours >= 1 {
-                        return "\(hours)h\(minutes)m"
-                    } else {
-                        return "\(minutes)m"
-                    }
-                }()
-
-                let insulinFraction: CGFloat = {
-                    guard let insulinHours = state.insulinHours,
-                          let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption)
-                    else {
-                        return 0.0
-                    }
-                    let remainingHours = insulinAgeOption.maxInsulinAge - insulinHours
-                    return remainingHours <= 1 ? 1.0 : CGFloat(min(max(
-                        remainingHours / insulinAgeOption.maxInsulinAge,
-                        0.0
-                    ), 1.0))
-                }()
-
-                let insulinColor: Color = {
-                    guard let insulinHours = state.insulinHours,
-                          let insulinAgeOption = InsulinAgeOption(rawValue: state.insulinAgeOption)
-                    else {
-                        return .clear
-                    }
-
-                    let maxInsulinAge = insulinAgeOption.maxInsulinAge
-                    let remainingHours = maxInsulinAge - CGFloat(insulinHours)
-
-                    return colorForRemainingHours(remainingHours)
-                }()
-
-                // let shouldBlink = insulinColor == .red
-
-                ZStack {
-                    FillablePieSegment(
-                        pieSegmentViewModel: insulinAgePieSegmentViewModel,
-                        fillFraction: insulinFraction,
-                        color: insulinColor,
-                        backgroundColor: .clear,
-                        displayText: insulinDisplayText,
-                        symbolSize: 25,
-                        symbol: "cross.vial",
-                        animateProgress: false,
-                        button3D: state.button3D,
-                        symbolRotation: -90,
-                        symbolBackgroundColor: Color.dynamicIconBackground,
-                        symbolColor: Color.dynamicIconForeground
-                    )
-                    .frame(width: 60, height: 60)
-                    // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
-                }
-            }
-        }
-
-        struct InsulinCatheterSymbol: View {
-            var color: Color // Farbe von außen übergeben
-            var baseSize: CGFloat = 40 // Basisgröße
-
-            var body: some View {
-                ZStack {
-                    Image(systemName: "hockey.puck")
-                        .resizable()
-                        .foregroundStyle(color)
-                        .frame(width: 22, height: 12)
-                        .offset(x: 0, y: -1)
-
-                    Rectangle()
-                        .frame(width: 2, height: 7)
-                        .foregroundStyle(color)
-                        .offset(x: 0, y: 8)
-                }
-                .frame(width: baseSize, height: baseSize)
-            }
-        }
-
-        private var cannulaAgeView: some View {
-            Group {
-                let cannulaDisplayText: String = {
-                    guard let cannulaHours = state.cannulaHours,
-                          let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
-                    else {
-                        return "--"
-                    }
-
-                    let remainingHours = max(cannulaAgeOption.maxCannulaAge - cannulaHours, 0)
-                    let totalRemainingMinutes = Int(remainingHours * 60)
-                    let days = totalRemainingMinutes / (24 * 60)
-                    let hours = (totalRemainingMinutes % (24 * 60)) / 60
-                    let minutes = totalRemainingMinutes % 60
-
-                    if days >= 1 {
-                        return "\(days)d\(hours)h"
-                    } else if hours >= 1 {
-                        return "\(hours)h\(minutes)m"
-                    } else {
-                        return "\(minutes)m"
-                    }
-                }()
-
-                let cannulaFraction: CGFloat = {
-                    if let cannulaHours = state.cannulaHours,
-                       let cannulaAgeOption = CannulaAgeOption(
-                           rawValue: state
-                               .cannulaAgeOption
-                       )
-                    {
-                        let remainingHours = cannulaAgeOption
-                            .maxCannulaAge - cannulaHours
-                        if remainingHours <= 1 {
-                            return 1.0
-                        } else {
-                            return CGFloat(min(max(
-                                remainingHours / cannulaAgeOption.maxCannulaAge,
-                                0.0
-                            ), 1.0))
-                        }
-                    } else {
-                        return 0.0
-                    }
-                }()
-
-                let cannulaColor: Color = {
-                    if let cannulaHours = state.cannulaHours,
-                       let cannulaAgeOption = CannulaAgeOption(rawValue: state.cannulaAgeOption)
-                    {
-                        let maxCannulaAge = cannulaAgeOption.maxCannulaAge
-                        let remainingHours = maxCannulaAge - CGFloat(cannulaHours)
-                        return colorForRemainingHours(remainingHours)
-                    } else {
-                        return .clear
-                    }
-
-                }()
-
-                // let shouldBlink = cannulaColor == .red
-
-                ZStack {
-                    FillablePieSegment(
-                        pieSegmentViewModel: batteryAgePieSegmentViewModel,
-                        fillFraction: cannulaFraction,
-                        color: cannulaColor,
-                        backgroundColor: .clear,
-                        displayText: cannulaDisplayText,
-                        symbolSize: 0,
-                        symbol: "",
-                        animateProgress: false,
-                        button3D: state.button3D,
-                        symbolRotation: -90,
-                        symbolBackgroundColor: Color.dynamicIconBackground,
-                        symbolColor: Color.dynamicIconForeground
-                    )
-                    .frame(width: 60, height: 60)
-
-                    InsulinCatheterSymbol(color: cannulaColor)
-                        .offset(y: -1.5)
-                    // .modifier(BlinkingModifier(shouldBlink: shouldBlink))
-                }
-            }
-        }
-
-        private var batteryAgeView: some View {
-            Group {
-                var batteryAgeColor: Color {
-                    if let batteryHours = state.batteryHours {
-                        switch batteryHours {
-                        case 192...: // >8 Tage = Rot
-                            return Color.dynamicIconForeground.opacity(0.5)
-                        case 168 ..< 192: // 7-8 Tage = Gelb
-                            return Color.dynamicIconForeground.opacity(0.5)
-                        default: // <7 Tage = Weiß/Transparent
-                            return Color.dynamicIconForeground.opacity(0.5)
-                        }
-                    } else {
-                        return .dynamicIconForeground.opacity(0.5)
-                    }
-                }
-
-                let batteryAgeText: String = {
-                    if let batteryHours = state.batteryHours {
-                        let totalMinutes = Int(batteryHours * 60)
-                        if totalMinutes < 60 {
-                            return "\(totalMinutes)min"
-                        } else {
-                            let days = totalMinutes / (24 * 60)
-                            let hours = (totalMinutes % (24 * 60)) / 60
-                            return days > 0 ? "\(days)d\(hours)h" : "\(hours)h"
-                        }
-                    } else {
-                        return "--"
-                    }
-                }()
-
-                ZStack {
-                    FillablePieSegment(
-                        pieSegmentViewModel: batteryAgePieSegmentViewModel,
-                        fillFraction: 1.0, // ✅ Korrekt - als eigener Parameter
-                        color: batteryAgeColor,
-                        backgroundColor: .clear,
-                        displayText: batteryAgeText,
-                        symbolSize: 25,
-                        symbol: "battery.50percent",
-                        animateProgress: false,
-                        button3D: state.button3D,
-                        symbolRotation: -90,
-                        symbolBackgroundColor: Color.dynamicIconBackground,
-                        symbolColor: Color.dynamicIconForeground
-                    ).frame(width: 60, height: 60)
-
-                    Image(systemName: "clock.fill")
-                        .resizable()
-                        // .rotationEffect(.degrees(-50))
-                        .foregroundColor(Color.dynamicIconForeground)
-                        .frame(width: 15, height: 15)
-                        .offset(x: 13, y: -17)
-                }
-            }
-        }
-
-        private var BluetoothConnectionView: some View {
-            Group {
-                let connectionFraction: CGFloat = state.isConnected ? 1.0 : 0.0
-                let displayText: String = state.isConnected ? "ON" : "OFF"
-
-                HStack {
-                    ZStack {
-                        FillablePieSegment(
-                            pieSegmentViewModel: connectionPieSegmentViewModel,
-                            fillFraction: connectionFraction, color: Color.dynamicColorBlue,
-                            backgroundColor: .clear,
-                            displayText: displayText,
-                            symbolSize: 25,
-                            symbol: "dot.radiowaves.left.and.right",
-                            animateProgress: true,
-                            button3D: state.button3D,
-                            symbolBackgroundColor: Color.dynamicIconBackground,
-                            symbolColor: Color.dynamicIconForeground
-                        )
-                        .frame(width: 60, height: 60)
-                    }
-                    .offset(y: -2)
-                }
-            }
-            .animation(.easeInOut(duration: 0.3), value: state.isConnected)
-        }
-
-        // TopBar Max Modules Ende
-
-        // MARK: - Helper-Views for Standard 1 und DanaBar Anfang
-
-        private func formatTime(_ hours: Double) -> String {
-            let totalMinutes = Int(hours * 60)
-            let days = totalMinutes / (24 * 60)
-            let hours = (totalMinutes % (24 * 60)) / 60
-            let minutes = totalMinutes % 60
-
-            if days >= 1 {
-                return "\(days)d\(hours)h"
-            } else if hours >= 1 {
-                return "\(hours)h"
-            } else {
-                return "\(minutes)m"
-            }
-        }
-
-        func colorForRemainingHours(_ remainingHours: CGFloat) -> Color {
-            switch remainingHours {
-            case ..<2:
-                return Color.dynamicColorRed
-            case ..<6:
-                return Color.dynamicColorYellow
-            default:
-                return Color.dynamicIconForeground
-            }
-        }
-
-        func colorForRemainingMinutes(_ remainingMinutes: CGFloat) -> Color {
-            switch remainingMinutes {
-            case ..<120:
-                return Color.dynamicColorRed
-            case ..<360:
-                return Color.dynamicColorYellow
-            default:
-                return Color.dynamicIconForeground
-            }
-        }
-
         func startTimer() {
-            timer?.invalidate() // Falls ein vorheriger Timer existiert, wird er gestoppt
+            timer?.invalidate()
             timer = Timer.scheduledTimer(withTimeInterval: timerInterval, repeats: true) { _ in
                 state.specialDanaKitFunction()
-                // Nach 15 Sekunden auf 60 Sekunden Intervall wechseln
                 if timerInterval == 2 {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 15) {
                         timerInterval = 60
@@ -1296,10 +937,6 @@ extension Home {
                 }
             }
         }
-
-        // MARK: - Helper-Views for DanaBar Ende
-
-        // TopBars Ende
 
         var mainChart: some View {
             Group {

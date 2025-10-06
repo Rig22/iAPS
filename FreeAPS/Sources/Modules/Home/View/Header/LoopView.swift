@@ -66,6 +66,7 @@ struct LoopView: View {
                         symbolBackgroundColor: backgroundColor,
                         symbolColor: color
                     )
+                    .offset(y: 1.5)
 
                     if isLooping {
                         Circle()
