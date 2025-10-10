@@ -166,6 +166,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var foodSearchEnabled: Bool = false
     var advancedDosingRecommendationsEnabled: Bool = false
     var useGPT5ForOpenAI: Bool = false
+    var ai: Bool = true
 }
 
 extension FreeAPSSettings: Decodable {
@@ -812,6 +813,10 @@ extension FreeAPSSettings: Decodable {
 
         if let useGPT5ForOpenAI = try? container.decode(Bool.self, forKey: .useGPT5ForOpenAI) {
             settings.useGPT5ForOpenAI = useGPT5ForOpenAI
+        }
+
+        if let ai = try? container.decode(Bool.self, forKey: .ai) {
+            settings.ai = ai
         }
 
         self = settings

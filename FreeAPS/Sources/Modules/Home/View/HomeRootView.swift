@@ -240,19 +240,20 @@ extension Home {
             let button3D: Bool
 
             @State private var animatedFill: CGFloat = 0.0
-            @StateObject private var pieSegmentViewModel = PieSegmentViewModel() // Hier instanziieren
+            @StateObject private var pieSegmentViewModel = PieSegmentViewModel()
 
             var body: some View {
                 HStack {
                     if let date = recentGlucose?.sessionStartDate {
-                        let sensorAge: TimeInterval = (-1 * date.timeIntervalSinceNow)
+                        let sensorAge: TimeInterval = -date.timeIntervalSinceNow
                         let expiration = sensordays - sensorAge
-                        let secondsOfDay = 8.64E4
+                        let secondsPerDay: TimeInterval = 86400
+                        let secondsPerHour: TimeInterval = 3600
 
                         let lineColour: Color = {
-                            if sensorAge >= sensordays - secondsOfDay * 1 {
+                            if sensorAge >= sensordays - secondsPerDay {
                                 return .red.opacity(0.9)
-                            } else if sensorAge >= sensordays - secondsOfDay * 2 {
+                            } else if sensorAge >= sensordays - (secondsPerDay * 2) {
                                 return .orange
                             } else {
                                 return .dynamicIconForeground
@@ -260,6 +261,16 @@ extension Home {
                         }()
 
                         let targetFill = CGFloat(sensorAge / sensordays)
+                        let displayInterval = displayExpiration ? expiration : sensorAge
+                        let displayText: String = {
+                            if displayInterval >= secondsPerDay {
+                                return dayFormatter.string(from: displayInterval) ?? ""
+                            } else if displayInterval >= secondsPerHour {
+                                return hourFormatter.string(from: displayInterval) ?? ""
+                            } else {
+                                return minuteFormatter.string(from: displayInterval) ?? ""
+                            }
+                        }()
 
                         ZStack {
                             FillablePieSegment(
@@ -267,29 +278,14 @@ extension Home {
                                 fillFraction: animatedFill,
                                 color: lineColour,
                                 backgroundColor: .clear,
-                                displayText: {
-                                    let minutesAndHours = (displayExpiration && expiration < 1 * secondsOfDay) ||
-                                        (displaySAGE && sensorAge < 1 * secondsOfDay)
-
-                                    return !minutesAndHours ?
-                                        (
-                                            remainingTimeFormatterDays
-                                                .string(from: displayExpiration ? expiration : sensorAge) ?? ""
-                                        )
-                                        .replacingOccurrences(of: ",", with: " ")
-                                        :
-                                        (
-                                            remainingTimeFormatter
-                                                .string(from: displayExpiration ? expiration : sensorAge) ?? ""
-                                        )
-                                        .replacingOccurrences(of: ",", with: " ")
-                                }(),
+                                displayText: displayText,
                                 symbolSize: 0,
                                 symbol: "sensor.tag.radiowaves.forward.fill",
                                 animateProgress: true,
                                 button3D: button3D,
                                 symbolBackgroundColor: .dynamicIconBackground
                             )
+
                             Image(systemName: "sensor.tag.radiowaves.forward.fill")
                                 .resizable()
                                 .scaledToFit()
@@ -323,18 +319,25 @@ extension Home {
                 .frame(width: 50, height: 50)
             }
 
-            private var remainingTimeFormatterDays: DateComponentsFormatter {
-                let formatter = DateComponentsFormatter()
-                formatter.allowedUnits = [.day]
-                formatter.unitsStyle = .abbreviated
-                return formatter
+            private var dayFormatter: DateComponentsFormatter {
+                let f = DateComponentsFormatter()
+                f.allowedUnits = [.day]
+                f.unitsStyle = .abbreviated
+                return f
             }
 
-            private var remainingTimeFormatter: DateComponentsFormatter {
-                let formatter = DateComponentsFormatter()
-                formatter.allowedUnits = [.day, .hour, .minute]
-                formatter.unitsStyle = .abbreviated
-                return formatter
+            private var hourFormatter: DateComponentsFormatter {
+                let f = DateComponentsFormatter()
+                f.allowedUnits = [.hour]
+                f.unitsStyle = .abbreviated
+                return f
+            }
+
+            private var minuteFormatter: DateComponentsFormatter {
+                let f = DateComponentsFormatter()
+                f.allowedUnits = [.minute]
+                f.unitsStyle = .abbreviated
+                return f
             }
         }
 

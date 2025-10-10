@@ -18,13 +18,7 @@ struct FoodSearchView: View {
             VStack {
                 HStack(spacing: 8) {
                     TextField("Food Search...", text: $state.foodSearchText)
-                        .padding(10) // Innenabstand für bessere Optik
-                        .background(Color(uiColor: UIColor { traitCollection in
-                            traitCollection.userInterfaceStyle == .dark
-                                ? UIColor.darkGray // dunkler Hintergrund im Dark Mode
-                                : UIColor.systemGray6 // heller Hintergrund im Light Mode
-                        }))
-                        .cornerRadius(10) // abgerundete Ecken
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .submitLabel(.search)
@@ -105,8 +99,9 @@ struct FoodSearchView: View {
                 }
                 .padding(.top, 8)
             }
+
             .navigationTitle("Food Search")
-            .navigationBarItems(trailing: Button("Fertig") { dismiss() })
+            .navigationBarItems(trailing: Button("Done") { dismiss() })
             .navigationDestination(isPresented: $navigateToBarcode) {
                 BarcodeScannerView(
                     onBarcodeScanned: { barcode in
@@ -131,11 +126,11 @@ struct FoodSearchView: View {
     }
 
     private func handleBarcodeScan(_ barcode: String) {
-        print("📦 Barcode gescannt: \(barcode)")
+        print("📦 Barcode scanned: \(barcode)")
         navigateToBarcode = false
         state.foodSearchText = barcode
         state.performSearch(query: barcode)
-        print("🔍 Suche nach Barcode: \(barcode)")
+        print("🔍 Search for Barcode: \(barcode)")
     }
 
     private func handleAIAnalysis(_ analysisResult: AIFoodAnalysisResult, image: UIImage?) { // ✅ Parameter name korrigiert

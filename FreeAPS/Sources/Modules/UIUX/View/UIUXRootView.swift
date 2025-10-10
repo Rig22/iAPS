@@ -166,8 +166,8 @@ extension UIUX {
                                 }
 
                                 Section(header: Text("Chart settings")) {
-                                    //   Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
-                                    //  Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
+                                    Toggle("Display Chart X - Grid lines", isOn: $state.xGridLines)
+                                    Toggle("Display Chart Y - Grid lines", isOn: $state.yGridLines)
                                     Toggle("Mark Glucose Target Range green", isOn: $state.rulerMarks)
                                     Toggle("Display Insulin Activity Chart", isOn: $state.showInsulinActivity)
                                     Toggle("Display COB Chart", isOn: $state.showCobChart)
@@ -213,6 +213,7 @@ extension UIUX {
                                 Section(header: Text("Add Meal View settings")) {
                                     Toggle("Skip Bolus screen after carbs", isOn: $state.skipBolusScreenAfterCarbs)
                                     Toggle("Display and allow Fat and Protein entries", isOn: $state.useFPUconversion)
+                                    Toggle("AI Food Search", isOn: $state.ai)
                                 }
                             }
                             .frame(minHeight: geometry.size.height)

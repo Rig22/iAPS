@@ -29,6 +29,7 @@ extension UIUX {
         @Published var hideInsulinBadge: Bool = false
         @Published var hidePredictions: Bool = false
         @Published var useCarbBars: Bool = false
+        @Published var ai: Bool = false
         // Dana UI Toggels
         @Published var showPumpIcon: Bool = false
         @Published var pumpIconRawValue: String = "nano200"
@@ -72,6 +73,7 @@ extension UIUX {
             subscribeSetting(\.showCobChart, on: $showCobChart) { showCobChart = $0 }
             subscribeSetting(\.hidePredictions, on: $hidePredictions) { hidePredictions = $0 }
             subscribeSetting(\.useCarbBars, on: $useCarbBars) { useCarbBars = $0 }
+            subscribeSetting(\.ai, on: $ai) { ai = $0 }
             // Dana Toggels
             subscribeSetting(\.danaBar, on: $danaBar) { danaBar = $0 }
             subscribeSetting(\.showPumpIcon, on: $showPumpIcon) { showPumpIcon = $0 }

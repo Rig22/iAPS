@@ -29,19 +29,16 @@ extension AddCarbs {
         @State private var searchResults: [FoodItem] = []
         @State private var isLoading = false
         @State private var errorMessage: String?
-        @State private var selectedFoodItem: AIFoodItem? = nil
+        @State private var selectedFoodItem: AIFoodItem?
         @State private var showMultiplierEditor: Bool = false
         @State private var portionGrams: Double = 100.0
-        @State private var selectedFoodImage: UIImage? = nil
+        @State private var selectedFoodImage: UIImage?
+        @State private var saveAlert = false
 
         init(resolver: Resolver, editMode: Bool, override: Bool) {
             self.resolver = resolver
             self.editMode = editMode
             self.override = override
-        }
-
-        private func isAIAnalysisProduct(_ food: AIFoodItem) -> Bool {
-            food.brand == "AI Analysis" || food.brand == nil || food.brand?.contains("AI") == true
         }
 
         @FetchRequest(
@@ -67,31 +64,8 @@ extension AddCarbs {
 
         var body: some View {
             Form {
-                foodSearchSection
-
-                if let selectedFood = selectedFoodItem {
-                    SelectedFoodView(
-                        food: selectedFood,
-                        foodImage: selectedFoodImage, // ✅ NEU: Bild übergeben
-                        portionGrams: $portionGrams,
-                        onChange: {
-                            selectedFoodItem = nil
-                            selectedFoodImage = nil // ✅ NEU: Bild zurücksetzen
-                            showingFoodSearch = true
-                        },
-                        onTakeOver: { food in
-                            if isAIAnalysisProduct(food) {
-                                state.carbs = Decimal(food.carbs)
-                                state.fat = Decimal(food.fat)
-                                state.protein = Decimal(food.protein)
-                            } else {
-                                state.carbs = Decimal(food.carbs)
-                                state.fat = Decimal(food.fat)
-                                state.protein = Decimal(food.protein)
-                            }
-                        }
-                    )
-                }
+                // AI Food Search
+                state.ai ? foodSearch : nil
 
                 if let carbsReq = state.carbsRequired, state.carbs < carbsReq {
                     Section {
@@ -147,8 +121,7 @@ extension AddCarbs {
                         if !pushed {
                             Button {
                                 pushed = true
-                            } label: { Text("Now") }.buttonStyle(.borderless).foregroundColor(.secondary)
-                                .padding(.trailing, 5)
+                            } label: { Text("Now") }.buttonStyle(.borderless).foregroundColor(.secondary).padding(.trailing, 5)
                         } else {
                             Button { state.date = state.date.addingTimeInterval(-15.minutes.timeInterval) }
                             label: { Image(systemName: "minus.circle") }.tint(.blue).buttonStyle(.borderless)
@@ -193,7 +166,7 @@ extension AddCarbs {
                         ) }
                         .disabled(empty)
                         .frame(maxWidth: .infinity, alignment: .center)
-                }.listRowBackground(!empty ? Color(.systemBlue) : Color(.clear))
+                }.listRowBackground(!empty ? Color(.systemBlue) : Color(.systemGray4))
                     .tint(.white)
             }
             .compactSectionSpacing()
@@ -220,6 +193,7 @@ extension AddCarbs {
                     }
                 )
             }
+            .alert(isPresented: $saveAlert) { alert(food: selectedFoodItem) }
         }
 
         // MARK: - Helper Functions
@@ -253,23 +227,42 @@ extension AddCarbs {
 
         // MARK: - Food Search Section
 
-        private var foodSearchSection: some View {
-            Section(header: Text("AI Food Search")) {
-                NavigationLink(destination: AISettingsView()) {
-                    HStack {
-                        Image(systemName: "gearshape")
-                        Text("AI Settings")
-                        Spacer()
-                    }
-                    .foregroundColor(.blue)
-                }
+        private var foodSearch: some View {
+            Group {
+                foodSearchSection
 
-                // Suche in der Food-Datenbank
+                if let selectedFood = selectedFoodItem {
+                    SelectedFoodView(
+                        food: selectedFood,
+                        foodImage: selectedFoodImage,
+                        portionGrams: $portionGrams,
+                        onChange: {
+                            selectedFoodItem = nil
+                            selectedFoodImage = nil
+                            showingFoodSearch = true
+                        },
+                        onTakeOver: { food in
+                            state.carbs += Decimal(max(food.carbs, 0))
+                            state.fat += Decimal(max(food.fat, 0))
+                            state.protein += Decimal(fmax(food.protein, 0))
+
+                            selectedFoodImage = nil
+                            showingFoodSearch = false
+                            saveAlert.toggle()
+                        }
+                    )
+                }
+            }
+        }
+
+        private var foodSearchSection: some View {
+            Section {
+                // Search in Food Database
                 Button {
                     showingFoodSearch = true
                 } label: {
                     HStack {
-                        Image(systemName: "magnifyingglass")
+                        Image(systemName: "network")
                         Text("Search Food Database")
                         Spacer()
                         Image(systemName: "chevron.right")
@@ -278,7 +271,40 @@ extension AddCarbs {
                     }
                     .foregroundColor(.blue)
                 }
+                .buttonStyle(PlainButtonStyle())
             }
+            // Settings
+            header: {
+                HStack {
+                    Text("AI Food Search")
+                    Spacer()
+                    NavigationLink(destination: AISettingsView()) {
+                        Image(systemName: "gearshape")
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .foregroundColor(.blue)
+                }
+            }
+        }
+
+        private func addToPresetsIfNew(food: AIFoodItem) {
+            let preset = Presets(context: moc)
+            preset.carbs = Decimal(max(food.carbs, 0)) as NSDecimalNumber
+            preset.fat = Decimal(max(food.fat, 0)) as NSDecimalNumber
+            preset.protein = Decimal(fmax(food.protein, 0)) as NSDecimalNumber
+            preset.dish = food.name + " \(portionGrams) g"
+            if moc.hasChanges, !carbPresets.compactMap(\.dish).contains(preset.dish), !food.name.isEmpty {
+                do {
+                    try moc.save()
+                    state.selection = preset
+                    state.addPresetToNewMeal()
+                    selectedFoodItem = nil
+                } catch { print("Couldn't save " + (preset.dish ?? "new preset.")) }
+            }
+        }
+
+        private func isAIAnalysisProduct(_ food: AIFoodItem) -> Bool {
+            food.brand == "AI Analysis" || food.brand == nil || food.brand?.contains("AI") == true
         }
 
         private func handleSelectedFood(_ foodItem: FoodItem) {
@@ -376,7 +402,11 @@ extension AddCarbs {
                             HStack {
                                 Text("Save as Preset")
                                 Spacer()
-                                Text("[\(state.carbs), \(state.fat), \(state.protein)]")
+                                Text(
+                                    "[Carbs: " + (formatter.string(from: state.carbs as NSNumber) ?? "") + ", Fat: " +
+                                        (formatter.string(from: state.fat as NSNumber) ?? "") + ", Protein: " +
+                                        (formatter.string(from: state.protein as NSNumber) ?? "") + "]"
+                                )
                             }
                         }.frame(maxWidth: .infinity, alignment: .center)
                             .listRowBackground(Color(.systemBlue)).tint(.white)
@@ -411,6 +441,24 @@ extension AddCarbs {
             }
             .sheet(isPresented: $state.edit, content: { editView })
             .environment(\.colorScheme, colorScheme)
+        }
+
+        private func alert(food: AIFoodItem?) -> Alert {
+            if let food = food {
+                return Alert(
+                    title: Text("Save \"" + food.name + "\" as new Meal Preset?"),
+                    message: Text("To avoid having to search for same food on web again."),
+                    primaryButton: .destructive(Text("Yes"), action: { addToPresetsIfNew(food: food) }),
+                    secondaryButton: .cancel()
+                )
+            }
+
+            return Alert(
+                title: Text("Oops!"),
+                message: Text("Something isnt't working with food item \"" + (food?.name ?? "nil")),
+                primaryButton: .cancel(Text("OK")),
+                secondaryButton: .cancel()
+            )
         }
 
         @ViewBuilder private func presetsList(for preset: Presets) -> some View {
@@ -492,7 +540,12 @@ extension AddCarbs {
         }
 
         private func addfromCarbsView() {
-            newPreset = (NSLocalizedString("New", comment: ""), state.carbs, state.fat, state.protein)
+            newPreset = (
+                NSLocalizedString("New", comment: ""),
+                state.carbs.rounded(to: 1),
+                state.fat.rounded(to: 1),
+                state.protein.rounded(to: 1)
+            )
             state.edit = true
         }
 
@@ -541,7 +594,7 @@ extension AddCarbs {
                     Button { save() }
                     label: { Text("Save") }
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .listRowBackground(!disabled ? Color(.systemBlue) : Color(.clear))
+                        .listRowBackground(!disabled ? Color(.systemBlue) : Color(.systemGray4))
                         .tint(.white)
                         .disabled(disabled)
                 }
