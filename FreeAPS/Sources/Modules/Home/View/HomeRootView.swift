@@ -650,32 +650,32 @@ extension Home {
             }
         }
 
-        func bolusProgressView(progress: Decimal, amount: Decimal) -> some View {
-            ZStack {
-                VStack {
-                    HStack {
-                        let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
-                        Text("Bolusing")
-                        Text(
-                            bolused + " " + NSLocalizedString("of", comment: "") + " " + amount
-                                .formatted() + NSLocalizedString(" U", comment: "")
-                        )
-                    }.frame(width: 250, height: 25).font(.bolusProgressBarFont)
-                    HStack(alignment: .bottom, spacing: 5) {
-                        ProgressView(value: Double(progress)).progressViewStyle(BolusProgressViewStyle())
-                            .overlay {
-                                Image(systemName: "pause.fill")
-                                    .symbolRenderingMode(.palette)
-                                    .foregroundStyle(.white, .blue)
-                                    .font(.bolusProgressStopFont)
-                            }
-                    }
-                    .onTapGesture { state.cancelBolus() }
-                }
-                .dynamicTypeSize(...DynamicTypeSize.large)
-                .padding(.bottom, 8)
-            }
-        }
+        /*    func bolusProgressView(progress: Decimal, amount: Decimal) -> some View {
+             ZStack {
+                 VStack {
+                     HStack {
+                         let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
+                         Text("Bolusing")
+                         Text(
+                             bolused + " " + NSLocalizedString("of", comment: "") + " " + amount
+                                 .formatted() + NSLocalizedString(" U", comment: "")
+                         )
+                     }.frame(width: 250, height: 25).font(.bolusProgressBarFont)
+                     HStack(alignment: .bottom, spacing: 5) {
+                         ProgressView(value: Double(progress)).progressViewStyle(BolusProgressViewStyle())
+                             .overlay {
+                                 Image(systemName: "pause.fill")
+                                     .symbolRenderingMode(.palette)
+                                     .foregroundStyle(.white, .blue)
+                                     .font(.bolusProgressStopFont)
+                             }
+                     }
+                     .onTapGesture { state.cancelBolus() }
+                 }
+                 .dynamicTypeSize(...DynamicTypeSize.large)
+                 .padding(.bottom, 8)
+             }
+         }*/
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
             let height: CGFloat = displayGlucose ? 140 : 210
@@ -908,17 +908,15 @@ extension Home {
                     .ignoresSafeArea(edges: .vertical)
                     .overlay {
                         if let progress = state.bolusProgress, let amount = state.bolusAmount {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 15)
-                                    .fill(.gray.opacity(0.9))
-                                    .frame(maxWidth: 320, maxHeight: 90)
-                                bolusProgressView(progress: progress, amount: amount)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .offset(y: -100)
+                            BolusProgressViewStyle(
+                                progress: progress,
+                                amount: amount,
+                                onCancel: { state.cancelBolus() }
+                            ).frame(maxWidth: .infinity, alignment: .center)
+                                .offset(y: -60)
+                                .padding(.horizontal, 20)
                         }
-                    }
-                    .onChange(of: scenePhase) {
+                    }.onChange(of: scenePhase) {
                         switch scenePhase {
                         case .active:
                             state.startTimer()
