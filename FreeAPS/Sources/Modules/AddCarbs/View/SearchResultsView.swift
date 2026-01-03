@@ -400,6 +400,80 @@ struct SearchResultsView: View {
                 .foregroundColor(Color.gray.opacity(0.2)),
             alignment: .bottom
         )
+        .contextMenu {
+                    Button {
+                        saveMealTotalsAsFoodItem()
+                    } label: {
+                        Label("Save", systemImage: "square.and.arrow.down")
+                    }
+                }
+            }
+
+            private func saveMealTotalsAsFoodItem() {
+                let allItems = state.searchResultsState.searchResults.flatMap(\.foodItemsDetailed)
+                    .filter { !state.searchResultsState.isDeleted($0) }
+
+                guard !allItems.isEmpty else { return }
+
+                // Calculate aggregate serving size (sum of all portion sizes for per100, and serving sizes for perServing)
+                var aggregateServingSize: Decimal? = 0
+                var hasAllServingSizes = true
+
+                for item in allItems {
+                    let portionSize = state.searchResultsState.portionSize(for: item)
+
+                    switch item.nutrition {
+                    case .per100:
+                        // For per100, use the portion size directly
+                        aggregateServingSize? += portionSize
+
+                    case .perServing:
+                        // For perServing, use standardServingSize multiplied by servingsMultiplier
+                        if let servingSize = item.standardServingSize {
+                            aggregateServingSize? += servingSize * portionSize
+                        } else {
+                            // If any perServing item doesn't have a serving size, we can't calculate aggregate
+                            hasAllServingSizes = false
+                            break
+                        }
+                    }
+                }
+
+                // If we couldn't calculate complete serving size, set to nil
+                if !hasAllServingSizes {
+                    aggregateServingSize = nil
+                }
+
+                // Create nutrition values from totals
+                let nutritionValues = NutritionValues(
+                    calories: state.searchResultsState.totalCalories,
+                    carbs: state.searchResultsState.totalCarbs,
+                    fat: state.searchResultsState.totalFat,
+                    fiber: state.searchResultsState.totalFiber,
+                    protein: state.searchResultsState.totalProtein,
+                    sugars: state.searchResultsState.totalSugars
+                )
+
+                // Create new food item with per-serving nutrition
+                let savedItem = FoodItemDetailed(
+                    name: "Complete Meal",
+                    nutritionPerServing: nutritionValues,
+                    servingsMultiplier: 1,
+                    confidence: nil,
+                    brand: nil,
+                    standardServing: nil,
+                    standardServingSize: aggregateServingSize,
+                    units: .grams,
+                    preparationMethod: nil,
+                    visualCues: nil,
+                    glycemicIndex: nil,
+                    assessmentNotes: nil,
+                    imageURL: nil,
+                    tags: nil,
+                    source: .manual
+                )
+
+                onPersist(savedItem)
     }
 
     private var undoButton: some View {
