@@ -251,17 +251,17 @@ extension FoodItemDetailed {
     }
 
     func fiberInPortion(portion: Decimal) -> Decimal? {
-            guard case let .per100(per100) = nutrition else { return nil }
-            guard let fiberPer100 = per100.fiber else { return nil }
-            return fiberPer100 / 100 * portion
-        }
+        guard case let .per100(per100) = nutrition else { return nil }
+        guard let fiberPer100 = per100.fiber else { return nil }
+        return fiberPer100 / 100 * portion
+    }
 
-        func sugarsInPortion(portion: Decimal) -> Decimal? {
-            guard case let .per100(per100) = nutrition else { return nil }
-            guard let sugarsPer100 = per100.sugars else { return nil }
-            return sugarsPer100 / 100 * portion
-        }
-    
+    func sugarsInPortion(portion: Decimal) -> Decimal? {
+        guard case let .per100(per100) = nutrition else { return nil }
+        guard let sugarsPer100 = per100.sugars else { return nil }
+        return sugarsPer100 / 100 * portion
+    }
+
     // MARK: - Per serving calculations
 
     func caloriesInServings(multiplier: Decimal) -> Decimal? {
@@ -287,18 +287,18 @@ extension FoodItemDetailed {
         guard let proteinPerServing = perServing.protein else { return nil }
         return proteinPerServing * multiplier
     }
-    
-    func fiberInServings(multiplier: Decimal) -> Decimal? {
-            guard case let .perServing(perServing) = nutrition else { return nil }
-            guard let fiberPerServing = perServing.fiber else { return nil }
-            return fiberPerServing * multiplier
-        }
 
-        func sugarsInServings(multiplier: Decimal) -> Decimal? {
-            guard case let .perServing(perServing) = nutrition else { return nil }
-            guard let sugarsPerServing = perServing.sugars else { return nil }
-            return sugarsPerServing * multiplier
-        }
+    func fiberInServings(multiplier: Decimal) -> Decimal? {
+        guard case let .perServing(perServing) = nutrition else { return nil }
+        guard let fiberPerServing = perServing.fiber else { return nil }
+        return fiberPerServing * multiplier
+    }
+
+    func sugarsInServings(multiplier: Decimal) -> Decimal? {
+        guard case let .perServing(perServing) = nutrition else { return nil }
+        guard let sugarsPerServing = perServing.sugars else { return nil }
+        return sugarsPerServing * multiplier
+    }
 
     /// Returns a copy of this food item with an updated portion size or servings multiplier
     func withPortion(_ newPortion: Decimal) -> FoodItemDetailed {

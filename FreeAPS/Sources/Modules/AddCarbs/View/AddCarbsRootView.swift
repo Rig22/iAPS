@@ -430,7 +430,7 @@ extension AddCarbs {
             preset.standardName = food.standardName
             if let tags = food.tags {
                 preset.tags = tags.map { tag in tag.lowercased().trimmingCharacters(in: .whitespacesAndNewlines) }
-                                    .joined(separator: ",")            } else {
+                    .joined(separator: ",") } else {
                 preset.tags = nil
             }
 
