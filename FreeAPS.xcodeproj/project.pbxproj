@@ -340,6 +340,8 @@
 		6FFAE524D1D9C262F2407CAE /* SnoozeProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CAE81192B118804DCD23034 /* SnoozeProvider.swift */; };
 		711C0CB42CAABE788916BC9D /* ManualTempBasalDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96653287EDB276A111288305 /* ManualTempBasalDataFlow.swift */; };
 		72F1BD388F42FCA6C52E4500 /* ConfigEditorProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44080E4709E3AE4B73054563 /* ConfigEditorProvider.swift */; };
+		7987958B2F75B03D00DAE1A1 /* StatusCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987958A2F75B03D00DAE1A1 /* StatusCards.swift */; };
+		7987958D2F75B05A00DAE1A1 /* TopStatusPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987958C2F75B05A00DAE1A1 /* TopStatusPill.swift */; };
 		7BCFACB97C821041BA43A114 /* ManualTempBasalRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C377490C77661D75E8C50649 /* ManualTempBasalRootView.swift */; };
 		7F7B756BE8543965D9FDF1A2 /* DataTableDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A401509D21F7F35D4E109EDA /* DataTableDataFlow.swift */; };
 		8194B80890CDD6A3C13B0FEE /* SnoozeStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26904AACA8D9C15D229D675 /* SnoozeStateModel.swift */; };
@@ -1031,6 +1033,8 @@
 		6BCF84DC2B16843A003AD46E /* LiveActitiyShared.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiveActitiyShared.swift; sourceTree = "<group>"; };
 		6F8BA8533F56BC55748CA877 /* PreferencesEditorProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PreferencesEditorProvider.swift; sourceTree = "<group>"; };
 		72778B68C3004F71F6E79BDC /* PumpSettingsEditorStateModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PumpSettingsEditorStateModel.swift; sourceTree = "<group>"; };
+		7987958A2F75B03D00DAE1A1 /* StatusCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusCards.swift; sourceTree = "<group>"; };
+		7987958C2F75B05A00DAE1A1 /* TopStatusPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopStatusPill.swift; sourceTree = "<group>"; };
 		79BDA519C9B890FD9A5DFCF3 /* ISFEditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ISFEditorDataFlow.swift; sourceTree = "<group>"; };
 		7E22146D3DF4853786C78132 /* CREditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CREditorDataFlow.swift; sourceTree = "<group>"; };
 		86FC1CFD647CF34508AF9A3B /* AddCarbsRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AddCarbsRootView.swift; sourceTree = "<group>"; };
@@ -1800,6 +1804,7 @@
 			isa = PBXGroup;
 			children = (
 				3811DE2E25C9D49500A708ED /* HomeRootView.swift */,
+				7987958A2F75B03D00DAE1A1 /* StatusCards.swift */,
 				3833B51E260264AC003021B3 /* Chart */,
 				3833B51F260264B6003021B3 /* Header */,
 				194D7E6C2B974EA4007A38C1 /* Previews */,
@@ -2031,6 +2036,7 @@
 				383420D525FFE38C002D46C1 /* LoopView.swift */,
 				38AAF85425FFF846004AF583 /* CurrentGlucoseView.swift */,
 				38DAB27F260CBB7F00F74C1A /* PumpView.swift */,
+				7987958C2F75B05A00DAE1A1 /* TopStatusPill.swift */,
 			);
 			path = Header;
 			sourceTree = "<group>";
@@ -3594,6 +3600,7 @@
 				F2159A522BA60F7A00A0B716 /* FontWeight.swift in Sources */,
 				CE2FAD3A297D93F0001A872C /* BloodGlucoseExtensions.swift in Sources */,
 				38E4453A274E411700EC9A94 /* Disk+[UIImage].swift in Sources */,
+				7987958D2F75B05A00DAE1A1 /* TopStatusPill.swift in Sources */,
 				F2B06FCB2EEF49EC000EADA9 /* AIUsageStatistics.swift in Sources */,
 				F24EB2962EE5B8F300C981A2 /* AIFoodAnalysisError.swift in Sources */,
 				F2941FA72E78806800A9DD5D /* AppGroupCGMSettingsView.swift in Sources */,
@@ -3716,6 +3723,7 @@
 				F21957B12EF48B8E003C9F09 /* Debug.swift in Sources */,
 				E4984C5262A90469788754BB /* PreferencesEditorProvider.swift in Sources */,
 				DD399FB31EACB9343C944C4C /* PreferencesEditorStateModel.swift in Sources */,
+				7987958B2F75B03D00DAE1A1 /* StatusCards.swift in Sources */,
 				F2159A4E2BA60AC000A0B716 /* ContactTrickProvider.swift in Sources */,
 				19E1F7EA29D082ED005C8D20 /* IconConfigProvider.swift in Sources */,
 				44190F0BBA464D74B857D1FB /* PreferencesEditorRootView.swift in Sources */,

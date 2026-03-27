@@ -57,6 +57,14 @@ extension Home {
         ) var enactedSliderTT: FetchedResults<TempTargetsSlider>
 
         @FetchRequest(
+            entity: InsulinConcentration.entity(),
+            sortDescriptors: [NSSortDescriptor(
+                key: "date",
+                ascending: true
+            )]
+        ) var concentration: FetchedResults<InsulinConcentration>
+
+        @FetchRequest(
             entity: Onboarding.entity(),
             sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
         ) var onboarded: FetchedResults<Onboarding>
@@ -106,11 +114,33 @@ extension Home {
             return dateFormatter
         }()
 
+        private var remainingTimeFormatter: DateComponentsFormatter {
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.day, .hour]
+            formatter.unitsStyle = .abbreviated
+            return formatter
+        }
+
+        private var remainingTimeFormatterDays: DateComponentsFormatter {
+            let formatter = DateComponentsFormatter()
+            formatter.allowedUnits = [.day]
+            formatter.unitsStyle = .abbreviated
+            return formatter
+        }
+
         private var spriteScene: SKScene {
             let scene = SnowScene()
             scene.scaleMode = .resizeFill
             scene.backgroundColor = .clear
             return scene
+        }
+
+        private var glucoseFormatter: NumberFormatter {
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .decimal
+            formatter.minimumFractionDigits = 0
+            formatter.maximumFractionDigits = 1
+            return formatter
         }
 
         init(resolver: Resolver) {
@@ -166,25 +196,6 @@ extension Home {
                 }
             }
             .offset(y: 1)
-        }
-
-        var loopView: some View {
-            LoopView(
-                suggestion: $state.data.suggestion,
-                enactedSuggestion: $state.enactedSuggestion,
-                closedLoop: $state.closedLoop,
-                timerDate: $state.data.timerDate,
-                isLooping: $state.isLooping,
-                lastLoopDate: $state.lastLoopDate,
-                manualTempBasal: $state.manualTempBasal
-            )
-            .onTapGesture {
-                state.isStatusPopupPresented.toggle()
-            }.onLongPressGesture {
-                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                impactHeavy.impactOccurred()
-                state.runLoop()
-            }
         }
 
         var tempBasalString: String {
@@ -273,141 +284,60 @@ extension Home {
                 }
                 MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
             }
-            .padding(.bottom, 5)
+            // .padding(.bottom, 5)
             .modal(for: .dataTable, from: self)
         }
 
-        @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
-            ZStack {
-                addHeaderBackground()
-                    .frame(height: 50 + geo.safeAreaInsets.bottom)
-                let isOverride = fetchedPercent.first?.enabled ?? false
-                let isTarget = (state.tempTarget != nil)
-                VStack {
-                    Divider()
-                    HStack {
-                        if state.carbButton {
-                            Button { state.showModal(for: .addCarbs(editMode: false, override: false, mode: .meal)) }
-                            label: {
-                                ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
-                                    Image(systemName: "fork.knife")
-                                        .renderingMode(.template)
-                                        .font(.custom("Buttons", size: 24))
-                                        .foregroundStyle(colorScheme == .dark ? .loopYellow : .orange)
-                                        .padding(8)
-                                    if let carbsReq = state.carbsRequired {
-                                        Text(numberFormatter.string(from: carbsReq as NSNumber)!)
-                                            .font(.caption)
-                                            .foregroundStyle(.white)
-                                            .padding(4)
-                                            .background(Capsule().fill(Color.red))
-                                    }
-                                }
-                            }
-                            .contextMenu {
-                                Button {
-                                    state.showModal(for: .addCarbs(editMode: false, override: false, mode: .presets)) }
-                                label: { Label("Meal Presets", systemImage: "menucard")
-                                }
-                                Button {
-                                    state.showModal(for: .addCarbs(editMode: false, override: false, mode: .barcode)) }
-                                label: { Label("Barcode", systemImage: "barcode.viewfinder")
-                                }
-                                if state.ai {
-                                    Button {
-                                        state.showModal(for: .addCarbs(editMode: false, override: false, mode: .image)) }
-                                    label: { Label("AI Image Analysis", systemImage: "photo.badge.magnifyingglass")
-                                    }
-                                }
-                                Button {
-                                    state.showModal(for: .addCarbs(editMode: false, override: false, mode: .meal)) }
-                                label: { Label("Add Meal", systemImage: "birthday.cake")
-                                }
-                            }
-                            Spacer()
+        var chart: some View {
+            // let ratio = 2.8
+
+            let chartRatio: CGFloat = 3.6
+            let chartMinHeight = UIScreen.main.bounds.height / chartRatio
+
+            return mainChart
+                // .padding(.vertical, 10)
+                // .padding(.horizontal, 10)
+                .frame(minHeight: chartMinHeight)
+                .background(
+                    Group {
+                        if colorScheme != .dark {
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .fill(Color.white)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                        .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                                )
+                                // 1. Schatten: Weiche, weite Streuung für die Tiefe
+                                .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 8)
+                                // 2. Schatten: Scharfer Kernschatten für die Kontur
+                                .shadow(color: Color.black.opacity(0.04), radius: 2, x: 0, y: 1)
+                        } else {
+                            Color.clear
                         }
-                        Button {
-                            (state.bolusProgress != nil) ? showBolusActiveAlert = true :
-                                state.showModal(for: .bolus(
-                                    waitForSuggestion: state.useCalc ? true : false,
-                                    fetch: false
-                                ))
-                        }
-                        label: {
-                            Image(systemName: "syringe")
-                                .renderingMode(.template)
-                                .font(.custom("Buttons", size: 24))
-                        }
-                        .buttonStyle(.borderless)
-                        .foregroundStyle(.insulin)
-                        Spacer()
-                        if state.allowManualTemp {
-                            Button { state.showModal(for: .manualTempBasal) }
-                            label: {
-                                Image("bolus1")
-                                    .renderingMode(.template)
-                                    .resizable()
-                                    .frame(width: IAPSconfig.buttonSize, height: IAPSconfig.buttonSize, alignment: .bottom)
-                            }
-                            .foregroundStyle(.insulin)
-                            Spacer()
-                        }
-                        if state.profileButton {
-                            ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
-                                Image(systemName: isOverride ? "person.fill" : "person")
-                                    .symbolRenderingMode(.palette)
-                                    .font(.custom("Buttons", size: 28))
-                                    .foregroundStyle(.purple)
-                                    .padding(8)
-                                    .background(isOverride ? .purple.opacity(0.15) : .clear)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                            }
-                            .onTapGesture {
-                                if isOverride {
-                                    showCancelAlert.toggle()
-                                } else {
-                                    state.showModal(for: .overrideProfilesConfig)
-                                }
-                            }
-                            .onLongPressGesture {
-                                state.showModal(for: .overrideProfilesConfig)
-                            }
-                            Spacer()
-                        }
-                        if state.useTargetButton {
-                            Image(systemName: "target")
-                                .renderingMode(.template)
-                                .font(.custom("Buttons", size: 24))
-                                .padding(8)
-                                .foregroundStyle(.loopGreen)
-                                .background(isTarget ? .green.opacity(0.15) : .clear)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-                                .onTapGesture {
-                                    if isTarget {
-                                        showCancelTTAlert.toggle()
-                                    } else {
-                                        state.showModal(for: .addTempTarget)
-                                    }
-                                }
-                                .onLongPressGesture {
-                                    state.showModal(for: .addTempTarget)
-                                }
-                            Spacer()
-                        }
-                        Button { state.showModal(for: .settings) }
-                        label: {
-                            Image(systemName: "gear")
-                                .renderingMode(.template)
-                                .font(.custom("Buttons", size: 24))
-                        }
-                        .buttonStyle(.borderless)
-                        .foregroundStyle(.gray)
                     }
-                    .padding(.horizontal, state.allowManualTemp ? 10 : 24)
-                    .padding(.bottom, geo.safeAreaInsets.bottom)
+                )
+                .padding(.horizontal, 10) // Gesamtbreite
+        }
+
+        @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
+            let isOverride = fetchedPercent.first?.enabled ?? false
+
+            ButtonPanelView(
+                geo: geo,
+                state: state,
+                showCancelAlert: $showCancelAlert,
+                tempBasalString: tempBasalString,
+                isOverride: isOverride,
+                profileButton: state.profileButton,
+                displayAutoHistory: $displayAutoHistory,
+                onBolusButtonTap: {
+                    if state.bolusProgress != nil {
+                        showBolusActiveAlert = true
+                    } else {
+                        state.showModal(for: .bolus(waitForSuggestion: state.useCalc ? true : false, fetch: false))
+                    }
                 }
-            }
-            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            )
             .confirmationDialog("Cancel Profile Override", isPresented: $showCancelAlert) {
                 Button("Cancel Profile Override", role: .destructive) {
                     state.cancelProfile()
@@ -426,189 +356,361 @@ extension Home {
             }
         }
 
-        var chart: some View {
-            let ratio = 1.96
-            let ratio2 = 2.0
+        struct ButtonPanelView: View {
+            let geo: GeometryProxy
+            @ObservedObject var state: StateModel
+            @Binding var showCancelAlert: Bool
+            let tempBasalString: String
+            @Environment(\.colorScheme) var colorScheme
+            let isOverride: Bool
+            let profileButton: Bool
+            @Binding var displayAutoHistory: Bool
+            let onBolusButtonTap: () -> Void
 
-            return addColouredBackground().shadow(radius: 3, y: 3)
-                .overlay {
-                    mainChart
+            var body: some View {
+                VStack {
+                    HStack(spacing: 0) {
+                        if state.carbButton {
+                            // 1. Kohlenhydrate Button
+                            Button {
+                                state.showModal(for: .addCarbs(
+                                    editMode: false,
+                                    override: false,
+                                    mode: .meal
+                                ))
+                            } label: {
+                                Image(systemName: "fork.knife")
+                                    .font(.system(size: 22, weight: .medium))
+                                    .foregroundStyle(.orange.opacity(0.7))
+                            }
+                            .frame(maxWidth: .infinity)
+                            /* .contextMenu {
+                                 Button {
+                                     state.showModal(for: .addCarbs(
+                                         editMode: false,
+                                         override: false,
+                                         mode: .presets
+                                     ))
+                                 } label: {
+                                     Label("Meal Presets", systemImage: "menucard")
+                                 }
+
+                                 /* Button {
+                                      state.showModal(for: .addCarbs(
+                                          editMode: false,
+                                          override: false,
+                                          mode: .search
+                                      ))
+                                  } label: {
+                                      Label("Search", systemImage: "network")
+                                  }*/
+
+                                 Button {
+                                     state.showModal(for: .addCarbs(
+                                         editMode: false,
+                                         override: false,
+                                         mode: .barcode
+                                     ))
+                                 } label: {
+                                     Label("Barcode", systemImage: "barcode.viewfinder")
+                                 }
+
+                                 Button {
+                                     state.showModal(for: .addCarbs(
+                                         editMode: false,
+                                         override: false,
+                                         mode: .image
+                                     ))
+                                 } label: {
+                                     Label("AI Image Analysis", systemImage: "photo.badge.magnifyingglass")
+                                 }
+
+                                 Button {
+                                     state.showModal(for: .addCarbs(
+                                         editMode: false,
+                                         override: false,
+                                         mode: .meal
+                                     ))
+                                 } label: {
+                                     Label("Add Meal", systemImage: "birthday.cake")
+                                 }
+                             } */
+                            .contextMenu {
+                                Button {
+                                    state
+                                        .showModal(for: .addCarbs(
+                                            editMode: false,
+                                            override: false,
+                                            mode: .presets
+                                        )) }
+                                label: { Label("Meal Presets", systemImage: "menucard")
+                                }
+                                Button {
+                                    state
+                                        .showModal(for: .addCarbs(
+                                            editMode: false,
+                                            override: false,
+                                            mode: .barcode
+                                        )) }
+                                label: { Label("Barcode", systemImage: "barcode.viewfinder")
+                                }
+                                if state.ai {
+                                    Button {
+                                        state
+                                            .showModal(for: .addCarbs(
+                                                editMode: false,
+                                                override: false,
+                                                mode: .image
+                                            )) }
+                                    label: {
+                                        Label(
+                                            "AI Image Analysis",
+                                            systemImage: "photo.badge.magnifyingglass"
+                                        )
+                                    }
+                                }
+                                Button {
+                                    state
+                                        .showModal(for: .addCarbs(
+                                            editMode: false,
+                                            override: false,
+                                            mode: .meal
+                                        )) }
+                                label: { Label("Add Meal", systemImage: "birthday.cake")
+                                }
+                            }
+                        }
+
+                        // 2. Bolus Button
+                        Button(action: onBolusButtonTap) {
+                            Image(systemName: "syringe")
+                                .font(.system(size: 22, weight: .medium))
+                                .foregroundStyle(.blue.opacity(0.7))
+                        }
+                        .frame(maxWidth: .infinity)
+
+                        // Zentraler Plus Button
+                        Menu {
+                            // SEKTION 1: Direkte Aktionen
+                            Section(header: Text("Aktionen")) {
+                                Button(action: {
+                                    let impact = UIImpactFeedbackGenerator(style: .heavy)
+                                    impact.impactOccurred()
+                                    state.runLoop()
+                                }) {
+                                    Label("Run Loop", systemImage: "arrow.clockwise")
+                                }
+
+                                // Hier kannst du auch den detaillierten Status öffnen
+                                /*         Button(action: {
+                                     isDetailSheetPresented = true
+                                 }) {
+                                     Label("System-Details", systemImage: "info.circle")
+                                 }*/
+                            }
+
+                            Divider()
+
+                            // SEKTION 2: Chart Range
+                            Section(header: Text("Chart Range")) {
+                                ForEach([3, 6, 9, 12, 24], id: \.self) { value in
+                                    Button(action: { state.hours = value }) {
+                                        HStack {
+                                            Text("\(value) Stunden")
+                                            if state.hours == value {
+                                                Image(systemName: "checkmark")
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // SEKTION 3: Status Infos
+                            /*   Section(header: Text("Status")) {
+                                 if let sensor = state.calculateSensorInfo() {
+                                     Button(action: { state.showModal(for: .cgm) }) {
+                                         Label("\(sensor.text)", systemImage: "sensor.tag.radiowaves.forward")
+                                     }
+                                 }
+                                 if state.tempRate != nil {
+                                     Button(action: { state.showModal(for: .manualTempBasal) }) {
+                                         Label(
+                                             "Basal: \(tempBasalString)",
+                                             systemImage: "chart.bar.xaxis.ascending.badge.clock"
+                                         )
+                                     }
+                                 }
+                             }*/
+                        } label: {
+                            // Das visuelle Design des Buttons bleibt exakt gleich
+                            Image(systemName: "plus")
+                                .font(.system(size: 24))
+                                .foregroundColor(.secondary)
+                                .frame(width: 55, height: 55)
+                                .background(
+                                    Circle()
+                                        .fill(
+                                            LinearGradient(
+                                                gradient: Gradient(colors: colorScheme == .dark ? [
+                                                    Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.6),
+                                                    Color(red: 0.1, green: 0.4, blue: 0.9).opacity(0.8),
+                                                    Color(red: 0.0, green: 0.2, blue: 0.7).opacity(1.0)
+                                                ] : [
+                                                    Color(red: 0.7, green: 0.9, blue: 0.5).opacity(0.10),
+                                                    Color(red: 0.3, green: 0.8, blue: 0.6).opacity(0.15),
+                                                    Color(red: 0.1, green: 0.6, blue: 0.9).opacity(0.20)
+                                                ]),
+                                                startPoint: .topLeading,
+                                                endPoint: .bottomTrailing
+                                            )
+                                        )
+                                )
+                        }
+                        .menuStyle(DefaultMenuStyle())
+                        .frame(maxWidth: .infinity)
+
+                        // Profile Button
+                        if profileButton {
+                            ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
+                                Image(systemName: isOverride ? "person.fill" : "person")
+                                    .symbolRenderingMode(.palette)
+                                    .font(.custom("Buttons", size: 22))
+                                    .foregroundStyle(.purple.opacity(0.7))
+                                    .padding(8)
+                                    .background(isOverride ? .purple.opacity(0.15) : .clear)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .frame(maxWidth: .infinity)
+                            .onTapGesture {
+                                if isOverride {
+                                    showCancelAlert.toggle()
+                                } else {
+                                    state.showModal(for: .overrideProfilesConfig)
+                                }
+                            }
+                            .onLongPressGesture {
+                                state.showModal(for: .overrideProfilesConfig)
+                            }
+                        }
+
+                        // Settings Button
+                        Button { state.showModal(for: .settings) }
+                        label: {
+                            Image(systemName: "gearshape")
+                                .font(.system(size: 22, weight: .medium))
+                                .foregroundStyle(.gray.opacity(0.7))
+                        }
+                        .frame(maxWidth: .infinity)
+                    }
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 8)
+                    .elegantShadow(scheme: colorScheme)
+                    .padding(.horizontal, 10)
+                    .padding(.bottom, geo.safeAreaInsets.bottom > 0 ? geo.safeAreaInsets.bottom : 20)
                 }
-                .frame(minHeight: UIScreen.main.bounds.height / (fontSize < .extraExtraLarge ? ratio : ratio2))
+            }
         }
 
-        var carbsAndInsulinView: some View {
-            HStack {
-                // A temporary ugly(?) workaround for displaying last real IOB and COB computation
-                let opacity: CGFloat = colorScheme == .dark ? 0.2 : 0.65
-                let materialOpacity: CGFloat = colorScheme == .dark ? 0.25 : 0.10
-                // Carbs on Board
-                HStack {
-                    let substance = Double(state.data.suggestion?.cob ?? 0)
-                    let max = max(Double(state.maxCOB), 1)
-                    let fraction: Double = 1 - (substance / max)
-                    let fill = CGFloat(min(Swift.max(fraction, 0.05), substance > 0 ? 0.92 : 1))
-                    TestTube(
-                        opacity: opacity,
-                        amount: fill,
-                        colourOfSubstance: .loopYellow,
-                        materialOpacity: materialOpacity
-                    )
-                    .frame(width: 12, height: 38)
-                    .offset(y: -5)
-                    HStack(spacing: 0) {
-                        if let loop = state.data.suggestion, let cob = loop.cob {
-                            Text(numberFormatter.string(from: cob as NSNumber) ?? "0")
-                                .font(.statusFont).bold()
-                            // Display last loop, unless very old
-                        } else {
-                            Text("?").font(.statusFont).bold()
-                        }
-                        Text(NSLocalizedString(" g", comment: "gram of carbs")).font(.statusFont).foregroundStyle(.secondary)
-                    }.offset(y: 5)
-                }
-                // Instead of Spacer
-                Text(" ")
-
-                // Insulin on Board
-                HStack {
-                    let substance = Double(state.data.iob ?? 0)
-                    let max = max(Double(state.maxIOB), 1)
-                    let fraction: Double = 1 - abs(substance) / max
-                    let fill = CGFloat(min(Swift.max(fraction, 0.05), 1))
-                    TestTube(
-                        opacity: opacity,
-                        amount: fill,
-                        colourOfSubstance: substance < 0 ? .red : .insulin,
-                        materialOpacity: materialOpacity
-                    )
-                    .frame(width: 12, height: 38)
-                    .offset(y: -5)
-                    HStack(spacing: 0) {
-                        if let iob = state.data.iob {
-                            Text(
-                                targetFormatter.string(from: iob as NSNumber) ?? "0"
-                            ).font(.statusFont).bold()
-                        } else {
-                            Text("?").font(.statusFont).bold()
-                        }
-                        Text(NSLocalizedString(" U", comment: "Insulin unit")).font(.statusFont).foregroundStyle(.secondary)
-                    }.offset(y: 5)
-                }
-            }.offset(x: 5, y: 5)
-        }
+        // MARK: - Statistik & Info Panels
 
         var preview: some View {
-            addBackground()
-                .frame(minHeight: 200)
-                .overlay {
-                    PreviewChart(
-                        readings: $state.readings,
-                        lowLimit: $state.data.lowGlucose,
-                        highLimit: $state.data.highGlucose
-                    )
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .addShadows()
-                .padding(.horizontal, 10)
-                .blur(radius: animateTIRView ? 2 : 0)
-                .onTapGesture {
-                    timeIsNowTIR()
-                    state.showModal(for: .statistics)
-                }
-                .overlay {
-                    if animateTIRView {
-                        animation.asAny()
-                    }
-                }
+            VStack {
+                PreviewChart(
+                    readings: $state.readings,
+                    lowLimit: $state.data.lowGlucose,
+                    highLimit: $state.data.highGlucose
+                )
+                .padding(15)
+            }
+            .frame(minHeight: 200)
+            .elegantShadow(scheme: colorScheme)
+            .padding(.horizontal, 10)
+            .blur(radius: animateTIRView ? 2 : 0)
+            .onTapGesture {
+                timeIsNowTIR()
+                state.showModal(for: .statistics)
+            }
+            .overlay {
+                if animateTIRView { animation.asAny() }
+            }
         }
 
         var infoPanelView: some View {
-            addBackground()
-                .frame(height: 30)
-                .overlay {
-                    HStack {
-                        info
-                    }
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .addShadows()
-                .padding(.horizontal, 10)
+            VStack {
+                info.padding(.horizontal, 15)
+            }
+            .frame(height: 40)
+            .elegantShadow(scheme: colorScheme)
+            .padding(.horizontal, 10)
         }
 
         var activeIOBView: some View {
-            addBackground()
-                .frame(minHeight: 190)
-                .overlay {
-                    ActiveIOBView(
-                        data: $state.iobData,
-                    )
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .addShadows()
-                .padding(.horizontal, 10)
+            VStack {
+                ActiveIOBView(data: $state.iobData)
+                    .padding(15)
+            }
+            .frame(minHeight: 190)
+            .elegantShadow(scheme: colorScheme)
+            .padding(.horizontal, 10)
         }
 
         var activeCOBView: some View {
-            addBackground()
-                .frame(minHeight: 190)
-                .overlay {
-                    ActiveCOBView(data: $state.iobData)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .addShadows()
-                .padding(.horizontal, 10)
+            VStack {
+                ActiveCOBView(data: $state.iobData)
+                    .padding(15)
+            }
+            .frame(minHeight: 190)
+            .elegantShadow(scheme: colorScheme)
+            .padding(.horizontal, 10)
         }
 
         var insulinView: some View {
-            addBackground()
-                .frame(minHeight: 280)
-                .overlay {
-                    InsulinSummaryView(
-                        neg: $state.neg,
-                        tddChange: $state.tddChange,
-                        tddAverage: $state.tddAverage,
-                        tddYesterday: $state.tddYesterday,
-                        tdd2DaysAgo: $state.tdd2DaysAgo,
-                        tdd3DaysAgo: $state.tdd3DaysAgo,
-                        tddActualAverage: $state.tddActualAverage
-                    )
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .addShadows()
-                .padding(.horizontal, 10)
+            VStack {
+                InsulinSummaryView(
+                    neg: $state.neg,
+                    tddChange: $state.tddChange,
+                    tddAverage: $state.tddAverage,
+                    tddYesterday: $state.tddYesterday,
+                    tdd2DaysAgo: $state.tdd2DaysAgo,
+                    tdd3DaysAgo: $state.tdd3DaysAgo,
+                    tddActualAverage: $state.tddActualAverage
+                )
+                .padding(15)
+            }
+            .frame(minHeight: 280)
+            .elegantShadow(scheme: colorScheme)
+            .padding(.horizontal, 10)
         }
 
         var mealsView: some View {
-            addBackground()
-                .frame(minHeight: 190)
-                .overlay {
-                    MealsSummaryView(data: $state.mealData)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .addShadows()
-                .padding(.horizontal, 10)
+            VStack {
+                MealsSummaryView(data: $state.mealData)
+                    .padding(15)
+            }
+            .frame(minHeight: 190)
+            .elegantShadow(scheme: colorScheme)
+            .padding(.horizontal, 10)
         }
 
         var loopPreview: some View {
-            addBackground()
-                .frame(minHeight: 160)
-                .overlay {
-                    LoopsView(loopStatistics: $state.loopStatistics)
+            VStack {
+                LoopsView(loopStatistics: $state.loopStatistics)
+                    .padding(.vertical, 20)
+                    .padding(.horizontal, 15)
+            }
+            .frame(minHeight: 160)
+            .blur(radius: animateLoopView ? 2.5 : 0)
+            .elegantShadow(scheme: colorScheme) // Erst den Hintergrund mit Schatten...
+            .padding(.horizontal, 10)
+            .onTapGesture {
+                timeIsNowLoop()
+                state.showModal(for: .statistics)
+            }
+            .overlay {
+                if animateLoopView {
+                    animation.asAny()
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .addShadows()
-                .padding(.horizontal, 10)
-                .blur(radius: animateLoopView ? 2.5 : 0)
-                .onTapGesture {
-                    timeIsNowLoop()
-                    state.showModal(for: .statistics)
-                }
-                .overlay {
-                    if animateLoopView {
-                        animation.asAny()
-                    }
-                }
+            }
         }
 
         var profileView: some View {
@@ -648,81 +750,81 @@ extension Home {
             }
         }
 
-        func bolusProgressView(progress: Decimal, amount: Decimal) -> some View {
-            ZStack {
-                VStack {
-                    HStack {
-                        let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
-                        Text("Bolusing")
-                        Text(
-                            bolused + " " + NSLocalizedString("of", comment: "") + " " + amount
-                                .formatted() + NSLocalizedString(" U", comment: "")
-                        )
-                    }.frame(width: 250, height: 25).font(.bolusProgressBarFont)
-                    HStack(alignment: .bottom, spacing: 5) {
-                        ProgressView(value: Double(progress)).progressViewStyle(BolusProgressViewStyle())
-                            .overlay {
-                                Image(systemName: "pause.fill")
-                                    .symbolRenderingMode(.palette)
-                                    .foregroundStyle(.white, .blue)
-                                    .font(.bolusProgressStopFont)
-                            }
-                    }
-                    .onTapGesture { state.cancelBolus() }
+        func bolusProgressView(progress _: Decimal, amount _: Decimal) -> some View {
+            Button(action: {
+                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                impactHeavy.impactOccurred()
+                state.cancelBolus()
+            }) {
+                HStack(spacing: 8) {
+                    // Pulsierendes Stopp-Icon
+                    Image(systemName: "stop.circle.fill")
+                        .font(.system(size: 14, weight: .bold))
+                        .symbolEffect(.pulse, options: .repeating) // Nur verfügbar ab iOS 17, sonst ignorieren
+
+                    Text("BOLUS STOPPEN")
+                        .font(.system(size: 11, weight: .black))
                 }
-                .dynamicTypeSize(...DynamicTypeSize.large)
-                .padding(.bottom, 8)
+                .foregroundColor(.white)
+                .padding(.vertical, 6)
+                .padding(.horizontal, 16)
+                .background(
+                    Capsule()
+                        .fill(Color.red)
+                        .shadow(color: .red.opacity(0.3), radius: 4, x: 0, y: 2)
+                )
             }
+            .transition(.move(edge: .top).combined(with: .opacity))
         }
 
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-            let height: CGFloat = displayGlucose ? 140 : 210
-            addHeaderBackground()
-                .frame(
-                    height: fontSize < .extraExtraLarge ? height + geo.safeAreaInsets.top : height + 10 + geo
-                        .safeAreaInsets.top
-                )
-                .overlay {
-                    VStack {
-                        ZStack {
-                            if !displayGlucose {
-                                glucoseView.frame(maxHeight: .infinity, alignment: .center).offset(y: -5)
-                                loopView
-                                    .frame(
-                                        maxWidth: .infinity,
-                                        maxHeight: .infinity,
-                                        alignment: .topLeading
-                                    )
-                                    .padding(20)
-                                    .offset(x: 5, y: -10)
-                            }
-                            if displayGlucose {
-                                glucoseView.frame(maxHeight: .infinity, alignment: .center).offset(y: -10)
-                            } else {
-                                HStack {
-                                    carbsAndInsulinView
-                                        .frame(maxHeight: .infinity, alignment: .bottom)
-                                    Spacer()
-                                    pumpView
-                                        .frame(maxHeight: .infinity, alignment: .bottom)
-                                }
-                                .dynamicTypeSize(...DynamicTypeSize.xLarge)
-                                .padding(.horizontal, 10)
-                                .padding(.bottom, 5)
-                            }
-                        }
+            VStack(spacing: 2) {
+                TopStatusPill(state: state)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.top, geo.safeAreaInsets.top + 5)
+                    .padding(.bottom, 10)
 
-                        if displayGlucose {
-                            glucosePreview
-                        } else {
-                            infoPanelView
-                        }
-
-                        Divider()
-                    }
-                    .padding(.top, geo.safeAreaInsets.top)
+                if let progress = state.bolusProgress, progress > 0,
+                   let amount = state.bolusAmount
+                {
+                    bolusProgressView(progress: progress, amount: amount)
                 }
+
+                glucoseView
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 20)
+                    .padding(.top, 15)
+                    .padding(.bottom, 25)
+            }
+            .background(Color.clear)
         }
+
+        // TopStatusPill unter dem Glucose Rad
+
+        /*  @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
+             VStack(spacing: 0) { // Spacing auf 0, um volle Kontrolle über Paddings zu haben
+                 // 1. Die Glukose-Anzeige (jetzt ganz oben)
+                 glucoseView
+                     .padding(.top, geo.safeAreaInsets.top + 10) // Schiebt das Rad unter die Dynamic Island
+                     .padding(.bottom, 10)
+                     .padding(.horizontal, 20)
+
+                 // 2. topStatusPill (jetzt unter der Glukose)
+                 TopStatusPill(state: state)
+                     .frame(maxWidth: .infinity, alignment: .center)
+                     .padding(.top, 15)
+                     .padding(.bottom, 20) // Abstand nach unten zur Status-Leiste/Chart
+
+                 // 3. Falls ein Bolus läuft
+                 if let progress = state.bolusProgress, progress > 0,
+                    let amount = state.bolusAmount
+                 {
+                     bolusProgressView(progress: progress, amount: amount)
+                         .padding(.bottom, 10)
+                 }
+             }
+             .background(Color.clear)
+         }*/
 
         var glucosePreview: some View {
             let data = state.data.glucose
@@ -763,46 +865,46 @@ extension Home {
             .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
         }
 
-        var timeSetting: some View {
-            let hourLabel = NSLocalizedString("\(state.hours) hours", comment: "") + "   "
-
-            return Menu(hourLabel) {
-                ForEach([3, 6, 9, 12, 24], id: \.self) { value in
-                    let label = NSLocalizedString("\(value) hours", comment: "")
-                    Button(label, action: { state.hours = value })
-                }
-
-                Button("UI/UX Settings", action: {
-                    state.showModal(for: .uiConfig)
-                })
-            }
-            .buttonStyle(.borderless)
-            .foregroundStyle(.primary)
-            .font(.timeSettingFont)
-            .padding(.vertical, 15)
-            .background(TimeEllipse(characters: hourLabel.count))
-        }
-
         private var isfView: some View {
-            ZStack {
-                HStack(spacing: 4) {
-                    Image(systemName: "divide")
-                        .font(.system(size: 16))
-                        .foregroundStyle(.teal)
+            HStack(spacing: 4) {
+                Image(systemName: "divide")
+                    .font(.system(size: 16))
+                    .foregroundStyle(.teal)
 
-                    Text(String(describing: state.data.suggestion?.sensitivityRatio ?? 1))
-                        .foregroundStyle(.primary)
-                        .lineLimit(1) // maximum 1 row
-                        .fixedSize(horizontal: true, vertical: false) // Prevent wrapping
-                }
-                .font(.timeSettingFont)
-                .background(TimeEllipse(characters: 10))
-                .onTapGesture {
-                    if (state.autoisf && !disabled()) || enabled() {
-                        displayAutoHistory.toggle()
+                Text(String(describing: state.data.suggestion?.sensitivityRatio ?? 1))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+            }
+            .font(.timeSettingFont)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 8)
+            .background(
+                Group {
+                    if colorScheme != .dark {
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Color.white)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                            )
+                            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
                     } else {
-                        displayDynamicHistory.toggle()
+                        RoundedRectangle(cornerRadius: 10, style: .continuous)
+                            .fill(Color.white.opacity(0.00))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                            )
+                            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
                     }
+                }
+            )
+            .onTapGesture {
+                if (state.autoisf && !disabled()) || enabled() {
+                    displayAutoHistory.toggle()
+                } else {
+                    displayDynamicHistory.toggle()
                 }
             }
             .offset(x: 130)
@@ -855,9 +957,17 @@ extension Home {
                             VStack {
                                 // Main Chart
                                 chart
-                                // Adjust hours visible (X-Axis) and ratio display
-                                timeSetting
-                                    .overlay { isfView }
+                                StatusCards(state: state)
+                                    .padding(.top, 5)
+                                    .padding(.bottom, 35)
+                                // timeSetting
+                                // .overlay { isfView }
+                                if !state.isfView {
+                                    isfView
+                                        .padding(.top, -25)
+                                        .padding(.bottom, -15)
+                                } else {}
+
                                 // TIR Chart
                                 if !state.data.glucose.isEmpty {
                                     preview.padding(.top, 15)
@@ -903,33 +1013,32 @@ extension Home {
                     .background(
                         colorScheme == .light ? IAPSconfig.homeViewBackgroundLight : IAPSconfig.homeViewBackgrundDark
                     )
-                    .ignoresSafeArea(edges: .vertical)
-                    .overlay {
-                        if let progress = state.bolusProgress, let amount = state.bolusAmount {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 15)
-                                    .fill(
-                                        colorScheme == .light ? IAPSconfig
-                                            .homeViewBackgroundLight : IAPSconfig
-                                            .homeViewBackgrundDark
-                                    )
-                                    .frame(maxWidth: 320, maxHeight: 90)
-                                bolusProgressView(progress: progress, amount: amount)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .center)
-                            .offset(y: -100)
-                        }
+                    .sheet(isPresented: $displayAutoHistory) {
+                        AutoISFHistoryView(units: state.data.units)
+                            .environment(\.colorScheme, colorScheme)
                     }
-                    .onChange(of: scenePhase) {
-                        switch scenePhase {
-                        case .active:
-                            state.startTimer()
-                        case .background,
-                             .inactive:
-                            state.stopTimer()
-                        default:
-                            break
+                    .sheet(isPresented: $displayDynamicHistory) {
+                        DynamicHistoryView(units: state.data.units)
+                            .environment(\.colorScheme, colorScheme)
+                    }
+                    .overlay(
+                        Group {
+                            if state.isStatusPopupPresented {
+                                Color.black.opacity(0.2) // Dimmt den Hintergrund leicht ab
+                                    .ignoresSafeArea()
+                                    .onTapGesture { state.isStatusPopupPresented = false } }
                         }
+                    )
+                    .ignoresSafeArea(edges: .vertical)
+                    .onChange(of: scenePhase) { switch scenePhase {
+                    case .active:
+                        state.startTimer()
+                    case .background,
+                         .inactive:
+                        state.stopTimer()
+                    default:
+                        break
+                    }
                     }
                 }
             }
@@ -951,49 +1060,87 @@ extension Home {
             }
             .popup(isPresented: state.isStatusPopupPresented, alignment: .bottom, direction: .bottom) {
                 popup
-                    .padding()
-                    .background(
-                        RoundedRectangle(cornerRadius: 8, style: .continuous)
-                            .fill(Color.popUpGray)
-                    )
+                    .padding(.bottom, 80)
                     .onTapGesture {
                         state.isStatusPopupPresented = false
                     }
                     .gesture(
                         DragGesture(minimumDistance: 10, coordinateSpace: .local)
                             .onEnded { value in
-                                if value.translation.height < 0 {
+                                if value.translation.height > 0 {
                                     state.isStatusPopupPresented = false
                                 }
                             }
                     )
+
+                    .alert("Bolus is already running", isPresented: $showBolusActiveAlert) {
+                        Button("OK", role: .cancel) {}
+                    } message: {
+                        Text("A bolus is already being administered. Please wait.")
+                    }
             }
         }
 
         private var popup: some View {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(state.statusTitle).font(.suggestionHeadline).foregroundColor(.white)
-                    .padding(.bottom, 4)
-                if let suggestion = state.data.suggestion {
-                    TagCloudView(tags: suggestion.reasonParts).animation(.none, value: false)
-
-                    Text(suggestion.reasonConclusion.capitalizingFirstLetter()).font(.suggestionSmallParts)
-                        .foregroundColor(.white)
-                } else {
-                    Text("No suggestion found").font(.suggestionHeadline).foregroundColor(.white)
+            VStack(alignment: .leading, spacing: 12) {
+                HStack {
+                    Text(state.statusTitle)
+                        .font(.suggestionHeadline)
+                        .foregroundColor(.primary)
+                    Spacer()
                 }
+
+                // Tag-Cloud Sektion
+                if let suggestion = state.data.suggestion {
+                    TagCloudView(tags: suggestion.reasonParts)
+                        .animation(.none, value: false)
+
+                    Text(suggestion.reasonConclusion.capitalizingFirstLetter())
+                        .font(.suggestionSmallParts)
+                        .foregroundColor(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    Text("No suggestion found")
+                        .font(.suggestionHeadline)
+                        .foregroundColor(.secondary)
+                }
+
                 if let errorMessage = state.errorMessage, let date = state.errorDate {
-                    Text(NSLocalizedString("Status at", comment: "") + " " + dateFormatter.string(from: date))
-                        .foregroundColor(.white)
-                        .font(.suggestionError)
-                        .padding(.bottom, 4)
-                        .padding(.top, 8)
-                    Text(errorMessage).font(.suggestionError).fontWeight(.semibold).foregroundColor(.orange)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("\(NSLocalizedString("Status at", comment: "")) \(dateFormatter.string(from: date))")
+                            .foregroundColor(.secondary)
+                            .font(.caption2)
+
+                        Text(errorMessage)
+                            .font(.suggestionError)
+                            .fontWeight(.semibold)
+                            .foregroundColor(.orange)
+                    }
+                    .padding(.top, 4)
                 } else if let suggestion = state.data.suggestion, (suggestion.bg ?? 100) == 400 {
-                    Text("Invalid CGM reading (HIGH).").font(.suggestionError).bold().foregroundColor(.loopRed).padding(.top, 8)
-                    Text("SMBs and High Temps Disabled.").font(.suggestionParts).foregroundColor(.white).padding(.bottom, 4)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Invalid CGM reading (HIGH).")
+                            .font(.suggestionError)
+                            .bold()
+                            .foregroundColor(.red)
+                        Text("SMBs and High Temps Disabled.")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 4)
                 }
             }
+            .padding(16)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(Color(UIColor.secondarySystemGroupedBackground))
+                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+            )
+            .padding(.horizontal, 16)
         }
 
         private func importResetSettingsView(settings: Preferences) -> some View {

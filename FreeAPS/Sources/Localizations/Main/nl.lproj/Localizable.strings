@@ -2855,6 +2855,9 @@ Je kunt maar één app tegelijk gebruiken die via bluetooth met de sensor commun
 /* UI/UX-setting */
 "Display Insulin Activity Chart" = "Geef insuline activiteitenoverzicht weer";
 
+/* UI/UX-setting */
+"Don't ask for saving search result as meal preset" = "Vraag niet om het zoekresultaat op te slaan als maaltijd preset";
+
 /* --------------------------------------------------------  Dexcom G7 --------------------------------------*/
 
 "CGM Configuration" = "CGM instellingen";
@@ -3963,3 +3966,13 @@ Eenvoudig gezegd, de Dynamische Carb Ratio past de koolhydraatverhouding aan op 
 
 /* main chart settings - toggle, controls whether to show y-axis labels (glucose) */
 "Y-axis labels" = "Y-as labels";
+/* Delta Status Pill */
+"Stable" = "Stabiel";
+"Slightly rising" = "Licht stijgend";
+"Rising" = "Stijgend";
+"Strongly rising" = "Sterk stijgend";
+"Slightly falling" = "Licht dalend";
+"Falling" = "Dalend";
+"Strongly falling" = "Sterk dalend";
+"Replace Sensor" = "Sensor vervangen";
+

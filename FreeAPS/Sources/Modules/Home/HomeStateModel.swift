@@ -85,6 +85,8 @@ extension Home {
         @Published var mealData = MealData()
         @Published var ai: Bool = false
 
+        @Published var isfView: Bool = true
+
         // Chart data
         var data = ChartModel(
             suggestion: nil,
@@ -223,6 +225,8 @@ extension Home {
             displayExpiration = settingsManager.settings.displayExpiration
             displaySAGE = settingsManager.settings.displaySAGE
             ai = settingsManager.settings.ai
+
+            isfView = settingsManager.settings.isfView
 
             updateSensorDays()
 
@@ -736,6 +740,50 @@ extension Home {
             let ratio = min(c / (target + c - 100), maxValue)
             return (ratio * 100)
         }
+
+        func calculateSensorInfo() -> (text: String, color: Color, priority: Int, timeToShow: TimeInterval)? {
+            guard let sessionDate = recentGlucose?.sessionStartDate else { return nil }
+
+            let nun = Date()
+            var diffInSeconds = nun.timeIntervalSince(sessionDate)
+
+            // Korrektur für extrem große/negative Werte (wie im Original)
+            if diffInSeconds > 1_576_800_000 { diffInSeconds /= 1000 }
+            if diffInSeconds < 0 { diffInSeconds *= -1 }
+
+            var daysLimit = sensorDays
+            if daysLimit > 365 { daysLimit /= 1000 }
+            if daysLimit <= 0 || daysLimit > 100 { daysLimit = 10.482 }
+
+            let limitInSeconds = daysLimit * 86400.0
+            let expirationInSeconds = limitInSeconds - diffInSeconds
+            let timeToShow = displayExpiration ? expirationInSeconds : diffInSeconds
+
+            let text: String
+            let color: Color
+            let priority: Int
+
+            if timeToShow <= 0 {
+                text = NSLocalizedString("Replace Sensor", comment: "Sensor ersetzten")
+                color = .red
+                priority = 850
+            } else if timeToShow < 86400 {
+                // Weniger als 24h: h und m anzeigen
+                let hours = Int(timeToShow / 3600)
+                let minutes = Int(timeToShow.truncatingRemainder(dividingBy: 3600) / 60)
+                text = "Sensor: \(hours)h \(minutes)m"
+                color = hours < 6 ? .orange : .blue
+                priority = hours < 14 ? 750 : 440
+            } else {
+                // Mehr als 24h: Tage anzeigen
+                let days = Int(timeToShow / 86400)
+                text = "Sensor: \(days)d"
+                color = .secondary
+                priority = 100
+            }
+
+            return (text, color, priority, timeToShow)
+        }
     }
 }
 
@@ -791,6 +839,9 @@ extension Home.StateModel:
         data.chartGlucosePeaks = settingsManager.settings.chartGlucosePeaks
         data.insulinActivityGridLines = settingsManager.settings.insulinActivityGridLines
         data.insulinActivityLabels = settingsManager.settings.insulinActivityLabels
+
+        isfView = settingsManager.settings.isfView
+
         data.yGridLabels = settingsManager.settings.yGridLabels
         data.showPredictionsLegend = settingsManager.settings.showPredictionsLegend
         useTargetButton = settingsManager.settings.useTargetButton

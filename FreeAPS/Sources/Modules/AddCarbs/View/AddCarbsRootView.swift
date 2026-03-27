@@ -507,6 +507,13 @@ extension AddCarbs {
             Form {
                 Section {} header: { back }
 
+                var nutrientLabel: String {
+                    let carbsStr = Self.formatter.string(from: state.carbs as NSNumber) ?? ""
+                    let fatStr = Self.formatter.string(from: state.fat as NSNumber) ?? ""
+                    let proteinStr = Self.formatter.string(from: state.protein as NSNumber) ?? ""
+                    return "[Carbs: \(carbsStr), Fat: \(fatStr), Protein: \(proteinStr)]"
+                }
+
                 if !empty {
                     Section {
                         Button {
@@ -516,11 +523,12 @@ extension AddCarbs {
                             HStack {
                                 Text("Save as Preset")
                                 Spacer()
-                                Text(
-                                    "[Carbs: " + (Self.formatter.string(from: state.carbs as NSNumber) ?? "") + ", Fat: " +
-                                        (Self.formatter.string(from: state.fat as NSNumber) ?? "") + ", Protein: " +
-                                        (Self.formatter.string(from: state.protein as NSNumber) ?? "") + "]"
-                                )
+                                /*  Text(
+                                     "[Carbs: " + (Self.formatter.string(from: state.carbs as NSNumber) ?? "") + ", Fat: " +
+                                         (Self.formatter.string(from: state.fat as NSNumber) ?? "") + ", Protein: " +
+                                         (Self.formatter.string(from: state.protein as NSNumber) ?? "") + "]"
+                                 )*/
+                                Text(nutrientLabel)
                             }
                         }.frame(maxWidth: .infinity, alignment: .center)
                             .listRowBackground(Color(.systemBlue)).tint(.white)

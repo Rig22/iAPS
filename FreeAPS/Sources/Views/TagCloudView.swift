@@ -7,16 +7,14 @@ struct TagCloudView: View {
     var tags: [String]
 
     @State private var totalHeight
-//          = CGFloat.zero       // << variant for ScrollView/List
-        = CGFloat.infinity // << variant for VStack
+        = CGFloat.infinity
     var body: some View {
         VStack {
             GeometryReader { geometry in
                 self.generateContent(in: geometry)
             }
         }
-//        .frame(height: totalHeight)// << variant for ScrollView/List
-        .frame(maxHeight: totalHeight) // << variant for VStack
+        .frame(maxHeight: totalHeight)
     }
 
     private func generateContent(in g: GeometryProxy) -> some View {
@@ -76,13 +74,19 @@ struct TagCloudView: View {
             }
         }
 
-        return ZStack { Text(textTag)
-            .padding(.vertical, 2)
-            .padding(.horizontal, 4)
-            .font(.suggestionParts)
-            .background(colorOfTag.opacity(0.8))
-            .foregroundColor(Color.white)
-            .cornerRadius(2) }
+        return Text(textTag)
+            .padding(.vertical, 4)
+            .padding(.horizontal, 8)
+            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .background(
+                Capsule()
+                    .fill(colorOfTag.opacity(0.15))
+            )
+            .foregroundColor(colorOfTag)
+            .overlay(
+                Capsule()
+                    .stroke(colorOfTag.opacity(0.3), lineWidth: 1)
+            )
     }
 
     private func viewHeightReader(_ binding: Binding<CGFloat>) -> some View {

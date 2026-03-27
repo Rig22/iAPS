@@ -64,7 +64,7 @@ private final class GeometriesBuilder {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
         formatter.minimumIntegerDigits = 0
-        formatter.maximumFractionDigits = 2
+        formatter.maximumFractionDigits = 1
         formatter.decimalSeparator = "."
         return formatter
     }()
@@ -227,9 +227,7 @@ private final class GeometriesBuilder {
         let firstHourPosition = calculateFirstHourPosition()
 
         let currentTimeX = timeToXCoordinate(Date.now.timeIntervalSince1970)
-
-        let activityZeroPointY = activityToCoordinate(date: Date(), activity: 0).y // only y-coordinate matters
-
+        let activityZeroPointY = fullSize.height - ChartConfig.bottomPadding
         let peakActivity_1unit_y = activityToYCoordinate(Decimal(peakActivity_1unit))
         let peakActivity_maxBolus_y = activityToYCoordinate(Decimal(peakActivity_maxBolus))
         let peakActivity_maxIOB_y = activityToYCoordinate(Decimal(peakActivity_maxIOB))
@@ -246,8 +244,8 @@ private final class GeometriesBuilder {
         let activityDots = calculateActivityDots()
 
         let cobDots = calculateCobDots(activityZeroPointY: activityZeroPointY)
-        let cobZeroPointY = cobToCoordinate(date: Date(), cob: 0, activityZeroPointY: activityZeroPointY)
-            .y // only y-coordinate matters
+
+        let cobZeroPointY = fullSize.height - ChartConfig.bottomPadding
 
         let manualGlucoseDots = calculateManualGlucoseDots()
 
@@ -470,7 +468,7 @@ private final class GeometriesBuilder {
                     desiredRect: CGRect(
                         origin: CGPoint(
                             x: point.x - textSize.width / 2,
-                            y: point.y - textSize.height / 2 + 18
+                            y: point.y - textSize.height / 2 + 30 // Peak Schilder unter der Glucose Linie
                         ),
                         size: textSize
                     ),
@@ -481,7 +479,7 @@ private final class GeometriesBuilder {
                     desiredRect: CGRect(
                         origin: CGPoint(
                             x: point.x - textSize.width / 2,
-                            y: point.y - textSize.height / 2 - 18
+                            y: point.y - textSize.height / 2 - 38 // Peak Schilder nach oben verschieben
                         ),
                         size: textSize
                     ),
@@ -1054,24 +1052,27 @@ private final class GeometriesBuilder {
         return y
     }
 
-    private func activityToYCoordinate(_ activityValue: Decimal) -> CGFloat {
-        let bottomPadding = fullSize.height - ChartConfig.bottomPadding
-        let stepYFraction = ChartConfig.activityChartHeight / CGFloat(activityChartMax - activityChartMin)
-        let yOffset = CGFloat(activityChartMin) * stepYFraction
-        let y = bottomPadding - CGFloat(activityValue) * stepYFraction + yOffset
-        return y
+    private func activityToYCoordinate(_ activity: Decimal) -> CGFloat {
+        let doubleActivity = NSDecimalNumber(decimal: activity).doubleValue
+
+        // Wir nutzen den max-Wert, der oben in der Struktur berechnet wurde
+        let maxAct = NSDecimalNumber(decimal: maxActivityInData ?? 1).doubleValue
+        let finalMax = maxAct > 0 ? maxAct : 1.0
+
+        let cloudHeight: CGFloat = 20 // Die Höhe der blauen Wolke
+        let ratio = doubleActivity / finalMax
+
+        let bottom = fullSize.height - ChartConfig.bottomPadding
+        return bottom - (CGFloat(ratio) * cloudHeight)
     }
 
-    private func cobToYCoordinate(
-        _ cobValue: Decimal,
-        activityZeroPointY: CGFloat
-    ) -> CGFloat {
-        let bottomPadding = activityZeroPointY
-        let circleHeight = (ChartConfig.carbsSize + 4.0 + 8.0)
-        let stepYFraction = (ChartConfig.cobChartHeight - circleHeight) / CGFloat(cobChartMax - cobChartMin)
-        let yOffset = CGFloat(cobChartMin) * stepYFraction
-        let y = bottomPadding - CGFloat(cobValue) * stepYFraction + yOffset
-        return y
+    private func cobToYCoordinate(_ cob: Decimal, activityZeroPointY _: CGFloat) -> CGFloat {
+        let currentCOB = NSDecimalNumber(decimal: cob).doubleValue
+        let maxCOBValue: Double = 100
+        let cloudHeight: CGFloat = 20 // Die Höhe der gelben Wolke
+        let ratio = currentCOB / maxCOBValue
+        let bottom = fullSize.height - ChartConfig.bottomPadding
+        return bottom - (CGFloat(ratio) * cloudHeight)
     }
 
     private static func calculateActivityChartMinMax(
@@ -1312,6 +1313,42 @@ private final class GeometriesBuilder {
         }
     }
 
+    /* private func carbsCircleEntries(_ realCarbs: [CarbsEntry]) -> [DotInfo] {
+         realCarbs.map { value -> DotInfo in
+             let center = timeToInterpolatedPoint(
+                 value.actualDate != nil ?
+                     (value.actualDate ?? Date()).timeIntervalSince1970 :
+                     value.createdAt.timeIntervalSince1970
+             )
+             let size = min(
+                 ChartConfig.maxCarbSize,
+                 ChartConfig.carbsSize + CGFloat(value.carbs) * ChartConfig.carbsScale
+             )
+             let rect = CGRect(
+                 x: center.x - size / 2,
+                 y: (center.y - size / 2) + ChartConfig.carbOffset + (size / 2),
+                 width: size,
+                 height: size // + CGFloat(value.carbs) * ChartConfig.carbsScale
+             )
+
+             let string = GeometriesBuilder.carbsFormatter.string(from: value.carbs as NSNumber)
+             var textRect: CGRect?
+             if let string {
+                 let stringSize = textSize(text: string, font: bolusUIFont)
+
+                 textRect = CGRect(
+                     origin: CGPoint(
+                         x: rect.midX - stringSize.width / 2,
+                         y: rect.maxY + ChartConfig.insulinCarbLabelMargin
+                     ),
+                     size: CGSize(width: stringSize.width, height: stringSize.height)
+                 )
+             }
+
+             return DotInfo(rect: rect, value: value.carbs, text: string, textRect: textRect)
+         }
+     }*/
+
     private func carbsCircleEntries(_ realCarbs: [CarbsEntry]) -> [DotInfo] {
         realCarbs.map { value -> DotInfo in
             let center = timeToInterpolatedPoint(
@@ -1319,32 +1356,22 @@ private final class GeometriesBuilder {
                     (value.actualDate ?? Date()).timeIntervalSince1970 :
                     value.createdAt.timeIntervalSince1970
             )
+
             let size = min(
                 ChartConfig.maxCarbSize,
                 ChartConfig.carbsSize + CGFloat(value.carbs) * ChartConfig.carbsScale
             )
+
+            // Wir speichern einfach die Position AUF der Linie als Referenz
             let rect = CGRect(
                 x: center.x - size / 2,
-                y: (center.y - size / 2) + ChartConfig.carbOffset + (size / 2),
+                y: center.y, // Direkt auf der Linie
                 width: size,
-                height: size // + CGFloat(value.carbs) * ChartConfig.carbsScale
+                height: size
             )
 
             let string = GeometriesBuilder.carbsFormatter.string(from: value.carbs as NSNumber)
-            var textRect: CGRect?
-            if let string {
-                let stringSize = textSize(text: string, font: bolusUIFont)
-
-                textRect = CGRect(
-                    origin: CGPoint(
-                        x: rect.midX - stringSize.width / 2,
-                        y: rect.maxY + ChartConfig.insulinCarbLabelMargin
-                    ),
-                    size: CGSize(width: stringSize.width, height: stringSize.height)
-                )
-            }
-
-            return DotInfo(rect: rect, value: value.carbs, text: string, textRect: textRect)
+            return DotInfo(rect: rect, value: value.carbs, text: string, textRect: nil)
         }
     }
 

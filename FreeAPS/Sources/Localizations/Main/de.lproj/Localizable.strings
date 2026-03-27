@@ -1566,6 +1566,7 @@ Enact a temp Basal or a temp target */
 
 "Provider for AI Image Analysis" = "Provider for AI Image Analysis";
 
+"Configure which service handles each type of food search." = "Configure which service handles each type of food search.";
 
 "Food Search Provider Configuration" = "Food Search Provider Configuration";
 
@@ -2783,7 +2784,7 @@ Enact a temp Basal or a temp target */
 "all" = "alle";
 
 /* IOB View */
-"Insulin on Board" = "Aktives Insulin (IOB)";
+"Insulin on Board" = "Aktives Insulin";
 
 /* Active Insulin View */
 "Time with negative insulin" = "Zeit mit negativem Insulin";
@@ -2815,6 +2816,9 @@ Enact a temp Basal or a temp target */
 
 /* UI/UX-setting */
 "Display Insulin Activity Chart" = "Insulin-Aktivitätsdiagramm anzeigen";
+
+/* UI/UX-setting */
+"Don't ask for saving search result as meal preset" = "Don't ask for saving search result as meal preset";
 
 /* --------------------------------------------------------  Dexcom G7 --------------------------------------*/
 
@@ -3920,3 +3924,13 @@ Enact a temp Basal or a temp target */
 
 /* main chart settings - toggle, controls whether to show y-axis labels (glucose) */
 "Y-axis labels" = "Y-axis labels";
+/* Delta Status Pill */
+"Stable" = "Stabil";
+"Slightly rising" = "Leicht steigend";
+"Rising" = "Steigend";
+"Strongly rising" = "Stark steigend";
+"Slightly falling" = "Leicht sinkend";
+"Falling" = "Sinkend";
+"Strongly falling" = "Stark sinkend";
+"Replace Sensor" = "Sensor ersetzten";
+

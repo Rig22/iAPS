@@ -15,8 +15,12 @@ struct CurrentGlucoseView: View {
     @Binding var sensordays: Double
     @Binding var timerDate: Date
 
+    var eventualBG: Int? = nil
+
     @Environment(\.colorScheme) var colorScheme
     @Environment(\.sizeCategory) private var fontSize
+
+    // MARK: - Formatters
 
     private var glucoseFormatter: NumberFormatter {
         let formatter = NumberFormatter()
@@ -30,35 +34,6 @@ struct CurrentGlucoseView: View {
         return formatter
     }
 
-    private var manualGlucoseFormatter: NumberFormatter {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        formatter.maximumFractionDigits = 0
-        if units == .mmolL {
-            formatter.minimumFractionDigits = 1
-            formatter.maximumFractionDigits = 1
-            formatter.roundingMode = .ceiling
-        }
-        return formatter
-    }
-
-    private var decimalString: String {
-        let formatter = NumberFormatter()
-        return formatter.decimalSeparator
-    }
-
-    private var deltaFormatter: NumberFormatter {
-        let formatter = NumberFormatter()
-        formatter.numberStyle = .decimal
-        if units == .mmolL {
-            formatter.decimalSeparator = "."
-        }
-        formatter.maximumFractionDigits = 1
-        formatter.positivePrefix = "+ "
-        formatter.negativePrefix = "- "
-        return formatter
-    }
-
     private var timaAgoFormatter: NumberFormatter {
         let formatter = NumberFormatter()
         formatter.numberStyle = .decimal
@@ -67,25 +42,29 @@ struct CurrentGlucoseView: View {
         return formatter
     }
 
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        return formatter
+    // MARK: - Rotations-Logik
+
+    private var adjustments: (degree: Double, x: CGFloat, y: CGFloat) {
+        guard let direction = recentGlucose?.direction else {
+            return (90, 0, 0)
+        }
+        switch direction {
+        case .doubleUp,
+             .singleUp,
+             .tripleUp: return (0, 0, 0) // ↑
+        case .fortyFiveUp: return (45, 0, 0) // ↗︎
+        case .flat: return (90, 0, 0) // →
+        case .fortyFiveDown: return (135, 0, 0) // ↘︎
+        case .doubleDown,
+             .singleDown,
+             .tripleDown: return (180, 0, 0) // ↓
+        case .none,
+             .notComputable,
+             .rateOutOfRange: return (90, 0, 0)
+        }
     }
 
-    private var remainingTimeFormatter: DateComponentsFormatter {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.day, .hour]
-        formatter.unitsStyle = .abbreviated
-        return formatter
-    }
-
-    private var remainingTimeFormatterDays: DateComponentsFormatter {
-        let formatter = DateComponentsFormatter()
-        formatter.allowedUnits = [.day]
-        formatter.unitsStyle = .abbreviated
-        return formatter
-    }
+    // MARK: - Body
 
     var body: some View {
         glucoseView
@@ -93,179 +72,133 @@ struct CurrentGlucoseView: View {
     }
 
     var glucoseView: some View {
-        ZStack {
+        ZStack(alignment: .center) {
             if let recent = recentGlucose {
-                if displayDelta, !scrolling, let deltaInt = delta,
-                   !(units == .mmolL && abs(deltaInt) <= 1) { deltaView(deltaInt) }
-                if displayExpiration || displaySAGE {
-                    sageView
-                }
-                VStack(spacing: 15) {
-                    let formatter = recent.type == GlucoseType.manual.rawValue ? manualGlucoseFormatter : glucoseFormatter
-                    if let string = recent.unfiltered.map({
-                        formatter
-                            .string(from: Double(units == .mmolL ? $0.asMmolL : $0) as NSNumber) ?? "" })
-                    {
-                        glucoseText(string).asAny()
-                            .background { glucoseDrop }
-                            .contentTransition(.numericText())
-                            .animation(.spring(response: 0.4, dampingFraction: 0.7), value: recent.glucose)
-                        if !scrolling {
-                            let minutesAgo = timerDate.timeIntervalSince(recent.dateString) / 60
-                            let text = timaAgoFormatter.string(for: Double(minutesAgo)) ?? ""
-                            Text(
-                                minutesAgo <= 1 ? NSLocalizedString("Now", comment: "") :
-                                    (text + " " + NSLocalizedString("min", comment: "Short form for minutes") + " ")
+                // EBENE 1: Der Hintergrund
+                ZStack {
+                    // 1a. Der Haupt-Kreis
+                    Circle()
+                        .fill(colorScheme == .dark ? .white.opacity(0.15) : .white)
+                        .frame(
+                            width: scrolling ? 90 : 165,
+                            height: scrolling ? 90 : 165
+                        )
+                        .background(
+                            Group {
+                                if colorScheme != .dark {
+                                    Circle()
+                                        .fill(Color.white)
+                                        .shadow(color: colorOfGlucose.opacity(0.15), radius: 15, x: 0, y: 8)
+                                } else {
+                                    Color.clear
+                                }
+                            }
+                        )
+
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                gradient: Gradient(colors: colorScheme == .dark ? [
+                                    Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.6),
+                                    Color(red: 0.1, green: 0.4, blue: 0.9).opacity(0.8),
+                                    Color(red: 0.0, green: 0.2, blue: 0.7).opacity(1.0)
+                                ] : [
+                                    Color(red: 0.7, green: 0.9, blue: 0.5).opacity(0.10),
+                                    Color(red: 0.3, green: 0.8, blue: 0.6).opacity(0.15),
+                                    Color(red: 0.1, green: 0.6, blue: 0.9).opacity(0.20)
+                                ]),
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
                             )
-                            .animation(.spring(response: 0.4, dampingFraction: 0.7), value: minutesAgo)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                            .offset(x: 1, y: fontSize >= .extraLarge ? -3 : 0)
+                        )
+                        .frame(width: scrolling ? 85 : 158, height: scrolling ? 85 : 158)
+                        .blur(radius: 2)
+
+                    // 1c. Die Spitze (Beak) - NUR DIESER TEIL DREHT SICH
+                    if !scrolling {
+                        Image(systemName: "triangle.fill")
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+                            .frame(width: 18, height: 14)
+                            .foregroundStyle(colorScheme == .dark ? Color(white: 0.20) : .white)
+                            .offset(y: -88)
+
+                            // Hier ist die Drehung nur für den Beak:
+                            .rotationEffect(.degrees(adjustments.degree))
+                            .animation(.bouncy(duration: 0.8), value: adjustments.degree)
+                    }
+                }
+
+                // EBENE 2: Die Werte (Zentral, feststehend)
+                VStack(spacing: 2) {
+                    let val = Double(units == .mmolL ? recent.glucose?.asMmolL ?? 0 : Decimal(recent.glucose ?? 0))
+
+                    Text(glucoseFormatter.string(from: val as NSNumber) ?? "--")
+                        .font(.system(size: scrolling ? 34 : 62, design: .rounded))
+                        .foregroundColor(alwaysUseColors ? colorOfGlucose : .primary)
+
+                    if !scrolling {
+                        VStack(spacing: 0) {
+                            /*   let deltaValue = delta ?? 0
+                             let deltaString = deltaValue > 0 ? "+\(deltaValue)" : "\(deltaValue)"
+
+                             Text("\(deltaString) Δ")
+                                 .font(.system(size: 16, weight: .bold, design: .rounded))
+                                 .foregroundColor(deltaColor)*/
+
+                            let minutesAgo = timerDate.timeIntervalSince(recent.dateString) / 60
+                            let timeText = timaAgoFormatter.string(for: Double(minutesAgo)) ?? ""
+                            Text(minutesAgo <= 1 ? "Jetzt" : "vor \(timeText) Min")
+                                .font(.system(size: 12))
+                                .foregroundStyle(.secondary.opacity(0.8))
                         }
                     }
                 }
+                // (Prediction etc.)
+                /*  if !scrolling, let deltaInt = delta {
+                     HStack(spacing: 4) {
+                         Image(systemName: "arrow.right")
+                             .font(.system(size: 14))
+                             .foregroundStyle(.secondary)
+
+                         Text("\(eventualBG ?? (recent.glucose ?? 0) + deltaInt)")
+                             .font(.system(size: 20, weight: .semibold))
+
+                         Text(units.rawValue)
+                             .font(.system(size: 12))
+                             .foregroundStyle(.secondary)
+                     }
+                     .offset(x: 145)
+                 }*/
             }
         }
-    }
-
-    private func deltaView(_ deltaInt: Int) -> some View {
-        ZStack {
-            let deltaConverted = units == .mmolL ? deltaInt.asMmolL : Decimal(deltaInt)
-            let string = deltaFormatter.string(from: deltaConverted as NSNumber) ?? ""
-            let offset: CGFloat = -7
-
-            Text(string)
-                .font(.callout).foregroundStyle(.secondary)
-                .offset(x: offset, y: 10)
-        }
-        .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-        .frame(maxHeight: .infinity, alignment: .center).offset(x: 110.5, y: -9)
-    }
-
-    private var sageView: some View {
-        ZStack {
-            if let date = recentGlucose?.sessionStartDate {
-                let sensorAge: TimeInterval = (-1 * date.timeIntervalSinceNow)
-                let expiration = sensordays - sensorAge
-                let secondsOfDay = 8.64E4
-                let colour = colorScheme == .light ? Color.black : Color.white
-                let lineColour: Color = sensorAge >= sensordays - secondsOfDay * 1 ? Color.red
-                    .opacity(0.9) : sensorAge >= sensordays - secondsOfDay * 2 ? Color
-                    .orange : Color.white
-                let minutesAndHours = (displayExpiration && expiration < 1 * 8.64E4) || (displaySAGE && sensorAge < 1 * 8.64E4)
-
-                Sage(amount: sensorAge, expiration: expiration, lineColour: lineColour, sensordays: sensordays)
-                    .frame(width: 36, height: 36)
-                    .overlay {
-                        HStack {
-                            Text(
-                                !minutesAndHours ?
-                                    (remainingTimeFormatterDays.string(from: displayExpiration ? expiration : sensorAge) ?? "")
-                                    .replacingOccurrences(of: ",", with: " ") :
-                                    (remainingTimeFormatter.string(from: displayExpiration ? expiration : sensorAge) ?? "")
-                                    .replacingOccurrences(of: ",", with: " ")
-                            ).foregroundStyle(colour).fontWeight(colorScheme == .dark ? .semibold : .regular)
-                        }
-                    }
-            }
-        }
-        .font(.footnote)
-        .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topTrailing).padding(20)
-        .offset(x: -5)
-    }
-
-    private var adjustments: (degree: Double, x: CGFloat, y: CGFloat) {
-        let yOffset: CGFloat = 17
-        guard let direction = recentGlucose?.direction else {
-            return (90, 0, yOffset)
-        }
-        switch direction {
-        case .doubleUp,
-             .singleUp,
-             .tripleUp:
-            return (0, 0, yOffset)
-        case .fortyFiveUp:
-            return (45, 0, yOffset)
-        case .flat:
-            return (90, 0, yOffset)
-        case .fortyFiveDown:
-            return (135, 0, yOffset)
-        case .doubleDown,
-             .singleDown,
-             .tripleDown:
-            return (180, 0, yOffset)
-        case .none,
-             .notComputable,
-             .rateOutOfRange:
-            return (90, 0, yOffset)
-        }
-    }
-
-    private func direction(degree: Double) -> (x: CGFloat, y: CGFloat) {
-        switch degree {
-        case 0:
-            return (0, -2)
-        case 45:
-            return (1, -2)
-        case 90:
-            return (2, 0)
-        case 135:
-            return (1, 2)
-        case 180:
-            return (0, 2)
-        default:
-            return (2, 0)
-        }
-    }
-
-    private func glucoseText(_ string: String) -> any View {
-        ZStack {
-            let decimal = string.components(separatedBy: decimalString)
-            if decimal.count > 1 {
-                HStack(spacing: 0) {
-                    Text(decimal[0]).font(scrolling ? .glucoseSmallFont : .glucoseFont)
-                    Text(decimalString).font(.system(size: !scrolling ? 28 : 14).weight(.semibold)).baselineOffset(-10)
-                    Text(decimal[1]).font(.system(size: !scrolling ? 28 : 18)).baselineOffset(!scrolling ? -10 : -4)
-                }
-                .tracking(-1)
-                .offset(x: -2, y: 14)
-                .foregroundColor(alwaysUseColors ? colorOfGlucose : alarm == nil ? .primary : .loopRed)
-            } else {
-                Text(string)
-                    .font(scrolling ? .glucoseSmallFont : .glucoseFontMdDl.width(.condensed)) // .tracking(-2)
-                    .foregroundColor(alwaysUseColors ? colorOfGlucose : alarm == nil ? .primary : .loopRed)
-                    .offset(x: string.count > 2 ? -1 : -1, y: 16)
-            }
-        }
-        .offset(y: scrolling ? 3 : 0)
-    }
-
-    private var glucoseDrop: some View {
-        let adjust = adjustments
-        let degree = adjustments.degree
-        let shadowDirection = direction(degree: degree)
-        return Image("glucoseDrops")
-            .resizable()
-            .frame(width: !scrolling ? 140 : 80, height: !scrolling ? 140 : 80).rotationEffect(.degrees(degree))
-            .animation(.bouncy(duration: 1, extraBounce: 0.2), value: degree)
-            .offset(x: adjust.x, y: adjust.y)
-            .shadow(radius: 3, x: shadowDirection.x, y: shadowDirection.y)
+        .frame(maxWidth: .infinity)
     }
 
     private var colorOfGlucose: Color {
         let whichGlucose = recentGlucose?.glucose ?? 0
-        guard lowGlucose < highGlucose else { return .primary }
+        guard lowGlucose < highGlucose else { return Color(red: 0.15, green: 0.83, blue: 0.55) }
 
-        switch whichGlucose {
-        case 0 ..< Int(lowGlucose):
-            return .loopRed
-        case Int(lowGlucose) ..< Int(highGlucose):
-            return .loopGreen
-        case Int(highGlucose)...:
-            return .loopYellow
-        default:
-            return .loopYellow
+        if whichGlucose < Int(lowGlucose) {
+            return Color(red: 1.0, green: 0.2, blue: 0.3) // Ein "leuchtendes" Rot-Pink
+        }
+        if whichGlucose > Int(highGlucose) {
+            return Color.orange
+        }
+
+        // Smaragd-Grün
+        return Color(red: 0.15, green: 0.83, blue: 0.55)
+    }
+
+    private var deltaColor: Color {
+        guard let delta = delta else { return .secondary }
+
+        if delta > 10 {
+            return Color.red.opacity(0.7) // Grün bei starkem Anstieg (>10)
+        } else if delta < -10 {
+            return Color.red.opacity(0.7) // Rot bei starkem Abfall (<-10)
+        } else {
+            return .secondary // Bei kleinen Änderungen (±10) = Neutral
         }
     }
 }

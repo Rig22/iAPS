@@ -441,6 +441,134 @@ extension UIImage {
     }
 }
 
+struct ElegantBackground: ViewModifier {
+    var colorScheme: ColorScheme
+
+    func body(content: Content) -> some View {
+        content
+            .frame(maxWidth: .infinity)
+            .background(
+                ZStack {
+                    if colorScheme != .dark {
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color.white)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .stroke(Color.primary.opacity(0.08), lineWidth: 1)
+                            )
+                            .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 8)
+                            .shadow(color: Color.black.opacity(0.04), radius: 2, x: 0, y: 1)
+                    } else {
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color.white.opacity(0.01))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .stroke(Color.primary.opacity(0.1), lineWidth: 1)
+                            )
+                            .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
+                    }
+                }
+            )
+    }
+}
+
+// Optional: Eine Extension für einfachere Schreibweise
+extension View {
+    func elegantShadow(scheme: ColorScheme) -> some View {
+        modifier(ElegantBackground(colorScheme: scheme))
+    }
+}
+
+// Ein schönerer, organischer Tropfen
+struct BolusDropShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
+        path.addCurve(
+            to: CGPoint(x: rect.midX, y: rect.maxY),
+            control1: CGPoint(x: rect.minX - rect.width * 0.2, y: rect.maxY * 0.6),
+            control2: CGPoint(x: rect.minX, y: rect.maxY)
+        )
+        path.addCurve(
+            to: CGPoint(x: rect.midX, y: rect.minY),
+            control1: CGPoint(x: rect.maxX, y: rect.maxY),
+            control2: CGPoint(x: rect.maxX + rect.width * 0.2, y: rect.maxY * 0.6)
+        )
+        return path
+    }
+}
+
+struct ModernBolusDrop: View {
+    @Environment(\.colorScheme) var colorScheme
+    let size: CGFloat
+
+    var body: some View {
+        // Definition der adaptiven Farben innerhalb des body
+        let lightBlue = colorScheme == .dark
+            ? Color(red: 0.45, green: 0.65, blue: 0.95) // Leuchtend für Dark Mode
+            : Color(red: 0.60, green: 0.80, blue: 1.00) // Sanfter/Heller für Light Mode
+
+        let darkBlue = colorScheme == .dark
+            ? Color(red: 0.15, green: 0.35, blue: 0.65) // Tiefblau für Dark Mode
+            : Color(red: 0.30, green: 0.50, blue: 0.80) // Frisches Blau für Light Mode
+
+        ZStack {
+            // 1. Hauptform mit radialem Verlauf für Tiefe
+            BolusDropShape()
+                .fill(
+                    RadialGradient(
+                        gradient: Gradient(colors: [lightBlue, darkBlue]),
+                        center: .init(x: 0.3, y: 0.3),
+                        startRadius: size * 0.1,
+                        endRadius: size * 1.2
+                    )
+                )
+                // Schatten im Light Mode dezenter machen
+                .shadow(
+                    color: darkBlue.opacity(colorScheme == .dark ? 0.4 : 0.2),
+                    radius: 2,
+                    x: 0,
+                    y: 2
+                )
+
+            // 2. Das Glanzlicht (Spiegelung)
+            Capsule()
+                .fill(Color.white.opacity(colorScheme == .dark ? 0.4 : 0.6))
+                .frame(width: size * 0.15, height: size * 0.4)
+                .rotationEffect(.degrees(20))
+                .offset(x: -size * 0.15, y: -size * 0.1)
+
+            // 3. Lichtpunkt unten rechts
+            Circle()
+                .fill(Color.white.opacity(colorScheme == .dark ? 0.1 : 0.3))
+                .frame(width: size * 0.1, height: size * 0.1)
+                .offset(x: size * 0.2, y: size * 0.3)
+        }
+        .frame(width: size, height: size * 1.35)
+    }
+}
+
+// Styling für die schwebenden Labels (die weißen Boxen)
+struct ChartLabelStyle: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .font(.system(size: 12, weight: .bold, design: .rounded))
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color.white)
+                    .shadow(color: Color.black.opacity(0.1), radius: 3, x: 0, y: 2)
+            )
+    }
+}
+
+extension View {
+    func chartLabelStyle() -> some View {
+        modifier(ChartLabelStyle())
+    }
+}
+
 enum HeaderPump {
     case medtrum
     case pod
