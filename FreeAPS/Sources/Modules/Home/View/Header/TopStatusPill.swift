@@ -7,7 +7,6 @@ extension Home {
         @Environment(\.colorScheme) var colorScheme
 
         @State private var isDetailSheetPresented = false
-        @State private var rotationDegree: Double = 0
 
         // Timer für das Rollieren (alle 60 Sek)
         let timer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
@@ -30,7 +29,6 @@ extension Home {
                 Image(systemName: currentStatus.icon)
                     .font(.system(size: 24, weight: .bold))
                     .foregroundColor(currentStatus.color)
-                    .rotationEffect(.degrees(rotationDegree))
                     .frame(width: 24, height: 24)
                     .shadow(color: currentStatus.color.opacity(0.3), radius: 3, x: 0, y: 0)
                     .padding(.leading, 12)
@@ -67,8 +65,6 @@ extension Home {
             .onReceive(timer) { _ in
                 // Der Timer triggert das UI-Update für das Rollieren
             }
-            .onAppear { setupRotation(isLooping: state.isLooping) }
-            .onChange(of: state.isLooping) { _, newValue in setupRotation(isLooping: newValue) }
             .sheet(isPresented: $isDetailSheetPresented) {
                 StatusDetailView(statuses: allStatuses)
             }
@@ -303,7 +299,6 @@ extension Home {
                 color: loopColor,
                 messageColor: .primary,
                 priority: 50,
-                // iconSize: 26
             ))
 
             return pool.sorted { $0.priority > $1.priority }
@@ -335,12 +330,6 @@ extension Home {
                             .frame(width: geo.size.width * CGFloat(truncating: progress as NSNumber))
                     }
                 }
-            }
-        }
-
-        private func setupRotation(isLooping: Bool) {
-            withAnimation(isLooping ? .linear(duration: 2.0).repeatForever(autoreverses: false) : .default) {
-                rotationDegree = isLooping ? 360 : 0
             }
         }
 
