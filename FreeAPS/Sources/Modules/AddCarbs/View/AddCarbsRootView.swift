@@ -61,6 +61,10 @@ extension AddCarbs {
             return formatter
         }()
 
+        private func format(_ value: Decimal) -> String {
+            Self.formatter.string(from: value as NSNumber) ?? ""
+        }
+
         var body: some View {
             content
                 .background(Color(.systemGroupedBackground))
@@ -507,13 +511,6 @@ extension AddCarbs {
             Form {
                 Section {} header: { back }
 
-                var nutrientLabel: String {
-                    let carbsStr = Self.formatter.string(from: state.carbs as NSNumber) ?? ""
-                    let fatStr = Self.formatter.string(from: state.fat as NSNumber) ?? ""
-                    let proteinStr = Self.formatter.string(from: state.protein as NSNumber) ?? ""
-                    return "[Carbs: \(carbsStr), Fat: \(fatStr), Protein: \(proteinStr)]"
-                }
-
                 if !empty {
                     Section {
                         Button {
@@ -523,12 +520,9 @@ extension AddCarbs {
                             HStack {
                                 Text("Save as Preset")
                                 Spacer()
-                                /*  Text(
-                                     "[Carbs: " + (Self.formatter.string(from: state.carbs as NSNumber) ?? "") + ", Fat: " +
-                                         (Self.formatter.string(from: state.fat as NSNumber) ?? "") + ", Protein: " +
-                                         (Self.formatter.string(from: state.protein as NSNumber) ?? "") + "]"
-                                 )*/
-                                Text(nutrientLabel)
+                                Text(
+                                    "[Carbs: \(format(state.carbs)), Fat: \(format(state.fat)), Protein: \(format(state.protein))]"
+                                )
                             }
                         }.frame(maxWidth: .infinity, alignment: .center)
                             .listRowBackground(Color(.systemBlue)).tint(.white)

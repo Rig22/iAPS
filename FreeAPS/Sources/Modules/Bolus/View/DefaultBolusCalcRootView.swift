@@ -304,12 +304,6 @@ extension Bolus {
             ]
 
             VStack {
-                var lastEntryLabel: String {
-                    let variable = entries.last?.variable ?? ""
-                    let value = entries.last?.value ?? ""
-                    return "\(variable) \(value)  ->"
-                }
-
                 Grid(verticalSpacing: 3) {
                     ForEach(entries.dropLast()) { entry in
                         GridRow {
@@ -342,9 +336,11 @@ extension Bolus {
                             if state.fraction != 1, state.insulin > 0 {
                                 Divider()
                                 HStack {
-                                    /*  Text((entries.last?.variable ?? "") + " " + (entries.last?.value ?? "") + "  ->")*/
-                                    Text(lastEntryLabel)
-                                        .foregroundStyle(.secondary)
+                                    if let recent = entries.last {
+                                        Text("\(recent.variable) \(recent.value)  ->")
+                                            .foregroundStyle(.secondary)
+                                    }
+
                                     Text(
                                         state.insulinCalculated.formatted() + unit
                                     ).fontWeight(fontWeight).font(.title3).foregroundStyle(.blue).bold()
