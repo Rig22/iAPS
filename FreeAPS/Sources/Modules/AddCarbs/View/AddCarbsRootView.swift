@@ -120,7 +120,7 @@ extension AddCarbs {
         @ViewBuilder private var foodItemEditorSheet: some View {
             FoodItemEditorSheet(
                 existingItem: foodSearchState.newFoodEntryToEdit,
-                title: NSLocalizedString("Create Saved Food", comment: ""),
+                title: NSLocalizedString("Add Food Manually", comment: ""),
                 allExistingTags: Set(foodSearchState.savedFoods?.foodItems.flatMap { $0.tags ?? [] } ?? []),
                 showTagsAndFavorite: true,
                 onSave: { foodItem in
@@ -151,7 +151,7 @@ extension AddCarbs {
             }
         }
 
-        private var navigationTitle: String {
+        private var navigationTitle: LocalizedStringKey {
             foodSearchState.showSavedFoods ? "Saved Foods" : "Add Meal"
         }
 

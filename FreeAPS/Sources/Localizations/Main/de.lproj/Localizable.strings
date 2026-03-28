@@ -1093,7 +1093,7 @@ Enact a temp Basal or a temp target */
 "Additional notification types" = "Weitere Benachrichtigungseinstellungen";
 
 /* */
-"Misc" = "Sonstiges";
+"Miscellaneous" = "Miscellaneous";
 
 /* */
 "Unit override" = "Einheit überschreiben";
@@ -1412,6 +1412,8 @@ Enact a temp Basal or a temp target */
 
 "Serving Size" = "Serving Size";
 
+"Standard Serving" = "Standard Serving";
+
 "Food Name" = "Food Name";
 
 "Food" = "Food";
@@ -1566,7 +1568,6 @@ Enact a temp Basal or a temp target */
 
 "Provider for AI Image Analysis" = "Provider for AI Image Analysis";
 
-"Configure which service handles each type of food search." = "Configure which service handles each type of food search.";
 
 "Food Search Provider Configuration" = "Food Search Provider Configuration";
 
@@ -1734,7 +1735,9 @@ Enact a temp Basal or a temp target */
 "• **OpenFoodFacts**: Free, open database with extensive barcode coverage and text search for packaged foods." = "• **OpenFoodFacts**: Free, open database with extensive barcode coverage and text search for packaged foods.";
 "❌ If you select 'OpenFoodFacts' or 'USDA', camera analysis will use basic estimation instead of AI" = "❌ If you select 'OpenFoodFacts' or 'USDA', camera analysis will use basic estimation instead of AI";
 
+"✅ Select 'Anthropic (Claude API)', 'Google (Gemini API)', or 'OpenAI (ChatGPT API)' for AI Image Analysis to use your paid keys" = "✅ Select 'Anthropic (Claude API)', 'Google (Gemini API)', or 'OpenAI (ChatGPT API)' for AI Image Analysis to use your paid keys";
 
+"When you take a photo of food, the app uses the provider selected in 'AI Image Analysis' above." = "When you take a photo of food, the app uses the provider selected in 'AI Image Analysis' above.";
 "Break down this meal into individual components with complete macronutrient profiles (carbs, protein, fat, calories) per item and combined totals." = "Break down this meal into individual components with complete macronutrient profiles (carbs, protein, fat, calories) per item and combined totals.";
 
 "Identify all food items in this image with focus on carbohydrate content for diabetes management. Provide detailed carb counts for each component and total meal carbohydrates." = "Identify all food items in this image with focus on carbohydrate content for diabetes management. Provide detailed carb counts for each component and total meal carbohydrates.";
@@ -2784,7 +2787,7 @@ Enact a temp Basal or a temp target */
 "all" = "alle";
 
 /* IOB View */
-"Insulin on Board" = "Aktives Insulin";
+"Insulin on Board" = "Aktives Insulin (IOB)";
 
 /* Active Insulin View */
 "Time with negative insulin" = "Zeit mit negativem Insulin";
@@ -2816,9 +2819,6 @@ Enact a temp Basal or a temp target */
 
 /* UI/UX-setting */
 "Display Insulin Activity Chart" = "Insulin-Aktivitätsdiagramm anzeigen";
-
-/* UI/UX-setting */
-"Don't ask for saving search result as meal preset" = "Don't ask for saving search result as meal preset";
 
 /* --------------------------------------------------------  Dexcom G7 --------------------------------------*/
 
@@ -3924,13 +3924,14 @@ Enact a temp Basal or a temp target */
 
 /* main chart settings - toggle, controls whether to show y-axis labels (glucose) */
 "Y-axis labels" = "Y-axis labels";
-/* Delta Status Pill */
-"Stable" = "Stabil";
-"Slightly rising" = "Leicht steigend";
-"Rising" = "Steigend";
-"Strongly rising" = "Stark steigend";
-"Slightly falling" = "Leicht sinkend";
-"Falling" = "Sinkend";
-"Strongly falling" = "Stark sinkend";
-"Replace Sensor" = "Sensor ersetzten";
 
+"Fiber" = "Fiber";
+
+"Sugars" = "Sugars";
+
+"Search Results" = "Search Results";
+
+"Results for" = "Results for";
+
+/* name of complete meals when saving */
+"Complete Meal" = "Complete Meal";
