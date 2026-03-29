@@ -3935,3 +3935,13 @@ Enact a temp Basal or a temp target */
 
 /* name of complete meals when saving */
 "Complete Meal" = "Complete Meal";
+
+/* Delta Status Pill */
+"Stable" = "Stabil";
+"Slightly rising" = "Leicht steigend";
+"Rising" = "Steigend";
+"Strongly rising" = "Stark steigend";
+"Slightly falling" = "Leicht sinkend";
+"Falling" = "Sinkend";
+"Strongly falling" = "Stark sinkend";
+
