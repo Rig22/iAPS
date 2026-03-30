@@ -78,9 +78,12 @@ extension Home {
             // 1. Bolus
             if let bolusProgress = state.bolusProgress, bolusProgress > 0 {
                 let amount = (state.bolusAmount ?? 0) as NSDecimalNumber
-                let delivered = amount.doubleValue * (bolusProgress as NSDecimalNumber).doubleValue
+                let progress = (bolusProgress as NSDecimalNumber).doubleValue
+                let total = amount.doubleValue
+                let delivered = total * progress
+
                 pool.append(DisplayStatus(
-                    message: "Bolus: \(String(format: "%.2f", delivered))U",
+                    message: "Bolus: \(String(format: "%.2f", delivered)) / \(String(format: "%.2f", total)) U",
                     icon: "syringe.fill",
                     color: .blue,
                     messageColor: .primary,
