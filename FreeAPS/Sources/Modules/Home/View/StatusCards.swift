@@ -25,7 +25,7 @@ extension Home {
         var body: some View {
             let patchStatus: String = {
                 guard let expiresAt = state.pumpExpiresAtDate else {
-                    return "--"
+                    return "no data"
                 }
 
                 let remaining = expiresAt.timeIntervalSince(Date())
@@ -155,6 +155,8 @@ extension Home {
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
                         Text(value)
                             .font(.system(size: 24, design: .rounded))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                         Text(unit)
                             .font(.system(size: 12, design: .rounded))
                             .foregroundColor(.secondary)
@@ -162,12 +164,12 @@ extension Home {
 
                     Spacer(minLength: 0) // Drückt den Inhalt nach links
                 }
-
+                // Unterer Text
                 Text(title)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(isCritical ? .red : .secondary)
                     .lineLimit(1)
-                    .padding(.leading, 2)
+                    .frame(maxWidth: .infinity, alignment: .center)
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
