@@ -156,7 +156,7 @@ extension Home {
                         Text(value)
                             .font(.system(size: 24, design: .rounded))
                             .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                            .minimumScaleFactor(0.7)
                         Text(unit)
                             .font(.system(size: 12, design: .rounded))
                             .foregroundColor(.secondary)

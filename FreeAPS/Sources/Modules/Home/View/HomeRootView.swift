@@ -161,7 +161,8 @@ extension Home {
                 scrolling: $displayGlucose, displaySAGE: $state.displaySAGE,
                 displayExpiration: $state.displayExpiration,
                 sensordays: $state.sensorDays,
-                timerDate: $state.data.timerDate
+                timerDate: $state.data.timerDate,
+                displayeventualBG: $state.displayeventualBG
             )
             .onTapGesture {
                 if state.alarm == nil {

@@ -50,12 +50,14 @@ extension UIUX {
 
                 Section {
                     /*   Toggle("Never display the small glucose chart when scrolling", isOn: $state.skipGlucoseChart)*/
-                    /* Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)*/
-                    /* Toggle("Display Glucose Delta", isOn: $state.displayDelta) */
+                    Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
+                    Toggle("Display Glucose Delta", isOn: $state.displayDelta)
+                    Toggle("Display Eventual Glucose", isOn: $state.displayeventualBG)
                     Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
                     Toggle("Display Sensor Age", isOn: $state.displaySAGE)
                     Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)
                     Toggle("Hide isfView", isOn: $state.isfView)
+
                 } header: { Text("Header settings") }
                     ._onBindingChange($state.displaySAGE) { enabled in
                         if enabled { state.displayExpiration = false }

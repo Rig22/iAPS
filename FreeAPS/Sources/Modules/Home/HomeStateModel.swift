@@ -86,6 +86,7 @@ extension Home {
         @Published var ai: Bool = false
 
         @Published var isfView: Bool = true
+        @Published var displayeventualBG: Bool = false
 
         // Chart data
         var data = ChartModel(
@@ -227,6 +228,7 @@ extension Home {
             ai = settingsManager.settings.ai
 
             isfView = settingsManager.settings.isfView
+            displayeventualBG = settingsManager.settings.displayeventualBG
 
             updateSensorDays()
 
@@ -867,6 +869,8 @@ extension Home.StateModel:
         carbButton = settingsManager.settings.carbButton
         profileButton = settingsManager.settings.profileButton
         ai = settingsManager.settings.ai
+        displayeventualBG = settingsManager.settings.displayeventualBG
+
         updateSensorDays()
 
         setupGlucose()

@@ -14,6 +14,7 @@ struct CurrentGlucoseView: View {
     @Binding var displayExpiration: Bool
     @Binding var sensordays: Double
     @Binding var timerDate: Date
+    @Binding var displayeventualBG: Bool
 
     var eventualBG: Int? = nil
 
@@ -139,13 +140,27 @@ struct CurrentGlucoseView: View {
 
                     if !scrolling {
                         VStack(spacing: 0) {
-                            /*   let deltaValue = delta ?? 0
+                            // Delta
+                            /*  let deltaValue = delta ?? 0
                              let deltaString = deltaValue > 0 ? "+\(deltaValue)" : "\(deltaValue)"
 
                              Text("\(deltaString) Δ")
                                  .font(.system(size: 16, weight: .bold, design: .rounded))
                                  .foregroundColor(deltaColor)*/
 
+                            if displayDelta,
+                               !scrolling,
+                               let deltaInt = delta,
+                               !(units == .mmolL && abs(deltaInt) <= 1)
+                            {
+                                let deltaString = deltaInt > 0 ? "+\(deltaInt)" : "\(deltaInt)"
+
+                                Text("\(deltaString) Δ")
+                                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                                    .foregroundColor(deltaColor)
+                            }
+
+                            // Minutes ago
                             let minutesAgo = timerDate.timeIntervalSince(recent.dateString) / 60
                             let timeText = timaAgoFormatter.string(for: Double(minutesAgo)) ?? ""
                             Text(minutesAgo <= 1 ? "Jetzt" : "vor \(timeText) Min")
@@ -155,21 +170,23 @@ struct CurrentGlucoseView: View {
                     }
                 }
                 // (Prediction etc.)
-                /*  if !scrolling, let deltaInt = delta {
-                     HStack(spacing: 4) {
-                         Image(systemName: "arrow.right")
-                             .font(.system(size: 14))
-                             .foregroundStyle(.secondary)
+                if displayeventualBG {
+                    if !scrolling, let deltaInt = delta {
+                        HStack(spacing: 4) {
+                            Image(systemName: "arrow.right")
+                                .font(.system(size: 14))
+                                .foregroundStyle(.secondary)
 
-                         Text("\(eventualBG ?? (recent.glucose ?? 0) + deltaInt)")
-                             .font(.system(size: 20, weight: .semibold))
+                            Text("\(eventualBG ?? (recent.glucose ?? 0) + deltaInt)")
+                                .font(.system(size: 20, weight: .medium))
 
-                         Text(units.rawValue)
-                             .font(.system(size: 12))
-                             .foregroundStyle(.secondary)
-                     }
-                     .offset(x: 145)
-                 }*/
+                            Text(units.rawValue)
+                                .font(.system(size: 12))
+                                .foregroundStyle(.secondary)
+                        }
+                        .offset(x: 145)
+                    } else {}
+                }
             }
         }
         .frame(maxWidth: .infinity)

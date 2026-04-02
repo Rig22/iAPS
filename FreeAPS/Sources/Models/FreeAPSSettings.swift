@@ -148,6 +148,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var skipSave = false
 
     var isfView: Bool = false
+    var displayeventualBG: Bool = false
 }
 
 extension FreeAPSSettings: Decodable {
@@ -719,6 +720,9 @@ extension FreeAPSSettings: Decodable {
         if let isfView = try? container.decode(Bool.self, forKey: .isfView) {
             settings.isfView = isfView
         }
+
+        if let displayeventualBG = try? container.decode(Bool.self, forKey: .displayeventualBG) {
+            settings.displayeventualBG = displayeventualBG }
 
         self = settings
     }
