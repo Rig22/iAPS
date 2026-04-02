@@ -20,7 +20,9 @@ extension Home {
                 key: "date",
                 ascending: true
             )]
-        ) var concentration: FetchedResults<InsulinConcentration>
+        )
+        
+        var concentration: FetchedResults<InsulinConcentration>
 
         var body: some View {
             let patchStatus: String = {
@@ -133,7 +135,7 @@ extension Home {
                     }
                 )
             }
-            .padding(.horizontal)
+            .padding(.horizontal, 10)
             .frame(height: 60)
         }
 

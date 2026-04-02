@@ -3949,13 +3949,3 @@ Eenvoudig gezegd, de Dynamische Carb Ratio past de koolhydraatverhouding aan op 
 
 /* name of complete meals when saving */
 "Complete Meal" = "Complete Meal";
-
-/* Delta Status Pill */
-"Stable" = "Stabiel";
-"Slightly rising" = "Licht stijgend";
-"Rising" = "Stijgend";
-"Strongly rising" = "Sterk stijgend";
-"Slightly falling" = "Licht dalend";
-"Falling" = "Dalend";
-"Strongly falling" = "Sterk dalend";
-"Replace Sensor" = "Sensor vervangen";
