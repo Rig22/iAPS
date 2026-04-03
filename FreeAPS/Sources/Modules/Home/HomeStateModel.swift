@@ -35,6 +35,7 @@ extension Home {
         @Published var reservoir: Decimal?
         @Published var pumpName = ""
         @Published var pumpExpiresAtDate: Date?
+        @Published var isExtendedLifespan = false
         @Published var tempTarget: TempTarget?
         @Published var setupPump = false
         @Published var errorMessage: String? = nil
@@ -286,9 +287,26 @@ extension Home {
                 .weakAssign(to: \.pumpName, on: self)
                 .store(in: &lifetime)
 
+            /*  apsManager.pumpExpiresAtDate
+             .receive(on: DispatchQueue.main)
+             .weakAssign(to: \.pumpExpiresAtDate, on: self)
+             .store(in: &lifetime)*/
+
             apsManager.pumpExpiresAtDate
                 .receive(on: DispatchQueue.main)
-                .weakAssign(to: \.pumpExpiresAtDate, on: self)
+                .sink { [weak self] date in
+                    self?.pumpExpiresAtDate = date
+
+                    // Den rawState des PumpManagers abfragen, ohne MedtrumKit direkt importieren zu müssen
+                    if let rawState = self?.provider.deviceManager.pumpManager?.rawState,
+                       let expiryMode = rawState["expiryMode"] as? Int
+                    {
+                        // ExpiryMode: 1 = default (72h), 2 = extended (112h)
+                        self?.isExtendedLifespan = (expiryMode == 2)
+                    } else {
+                        self?.isExtendedLifespan = false
+                    }
+                }
                 .store(in: &lifetime)
 
             apsManager.lastError

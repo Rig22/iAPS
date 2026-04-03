@@ -5,43 +5,45 @@ extension Home {
         @ObservedObject var state: Home.StateModel
         @Environment(\.colorScheme) var colorScheme
 
-        // Formatter für die IOB Anzeige (1 Nachkommastellen)
+        // Formatter für die IOB Anzeige (1 Nachkommastelle)
         private var targetFormatter: NumberFormatter {
             let formatter = NumberFormatter()
             formatter.numberStyle = .decimal
-            formatter.maximumFractionDigits = 1 // 2
-            formatter.minimumFractionDigits = 1 // 2
+            formatter.maximumFractionDigits = 1
+            formatter.minimumFractionDigits = 1
             return formatter
         }
 
         @FetchRequest(
             entity: InsulinConcentration.entity(),
-            sortDescriptors: [NSSortDescriptor(
-                key: "date",
-                ascending: true
-            )]
-        )
-        
-        var concentration: FetchedResults<InsulinConcentration>
+            sortDescriptors: [NSSortDescriptor(key: "date", ascending: true)]
+        ) var concentration: FetchedResults<InsulinConcentration>
 
         var body: some View {
-            let patchStatus: String = {
+            let patchStatusString: String = {
                 guard let expiresAt = state.pumpExpiresAtDate else {
                     return "no data"
                 }
-
                 let remaining = expiresAt.timeIntervalSince(Date())
-
                 if remaining <= 0 {
                     return NSLocalizedString("Replace", comment: "")
                 }
-
                 let totalMinutes = Int(remaining / 60)
                 let days = totalMinutes / (24 * 60)
                 let hours = (totalMinutes % (24 * 60)) / 60
                 let minutes = totalMinutes % 60
-
                 return "\(days)d \(hours)h \(minutes)m"
+            }()
+
+            let patchTitle: LocalizedStringKey = {
+                if patchStatusString == NSLocalizedString("Replace", comment: "") || patchStatusString == "no data" {
+                    return LocalizedStringKey(patchStatusString)
+                }
+                if state.isExtendedLifespan {
+                    return LocalizedStringKey("\(Image(systemName: "infinity")) \(patchStatusString)")
+                } else {
+                    return LocalizedStringKey("\(Image(systemName: "timer")) \(patchStatusString)")
+                }
             }()
 
             HStack(alignment: .top, spacing: 10) {
@@ -50,17 +52,22 @@ extension Home {
                     value: targetFormatter.string(from: (state.data.iob ?? 0) as NSNumber) ?? "0.0",
                     unit: "U",
                     title: "Insulin on Board",
-                    icon: {
-                        AnyView(ModernBolusDrop(size: 18))
-                    }
+                    icon: { AnyView(ModernBolusDrop(size: 18)) }
                 )
 
                 // 2. Reservoir & Patch Card
                 let concentrationValue = Double(truncating: (concentration.last?.concentration ?? 1) as NSNumber)
-                let adjustedReservoir = Double(truncating: (state.reservoir ?? 0) as NSNumber) * concentrationValue
-                let isReplaceActive = (patchStatus == NSLocalizedString("Replace", comment: ""))
+                let rawReservoir = state.reservoir ?? 0
 
-                // DYNAMISCHE KAPAZITÄT
+                // Platzhalter 0xDEADBEEF (3735928559) erkennen
+                let isDeadBeef = (rawReservoir == 3_735_928_559)
+
+                let physicalReservoir = isDeadBeef ? 0 : Double(truncating: rawReservoir as NSNumber)
+                let adjustedReservoir = physicalReservoir * concentrationValue
+                let reservoirDisplayValue = isDeadBeef ? "?" : "\(Int(adjustedReservoir))"
+
+                let isReplaceActive = (patchStatusString == NSLocalizedString("Replace", comment: ""))
+
                 let maxCapacity: Double = {
                     if let maxRes = state.openAPSSettings?.maximumReservoir {
                         return Double(truncating: maxRes as! NSNumber)
@@ -68,40 +75,36 @@ extension Home {
                     return 200.0
                 }()
 
-                let physicalReservoir = Double(truncating: (state.reservoir ?? 0) as NSNumber)
                 let portion = 1.0 - max(0, min(1, physicalReservoir / maxCapacity))
 
+                // Pumpentyp für das Insulin-Badge bestimmen
+                let pumpType: HeaderPump = {
+                    if state.pumpName.contains("Medtrum") {
+                        return .medtrum
+                    } else if state.pumpName.contains("Omni") {
+                        return .pod
+                    } else if state.pumpName.contains("Dana") {
+                        return .dana
+                    } else if state.pumpName.contains("Medtronic") {
+                        return .medtronic
+                    } else {
+                        return .other
+                    }
+                }()
+
                 statusCard(
-                    value: "\(Int(adjustedReservoir))",
+                    value: reservoirDisplayValue,
                     unit: "U",
-                    title: "\(patchStatus)",
+                    title: patchTitle,
                     icon: {
                         AnyView(
-                            ZStack {
-                                let isMedtrum = state.pumpName.contains("Medtrum")
-                                let imageName = isMedtrum ? "nano" : (colorScheme == .dark ? "pod_dark" : "pod_light")
-
-                                // 1. Das UIImage aus den Assets laden
-                                if let uiImage = UIImage(named: imageName) {
-                                    let fillStyleColor: Color = adjustedReservoir < 20 ? .red : .insulin
-                                    uiImage.fillImageUpToPortion(
-                                        color: fillStyleColor.opacity(0.8),
-                                        portion: portion
-                                    )
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(width: isMedtrum ? 20 : 26, height: 26)
-                                    .opacity(isReplaceActive ? 0.5 : 1.0)
-                                }
-
-                                if isReplaceActive {
-                                    Image(systemName: "exclamationmark.circle.fill")
-                                        .font(.system(size: 12, weight: .bold))
-                                        .foregroundColor(.red)
-                                        .background(Circle().fill(.white).frame(width: 10, height: 10))
-                                        .offset(x: 8, y: -8)
-                                }
-                            }
+                            pumpReservoirIcon(
+                                portion: portion,
+                                isReplaceActive: isReplaceActive,
+                                pumpName: state.pumpName,
+                                adjustedReservoir: adjustedReservoir,
+                                colorScheme: colorScheme
+                            )
                         )
                     },
                     isCritical: isReplaceActive,
@@ -113,11 +116,8 @@ extension Home {
                 )
                 .overlay(alignment: .topLeading) {
                     if concentrationValue != 1, !state.settingsManager.settings.hideInsulinBadge {
-                        NonStandardInsulin(
-                            concentration: Double(concentrationValue),
-                            pump: state.pumpName.contains("Medtrum") ? .medtrum : .pod
-                        )
-                        .offset(x: 0, y: 30)
+                        NonStandardInsulin(concentration: concentrationValue, pump: pumpType)
+                            .offset(x: 0, y: 30)
                     }
                 }
 
@@ -139,7 +139,56 @@ extension Home {
             .frame(height: 60)
         }
 
-        // MARK: - Card Builder
+        // MARK: - Pumpenspezifisches Icon mit Reservoirfüllung
+
+        @ViewBuilder private func pumpReservoirIcon(
+            portion: Double,
+            isReplaceActive: Bool,
+            pumpName: String,
+            adjustedReservoir: Double,
+            colorScheme: ColorScheme
+        ) -> some View {
+            let isMedtrum = pumpName.contains("Medtrum")
+            let isOmnipod = pumpName.contains("Omni")
+
+            let fillColor: Color = adjustedReservoir < 20 ? .red : .insulin
+
+            ZStack {
+                if isMedtrum {
+                    UIImage(imageLiteralResourceName: "nano")
+                        .fillImageUpToPortion(color: fillColor.opacity(0.8), portion: portion)
+                        .resizable()
+                        .aspectRatio(0.7, contentMode: .fit)
+                        .frame(height: 26)
+                        .opacity(isReplaceActive ? 0.5 : 1.0)
+                } else if isOmnipod {
+                    let imageName = colorScheme == .dark ? "pod_dark" : "pod_light"
+                    UIImage(imageLiteralResourceName: imageName)
+                        .fillImageUpToPortion(color: fillColor.opacity(0.8), portion: portion)
+                        .resizable()
+                        .aspectRatio(0.72, contentMode: .fit)
+                        .frame(width: 26, height: 26)
+                        .opacity(isReplaceActive ? 0.5 : 1.0)
+                } else {
+                    let imageName = colorScheme == .dark ? "pump_dark" : "pump_light"
+                    UIImage(imageLiteralResourceName: imageName)
+                        .fillImageUpToPortion(color: fillColor.opacity(0.8), portion: portion)
+                        .resizable()
+                        .frame(width: 17, height: 36)
+                        .opacity(isReplaceActive ? 0.5 : 1.0)
+                }
+
+                if isReplaceActive {
+                    Image(systemName: "exclamationmark.circle.fill")
+                        .font(.system(size: 12, weight: .bold))
+                        .foregroundColor(.red)
+                        .background(Circle().fill(.white).frame(width: 10, height: 10))
+                        .offset(x: 8, y: -8)
+                }
+            }
+        }
+
+        // MARK: - Generische StatusCard
 
         @ViewBuilder func statusCard(
             value: String,
@@ -153,20 +202,17 @@ extension Home {
                 HStack(alignment: .center, spacing: 8) {
                     icon()
                         .frame(width: 25)
-
                     HStack(alignment: .firstTextBaseline, spacing: 2) {
                         Text(value)
                             .font(.system(size: 24, design: .rounded))
                             .lineLimit(1)
-                            .minimumScaleFactor(0.7)
+                            .minimumScaleFactor(0.2)
                         Text(unit)
                             .font(.system(size: 12, design: .rounded))
                             .foregroundColor(.secondary)
                     }
-
-                    Spacer(minLength: 0) // Drückt den Inhalt nach links
+                    Spacer(minLength: 0)
                 }
-                // Unterer Text
                 Text(title)
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(isCritical ? .red : .secondary)
@@ -183,9 +229,7 @@ extension Home {
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
                             .stroke(Color.primary.opacity(colorScheme == .dark ? 0 : 0.05), lineWidth: 1)
                     )
-                    // 1. Kernschatten
                     .shadow(color: Color.black.opacity(colorScheme == .dark ? 0 : 0.08), radius: 2, x: 0, y: 1)
-                    // 2. Umgebungslicht für Tiefe
                     .shadow(color: Color.black.opacity(colorScheme == .dark ? 0 : 0.06), radius: 10, x: 0, y: 6)
             )
 
