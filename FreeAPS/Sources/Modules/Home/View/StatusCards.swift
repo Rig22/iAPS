@@ -59,12 +59,13 @@ extension Home {
                 let concentrationValue = Double(truncating: (concentration.last?.concentration ?? 1) as NSNumber)
                 let rawReservoir = state.reservoir ?? 0
 
-                // Platzhalter 0xDEADBEEF (3735928559) erkennen
+                // Platzhalter 0xDEADBEEF (3735928559) erkennen (Pod > 50U)
                 let isDeadBeef = (rawReservoir == 3_735_928_559)
 
-                let physicalReservoir = isDeadBeef ? 0 : Double(truncating: rawReservoir as NSNumber)
+                let physicalReservoir = isDeadBeef ? 50.0 : Double(truncating: rawReservoir as NSNumber)
                 let adjustedReservoir = physicalReservoir * concentrationValue
-                let reservoirDisplayValue = isDeadBeef ? "?" : "\(Int(adjustedReservoir))"
+
+                let reservoirDisplayValue = isDeadBeef ? "50+" : "\(Int(adjustedReservoir))"
 
                 let isReplaceActive = (patchStatusString == NSLocalizedString("Replace", comment: ""))
 
@@ -72,24 +73,21 @@ extension Home {
                     if let maxRes = state.openAPSSettings?.maximumReservoir {
                         return Double(truncating: maxRes as! NSNumber)
                     }
-                    return 200.0
+                    // Sinnvolle Defaults, falls OpenAPS Settings noch nicht geladen sind
+                    return state.pumpName.contains("Omni") ? 200.0 : 300.0
                 }()
 
-                let portion = 1.0 - max(0, min(1, physicalReservoir / maxCapacity))
+                // Füllstand berechnen. Wenn DeadBeef, künstlich auf 0.3 (gut gefüllt) setzen
+                let calculatedPortion = 1.0 - max(0, min(1, physicalReservoir / maxCapacity))
+                let portion = isDeadBeef ? 0.3 : calculatedPortion
 
                 // Pumpentyp für das Insulin-Badge bestimmen
                 let pumpType: HeaderPump = {
-                    if state.pumpName.contains("Medtrum") {
-                        return .medtrum
-                    } else if state.pumpName.contains("Omni") {
-                        return .pod
-                    } else if state.pumpName.contains("Dana") {
-                        return .dana
-                    } else if state.pumpName.contains("Medtronic") {
-                        return .medtronic
-                    } else {
-                        return .other
-                    }
+                    if state.pumpName.contains("Medtrum") { return .medtrum }
+                    else if state.pumpName.contains("Omni") { return .pod }
+                    else if state.pumpName.contains("Dana") { return .dana }
+                    else if state.pumpName.contains("Medtronic") { return .medtronic }
+                    else { return .other }
                 }()
 
                 statusCard(
@@ -155,27 +153,53 @@ extension Home {
 
             ZStack {
                 if isMedtrum {
+                    // 1. Hintergrund: Leerer Umriss der Pumpe
+                    Image("nano")
+                        .resizable()
+                        .aspectRatio(0.7, contentMode: .fit)
+                        .frame(height: 26)
+                        .opacity(0.3)
+
+                    // 2. Vordergrund: Farbige Füllung
                     UIImage(imageLiteralResourceName: "nano")
                         .fillImageUpToPortion(color: fillColor.opacity(0.8), portion: portion)
                         .resizable()
                         .aspectRatio(0.7, contentMode: .fit)
                         .frame(height: 26)
-                        .opacity(isReplaceActive ? 0.5 : 1.0)
+
                 } else if isOmnipod {
                     let imageName = colorScheme == .dark ? "pod_dark" : "pod_light"
+
+                    // 1. Hintergrund: Leerer Umriss des Pods
+                    Image(imageName)
+                        .resizable()
+                        .aspectRatio(0.72, contentMode: .fit)
+                        .frame(width: 26, height: 26)
+                        .opacity(0.3)
+
+                    // 2. Vordergrund: Farbige Füllung
                     UIImage(imageLiteralResourceName: imageName)
                         .fillImageUpToPortion(color: fillColor.opacity(0.8), portion: portion)
                         .resizable()
                         .aspectRatio(0.72, contentMode: .fit)
                         .frame(width: 26, height: 26)
-                        .opacity(isReplaceActive ? 0.5 : 1.0)
+
                 } else {
-                    let imageName = colorScheme == .dark ? "pump_dark" : "pump_light"
-                    UIImage(imageLiteralResourceName: imageName)
-                        .fillImageUpToPortion(color: fillColor.opacity(0.8), portion: portion)
+                    let imageName = colorScheme == .dark ? "pump_light" : "pump_dark"
+
+                    // 1. Hintergrund: Leerer Umriss der Pumpe
+                    Image(imageName)
                         .resizable()
-                        .frame(width: 17, height: 36)
-                        .opacity(isReplaceActive ? 0.5 : 1.0)
+                        .frame(width: 17, height: 27)
+                        .opacity(0.3)
+
+                    // 2. Vordergrund: Farbige Füllung
+                    UIImage(imageLiteralResourceName: imageName)
+                        .fillImageUpToPortion(color: fillColor.opacity(0.8), portion: max(portion, 0.3))
+                        .resizable()
+                        .frame(maxWidth: 17, maxHeight: 27)
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(.white)
                 }
 
                 if isReplaceActive {
@@ -186,6 +210,7 @@ extension Home {
                         .offset(x: 8, y: -8)
                 }
             }
+            .opacity(isReplaceActive ? 0.5 : 1.0)
         }
 
         // MARK: - Generische StatusCard
