@@ -69,16 +69,9 @@ extension Home {
 
                 let isReplaceActive = (patchStatusString == NSLocalizedString("Replace", comment: ""))
 
-                let maxCapacity: Double = {
-                    if let maxRes = state.openAPSSettings?.maximumReservoir {
-                        return Double(truncating: maxRes as! NSNumber)
-                    }
-                    // Sinnvolle Defaults, falls OpenAPS Settings noch nicht geladen sind
-                    return state.pumpName.contains("Omni") ? 200.0 : 300.0
-                }()
-
-                // Füllstand berechnen. Wenn DeadBeef, künstlich auf 0.3 (gut gefüllt) setzen
-                let calculatedPortion = 1.0 - max(0, min(1, physicalReservoir / maxCapacity))
+                let amountFraction = 1.0 - ((physicalReservoir + 10.0) * 1.2 / 200.0)
+                let calculatedPortion = max(0.0, min(1.0, amountFraction))
+                // Wenn DeadBeef (Pod > 50), künstlich auf 0.3 (gut gefüllt) setzen, sonst die optische Berechnung nutzen
                 let portion = isDeadBeef ? 0.3 : calculatedPortion
 
                 // Pumpentyp für das Insulin-Badge bestimmen

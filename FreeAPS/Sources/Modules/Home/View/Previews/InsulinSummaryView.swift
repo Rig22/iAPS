@@ -9,6 +9,7 @@ struct InsulinSummaryView: View {
     @Binding var tdd2DaysAgo: Decimal
     @Binding var tdd3DaysAgo: Decimal
     @Binding var tddActualAverage: Decimal
+    var showHeadline: Bool = true
 
     private var formatter: NumberFormatter {
         let formatter = NumberFormatter()
@@ -35,8 +36,12 @@ struct InsulinSummaryView: View {
 
     var body: some View {
         VStack {
-            Text("Insulin").font(.previewHeadline).padding(.top, 20).padding(.bottom, 15)
-            sumView().frame(maxHeight: 250).padding(.bottom, 10)
+            if showHeadline {
+                Text("Insulin").font(.previewHeadline).padding(.top, 20).padding(.bottom, 15)
+            }
+            sumView()
+                .frame(maxHeight: showHeadline ? 250 : .infinity)
+                .padding(.bottom, showHeadline ? 10 : 0)
         }.dynamicTypeSize(...DynamicTypeSize.xLarge)
     }
 
@@ -100,11 +105,13 @@ struct InsulinSummaryView: View {
 
         let insulinData = useData(entries)
 
-        Grid {
+        Grid(verticalSpacing: showHeadline ? 8 : 4) {
             ForEach(insulinData) { entry in
 
                 GridRow(alignment: .firstTextBaseline) {
-                    Text(entry.variable).foregroundStyle(.secondary).frame(maxWidth: .infinity, alignment: .leading)
+                    Text(entry.variable)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     Text("")
                     if entry.insulin != 0 {
                         Text(
@@ -118,7 +125,8 @@ struct InsulinSummaryView: View {
                 }
             }
         }
-        .padding(.horizontal, 20)
+        .font(showHeadline ? .body : .system(size: 15))
+        .padding(.horizontal, showHeadline ? 20 : 4)
     }
 
     private func isTDD(_ insulin: Decimal) -> Bool {

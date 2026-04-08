@@ -141,23 +141,16 @@ struct CurrentGlucoseView: View {
                     if !scrolling {
                         VStack(spacing: 0) {
                             // Delta
-                            /*  let deltaValue = delta ?? 0
-                             let deltaString = deltaValue > 0 ? "+\(deltaValue)" : "\(deltaValue)"
-
-                             Text("\(deltaString) Δ")
-                                 .font(.system(size: 16, weight: .bold, design: .rounded))
-                                 .foregroundColor(deltaColor)*/
-
                             if displayDelta,
                                !scrolling,
                                let deltaInt = delta,
                                !(units == .mmolL && abs(deltaInt) <= 1)
                             {
-                                let deltaString = deltaInt > 0 ? "+\(deltaInt)" : "\(deltaInt)"
-
-                                Text("\(deltaString) Δ")
-                                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                                    .foregroundColor(deltaColor)
+                                Text(
+                                    "\(deltaInt > 0 ? "+" : "")\(units == .mmolL ? String(format: "%.1f", Double(deltaInt) * 0.0555) : "\(deltaInt)") Δ"
+                                )
+                                .font(.system(size: 16, weight: .bold, design: .rounded))
+                                .foregroundColor(deltaColor)
                             }
 
                             // Minutes ago
@@ -169,7 +162,7 @@ struct CurrentGlucoseView: View {
                         }
                     }
                 }
-                // (Prediction etc.)
+
                 if displayeventualBG {
                     if !scrolling, let deltaInt = delta {
                         HStack(spacing: 4) {
@@ -177,7 +170,15 @@ struct CurrentGlucoseView: View {
                                 .font(.system(size: 14))
                                 .foregroundStyle(.secondary)
 
-                            Text("\(eventualBG ?? (recent.glucose ?? 0) + deltaInt)")
+                            // Vorhersagewert in mg/dL berechnen
+                            let rawEventual = eventualBG ?? (recent.glucose ?? 0) + deltaInt
+
+                            let isMmol = (units == .mmolL)
+                            let convertedEventual = isMmol ? Double(rawEventual) * 0.0555 : Double(rawEventual)
+                            let eventualFormatted = glucoseFormatter
+                                .string(from: convertedEventual as NSNumber) ?? "\(rawEventual)"
+
+                            Text(eventualFormatted)
                                 .font(.system(size: 20, weight: .medium))
 
                             Text(units.rawValue)
@@ -185,7 +186,7 @@ struct CurrentGlucoseView: View {
                                 .foregroundStyle(.secondary)
                         }
                         .offset(x: 145)
-                    } else {}
+                    }
                 }
             }
         }

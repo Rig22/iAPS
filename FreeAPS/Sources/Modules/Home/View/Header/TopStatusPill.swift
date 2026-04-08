@@ -228,48 +228,98 @@ extension Home {
             }
 
             // 9. DELTA
+            /* if let delta = state.glucoseDelta {
+                 let absDelta = abs(delta)
+                 let isRising = delta > 0
+                 let trendDescription: String
+                 let icon: String
+
+                 // Deine Vorgabe: +/- 3 ist "Stabil"
+                 if absDelta <= 3 {
+                     trendDescription = NSLocalizedString("Stable", comment: "")
+                     icon = "arrow.right"
+                 } else if absDelta < 10 {
+                     // Leicht steigend / sinkend
+                     trendDescription = isRising ? NSLocalizedString("Slightly rising", comment: "") :
+                         NSLocalizedString("Slightly falling", comment: "")
+                     icon = isRising ? "arrow.up.right" : "arrow.down.right"
+                 } else if absDelta < 15 {
+                     // Steigend / Sinkend
+                     trendDescription = isRising ? NSLocalizedString("Rising", comment: "") :
+                         NSLocalizedString("Falling", comment: "")
+                     icon = isRising ? "arrow.up" : "arrow.down"
+                 } else {
+                     // Stark steigend / sinkend (ab 15 mg/dL)
+                     trendDescription = isRising ? NSLocalizedString("Strongly rising", comment: "") :
+                         NSLocalizedString("Strongly falling", comment: "")
+                     icon = isRising ? "chevron.up.2" : "chevron.down.2"
+                 }
+
+                 let deltaString = isRising ? "+\(delta)" : "\(delta)"
+                 let fullMessage = "\(trendDescription) (\(deltaString))"
+
+                 // Sofort-Anzeige bei massiven Änderungen (Override)
+                 /* if absDelta >= 15 {
+                      return DisplayStatus(
+                          message: fullMessage,
+                          icon: icon,
+                          color: .red,
+                          messageColor: .primary,
+                          priority: 350
+                      )
+                  }*/
+
+                 // Zum Pool hinzufügen für das Rollieren
+                 pool.append(DisplayStatus(
+                     message: fullMessage,
+                     icon: icon,
+                     color: absDelta <= 5 ? .green : .orange,
+                     messageColor: .primary,
+                     priority: 350
+                 ))
+             }*/
+            // 9. DELTA
             if let delta = state.glucoseDelta {
                 let absDelta = abs(delta)
                 let isRising = delta > 0
+
+                // Einheit prüfen und Wert für die Anzeige umrechnen
+                let isMmol = state.settingsManager.settings.units == .mmolL
+                let convertedDelta = isMmol ? Double(delta) * 0.0555 : Double(delta)
+
+                let deltaFormatted: String
+                if isMmol {
+                    deltaFormatted = String(format: "%.1f", convertedDelta)
+                } else {
+                    deltaFormatted = "\(Int(convertedDelta))"
+                }
+
+                let unitString = isMmol ? "mmol/L" : "mg/dL"
+                let deltaString = (isRising ? "+" : "") + "\(deltaFormatted) \(unitString)"
+
                 let trendDescription: String
                 let icon: String
 
-                // Deine Vorgabe: +/- 3 ist "Stabil"
+                // Logik für Trend bleibt auf mg/dL Basis (interne iAPS Standardwerte)
                 if absDelta <= 3 {
                     trendDescription = NSLocalizedString("Stable", comment: "")
                     icon = "arrow.right"
                 } else if absDelta < 10 {
-                    // Leicht steigend / sinkend
                     trendDescription = isRising ? NSLocalizedString("Slightly rising", comment: "") :
                         NSLocalizedString("Slightly falling", comment: "")
                     icon = isRising ? "arrow.up.right" : "arrow.down.right"
                 } else if absDelta < 15 {
-                    // Steigend / Sinkend
                     trendDescription = isRising ? NSLocalizedString("Rising", comment: "") :
                         NSLocalizedString("Falling", comment: "")
                     icon = isRising ? "arrow.up" : "arrow.down"
                 } else {
-                    // Stark steigend / sinkend (ab 15 mg/dL)
                     trendDescription = isRising ? NSLocalizedString("Strongly rising", comment: "") :
                         NSLocalizedString("Strongly falling", comment: "")
                     icon = isRising ? "chevron.up.2" : "chevron.down.2"
                 }
 
-                let deltaString = isRising ? "+\(delta)" : "\(delta)"
                 let fullMessage = "\(trendDescription) (\(deltaString))"
 
-                // Sofort-Anzeige bei massiven Änderungen (Override)
-                /* if absDelta >= 15 {
-                     return DisplayStatus(
-                         message: fullMessage,
-                         icon: icon,
-                         color: .red,
-                         messageColor: .primary,
-                         priority: 350
-                     )
-                 }*/
-
-                // Zum Pool hinzufügen für das Rollieren
                 pool.append(DisplayStatus(
                     message: fullMessage,
                     icon: icon,

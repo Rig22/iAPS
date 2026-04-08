@@ -292,7 +292,8 @@ extension Home {
         var chart: some View {
             // let ratio = 2.8
 
-            let chartRatio: CGFloat = 3.6
+            // let chartRatio: CGFloat = 3.6
+            let chartRatio: CGFloat = 3.4
             let chartMinHeight = UIScreen.main.bounds.height / chartRatio
 
             return mainChart
@@ -322,14 +323,17 @@ extension Home {
 
         @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
             let isOverride = fetchedPercent.first?.enabled ?? false
+            let isTarget = (state.tempTarget != nil)
 
             ButtonPanelView(
                 geo: geo,
                 state: state,
                 showCancelAlert: $showCancelAlert,
+                showCancelTTAlert: $showCancelTTAlert,
                 tempBasalString: tempBasalString,
                 isOverride: isOverride,
-                profileButton: state.profileButton,
+                profileButton: true,
+                isTarget: isTarget,
                 displayAutoHistory: $displayAutoHistory,
                 onBolusButtonTap: {
                     if state.bolusProgress != nil {
@@ -348,6 +352,7 @@ extension Home {
             .confirmationDialog("Cancel Temporary Target", isPresented: $showCancelTTAlert) {
                 Button("Cancel Temporary Target", role: .destructive) {
                     state.cancelTempTarget()
+                    triggerUpdate.toggle()
                 }
             }
             .confirmationDialog("Bolus already in Progress", isPresented: $showBolusActiveAlert) {
@@ -361,10 +366,12 @@ extension Home {
             let geo: GeometryProxy
             @ObservedObject var state: StateModel
             @Binding var showCancelAlert: Bool
+            @Binding var showCancelTTAlert: Bool
             let tempBasalString: String
             @Environment(\.colorScheme) var colorScheme
             let isOverride: Bool
             let profileButton: Bool
+            let isTarget: Bool
             @Binding var displayAutoHistory: Bool
             let onBolusButtonTap: () -> Void
 
@@ -439,6 +446,16 @@ extension Home {
                         }
                         .frame(maxWidth: .infinity)
 
+                        // 3. NEU: Statistik Button
+                        Button {
+                            state.showModal(for: .statistics)
+                        } label: {
+                            Image(systemName: "chart.xyaxis.line")
+                                .font(.system(size: 22, weight: .medium))
+                                .foregroundStyle(.secondary.opacity(0.8))
+                        }
+                        .frame(maxWidth: .infinity)
+
                         // Zentraler Plus Button
                         Menu {
                             // SEKTION 1: Direkte Aktionen
@@ -450,13 +467,6 @@ extension Home {
                                 }) {
                                     Label("Run Loop", systemImage: "arrow.clockwise")
                                 }
-
-                                // Hier kannst du auch den detaillierten Status öffnen
-                                /*         Button(action: {
-                                     isDetailSheetPresented = true
-                                 }) {
-                                     Label("System-Details", systemImage: "info.circle")
-                                 }*/
                             }
 
                             Divider()
@@ -475,28 +485,11 @@ extension Home {
                                 }
                             }
 
-                            // SEKTION 3: Status Infos
-                            /*   Section(header: Text("Status")) {
-                                 if let sensor = state.calculateSensorInfo() {
-                                     Button(action: { state.showModal(for: .cgm) }) {
-                                         Label("\(sensor.text)", systemImage: "sensor.tag.radiowaves.forward")
-                                     }
-                                 }
-                                 if state.tempRate != nil {
-                                     Button(action: { state.showModal(for: .manualTempBasal) }) {
-                                         Label(
-                                             "Basal: \(tempBasalString)",
-                                             systemImage: "chart.bar.xaxis.ascending.badge.clock"
-                                         )
-                                     }
-                                 }
-                             }*/
                         } label: {
-                            // Das visuelle Design des Buttons bleibt exakt gleich
                             Image(systemName: "plus")
                                 .font(.system(size: 24))
                                 .foregroundColor(.secondary)
-                                .frame(width: 55, height: 55)
+                                .frame(width: 50, height: 50)
                                 .background(
                                     Circle()
                                         .fill(
@@ -519,30 +512,42 @@ extension Home {
                         .menuStyle(DefaultMenuStyle())
                         .frame(maxWidth: .infinity)
 
-                        // Profile Button
-                        if profileButton {
-                            ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
-                                Image(systemName: isOverride ? "person.fill" : "person")
-                                    .symbolRenderingMode(.palette)
-                                    .font(.custom("Buttons", size: 22))
-                                    .foregroundStyle(.purple.opacity(0.7))
-                                    .padding(8)
-                                    .background(isOverride ? .purple.opacity(0.15) : .clear)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                            }
+                        // 5. Profile Button
+                        ZStack {
+                            Image(systemName: isOverride ? "person.fill" : "person")
+                                .font(.system(size: 22))
+                                .foregroundStyle(.purple.opacity(0.7))
+                                .padding(8)
+                                .background(isOverride ? .purple.opacity(0.15) : .clear)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                        }
+                        .frame(maxWidth: .infinity)
+                        .onTapGesture {
+                            if isOverride { showCancelAlert.toggle() }
+                            else { state.showModal(for: .overrideProfilesConfig) }
+                        }
+                        .onLongPressGesture {
+                            state.showModal(for: .overrideProfilesConfig)
+                        }
+
+                        // 6. TempTarget Button
+                        Image(systemName: "target")
+                            .font(.system(size: 22, weight: .medium))
+                            .foregroundStyle(isTarget ? .green : .green.opacity(0.7))
+                            .padding(8)
+                            .background(isTarget ? .green.opacity(0.15) : .clear)
+                            .clipShape(RoundedRectangle(cornerRadius: 10))
                             .frame(maxWidth: .infinity)
                             .onTapGesture {
-                                if isOverride {
-                                    showCancelAlert.toggle()
+                                if isTarget {
+                                    showCancelTTAlert.toggle()
                                 } else {
-                                    state.showModal(for: .overrideProfilesConfig)
+                                    state.showModal(for: .addTempTarget)
                                 }
                             }
                             .onLongPressGesture {
-                                state.showModal(for: .overrideProfilesConfig)
+                                state.showModal(for: .addTempTarget)
                             }
-                        }
-
                         // Settings Button
                         Button { state.showModal(for: .settings) }
                         label: {
@@ -552,7 +557,7 @@ extension Home {
                         }
                         .frame(maxWidth: .infinity)
                     }
-                    .padding(.horizontal, 10)
+                    .padding(.horizontal, 0)
                     .padding(.vertical, 8)
                     .elegantShadow(scheme: colorScheme)
                     .padding(.horizontal, 10)
@@ -562,37 +567,6 @@ extension Home {
         }
 
         // MARK: - Statistik & Info Panels
-
-        var preview: some View {
-            VStack {
-                PreviewChart(
-                    readings: $state.readings,
-                    lowLimit: $state.data.lowGlucose,
-                    highLimit: $state.data.highGlucose
-                )
-                .padding(15)
-            }
-            .frame(minHeight: 200)
-            .elegantShadow(scheme: colorScheme)
-            .padding(.horizontal, 10)
-            .blur(radius: animateTIRView ? 2 : 0)
-            .onTapGesture {
-                timeIsNowTIR()
-                state.showModal(for: .statistics)
-            }
-            .overlay {
-                if animateTIRView { animation.asAny() }
-            }
-        }
-
-        var infoPanelView: some View {
-            VStack {
-                info.padding(.horizontal, 15)
-            }
-            .frame(height: 40)
-            .elegantShadow(scheme: colorScheme)
-            .padding(.horizontal, 10)
-        }
 
         var activeIOBView: some View {
             VStack {
@@ -612,55 +586,6 @@ extension Home {
             .frame(minHeight: 190)
             .elegantShadow(scheme: colorScheme)
             .padding(.horizontal, 10)
-        }
-
-        var insulinView: some View {
-            VStack {
-                InsulinSummaryView(
-                    neg: $state.neg,
-                    tddChange: $state.tddChange,
-                    tddAverage: $state.tddAverage,
-                    tddYesterday: $state.tddYesterday,
-                    tdd2DaysAgo: $state.tdd2DaysAgo,
-                    tdd3DaysAgo: $state.tdd3DaysAgo,
-                    tddActualAverage: $state.tddActualAverage
-                )
-                .padding(15)
-            }
-            .frame(minHeight: 280)
-            .elegantShadow(scheme: colorScheme)
-            .padding(.horizontal, 10)
-        }
-
-        var mealsView: some View {
-            VStack {
-                MealsSummaryView(data: $state.mealData)
-                    .padding(15)
-            }
-            .frame(minHeight: 190)
-            .elegantShadow(scheme: colorScheme)
-            .padding(.horizontal, 10)
-        }
-
-        var loopPreview: some View {
-            VStack {
-                LoopsView(loopStatistics: $state.loopStatistics)
-                    .padding(.vertical, 20)
-                    .padding(.horizontal, 15)
-            }
-            .frame(minHeight: 160)
-            .blur(radius: animateLoopView ? 2.5 : 0)
-            .elegantShadow(scheme: colorScheme) // Erst den Hintergrund mit Schatten...
-            .padding(.horizontal, 10)
-            .onTapGesture {
-                timeIsNowLoop()
-                state.showModal(for: .statistics)
-            }
-            .overlay {
-                if animateLoopView {
-                    animation.asAny()
-                }
-            }
         }
 
         var profileView: some View {
@@ -748,33 +673,6 @@ extension Home {
             }
             .background(Color.clear)
         }
-
-        // TopStatusPill unter dem Glucose Rad
-
-        /*  @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-             VStack(spacing: 0) { // Spacing auf 0, um volle Kontrolle über Paddings zu haben
-                 // 1. Die Glukose-Anzeige (jetzt ganz oben)
-                 glucoseView
-                     .padding(.top, geo.safeAreaInsets.top + 10) // Schiebt das Rad unter die Dynamic Island
-                     .padding(.bottom, 10)
-                     .padding(.horizontal, 20)
-
-                 // 2. topStatusPill (jetzt unter der Glukose)
-                 TopStatusPill(state: state)
-                     .frame(maxWidth: .infinity, alignment: .center)
-                     .padding(.top, 15)
-                     .padding(.bottom, 20) // Abstand nach unten zur Status-Leiste/Chart
-
-                 // 3. Falls ein Bolus läuft
-                 if let progress = state.bolusProgress, progress > 0,
-                    let amount = state.bolusAmount
-                 {
-                     bolusProgressView(progress: progress, amount: amount)
-                         .padding(.bottom, 10)
-                 }
-             }
-             .background(Color.clear)
-         }*/
 
         var glucosePreview: some View {
             let data = state.data.glucose
@@ -918,26 +816,15 @@ extension Home {
                                         .padding(.bottom, -15)
                                 } else {}
 
-                                // TIR Chart
-                                if !state.data.glucose.isEmpty {
-                                    preview.padding(.top, 15)
-                                }
-                                // Loops Chart
-                                loopPreview.padding(.vertical, 15)
-
                                 // COB Chart
                                 if state.carbData > 0 {
-                                    activeCOBView.padding(.bottom, 15)
+                                    activeCOBView.padding(.bottom, 15).padding(.top, 45)
                                 }
 
                                 // IOB Chart
                                 if !state.iobData.isEmpty {
                                     activeIOBView.padding(.bottom, 15)
                                 }
-
-                                // Summary Views
-                                insulinView.padding(.bottom, 15)
-                                mealsView.padding(.bottom, 15)
                             }
                             .background {
                                 // Track vertical scroll
