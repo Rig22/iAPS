@@ -17,7 +17,7 @@ extension Stat {
         @Published var units: GlucoseUnits = .mmolL
 
         // Selected view and chart types
-        @Published var selectedView: StatisticViewType = .glucose
+        @Published var selectedView: StatisticViewType = .overview
         @Published var selectedGlucoseChartType: GlucoseChartType = .sectorAndMetrics
         @Published var selectedInsulinChartType: InsulinChartType = .totalDailyDose
         @Published var selectedLoopingChartType: LoopingChartType = .loopingPerformance
@@ -25,9 +25,9 @@ extension Stat {
 
         // Selected intervals
         @Published var selectedIntervalForGlucoseStats: StatsTimeIntervalWithToday = .today
-        @Published var selectedIntervalForInsulinStats: StatsTimeInterval = .day
+        @Published var selectedIntervalForInsulinStats: StatsTimeIntervalWithToday = .today
         @Published var selectedIntervalForLoopStats: StatsTimeIntervalWithToday = .today
-        @Published var selectedIntervalForMealStats: StatsTimeInterval = .day
+        @Published var selectedIntervalForMealStats: StatsTimeIntervalWithToday = .today
 
         // Computed data caches
         @Published var dailyTDDStats: [TDDStats] = []
@@ -36,6 +36,8 @@ extension Stat {
         @Published var hourlyBolusStats: [BolusStats] = []
         @Published var dailyMealStats: [MealStats] = []
         @Published var hourlyMealStats: [MealStats] = []
+        @Published var last24hHourlyTDDStats: [TDDStats] = []
+        @Published var last24hHourlyBolusStats: [BolusStats] = []
         @Published var loopStats: [LoopStatsProcessedData] = []
         @Published var hourlyStats: [HourlyStats] = []
 
@@ -133,6 +135,29 @@ extension Stat {
             return dailyMealStats.filter { $0.date >= cutoff }
         }
 
+        /// Hourly meal stats filtered to today only (from midnight), with all 24h slots filled
+        var todayHourlyMealStats: [MealStats] {
+            let calendar = Calendar.current
+            let midnight = calendar.startOfDay(for: Date())
+            let todayData = hourlyMealStats.filter { $0.date >= midnight }
+
+            // Build a full 24h timeline with empty slots
+            var hourlyMap: [Date: (carbs: Double, fat: Double, protein: Double)] = [:]
+            for h in 0 ..< 24 {
+                if let hourDate = calendar.date(byAdding: .hour, value: h, to: midnight) {
+                    hourlyMap[hourDate] = (0, 0, 0)
+                }
+            }
+            // Overlay actual data
+            for stat in todayData {
+                let hour = calendar.date(from: calendar.dateComponents([.year, .month, .day, .hour], from: stat.date))!
+                hourlyMap[hour] = (stat.carbs, stat.fat, stat.protein)
+            }
+            return hourlyMap
+                .map { MealStats(date: $0.key, carbs: $0.value.carbs, fat: $0.value.fat, protein: $0.value.protein) }
+                .sorted { $0.date < $1.date }
+        }
+
         // MARK: - Insulin Setup (TDD + Bolus Distribution)
 
         /// Computes both TDD and Bolus Distribution stats from a single source (InsulinDistribution).
@@ -227,6 +252,63 @@ extension Stat {
                 BolusStats(date: $0.key, manualBolus: $0.value.bolus, smb: 0, external: $0.value.basal)
             }
             hourlyTDDStats = sortedHourly.map {
+                TDDStats(date: $0.key, amount: $0.value.bolus + $0.value.basal)
+            }
+
+            // Last 24h hourly stats (for "Day" picker – covers yesterday evening through now)
+            let dayAgoStart = now.addingTimeInterval(-24 * 3600)
+            let dayAgoHourStart = calendar.date(from: calendar.dateComponents(
+                [.year, .month, .day, .hour], from: dayAgoStart
+            ))!
+
+            var last24hMap: [Date: (bolus: Double, basal: Double)] = [:]
+            // Initialize all 24 hour-slots
+            for h in 0 ..< 24 {
+                if let hourDate = calendar.date(byAdding: .hour, value: h, to: dayAgoHourStart) {
+                    last24hMap[hourDate] = (0, 0)
+                }
+            }
+
+            // Sum boluses from pump events in the last 24h
+            let last24hEvents = pumpEvents.filter { $0.timestamp >= dayAgoStart }
+            for event in last24hEvents where event.type == .bolus {
+                let hour = calendar.date(from: calendar.dateComponents(
+                    [.year, .month, .day, .hour], from: event.timestamp
+                ))!
+                let amount = Double(truncating: (event.amount ?? 0) as NSDecimalNumber)
+                last24hMap[hour, default: (0, 0)].bolus += amount
+            }
+
+            // Distribute basal: use yesterday's daily basal for pre-midnight hours,
+            // today's basal for post-midnight hours
+            let yesterdayStart = calendar.startOfDay(for: dayAgoStart)
+            let yesterdayDaily = dailyLatest[yesterdayStart]
+            let yesterdayBasal = yesterdayDaily?.basal ?? 0
+            // Hours from yesterday (dayAgoHourStart until midnight)
+            let preHourCount = max(1, calendar.dateComponents([.hour], from: dayAgoHourStart, to: todayStart).hour ?? 0)
+            if yesterdayBasal > 0 {
+                let perHour = yesterdayBasal / 24.0
+                for h in 0 ..< preHourCount {
+                    if let hourDate = calendar.date(byAdding: .hour, value: h, to: dayAgoHourStart) {
+                        last24hMap[hourDate, default: (0, 0)].basal += perHour
+                    }
+                }
+            }
+            // Hours from today (midnight until now)
+            if todayBasal > 0, elapsedHours > 0 {
+                let perHour = todayBasal / Double(elapsedHours)
+                for h in 0 ..< elapsedHours {
+                    if let hourDate = calendar.date(byAdding: .hour, value: h, to: todayStart) {
+                        last24hMap[hourDate, default: (0, 0)].basal += perHour
+                    }
+                }
+            }
+
+            let sortedLast24h = last24hMap.sorted { $0.key < $1.key }
+            last24hHourlyBolusStats = sortedLast24h.map {
+                BolusStats(date: $0.key, manualBolus: $0.value.bolus, smb: 0, external: $0.value.basal)
+            }
+            last24hHourlyTDDStats = sortedLast24h.map {
                 TDDStats(date: $0.key, amount: $0.value.bolus + $0.value.basal)
             }
         }

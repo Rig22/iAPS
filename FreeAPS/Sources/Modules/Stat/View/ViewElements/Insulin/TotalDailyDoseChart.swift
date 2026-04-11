@@ -2,10 +2,10 @@ import Charts
 import SwiftUI
 
 struct TotalDailyDoseChart: View {
-    @Binding var selectedInterval: StatsTimeInterval
+    @Binding var selectedInterval: StatsTimeIntervalWithToday
     let tddStats: [TDDStats]
 
-    @State private var scrollPosition: Date = StatChartUtils.getInitialScrollPosition(for: .day)
+    @State private var scrollPosition: Date = StatChartUtils.getInitialScrollPosition(for: .day as StatsTimeInterval)
     @State private var selectedDate: Date?
     @Environment(\.colorScheme) private var colorScheme
 
@@ -14,7 +14,7 @@ struct TotalDailyDoseChart: View {
     private var selectedStat: TDDStats? {
         guard let selectedDate else { return nil }
         let cal = Calendar.current
-        if selectedInterval == .day {
+        if selectedInterval.isHourly {
             return tddStats.first {
                 cal.compare($0.date, to: selectedDate, toGranularity: .hour) == .orderedSame
             }
@@ -25,15 +25,16 @@ struct TotalDailyDoseChart: View {
     var body: some View {
         let average = tddStats.isEmpty ? 0 : tddStats.map(\.amount).reduce(0, +) / Double(tddStats.count)
         let total = tddStats.map(\.amount).reduce(0, +)
-        let isHourly = selectedInterval == .day
+        let isHourly = selectedInterval.isHourly
 
         VStack(spacing: 16) {
             // Stats row
             HStack {
                 if isHourly {
-                    // For "Day" view: show only today's TDD as a single meaningful value
                     StatChartUtils.statView(
-                        title: NSLocalizedString("TDD Today", comment: "Total Daily Dose for today"),
+                        title: selectedInterval == .today
+                            ? NSLocalizedString("TDD Today", comment: "Total Daily Dose for today")
+                            : NSLocalizedString("TDD 24h", comment: "Total Daily Dose last 24 hours"),
                         value: total.formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) + " U"
                     )
                 } else {
@@ -56,7 +57,7 @@ struct TotalDailyDoseChart: View {
             Chart {
                 ForEach(tddStats) { stat in
                     BarMark(
-                        x: .value("Date", stat.date, unit: selectedInterval == .day ? .hour : .day),
+                        x: .value("Date", stat.date, unit: isHourly ? .hour : .day),
                         y: .value("TDD", stat.amount)
                     )
                     .foregroundStyle(.blue.gradient)
@@ -65,7 +66,7 @@ struct TotalDailyDoseChart: View {
                 }
 
                 if selectable, let sel = selectedStat {
-                    RuleMark(x: .value("Selected", sel.date, unit: selectedInterval == .day ? .hour : .day))
+                    RuleMark(x: .value("Selected", sel.date, unit: isHourly ? .hour : .day))
                         .foregroundStyle(Color.secondary.opacity(0.35))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
                 }
@@ -73,7 +74,7 @@ struct TotalDailyDoseChart: View {
             .chartXSelection(value: $selectedDate)
             .chartXAxis {
                 AxisMarks(values: .automatic) { _ in
-                    AxisValueLabel(format: StatChartUtils.dateFormat(for: selectedInterval))
+                    AxisValueLabel(format: StatChartUtils.dateFormat(for: selectedInterval.asChartInterval))
                     AxisGridLine()
                 }
             }
@@ -89,16 +90,16 @@ struct TotalDailyDoseChart: View {
                 }
             }
             .chartScrollableAxes(.horizontal)
-            .chartXVisibleDomain(length: StatChartUtils.visibleDomainLength(for: selectedInterval))
+            .chartXVisibleDomain(length: StatChartUtils.visibleDomainLength(for: selectedInterval.asChartInterval))
             .chartScrollPosition(x: $scrollPosition)
             .frame(height: 200)
             .padding(.horizontal)
             .overlay(alignment: .top) {
                 if selectable, let sel = selectedStat {
-                    let title = selectedInterval == .day
+                    let title = isHourly
                         ? sel.date.formatted(.dateTime.hour().minute())
                         : sel.date.formatted(.dateTime.weekday(.wide).day().month(.abbreviated))
-                    let label = selectedInterval == .day
+                    let label = isHourly
                         ? NSLocalizedString("Insulin", comment: "")
                         : NSLocalizedString("TDD", comment: "")
                     InsulinBarDetailPopover(
@@ -117,7 +118,7 @@ struct TotalDailyDoseChart: View {
             }
         }
         .onChange(of: selectedInterval) { _, newValue in
-            scrollPosition = StatChartUtils.getInitialScrollPosition(for: newValue)
+            scrollPosition = StatChartUtils.getInitialScrollPosition(for: newValue.asChartInterval)
             selectedDate = nil
         }
     }

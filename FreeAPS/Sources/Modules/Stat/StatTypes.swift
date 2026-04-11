@@ -4,15 +4,17 @@ import SwiftUI
 // MARK: - View Type Enums
 
 enum StatisticViewType: String, CaseIterable, Identifiable {
+    case overview
     case glucose
-    case insulin
     case looping
+    case insulin
     case meals
 
     var id: String { rawValue }
 
     var displayName: String {
         switch self {
+        case .overview: return NSLocalizedString("Overview", comment: "")
         case .glucose: return NSLocalizedString("Glucose", comment: "")
         case .insulin: return NSLocalizedString("Insulin", comment: "")
         case .looping: return NSLocalizedString("Looping", comment: "")
@@ -41,6 +43,21 @@ enum StatsTimeIntervalWithToday: String, CaseIterable, Identifiable {
         case .total: return NSLocalizedString("3 M", comment: "Abbreviation for three months")
         }
     }
+}
+
+extension StatsTimeIntervalWithToday {
+    /// Maps to StatsTimeInterval for chart utilities — .today behaves like .day
+    var asChartInterval: StatsTimeInterval {
+        switch self {
+        case .day,
+             .today: return .day
+        case .week: return .week
+        case .month: return .month
+        case .total: return .total
+        }
+    }
+
+    var isHourly: Bool { self == .today || self == .day }
 }
 
 enum StatsTimeInterval: String, CaseIterable, Identifiable {

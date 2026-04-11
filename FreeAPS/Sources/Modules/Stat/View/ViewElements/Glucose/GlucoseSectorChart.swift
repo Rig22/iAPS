@@ -93,6 +93,32 @@ struct GlucoseSectorChart: View {
         inRangePercentage: Decimal
     ) -> some View {
         HStack(alignment: .center, spacing: 14) {
+            VStack(alignment: .leading, spacing: 6) {
+                avgMedianRow(
+                    label: NSLocalizedString("Ø", comment: ""),
+                    labelSize: 15,
+                    value: formatGlucoseValue(average) + " " + units.rawValue
+                )
+                avgMedianRow(
+                    label: NSLocalizedString("MED", comment: ""),
+                    labelSize: 11,
+                    value: formatGlucoseValue(median) + " " + units.rawValue
+                )
+            }
+
+            Spacer()
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(formatPercentage(inRangePercentage))
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.green)
+                Text(NSLocalizedString("Time in Range", comment: ""))
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+            }
+
             if showChart {
                 donutChart
                     .frame(width: 86, height: 86)
@@ -106,43 +132,21 @@ struct GlucoseSectorChart: View {
                         .foregroundStyle(Color.green)
                 }
             }
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(formatPercentage(inRangePercentage))
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(.green)
-                Text(NSLocalizedString("Time in Range", comment: ""))
-                    .font(.system(size: 12, weight: .medium, design: .rounded))
-                    .foregroundStyle(.secondary)
-                    .textCase(.uppercase)
-            }
-
-            Spacer()
-
-            VStack(alignment: .trailing, spacing: 6) {
-                avgMedianRow(
-                    label: NSLocalizedString("Ø", comment: ""),
-                    value: formatGlucoseValue(average)
-                )
-                avgMedianRow(
-                    label: NSLocalizedString("Med", comment: ""),
-                    value: formatGlucoseValue(median)
-                )
-            }
         }
     }
 
-    private func avgMedianRow(label: String, value: String) -> some View {
+    private func avgMedianRow(label: String, labelSize: CGFloat, value: String) -> some View {
         HStack(spacing: 6) {
             Text(label)
-                .font(.system(size: 13, weight: .medium, design: .rounded))
+                .font(.system(size: labelSize, weight: .semibold, design: .rounded))
                 .foregroundStyle(.secondary)
-                .textCase(.uppercase)
+                .frame(width: 34, alignment: .leading)
             Text(value)
-                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
     }
 

@@ -122,7 +122,10 @@ struct LoopingCard: View {
         let medianInterval = StatChartUtils.medianCalculationDouble(array: intervalArray) * 60 // to seconds
 
         let readingsCount = readings.count
-        let readingsPerDay = Double(readingsCount) / days
+        // Use the readings' own time span to avoid dividing by more days than readings actually cover
+        let oldestReading = readings.last?.date ?? Date()
+        let readingsDays = max(-1 * oldestReading.timeIntervalSinceNow / 86400, 1)
+        let readingsPerDay = Double(readingsCount) / readingsDays
 
         let loopsPerDay = Double(loopCount) / days
         let totalDays = Int(days)

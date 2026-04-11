@@ -2,10 +2,10 @@ import Charts
 import SwiftUI
 
 struct MealStatsView: View {
-    @Binding var selectedInterval: StatsTimeInterval
+    @Binding var selectedInterval: StatsTimeIntervalWithToday
     let mealStats: [MealStats]
 
-    @State private var scrollPosition: Date = StatChartUtils.getInitialScrollPosition(for: .day)
+    @State private var scrollPosition: Date = StatChartUtils.getInitialScrollPosition(for: .day as StatsTimeInterval)
     @State private var selectedDate: Date?
 
     private var selectable: Bool { true }
@@ -13,7 +13,7 @@ struct MealStatsView: View {
     private var selectedStat: MealStats? {
         guard let selectedDate else { return nil }
         let cal = Calendar.current
-        if selectedInterval == .day {
+        if selectedInterval.isHourly {
             return mealStats.first {
                 cal.compare($0.date, to: selectedDate, toGranularity: .hour) == .orderedSame
             }
@@ -22,30 +22,37 @@ struct MealStatsView: View {
     }
 
     var body: some View {
-        let avgCarbs = mealStats.isEmpty ? 0 : mealStats.map(\.carbs).reduce(0, +) / Double(mealStats.count)
-        let avgFat = mealStats.isEmpty ? 0 : mealStats.map(\.fat).reduce(0, +) / Double(mealStats.count)
-        let avgProtein = mealStats.isEmpty ? 0 : mealStats.map(\.protein).reduce(0, +) / Double(mealStats.count)
+        let totalCarbs = mealStats.map(\.carbs).reduce(0, +)
+        let totalFat = mealStats.map(\.fat).reduce(0, +)
+        let totalProtein = mealStats.map(\.protein).reduce(0, +)
         let hasFatProtein = mealStats.contains { $0.fat > 0 || $0.protein > 0 }
-        let isHourly = selectedInterval == .day
-        let suffix = isHourly ? "/h" : "/d"
+        let isHourly = selectedInterval.isHourly
+
+        // For hourly views (Today/Day): show totals. For multi-day views: show daily averages.
+        let count = max(mealStats.isEmpty ? 1 : mealStats.count, 1)
+        let carbsValue = isHourly ? totalCarbs : totalCarbs / Double(count)
+        let fatValue = isHourly ? totalFat : totalFat / Double(count)
+        let proteinValue = isHourly ? totalProtein : totalProtein / Double(count)
+        let prefix = isHourly ? "Σ " : "Ø "
+        let suffix = isHourly ? "" : "/d"
 
         VStack(spacing: 16) {
             // Stats row
             HStack {
                 StatChartUtils.statView(
-                    title: "Ø Carbs" + suffix,
-                    value: avgCarbs.formatted(.number.grouping(.never).rounded().precision(.fractionLength(0))) + " g"
+                    title: prefix + "Carbs" + suffix,
+                    value: carbsValue.formatted(.number.grouping(.never).rounded().precision(.fractionLength(0))) + " g"
                 )
                 Spacer()
                 if hasFatProtein {
                     StatChartUtils.statView(
-                        title: "Ø Fat" + suffix,
-                        value: avgFat.formatted(.number.grouping(.never).rounded().precision(.fractionLength(0))) + " g"
+                        title: prefix + "Fat" + suffix,
+                        value: fatValue.formatted(.number.grouping(.never).rounded().precision(.fractionLength(0))) + " g"
                     )
                     Spacer()
                     StatChartUtils.statView(
-                        title: "Ø Protein" + suffix,
-                        value: avgProtein.formatted(.number.grouping(.never).rounded().precision(.fractionLength(0))) + " g"
+                        title: prefix + "Protein" + suffix,
+                        value: proteinValue.formatted(.number.grouping(.never).rounded().precision(.fractionLength(0))) + " g"
                     )
                 }
             }
@@ -68,7 +75,7 @@ struct MealStatsView: View {
                     let dimmed = selectable && selectedStat != nil && selectedStat?.id != stat.id
 
                     BarMark(
-                        x: .value("Date", stat.date, unit: selectedInterval == .day ? .hour : .day),
+                        x: .value("Date", stat.date, unit: selectedInterval.isHourly ? .hour : .day),
                         y: .value("Carbs", stat.carbs)
                     )
                     .foregroundStyle(.orange)
@@ -77,7 +84,7 @@ struct MealStatsView: View {
 
                     if hasFatProtein {
                         BarMark(
-                            x: .value("Date", stat.date, unit: selectedInterval == .day ? .hour : .day),
+                            x: .value("Date", stat.date, unit: selectedInterval.isHourly ? .hour : .day),
                             y: .value("Fat", stat.fat)
                         )
                         .foregroundStyle(.red)
@@ -85,7 +92,7 @@ struct MealStatsView: View {
                         .opacity(dimmed ? 0.35 : 1.0)
 
                         BarMark(
-                            x: .value("Date", stat.date, unit: selectedInterval == .day ? .hour : .day),
+                            x: .value("Date", stat.date, unit: selectedInterval.isHourly ? .hour : .day),
                             y: .value("Protein", stat.protein)
                         )
                         .foregroundStyle(.yellow)
@@ -95,7 +102,7 @@ struct MealStatsView: View {
                 }
 
                 if selectable, let sel = selectedStat {
-                    RuleMark(x: .value("Selected", sel.date, unit: selectedInterval == .day ? .hour : .day))
+                    RuleMark(x: .value("Selected", sel.date, unit: selectedInterval.isHourly ? .hour : .day))
                         .foregroundStyle(Color.secondary.opacity(0.35))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
                 }
@@ -103,7 +110,7 @@ struct MealStatsView: View {
             .chartXSelection(value: $selectedDate)
             .chartXAxis {
                 AxisMarks(values: .automatic) { _ in
-                    AxisValueLabel(format: StatChartUtils.dateFormat(for: selectedInterval))
+                    AxisValueLabel(format: StatChartUtils.dateFormat(for: selectedInterval.asChartInterval))
                     AxisGridLine()
                 }
             }
@@ -113,13 +120,13 @@ struct MealStatsView: View {
                 }
             }
             .chartScrollableAxes(.horizontal)
-            .chartXVisibleDomain(length: StatChartUtils.visibleDomainLength(for: selectedInterval))
+            .chartXVisibleDomain(length: StatChartUtils.visibleDomainLength(for: selectedInterval.asChartInterval))
             .chartScrollPosition(x: $scrollPosition)
             .frame(height: 200)
             .padding(.horizontal)
             .overlay(alignment: .top) {
                 if selectable, let sel = selectedStat {
-                    let title = selectedInterval == .day
+                    let title = selectedInterval.isHourly
                         ? sel.date.formatted(.dateTime.hour().minute())
                         : sel.date.formatted(.dateTime.weekday(.wide).day().month(.abbreviated))
                     InsulinBarDetailPopover(
@@ -133,7 +140,7 @@ struct MealStatsView: View {
             }
         }
         .onChange(of: selectedInterval) { _, newValue in
-            scrollPosition = StatChartUtils.getInitialScrollPosition(for: newValue)
+            scrollPosition = StatChartUtils.getInitialScrollPosition(for: newValue.asChartInterval)
             selectedDate = nil
         }
     }

@@ -30,12 +30,14 @@ extension Stat {
                 ScrollView {
                     VStack(spacing: 16) {
                         switch state.selectedView {
+                        case .overview:
+                            StatOverviewView(state: state)
                         case .glucose:
                             glucoseView
-                        case .insulin:
-                            insulinView
                         case .looping:
                             loopingView
+                        case .insulin:
+                            insulinView
                         case .meals:
                             mealsView
                         }
@@ -47,7 +49,25 @@ extension Stat {
             .dynamicTypeSize(...DynamicTypeSize.xLarge)
             .navigationBarTitle("Statistics")
             .navigationBarTitleDisplayMode(.inline)
-            .navigationBarItems(trailing: Button("Close", action: state.hideModal))
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    if state.selectedView != .overview {
+                        Button {
+                            state.selectedView = .overview
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 13, weight: .semibold))
+                                Text(NSLocalizedString("Overview", comment: ""))
+                                    .font(.system(size: 14, weight: .medium, design: .rounded))
+                            }
+                        }
+                    }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Close", action: state.hideModal)
+                }
+            }
         }
 
         // MARK: - Glucose
@@ -108,7 +128,7 @@ extension Stat {
             }.padding(.horizontal)
 
             Picker("Duration", selection: $state.selectedIntervalForInsulinStats) {
-                ForEach(StatsTimeInterval.allCases) { interval in
+                ForEach(StatsTimeIntervalWithToday.allCases) { interval in
                     Text(interval.displayName).tag(interval)
                 }
             }.pickerStyle(.segmented)
@@ -135,8 +155,13 @@ extension Stat {
             StatCard {
                 switch state.selectedInsulinChartType {
                 case .totalDailyDose:
-                    let tddData = state.selectedIntervalForInsulinStats == .day ?
-                        state.hourlyTDDStats : state.filteredDailyTDDStats
+                    let tddData: [TDDStats] = {
+                        switch state.selectedIntervalForInsulinStats {
+                        case .today: return state.hourlyTDDStats
+                        case .day: return state.last24hHourlyTDDStats
+                        default: return state.filteredDailyTDDStats
+                        }
+                    }()
                     if tddData.isEmpty {
                         ContentUnavailableView(
                             NSLocalizedString("No TDD Data", comment: ""),
@@ -151,8 +176,13 @@ extension Stat {
                     }
 
                 case .bolusDistribution:
-                    let bolusData = state.selectedIntervalForInsulinStats == .day ?
-                        state.hourlyBolusStats : state.filteredDailyBolusStats
+                    let bolusData: [BolusStats] = {
+                        switch state.selectedIntervalForInsulinStats {
+                        case .today: return state.hourlyBolusStats
+                        case .day: return state.last24hHourlyBolusStats
+                        default: return state.filteredDailyBolusStats
+                        }
+                    }()
                     let hasData = bolusData.contains { $0.manualBolus > 0 || $0.external > 0 }
                     if bolusData.isEmpty || !hasData {
                         ContentUnavailableView(
@@ -187,13 +217,14 @@ extension Stat {
 
         @ViewBuilder var mealsView: some View {
             Picker("Duration", selection: $state.selectedIntervalForMealStats) {
-                ForEach(StatsTimeInterval.allCases) { interval in
+                ForEach(StatsTimeIntervalWithToday.allCases) { interval in
                     Text(interval.displayName).tag(interval)
                 }
             }.pickerStyle(.segmented)
 
-            let mealData = state.selectedIntervalForMealStats == .day ?
-                state.hourlyMealStats : state.filteredDailyMealStats
+            let mealData = state.selectedIntervalForMealStats.isHourly ?
+                (state.selectedIntervalForMealStats == .today ? state.todayHourlyMealStats : state.hourlyMealStats) :
+                state.filteredDailyMealStats
             let hasData = mealData.contains { $0.carbs > 0 || $0.fat > 0 || $0.protein > 0 }
 
             StatCard {
@@ -221,7 +252,8 @@ extension Stat {
                     let interval = state.selectedIntervalForMealStats
                     let daysCount: Int = {
                         switch interval {
-                        case .day: return 1
+                        case .day,
+                             .today: return 1
                         case .week: return 7
                         case .month: return 30
                         case .total: return 90
@@ -233,7 +265,7 @@ extension Stat {
                             fat: totalFat,
                             protein: totalProtein,
                             daysCount: daysCount,
-                            showAverage: interval != .day
+                            showAverage: !interval.isHourly
                         )
                     }
                 }
@@ -349,16 +381,6 @@ private struct GlucoseScatterCard: View {
         self.selectedInterval = selectedInterval
     }
 
-    private var visibleDomainLength: TimeInterval {
-        switch selectedInterval {
-        case .day,
-             .today: return 24 * 3600
-        case .week: return 7 * 24 * 3600
-        case .month: return 30 * 24 * 3600
-        case .total: return 90 * 24 * 3600
-        }
-    }
-
     private var xAxisFormat: Date.FormatStyle {
         switch selectedInterval {
         case .day,
@@ -369,16 +391,6 @@ private struct GlucoseScatterCard: View {
         }
     }
 
-    private var scrollWindowLength: TimeInterval {
-        switch selectedInterval {
-        case .day,
-             .today: return 24 * 3600
-        case .week: return 7 * 24 * 3600
-        case .month: return 7 * 24 * 3600 // 1 Woche sichtbar, Rest scrollen
-        case .total: return 14 * 24 * 3600 // 2 Wochen sichtbar, Rest scrollen
-        }
-    }
-
     var body: some View {
         let low = lowLimit * (units == .mmolL ? Decimal(conversionFactor) : 1)
         let high = highLimit * (units == .mmolL ? Decimal(conversionFactor) : 1)
@@ -386,13 +398,9 @@ private struct GlucoseScatterCard: View {
         let count = readings.count
         let sizeOfDataPoints: CGFloat = count < 20 ? 50 : count < 50 ? 35 : count > 2000 ? 5 : 15
 
-        let needsScroll = selectedInterval == .month || selectedInterval == .total
-
         // Fixed threshold values (180 mg/dL and 70 mg/dL) converted to display units
         let highThreshold: Double = units == .mmolL ? 180 * conversionFactor : 180
         let lowThreshold: Double = units == .mmolL ? 70 * conversionFactor : 70
-        let highThresholdLabel = units == .mmolL ? "10.0 mmol/L" : "180 mg/dL"
-        let lowThresholdLabel = units == .mmolL ? "3.9 mmol/L" : "70 mg/dL"
 
         StatCard {
             VStack(spacing: 12) {
@@ -442,26 +450,10 @@ private struct GlucoseScatterCard: View {
                 .chartYAxis {
                     AxisMarks(values: [0, low, high, units == .mmolL ? 15 : 270])
                 }
-                .if(needsScroll) { chart in
-                    chart
-                        .chartScrollableAxes(.horizontal)
-                        .chartXVisibleDomain(length: scrollWindowLength)
-                }
                 .frame(height: 200)
 
                 // Legend
-                ScatterLegend(
-                    highThresholdLabel: highThresholdLabel,
-                    lowThresholdLabel: lowThresholdLabel
-                )
-
-                if needsScroll {
-                    HStack {
-                        Image(systemName: "hand.draw.fill").foregroundStyle(.primary)
-                        Text("Swipe to scroll through time.")
-                            .foregroundStyle(.secondary)
-                    }.font(.footnote)
-                }
+                ScatterLegend()
             }
         }
     }
@@ -470,20 +462,11 @@ private struct GlucoseScatterCard: View {
 // MARK: - Scatter Legend
 
 private struct ScatterLegend: View {
-    let highThresholdLabel: String
-    let lowThresholdLabel: String
-
     var body: some View {
-        VStack(spacing: 6) {
-            HStack(spacing: 14) {
-                legendDot(color: .red, label: NSLocalizedString("Low", comment: ""))
-                legendDot(color: .green, label: NSLocalizedString("In Range", comment: ""))
-                legendDot(color: .orange, label: NSLocalizedString("High", comment: ""))
-            }
-            HStack(spacing: 14) {
-                legendLine(color: .red, label: lowThresholdLabel)
-                legendLine(color: .yellow, label: highThresholdLabel)
-            }
+        HStack(spacing: 14) {
+            legendDot(color: .red, label: NSLocalizedString("Low", comment: ""))
+            legendDot(color: .green, label: NSLocalizedString("In Range", comment: ""))
+            legendDot(color: .orange, label: NSLocalizedString("High", comment: ""))
         }
         .font(.system(size: 11, weight: .medium, design: .rounded))
         .foregroundStyle(.secondary)
@@ -496,29 +479,6 @@ private struct ScatterLegend: View {
                 .fill(color)
                 .frame(width: 8, height: 8)
             Text(label)
-        }
-    }
-
-    private func legendLine(color: Color, label: String) -> some View {
-        HStack(spacing: 5) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 1)
-                    .fill(color)
-                    .frame(width: 16, height: 2)
-            }
-            Text(label)
-        }
-    }
-}
-
-// MARK: - Conditional View Modifier
-
-private extension View {
-    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
-        if condition {
-            transform(self)
-        } else {
-            self
         }
     }
 }

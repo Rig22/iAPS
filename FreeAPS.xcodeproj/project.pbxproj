@@ -349,6 +349,7 @@
 		7940BF6A2F83D87D00E56268 /* MealStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF632F83D87D00E56268 /* MealStatsView.swift */; };
 		7940BF6B2F83D87D00E56268 /* TotalDailyDoseChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF5D2F83D87D00E56268 /* TotalDailyDoseChart.swift */; };
 		7940BFEE2F83D87D00E56268 /* InsulinStatsTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BFEF2F83D87D00E56268 /* InsulinStatsTileView.swift */; };
+		AA00BB01CC02DD03EE04FF06 /* StatOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00BB01CC02DD03EE04FF05 /* StatOverviewView.swift */; };
 		7940BF6C2F83D87D00E56268 /* LoopBarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF5F2F83D87D00E56268 /* LoopBarChartView.swift */; };
 		7940BF6D2F83D87D00E56268 /* GlucoseMetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF592F83D87D00E56268 /* GlucoseMetricsView.swift */; };
 		7987958B2F75B03D00DAE1A1 /* StatusCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987958A2F75B03D00DAE1A1 /* StatusCards.swift */; };
@@ -1051,6 +1052,7 @@
 		7940BF5C2F83D87D00E56268 /* BolusStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BolusStatsView.swift; sourceTree = "<group>"; };
 		7940BF5D2F83D87D00E56268 /* TotalDailyDoseChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalDailyDoseChart.swift; sourceTree = "<group>"; };
 		7940BFEF2F83D87D00E56268 /* InsulinStatsTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinStatsTileView.swift; sourceTree = "<group>"; };
+		AA00BB01CC02DD03EE04FF05 /* StatOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatOverviewView.swift; sourceTree = "<group>"; };
 		7940BF5F2F83D87D00E56268 /* LoopBarChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopBarChartView.swift; sourceTree = "<group>"; };
 		7940BF602F83D87D00E56268 /* LoopingCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopingCard.swift; sourceTree = "<group>"; };
 		7940BF612F83D87D00E56268 /* LoopStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopStatsView.swift; sourceTree = "<group>"; };
@@ -2654,6 +2656,14 @@
 			path = Meal;
 			sourceTree = "<group>";
 		};
+		AA00BB01CC02DD03EE04FF07 /* Overview */ = {
+			isa = PBXGroup;
+			children = (
+				AA00BB01CC02DD03EE04FF05 /* StatOverviewView.swift */,
+			);
+			path = Overview;
+			sourceTree = "<group>";
+		};
 		7940BF652F83D87D00E56268 /* ViewElements */ = {
 			isa = PBXGroup;
 			children = (
@@ -2661,6 +2671,7 @@
 				7940BF5E2F83D87D00E56268 /* Insulin */,
 				7940BF622F83D87D00E56268 /* Looping */,
 				7940BF642F83D87D00E56268 /* Meal */,
+				AA00BB01CC02DD03EE04FF07 /* Overview */,
 			);
 			path = ViewElements;
 			sourceTree = "<group>";
@@ -3817,6 +3828,7 @@
 				7940BF6A2F83D87D00E56268 /* MealStatsView.swift in Sources */,
 				7940BF6B2F83D87D00E56268 /* TotalDailyDoseChart.swift in Sources */,
 				7940BFEE2F83D87D00E56268 /* InsulinStatsTileView.swift in Sources */,
+				AA00BB01CC02DD03EE04FF06 /* StatOverviewView.swift in Sources */,
 				7940BF6C2F83D87D00E56268 /* LoopBarChartView.swift in Sources */,
 				7940BF6D2F83D87D00E56268 /* GlucoseMetricsView.swift in Sources */,
 				33E198D3039045D98C3DC5D4 /* AddCarbsStateModel.swift in Sources */,

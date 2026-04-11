@@ -23,11 +23,11 @@ struct LoopStatsView: View {
         HStack(alignment: .center, spacing: 14) {
             ZStack {
                 Circle()
-                    .fill(Color.blue.opacity(colorScheme == .dark ? 0.20 : 0.12))
+                    .fill(Color.purple.opacity(colorScheme == .dark ? 0.20 : 0.12))
                     .frame(width: 56, height: 56)
                 Image(systemName: "arrow.triangle.2.circlepath")
                     .font(.system(size: 26, weight: .semibold))
-                    .foregroundStyle(Color.blue)
+                    .foregroundStyle(Color.purple)
             }
 
             VStack(alignment: .leading, spacing: 2) {
