@@ -58,7 +58,7 @@ extension Stat {
                             HStack(spacing: 4) {
                                 Image(systemName: "chevron.left")
                                     .font(.system(size: 13, weight: .semibold))
-                                Text(NSLocalizedString("Overview", comment: ""))
+                                Text(NSLocalizedString("Back", comment: ""))
                                     .font(.system(size: 14, weight: .medium, design: .rounded))
                             }
                         }
@@ -450,11 +450,36 @@ private struct GlucoseScatterCard: View {
                 .chartYAxis {
                     AxisMarks(values: [0, low, high, units == .mmolL ? 15 : 270])
                 }
+                .if(selectedInterval == .total) { chart in
+                    chart
+                        .chartScrollableAxes(.horizontal)
+                        .chartXVisibleDomain(length: 30 * 24 * 3600)
+                }
                 .frame(height: 200)
 
                 // Legend
                 ScatterLegend()
+
+                if selectedInterval == .total {
+                    HStack {
+                        Image(systemName: "hand.draw.fill").foregroundStyle(.primary)
+                        Text("Swipe to scroll through time.")
+                            .foregroundStyle(.secondary)
+                    }.font(.footnote)
+                }
             }
+        }
+    }
+}
+
+// MARK: - Conditional View Modifier
+
+private extension View {
+    @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
+        if condition {
+            transform(self)
+        } else {
+            self
         }
     }
 }

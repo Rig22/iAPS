@@ -338,9 +338,21 @@ extension Stat {
                 .map { MealStats(date: $0.key, carbs: $0.value.carbs, fat: $0.value.fat, protein: $0.value.protein) }
                 .sorted { $0.date < $1.date }
 
-            // Hourly
+            // Hourly (last 24h with all hour slots filled)
+            let now = Date()
+            let dayAgo = now.addingTimeInterval(-24 * 3600)
+            let dayAgoHourStart = calendar.date(from: calendar.dateComponents(
+                [.year, .month, .day, .hour], from: dayAgo
+            ))!
+
             var hourlyMap: [Date: (carbs: Double, fat: Double, protein: Double)] = [:]
-            let dayAgo = Date().addingTimeInterval(-24 * 3600)
+            // Initialize all 24 hour slots
+            for h in 0 ..< 24 {
+                if let hourDate = calendar.date(byAdding: .hour, value: h, to: dayAgoHourStart) {
+                    hourlyMap[hourDate] = (0, 0, 0)
+                }
+            }
+            // Overlay actual data
             for record in results {
                 guard let date = record.date, date > dayAgo else { continue }
                 let hour = calendar.date(from: calendar.dateComponents([.year, .month, .day, .hour], from: date))!

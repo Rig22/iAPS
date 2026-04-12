@@ -348,12 +348,12 @@
 		7940BF692F83D87D00E56268 /* BolusStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF5C2F83D87D00E56268 /* BolusStatsView.swift */; };
 		7940BF6A2F83D87D00E56268 /* MealStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF632F83D87D00E56268 /* MealStatsView.swift */; };
 		7940BF6B2F83D87D00E56268 /* TotalDailyDoseChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF5D2F83D87D00E56268 /* TotalDailyDoseChart.swift */; };
-		7940BFEE2F83D87D00E56268 /* InsulinStatsTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BFEF2F83D87D00E56268 /* InsulinStatsTileView.swift */; };
-		AA00BB01CC02DD03EE04FF06 /* StatOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00BB01CC02DD03EE04FF05 /* StatOverviewView.swift */; };
 		7940BF6C2F83D87D00E56268 /* LoopBarChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF5F2F83D87D00E56268 /* LoopBarChartView.swift */; };
 		7940BF6D2F83D87D00E56268 /* GlucoseMetricsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF592F83D87D00E56268 /* GlucoseMetricsView.swift */; };
+		7940BFEE2F83D87D00E56268 /* InsulinStatsTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BFEF2F83D87D00E56268 /* InsulinStatsTileView.swift */; };
 		7987958B2F75B03D00DAE1A1 /* StatusCards.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987958A2F75B03D00DAE1A1 /* StatusCards.swift */; };
 		7987958D2F75B05A00DAE1A1 /* TopStatusPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7987958C2F75B05A00DAE1A1 /* TopStatusPill.swift */; };
+		79E183272F8AB555006D17A5 /* MealsDonutIconView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79E183262F8AB555006D17A5 /* MealsDonutIconView.swift */; };
 		7BCFACB97C821041BA43A114 /* ManualTempBasalRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C377490C77661D75E8C50649 /* ManualTempBasalRootView.swift */; };
 		7F7B756BE8543965D9FDF1A2 /* DataTableDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A401509D21F7F35D4E109EDA /* DataTableDataFlow.swift */; };
 		8194B80890CDD6A3C13B0FEE /* SnoozeStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E26904AACA8D9C15D229D675 /* SnoozeStateModel.swift */; };
@@ -370,6 +370,7 @@
 		A228DF96647338139F152B15 /* PreferencesEditorDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12204445D7632AF09264A979 /* PreferencesEditorDataFlow.swift */; };
 		A33352ED40476125EBAC6EE0 /* CREditorDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E22146D3DF4853786C78132 /* CREditorDataFlow.swift */; };
 		A6F097A14CAAE0CE0D11BE1B /* AddCarbsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 618E62C9757B2F95431B5DC0 /* AddCarbsProvider.swift */; };
+		AA00BB01CC02DD03EE04FF06 /* StatOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00BB01CC02DD03EE04FF05 /* StatOverviewView.swift */; };
 		AD3D2CD42CD01B9EB8F26522 /* PumpConfigDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF65DA88F972B56090AD6AC3 /* PumpConfigDataFlow.swift */; };
 		B7C465E9472624D8A2BE2A6A /* CalibrationsDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA241FB1663EC96FDBE64C8A /* CalibrationsDataFlow.swift */; };
 		B9CAAEFC2AE70836000F68BC /* branch.txt in Resources */ = {isa = PBXBuildFile; fileRef = B9CAAEFB2AE70836000F68BC /* branch.txt */; };
@@ -1051,15 +1052,15 @@
 		7940BF5A2F83D87D00E56268 /* GlucoseSectorChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseSectorChart.swift; sourceTree = "<group>"; };
 		7940BF5C2F83D87D00E56268 /* BolusStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BolusStatsView.swift; sourceTree = "<group>"; };
 		7940BF5D2F83D87D00E56268 /* TotalDailyDoseChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TotalDailyDoseChart.swift; sourceTree = "<group>"; };
-		7940BFEF2F83D87D00E56268 /* InsulinStatsTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinStatsTileView.swift; sourceTree = "<group>"; };
-		AA00BB01CC02DD03EE04FF05 /* StatOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatOverviewView.swift; sourceTree = "<group>"; };
 		7940BF5F2F83D87D00E56268 /* LoopBarChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopBarChartView.swift; sourceTree = "<group>"; };
 		7940BF602F83D87D00E56268 /* LoopingCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopingCard.swift; sourceTree = "<group>"; };
 		7940BF612F83D87D00E56268 /* LoopStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoopStatsView.swift; sourceTree = "<group>"; };
 		7940BF632F83D87D00E56268 /* MealStatsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealStatsView.swift; sourceTree = "<group>"; };
+		7940BFEF2F83D87D00E56268 /* InsulinStatsTileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinStatsTileView.swift; sourceTree = "<group>"; };
 		7987958A2F75B03D00DAE1A1 /* StatusCards.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusCards.swift; sourceTree = "<group>"; };
 		7987958C2F75B05A00DAE1A1 /* TopStatusPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TopStatusPill.swift; sourceTree = "<group>"; };
 		79BDA519C9B890FD9A5DFCF3 /* ISFEditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ISFEditorDataFlow.swift; sourceTree = "<group>"; };
+		79E183262F8AB555006D17A5 /* MealsDonutIconView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MealsDonutIconView.swift; sourceTree = "<group>"; };
 		7E22146D3DF4853786C78132 /* CREditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CREditorDataFlow.swift; sourceTree = "<group>"; };
 		86FC1CFD647CF34508AF9A3B /* AddCarbsRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AddCarbsRootView.swift; sourceTree = "<group>"; };
 		8782B44544F38F2B2D82C38E /* NightscoutConfigRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NightscoutConfigRootView.swift; sourceTree = "<group>"; };
@@ -1076,6 +1077,7 @@
 		A0A48AE3AC813A49A517846A /* NightscoutConfigStateModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NightscoutConfigStateModel.swift; sourceTree = "<group>"; };
 		A401509D21F7F35D4E109EDA /* DataTableDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DataTableDataFlow.swift; sourceTree = "<group>"; };
 		A8630D58BDAD6D9C650B9B39 /* PumpConfigProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PumpConfigProvider.swift; sourceTree = "<group>"; };
+		AA00BB01CC02DD03EE04FF05 /* StatOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatOverviewView.swift; sourceTree = "<group>"; };
 		AAFF91130F2FCCC7EBBA11AD /* BasalProfileEditorStateModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BasalProfileEditorStateModel.swift; sourceTree = "<group>"; };
 		AEE53A13D26F101B332EFFC8 /* AddTempTargetProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AddTempTargetProvider.swift; sourceTree = "<group>"; };
 		AF65DA88F972B56090AD6AC3 /* PumpConfigDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PumpConfigDataFlow.swift; sourceTree = "<group>"; };
@@ -1830,6 +1832,7 @@
 		3811DE2C25C9D49500A708ED /* View */ = {
 			isa = PBXGroup;
 			children = (
+				79E183262F8AB555006D17A5 /* MealsDonutIconView.swift */,
 				3811DE2E25C9D49500A708ED /* HomeRootView.swift */,
 				7987958A2F75B03D00DAE1A1 /* StatusCards.swift */,
 				3833B51E260264AC003021B3 /* Chart */,
@@ -2656,14 +2659,6 @@
 			path = Meal;
 			sourceTree = "<group>";
 		};
-		AA00BB01CC02DD03EE04FF07 /* Overview */ = {
-			isa = PBXGroup;
-			children = (
-				AA00BB01CC02DD03EE04FF05 /* StatOverviewView.swift */,
-			);
-			path = Overview;
-			sourceTree = "<group>";
-		};
 		7940BF652F83D87D00E56268 /* ViewElements */ = {
 			isa = PBXGroup;
 			children = (
@@ -2734,6 +2729,14 @@
 				3F8670D63672AF88E2E9B09E /* View */,
 			);
 			path = AddTempTarget;
+			sourceTree = "<group>";
+		};
+		AA00BB01CC02DD03EE04FF07 /* Overview */ = {
+			isa = PBXGroup;
+			children = (
+				AA00BB01CC02DD03EE04FF05 /* StatOverviewView.swift */,
+			);
+			path = Overview;
 			sourceTree = "<group>";
 		};
 		B9488883C59C31550E0B4CEC /* View */ = {
@@ -3560,6 +3563,7 @@
 				388E5A5C25B6F0770019842D /* JSON.swift in Sources */,
 				F252846D2F01C81F0084D094 /* FoodImageStorageManager.swift in Sources */,
 				3811DF0225CA9FEA00A708ED /* Credentials.swift in Sources */,
+				79E183272F8AB555006D17A5 /* MealsDonutIconView.swift in Sources */,
 				19DC678529CA67A400FD9EC4 /* OverrideProfilesRootView.swift in Sources */,
 				389A572026079BAA00BC102F /* Interpolation.swift in Sources */,
 				19A910382A24EF3200C8951B /* ChartsView.swift in Sources */,

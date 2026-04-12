@@ -42,13 +42,25 @@ struct StatOverviewView: View {
                         lowLimit: state.lowLimit,
                         units: state.units,
                         navigate: { state.selectedView = .glucose },
-                        showPopover: { activePopover = $0 }
+                        showPopover: { newPopover in
+                            if activePopover?.origin == newPopover.origin {
+                                activePopover = nil
+                            } else {
+                                activePopover = newPopover
+                            }
+                        }
                     )
 
                     OverviewLoopingCard(
                         filter: todayFilter,
                         navigate: { state.selectedView = .looping },
-                        showPopover: { activePopover = $0 }
+                        showPopover: { newPopover in
+                            if activePopover?.origin == newPopover.origin {
+                                activePopover = nil
+                            } else {
+                                activePopover = newPopover
+                            }
+                        }
                     )
 
                     OverviewInsulinCard(
@@ -59,13 +71,25 @@ struct StatOverviewView: View {
                         tdd2DaysAgo: state.tdd2DaysAgo,
                         tdd3DaysAgo: state.tdd3DaysAgo,
                         navigate: { state.selectedView = .insulin },
-                        showPopover: { activePopover = $0 }
+                        showPopover: { newPopover in
+                            if activePopover?.origin == newPopover.origin {
+                                activePopover = nil
+                            } else {
+                                activePopover = newPopover
+                            }
+                        }
                     )
 
                     OverviewMealCard(
                         mealStats: todayMealStats,
                         navigate: { state.selectedView = .meals },
-                        showPopover: { activePopover = $0 }
+                        showPopover: { newPopover in
+                            if activePopover?.origin == newPopover.origin {
+                                activePopover = nil
+                            } else {
+                                activePopover = newPopover
+                            }
+                        }
                     )
                 }
 
@@ -86,6 +110,7 @@ struct StatOverviewView: View {
                     .onTapGesture { withAnimation(.easeOut(duration: 0.2)) { activePopover = nil } }
 
                 OverviewPopoverView(data: popover)
+                    .onTapGesture { withAnimation(.easeOut(duration: 0.2)) { activePopover = nil } }
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: popoverAlignment(for: popover.origin))
                     .padding(20)
                     .transition(.scale(scale: 0.85).combined(with: .opacity))

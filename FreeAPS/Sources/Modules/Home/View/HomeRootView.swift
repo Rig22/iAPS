@@ -450,9 +450,20 @@ extension Home {
                         Button {
                             state.showModal(for: .statistics)
                         } label: {
-                            Image(systemName: "chart.xyaxis.line")
-                                .font(.system(size: 22, weight: .medium))
-                                .foregroundStyle(.secondary.opacity(0.8))
+                            /* Image(
+                                 systemName: // "chart.xyaxis.line")
+                                 "chart.pie"
+                             )*/
+                            /*  DonutIconView()
+                             .opacity(0.8)
+                             .frame(width: 22, height: 22)*/
+                            MealsDonutIconView(
+                                carbs: 60,
+                                fat: 20,
+                                protein: 20
+                            )
+                            .frame(width: 26, height: 26)
+                            .opacity(0.8)
                         }
                         .frame(maxWidth: .infinity)
 
@@ -674,45 +685,6 @@ extension Home {
             .background(Color.clear)
         }
 
-        var glucosePreview: some View {
-            let data = state.data.glucose
-            let minimum = data.compactMap(\.glucose).min() ?? 0
-            let minimumRange = Double(minimum) * 0.8
-            let maximum = Double(data.compactMap(\.glucose).max() ?? 0) * 1.1
-
-            let high = state.data.highGlucose
-            let low = state.data.lowGlucose
-            let veryHigh = 198
-
-            return Chart(data) {
-                PointMark(
-                    x: .value("Time", $0.dateString),
-                    y: .value("Glucose", Double($0.glucose ?? 0) * (state.data.units == .mmolL ? 0.0555 : 1.0))
-                )
-                .foregroundStyle(
-                    (($0.glucose ?? 0) > veryHigh || Decimal($0.glucose ?? 0) < low) ? Color(.red) : Decimal($0.glucose ?? 0) >
-                        high ? Color(.yellow) : Color(.darkGreen)
-                )
-                .symbolSize(5)
-            }
-            .chartXAxis(.hidden)
-            .chartYAxis {
-                AxisMarks(values: .automatic(desiredCount: 3))
-            }
-            .chartYScale(
-                domain: minimumRange * (state.data.units == .mmolL ? 0.0555 : 1.0) ... maximum *
-                    (state.data.units == .mmolL ? 0.0555 : 1.0)
-            )
-            .chartXScale(
-                domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
-            )
-            .frame(height: 50)
-            .padding(.leading, 30)
-            .padding(.trailing, 32)
-            .padding(.top, 15)
-            .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
-        }
-
         private var isfView: some View {
             HStack(spacing: 4) {
                 Image(systemName: "divide")
@@ -808,8 +780,6 @@ extension Home {
                                 StatusCards(state: state)
                                     .padding(.top, 5)
                                     .padding(.bottom, 35)
-                                // timeSetting
-                                // .overlay { isfView }
                                 if !state.isfView {
                                     isfView
                                         .padding(.top, -25)
