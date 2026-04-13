@@ -18,7 +18,7 @@ extension Stat {
 
         // Selected view and chart types
         @Published var selectedView: StatisticViewType = .overview
-        @Published var selectedGlucoseChartType: GlucoseChartType = .sectorAndMetrics
+        @Published var selectedGlucoseChartType: GlucoseChartType = .percentileByTime
         @Published var selectedInsulinChartType: InsulinChartType = .totalDailyDose
         @Published var selectedLoopingChartType: LoopingChartType = .loopingPerformance
         @Published var selectedMealChartType: MealChartType = .totalMeals
@@ -40,6 +40,16 @@ extension Stat {
         @Published var last24hHourlyBolusStats: [BolusStats] = []
         @Published var loopStats: [LoopStatsProcessedData] = []
         @Published var hourlyStats: [HourlyStats] = []
+        @Published var agpToday: [AGPSlot] = []
+        @Published var agpDay: [AGPSlot] = []
+        @Published var agpWeek: [AGPSlot] = []
+        @Published var agpMonth: [AGPSlot] = []
+        @Published var agpTotal: [AGPSlot] = []
+        @Published var distributionToday: [GlucoseDistributionSlot] = []
+        @Published var distributionDay: [GlucoseDistributionSlot] = []
+        @Published var distributionWeek: [GlucoseDistributionSlot] = []
+        @Published var distributionMonth: [GlucoseDistributionSlot] = []
+        @Published var distributionTotal: [GlucoseDistributionSlot] = []
 
         // Insulin summary (mirrors HomeStateModel for consistency with HomeRootView)
         @Published var neg: Int = 0
@@ -60,6 +70,7 @@ extension Stat {
             setupInsulinStats()
             setupInsulinSummary()
             setupMealStats()
+            setupAGP()
         }
 
         // MARK: - Insulin Summary (mirrors HomeStateModel.setupData)
@@ -363,6 +374,282 @@ extension Stat {
             hourlyMealStats = hourlyMap
                 .map { MealStats(date: $0.key, carbs: $0.value.carbs, fat: $0.value.fat, protein: $0.value.protein) }
                 .sorted { $0.date < $1.date }
+        }
+
+        // MARK: - AGP Setup
+
+        private func setupAGP() {
+            let context = CoreDataStack.shared.persistentContainer.viewContext
+            let request = NSFetchRequest<Readings>(entityName: "Readings")
+            request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: false)]
+            request.predicate = NSPredicate(
+                format: "glucose > 0 AND date > %@",
+                Date().addingTimeInterval(-90 * 24 * 3600) as NSDate
+            )
+
+            guard let allReadings = try? context.fetch(request) else { return }
+
+            let convert = units == .mmolL ? 0.0555 : 1.0
+            let todayCutoff = Calendar.current.startOfDay(for: Date())
+            let dayCutoff = Date().addingTimeInterval(-24 * 3600)
+            let weekCutoff = Date().addingTimeInterval(-7 * 24 * 3600)
+            let monthCutoff = Date().addingTimeInterval(-30 * 24 * 3600)
+
+            let todayReadings = allReadings.filter { ($0.date ?? .distantPast) >= todayCutoff }
+            let dayReadings = allReadings.filter { ($0.date ?? .distantPast) >= dayCutoff }
+            let weekReadings = allReadings.filter { ($0.date ?? .distantPast) >= weekCutoff }
+            let monthReadings = allReadings.filter { ($0.date ?? .distantPast) >= monthCutoff }
+
+            agpToday = computeChronologicalAGPSlots(from: todayReadings, start: todayCutoff, convert: convert)
+            agpDay = computeChronologicalAGPSlots(from: dayReadings, start: dayCutoff, convert: convert)
+            agpWeek = computeAGPSlots(from: weekReadings, convert: convert)
+            agpMonth = computeAGPSlots(from: monthReadings, convert: convert)
+            agpTotal = computeAGPSlots(from: allReadings, convert: convert)
+
+            distributionToday = computeHourlyDistributionSlots(
+                from: todayReadings, referenceStart: todayCutoff
+            )
+            distributionDay = computeHourlyDistributionSlots(
+                from: dayReadings, referenceStart: dayCutoff
+            )
+            distributionWeek = computeDistributionSlots(from: weekReadings)
+            distributionMonth = computeDistributionSlots(from: monthReadings)
+            distributionTotal = computeDistributionSlots(from: allReadings)
+        }
+
+        /// Computes AGP-like slots chronologically (actual timestamps, not time-of-day mapped).
+        /// Used for Today/Day where we want to see the real timeline, not a 00–24 overlay.
+        private func computeChronologicalAGPSlots(
+            from readings: [Readings],
+            start: Date,
+            convert: Double
+        ) -> [AGPSlot] {
+            let calendar = Calendar.current
+            let hourStart = calendar.date(from: calendar.dateComponents(
+                [.year, .month, .day, .hour], from: start
+            ))!
+
+            // Group readings by actual hour
+            var hourlyValues: [Date: [Double]] = [:]
+            for h in 0 ..< 24 {
+                if let hourDate = calendar.date(byAdding: .hour, value: h, to: hourStart) {
+                    hourlyValues[hourDate] = []
+                }
+            }
+            for reading in readings {
+                guard let date = reading.date else { continue }
+                let hour = calendar.date(from: calendar.dateComponents(
+                    [.year, .month, .day, .hour], from: date
+                ))!
+                hourlyValues[hour, default: []].append(Double(reading.glucose) * convert)
+            }
+
+            var result: [AGPSlot] = []
+            let sortedHours = hourlyValues.sorted { $0.key < $1.key }
+            for (idx, entry) in sortedHours.enumerated() {
+                let values = entry.value
+                if !values.isEmpty {
+                    let sorted = values.sorted()
+                    result.append(AGPSlot(
+                        id: idx, date: entry.key,
+                        p10: Self.percentile(sorted, 0.10),
+                        p25: Self.percentile(sorted, 0.25),
+                        p50: Self.percentile(sorted, 0.50),
+                        p75: Self.percentile(sorted, 0.75),
+                        p90: Self.percentile(sorted, 0.90)
+                    ))
+                } else {
+                    result.append(AGPSlot(id: idx, date: entry.key, p10: 0, p25: 0, p50: 0, p75: 0, p90: 0))
+                }
+            }
+
+            // Interpolate empty slots
+            let filledIds = Set(sortedHours.enumerated().filter { !$0.element.value.isEmpty }.map(\.offset))
+            for i in 0 ..< result.count where !filledIds.contains(i) {
+                let prev = (0 ..< i).last(where: { filledIds.contains($0) }).map { result[$0] }
+                let next = ((i + 1) ..< result.count).first(where: { filledIds.contains($0) }).map { result[$0] }
+                if let p = prev, let n = next {
+                    let t = Double(i - p.id) / Double(n.id - p.id)
+                    result[i] = AGPSlot(
+                        id: i, date: result[i].date,
+                        p10: p.p10 + (n.p10 - p.p10) * t,
+                        p25: p.p25 + (n.p25 - p.p25) * t,
+                        p50: p.p50 + (n.p50 - p.p50) * t,
+                        p75: p.p75 + (n.p75 - p.p75) * t,
+                        p90: p.p90 + (n.p90 - p.p90) * t
+                    )
+                } else if let p = prev {
+                    result[i] = AGPSlot(id: i, date: result[i].date, p10: p.p10, p25: p.p25, p50: p.p50, p75: p.p75, p90: p.p90)
+                } else if let n = next {
+                    result[i] = AGPSlot(id: i, date: result[i].date, p10: n.p10, p25: n.p25, p50: n.p50, p75: n.p75, p90: n.p90)
+                }
+            }
+
+            return result
+        }
+
+        private func computeAGPSlots(from readings: [Readings], convert: Double) -> [AGPSlot] {
+            let calendar = Calendar.current
+            let refDay = calendar.startOfDay(for: Date())
+
+            // Group readings into 30-minute slots by time of day
+            var slotValues: [Int: [Double]] = [:]
+            for reading in readings {
+                guard let date = reading.date else { continue }
+                let comps = calendar.dateComponents([.hour, .minute], from: date)
+                let minuteOfDay = (comps.hour ?? 0) * 60 + (comps.minute ?? 0)
+                let slot = (minuteOfDay / 30) * 30
+                slotValues[slot, default: []].append(Double(reading.glucose) * convert)
+            }
+
+            // Build all 48 slots
+            var result: [AGPSlot] = []
+            for slotMinute in stride(from: 0, to: 1440, by: 30) {
+                guard let slotDate = calendar.date(byAdding: .minute, value: slotMinute, to: refDay) else { continue }
+                if let values = slotValues[slotMinute], !values.isEmpty {
+                    let sorted = values.sorted()
+                    result.append(AGPSlot(
+                        id: slotMinute,
+                        date: slotDate,
+                        p10: Self.percentile(sorted, 0.10),
+                        p25: Self.percentile(sorted, 0.25),
+                        p50: Self.percentile(sorted, 0.50),
+                        p75: Self.percentile(sorted, 0.75),
+                        p90: Self.percentile(sorted, 0.90)
+                    ))
+                } else {
+                    // Empty slot — will be filled by interpolation
+                    result.append(AGPSlot(id: slotMinute, date: slotDate, p10: 0, p25: 0, p50: 0, p75: 0, p90: 0))
+                }
+            }
+
+            // Interpolate empty slots from neighbors
+            for i in 0 ..< result.count where slotValues[result[i].id] == nil {
+                let prev = (0 ..< i).last(where: { slotValues[result[$0].id] != nil }).map { result[$0] }
+                let next = ((i + 1) ..< result.count).first(where: { slotValues[result[$0].id] != nil }).map { result[$0] }
+                let slot = result[i]
+                if let p = prev, let n = next, n.id != p.id {
+                    let t = Double(slot.id - p.id) / Double(n.id - p.id)
+                    result[i] = AGPSlot(
+                        id: slot.id, date: slot.date,
+                        p10: p.p10 + (n.p10 - p.p10) * t,
+                        p25: p.p25 + (n.p25 - p.p25) * t,
+                        p50: p.p50 + (n.p50 - p.p50) * t,
+                        p75: p.p75 + (n.p75 - p.p75) * t,
+                        p90: p.p90 + (n.p90 - p.p90) * t
+                    )
+                } else if let p = prev {
+                    result[i] = AGPSlot(
+                        id: slot.id,
+                        date: slot.date,
+                        p10: p.p10,
+                        p25: p.p25,
+                        p50: p.p50,
+                        p75: p.p75,
+                        p90: p.p90
+                    )
+                } else if let n = next {
+                    result[i] = AGPSlot(
+                        id: slot.id,
+                        date: slot.date,
+                        p10: n.p10,
+                        p25: n.p25,
+                        p50: n.p50,
+                        p75: n.p75,
+                        p90: n.p90
+                    )
+                }
+            }
+
+            return result
+        }
+
+        /// Computes glucose distribution (% time in each range) per hour for Today/Day views.
+        private func computeHourlyDistributionSlots(
+            from readings: [Readings],
+            referenceStart: Date
+        ) -> [GlucoseDistributionSlot] {
+            let calendar = Calendar.current
+            let hourStart = calendar.date(from: calendar.dateComponents(
+                [.year, .month, .day, .hour], from: referenceStart
+            ))!
+
+            // Initialize all 24 hour slots
+            var hourlyValues: [Date: [Int16]] = [:]
+            for h in 0 ..< 24 {
+                if let hourDate = calendar.date(byAdding: .hour, value: h, to: hourStart) {
+                    hourlyValues[hourDate] = []
+                }
+            }
+
+            // Group readings into hours
+            for reading in readings {
+                guard let date = reading.date else { continue }
+                let hour = calendar.date(from: calendar.dateComponents(
+                    [.year, .month, .day, .hour], from: date
+                ))!
+                hourlyValues[hour, default: []].append(reading.glucose)
+            }
+
+            return hourlyValues.map { hour, values in
+                guard !values.isEmpty else {
+                    return GlucoseDistributionSlot(
+                        id: hour, date: hour,
+                        veryLow: 0, low: 0, inRange: 0, high: 0, veryHigh: 0,
+                        totalReadings: 0
+                    )
+                }
+                let total = Double(values.count)
+                let veryLow = Double(values.filter { $0 < 54 }.count) / total * 100
+                let low = Double(values.filter { $0 >= 54 && $0 < 70 }.count) / total * 100
+                let inRange = Double(values.filter { $0 >= 70 && $0 <= 180 }.count) / total * 100
+                let high = Double(values.filter { $0 > 180 && $0 <= 250 }.count) / total * 100
+                let veryHigh = Double(values.filter { $0 > 250 }.count) / total * 100
+                return GlucoseDistributionSlot(
+                    id: hour, date: hour,
+                    veryLow: veryLow, low: low, inRange: inRange, high: high, veryHigh: veryHigh,
+                    totalReadings: values.count
+                )
+            }.sorted { $0.date < $1.date }
+        }
+
+        /// Computes glucose distribution (% time in each range) per calendar day.
+        /// Thresholds are in mg/dL: very low <54, low 54–70, in range 70–180, high 180–250, very high >250.
+        private func computeDistributionSlots(from readings: [Readings]) -> [GlucoseDistributionSlot] {
+            let calendar = Calendar.current
+
+            // Group readings by calendar day
+            var dayValues: [Date: [Int16]] = [:]
+            for reading in readings {
+                guard let date = reading.date else { continue }
+                let day = calendar.startOfDay(for: date)
+                dayValues[day, default: []].append(reading.glucose)
+            }
+
+            return dayValues.map { day, values in
+                let total = Double(values.count)
+                let veryLow = Double(values.filter { $0 < 54 }.count) / total * 100
+                let low = Double(values.filter { $0 >= 54 && $0 < 70 }.count) / total * 100
+                let inRange = Double(values.filter { $0 >= 70 && $0 <= 180 }.count) / total * 100
+                let high = Double(values.filter { $0 > 180 && $0 <= 250 }.count) / total * 100
+                let veryHigh = Double(values.filter { $0 > 250 }.count) / total * 100
+                return GlucoseDistributionSlot(
+                    id: day, date: day,
+                    veryLow: veryLow, low: low, inRange: inRange, high: high, veryHigh: veryHigh,
+                    totalReadings: values.count
+                )
+            }.sorted { $0.date < $1.date }
+        }
+
+        private static func percentile(_ sorted: [Double], _ p: Double) -> Double {
+            let n = sorted.count
+            guard n > 0 else { return 0 }
+            let index = p * Double(n - 1)
+            let lower = Int(floor(index))
+            let upper = min(Int(ceil(index)), n - 1)
+            if lower == upper { return sorted[lower] }
+            let frac = index - Double(lower)
+            return sorted[lower] * (1 - frac) + sorted[upper] * frac
         }
     }
 }

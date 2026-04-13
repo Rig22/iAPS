@@ -5,8 +5,8 @@ struct MealsDonutIconView: View {
     let fat: Double
     let protein: Double
 
-    private let lineWidth: CGFloat = 4 //Donut Stärke
-    private let gap: Double = 15 //Lücke zwischen den Segmenten
+    private let lineWidth: CGFloat = 4 // Donut Stärke
+    private let gap: Double = 15 // Lücke zwischen den Segmenten
 
     private var total: Double {
         carbs + fat + protein

@@ -82,7 +82,59 @@ extension Stat {
 
             let filter = state.filterDate(for: state.selectedIntervalForGlucoseStats)
 
-            glucoseScatterCard(filter: filter)
+            // Chart type picker
+            HStack {
+                Text("Chart Type")
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+                    .lineLimit(1)
+                    .fixedSize(horizontal: true, vertical: false)
+                Spacer()
+                Picker("Glucose Chart Type", selection: $state.selectedGlucoseChartType) {
+                    Text(GlucoseChartType.percentileByTime.displayName)
+                        .tag(GlucoseChartType.percentileByTime)
+                    Text(GlucoseChartType.distribution.displayName)
+                        .tag(GlucoseChartType.distribution)
+                }
+                .pickerStyle(.menu)
+                .lineLimit(1)
+                .fixedSize(horizontal: true, vertical: false)
+            }.padding(.horizontal)
+
+            let agpData: [AGPSlot] = {
+                switch state.selectedIntervalForGlucoseStats {
+                case .today: return state.agpToday
+                case .day: return state.agpDay
+                case .week: return state.agpWeek
+                case .month: return state.agpMonth
+                case .total: return state.agpTotal
+                }
+            }()
+            let distributionData: [GlucoseDistributionSlot] = {
+                switch state.selectedIntervalForGlucoseStats {
+                case .today: return state.distributionToday
+                case .day: return state.distributionDay
+                case .week: return state.distributionWeek
+                case .month: return state.distributionMonth
+                case .total: return state.distributionTotal
+                }
+            }()
+
+            if state.selectedGlucoseChartType == .distribution {
+                GlucoseDistributionCard(
+                    distributionData: distributionData,
+                    selectedInterval: state.selectedIntervalForGlucoseStats
+                )
+            } else {
+                GlucoseAGPCard(
+                    agpData: agpData,
+                    highLimit: state.highLimit,
+                    lowLimit: state.lowLimit,
+                    units: state.units,
+                    selectedInterval: state.selectedIntervalForGlucoseStats
+                )
+            }
             glucoseOverviewCard(filter: filter)
         }
 
@@ -474,7 +526,7 @@ private struct GlucoseScatterCard: View {
 
 // MARK: - Conditional View Modifier
 
-private extension View {
+extension View {
     @ViewBuilder func `if`<Content: View>(_ condition: Bool, transform: (Self) -> Content) -> some View {
         if condition {
             transform(self)
@@ -504,6 +556,267 @@ private struct ScatterLegend: View {
                 .fill(color)
                 .frame(width: 8, height: 8)
             Text(label)
+        }
+    }
+}
+
+// MARK: - AGP (Ambulatory Glucose Profile) Card
+
+struct GlucoseAGPCard: View {
+    let agpData: [AGPSlot]
+    let highLimit: Decimal
+    let lowLimit: Decimal
+    let units: GlucoseUnits
+    var selectedInterval: StatsTimeIntervalWithToday = .week
+    @Environment(\.colorScheme) private var colorScheme
+
+    private let conversionFactor = 0.0555
+
+    var body: some View {
+        if agpData.isEmpty || agpData.allSatisfy({ $0.p50 == 0 }) {
+            StatCard {
+                ContentUnavailableView(
+                    NSLocalizedString("No Glucose Data", comment: ""),
+                    systemImage: "chart.bar.fill",
+                    description: Text("Glucose statistics will appear here once data is available.")
+                )
+            }
+        } else {
+            let highThreshold = units == .mmolL ? 180.0 * conversionFactor : 180.0
+            let lowThreshold = units == .mmolL ? 70.0 * conversionFactor : 70.0
+            let yMax = units == .mmolL ? 15.0 : 270.0
+
+            StatCard {
+                VStack(spacing: 12) {
+                    let showBands = !selectedInterval.isHourly
+
+                    Text(
+                        showBands
+                            ? NSLocalizedString("Ambulatory Glucose Profile", comment: "AGP chart title")
+                            : NSLocalizedString("Glucose", comment: "Glucose chart title")
+                    )
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .textCase(.uppercase)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Chart {
+                        // 10th–90th percentile band (only for W/M/3M)
+                        if showBands {
+                            ForEach(agpData) { slot in
+                                BarMark(
+                                    x: .value("Time", slot.date, unit: .minute),
+                                    yStart: .value("P10", slot.p10),
+                                    yEnd: .value("P90", slot.p90),
+                                    width: .fixed(4)
+                                )
+                                .foregroundStyle(Color.green.opacity(0.15))
+                            }
+
+                            // 25th–75th percentile band
+                            ForEach(agpData) { slot in
+                                BarMark(
+                                    x: .value("Time", slot.date, unit: .minute),
+                                    yStart: .value("P25", slot.p25),
+                                    yEnd: .value("P75", slot.p75),
+                                    width: .fixed(4)
+                                )
+                                .foregroundStyle(Color.green.opacity(0.35))
+                            }
+                        }
+
+                        // Glucose line
+                        ForEach(agpData) { slot in
+                            LineMark(
+                                x: .value("Time", slot.date),
+                                y: .value("Median", slot.p50)
+                            )
+                            .foregroundStyle(.green)
+                            .lineStyle(StrokeStyle(lineWidth: 2.5))
+                            .interpolationMethod(.catmullRom)
+                        }
+
+                        // Threshold lines
+                        RuleMark(y: .value("High", highThreshold))
+                            .foregroundStyle(.yellow)
+                            .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                        RuleMark(y: .value("Low", lowThreshold))
+                            .foregroundStyle(.red)
+                            .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                    }
+                    .chartLegend(.hidden)
+                    .chartXAxis {
+                        AxisMarks(values: .stride(by: .hour, count: 3)) { value in
+                            if let date = value.as(Date.self) {
+                                AxisValueLabel {
+                                    Text(String(format: "%02d", Calendar.current.component(.hour, from: date)))
+                                }
+                            }
+                            AxisGridLine()
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(values: [0, lowThreshold, highThreshold, yMax])
+                    }
+                    .frame(height: 140)
+
+                    // Legend
+                    HStack(spacing: 14) {
+                        HStack(spacing: 4) {
+                            RoundedRectangle(cornerRadius: 1)
+                                .fill(.green)
+                                .frame(width: 14, height: 2.5)
+                            Text(showBands ? "Median" : NSLocalizedString("Glucose", comment: ""))
+                        }
+                        if showBands {
+                            HStack(spacing: 4) {
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(.green.opacity(0.35))
+                                    .frame(width: 14, height: 10)
+                                Text("25–75%")
+                            }
+                            HStack(spacing: 4) {
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(.green.opacity(0.15))
+                                    .frame(width: 14, height: 10)
+                                Text("10–90%")
+                            }
+                        }
+                    }
+                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                }
+            }
+        }
+    }
+}
+
+// MARK: - Glucose Distribution Card
+
+struct GlucoseDistributionCard: View {
+    let distributionData: [GlucoseDistributionSlot]
+    let selectedInterval: StatsTimeIntervalWithToday
+    @Environment(\.colorScheme) private var colorScheme
+
+    private let rangeColors: [(label: String, color: Color)] = [
+        (NSLocalizedString("Very High", comment: ""), Color.orange.opacity(0.85)),
+        (NSLocalizedString("High", comment: ""), Color.yellow.opacity(0.85)),
+        (NSLocalizedString("In Range", comment: ""), Color.green),
+        (NSLocalizedString("Low", comment: ""), Color.red.opacity(0.75)),
+        (NSLocalizedString("Very Low", comment: ""), Color.red)
+    ]
+
+    private var isHourly: Bool { selectedInterval.isHourly }
+
+    private var barUnit: Calendar.Component { isHourly ? .hour : .day }
+
+    var body: some View {
+        if distributionData.isEmpty || distributionData.allSatisfy({ $0.inRange == 0 && $0.high == 0 && $0.low == 0 }) {
+            StatCard {
+                ContentUnavailableView(
+                    NSLocalizedString("No Glucose Data", comment: ""),
+                    systemImage: "chart.bar.fill",
+                    description: Text("Glucose statistics will appear here once data is available.")
+                )
+            }
+        } else {
+            StatCard {
+                VStack(spacing: 12) {
+                    Text(NSLocalizedString("Glucose Distribution", comment: "Distribution chart title"))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Chart {
+                        ForEach(distributionData) { slot in
+                            BarMark(
+                                x: .value("Date", slot.date, unit: barUnit),
+                                y: .value("Very Low", slot.veryLow)
+                            )
+                            .foregroundStyle(Color.red)
+
+                            BarMark(
+                                x: .value("Date", slot.date, unit: barUnit),
+                                y: .value("Low", slot.low)
+                            )
+                            .foregroundStyle(Color.red.opacity(0.75))
+
+                            BarMark(
+                                x: .value("Date", slot.date, unit: barUnit),
+                                y: .value("In Range", slot.inRange)
+                            )
+                            .foregroundStyle(Color.green)
+
+                            BarMark(
+                                x: .value("Date", slot.date, unit: barUnit),
+                                y: .value("High", slot.high)
+                            )
+                            .foregroundStyle(Color.yellow.opacity(0.85))
+
+                            BarMark(
+                                x: .value("Date", slot.date, unit: barUnit),
+                                y: .value("Very High", slot.veryHigh)
+                            )
+                            .foregroundStyle(Color.orange.opacity(0.85))
+                        }
+                    }
+                    .chartXAxis {
+                        if isHourly {
+                            AxisMarks(values: .stride(by: .hour, count: 3)) { value in
+                                if let date = value.as(Date.self) {
+                                    AxisValueLabel {
+                                        Text(String(format: "%02d", Calendar.current.component(.hour, from: date)))
+                                    }
+                                }
+                                AxisGridLine()
+                            }
+                        } else {
+                            AxisMarks(values: .automatic) { _ in
+                                AxisValueLabel(
+                                    format: selectedInterval == .week
+                                        ? .dateTime.weekday(.abbreviated)
+                                        : .dateTime.day().month(.abbreviated)
+                                )
+                                AxisGridLine()
+                            }
+                        }
+                    }
+                    .chartYAxis {
+                        AxisMarks(values: [0, 25, 50, 75, 100]) { value in
+                            AxisValueLabel {
+                                if let val = value.as(Int.self) {
+                                    Text("\(val)%")
+                                        .font(.caption)
+                                }
+                            }
+                            AxisGridLine()
+                        }
+                    }
+                    .chartYScale(domain: 0 ... 100)
+                    .chartLegend(.hidden)
+                    .if(selectedInterval == .total) { chart in
+                        chart
+                            .chartScrollableAxes(.horizontal)
+                            .chartXVisibleDomain(length: 30 * 24 * 3600)
+                    }
+                    .frame(height: 140)
+
+                    // Legend
+                    HStack(spacing: 10) {
+                        ForEach(Array(rangeColors.enumerated()), id: \.offset) { _, item in
+                            HStack(spacing: 4) {
+                                RoundedRectangle(cornerRadius: 2)
+                                    .fill(item.color)
+                                    .frame(width: 10, height: 10)
+                                Text(item.label)
+                            }
+                        }
+                    }
+                    .font(.system(size: 9, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                }
+            }
         }
     }
 }

@@ -83,11 +83,13 @@ enum StatsTimeInterval: String, CaseIterable, Identifiable {
 enum GlucoseChartType: String, CaseIterable {
     case sectorAndMetrics = "Overview"
     case percentileByTime = "Percentile"
+    case distribution = "Distribution"
 
     var displayName: String {
         switch self {
         case .sectorAndMetrics: return NSLocalizedString("Overview", comment: "")
         case .percentileByTime: return NSLocalizedString("Percentile", comment: "")
+        case .distribution: return NSLocalizedString("Distribution", comment: "")
         }
     }
 }
@@ -153,6 +155,16 @@ struct HourlyStats: Equatable {
     let percentile90: Double
 }
 
+struct AGPSlot: Identifiable {
+    let id: Int // minute of day (0, 30, 60, ...)
+    let date: Date // reference date for charting
+    let p10: Double
+    let p25: Double
+    let p50: Double
+    let p75: Double
+    let p90: Double
+}
+
 struct LoopStatsProcessedData: Identifiable {
     var id = UUID()
     let category: LoopStatsDataType
@@ -185,4 +197,15 @@ struct LoopStatsByPeriod: Identifiable {
     var total: Int { successful + failed }
     var successPercentage: Double { total > 0 ? Double(successful) / Double(total) * 100 : 0 }
     var id: Date { period }
+}
+
+struct GlucoseDistributionSlot: Identifiable {
+    let id: Date // calendar day
+    let date: Date
+    let veryLow: Double // <54 mg/dL (%)
+    let low: Double // 54–70 mg/dL (%)
+    let inRange: Double // 70–180 mg/dL (%)
+    let high: Double // 180–250 mg/dL (%)
+    let veryHigh: Double // >250 mg/dL (%)
+    let totalReadings: Int
 }
