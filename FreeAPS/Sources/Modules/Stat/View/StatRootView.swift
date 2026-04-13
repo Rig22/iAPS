@@ -604,36 +604,40 @@ struct GlucoseAGPCard: View {
                         // 10th–90th percentile band (only for W/M/3M)
                         if showBands {
                             ForEach(agpData) { slot in
-                                BarMark(
-                                    x: .value("Time", slot.date, unit: .minute),
+                                AreaMark(
+                                    x: .value("Time", slot.date),
                                     yStart: .value("P10", slot.p10),
                                     yEnd: .value("P90", slot.p90),
-                                    width: .fixed(4)
+                                    series: .value("Band", "10-90")
                                 )
-                                .foregroundStyle(Color.green.opacity(0.15))
+                                .foregroundStyle(by: .value("Series", "10-90%"))
+                                .opacity(slot.p50 > 0 ? 0.3 : 0)
                             }
 
                             // 25th–75th percentile band
                             ForEach(agpData) { slot in
-                                BarMark(
-                                    x: .value("Time", slot.date, unit: .minute),
+                                AreaMark(
+                                    x: .value("Time", slot.date),
                                     yStart: .value("P25", slot.p25),
                                     yEnd: .value("P75", slot.p75),
-                                    width: .fixed(4)
+                                    series: .value("Band", "25-75")
                                 )
-                                .foregroundStyle(Color.green.opacity(0.35))
+                                .foregroundStyle(by: .value("Series", "25-75%"))
+                                .opacity(slot.p50 > 0 ? 0.5 : 0)
                             }
                         }
 
-                        // Glucose line
+                        // Median / Glucose line
                         ForEach(agpData) { slot in
-                            LineMark(
-                                x: .value("Time", slot.date),
-                                y: .value("Median", slot.p50)
-                            )
-                            .foregroundStyle(.green)
-                            .lineStyle(StrokeStyle(lineWidth: 2.5))
-                            .interpolationMethod(.catmullRom)
+                            if slot.p50 > 0 {
+                                LineMark(
+                                    x: .value("Time", slot.date),
+                                    y: .value("Median", slot.p50),
+                                    series: .value("Line", "Median")
+                                )
+                                .foregroundStyle(by: .value("Series", "Median"))
+                                .lineStyle(StrokeStyle(lineWidth: 2))
+                            }
                         }
 
                         // Threshold lines
@@ -644,6 +648,11 @@ struct GlucoseAGPCard: View {
                             .foregroundStyle(.red)
                             .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
                     }
+                    .chartForegroundStyleScale([
+                        "10-90%": Color.blue.opacity(0.3),
+                        "25-75%": Color.blue.opacity(0.5),
+                        "Median": Color.blue
+                    ])
                     .chartLegend(.hidden)
                     .chartXAxis {
                         AxisMarks(values: .stride(by: .hour, count: 3)) { value in
@@ -664,20 +673,20 @@ struct GlucoseAGPCard: View {
                     HStack(spacing: 14) {
                         HStack(spacing: 4) {
                             RoundedRectangle(cornerRadius: 1)
-                                .fill(.green)
+                                .fill(.blue)
                                 .frame(width: 14, height: 2.5)
                             Text(showBands ? "Median" : NSLocalizedString("Glucose", comment: ""))
                         }
                         if showBands {
                             HStack(spacing: 4) {
                                 RoundedRectangle(cornerRadius: 2)
-                                    .fill(.green.opacity(0.35))
+                                    .fill(.blue.opacity(0.3))
                                     .frame(width: 14, height: 10)
                                 Text("25–75%")
                             }
                             HStack(spacing: 4) {
                                 RoundedRectangle(cornerRadius: 2)
-                                    .fill(.green.opacity(0.15))
+                                    .fill(.blue.opacity(0.15))
                                     .frame(width: 14, height: 10)
                                 Text("10–90%")
                             }
