@@ -2,4 +2,6 @@ enum Settings {
     enum Config {}
 }
 
-protocol SettingsProvider: Provider {}
+protocol SettingsProvider: Provider {
+    func runLoop()
+}

@@ -639,7 +639,7 @@ struct MainChartCanvas: View {
                     path.addEllipse(in: rect.rect)
                 }
             }
-        }.fill(Color.red)
+        }.fill(ZenPalette.daemmer)
     }
 
     private var glucoseView: some View {
@@ -651,7 +651,7 @@ struct MainChartCanvas: View {
                     path.addEllipse(in: rect.rect)
                 }
             }
-        }.fill(Color(.darkGreen))
+        }.fill(ZenPalette.salbei)
     }
 
     // Güner verlauf unter der GlucoseLinie
@@ -802,7 +802,7 @@ struct MainChartCanvas: View {
                     path.addEllipse(in: rect.rect)
                 }
             }
-        }.fill(.orange)
+        }.fill(ZenPalette.kamille)
     }
 
     private var glucosePeaksView: some View {

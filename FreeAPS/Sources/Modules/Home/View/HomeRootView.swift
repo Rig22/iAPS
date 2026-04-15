@@ -148,38 +148,85 @@ extension Home {
             _state = StateObject(wrappedValue: StateModel(resolver: resolver))
         }
 
-        var glucoseView: some View {
-            CurrentGlucoseView(
-                recentGlucose: $state.recentGlucose,
-                delta: $state.glucoseDelta,
-                units: $state.data.units,
-                alarm: $state.alarm,
-                lowGlucose: $state.data.lowGlucose,
-                highGlucose: $state.data.highGlucose,
-                alwaysUseColors: $state.alwaysUseColors,
-                displayDelta: $state.displayDelta,
-                scrolling: $displayGlucose, displaySAGE: $state.displaySAGE,
-                displayExpiration: $state.displayExpiration,
-                sensordays: $state.sensorDays,
-                timerDate: $state.data.timerDate,
-                displayeventualBG: $state.displayeventualBG
+        @ViewBuilder var glucoseView: some View {
+            if state.useBreathingOrb {
+                breathingOrbView
+                    .onTapGesture {
+                        if state.alarm == nil {
+                            state.openCGM()
+                        } else {
+                            state.showModal(for: .snooze)
+                        }
+                    }
+                    .onLongPressGesture {
+                        let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                        impactHeavy.impactOccurred()
+                        if state.alarm == nil {
+                            state.showModal(for: .snooze)
+                        } else {
+                            state.openCGM()
+                        }
+                    }
+            } else {
+                CurrentGlucoseView(
+                    recentGlucose: $state.recentGlucose,
+                    delta: $state.glucoseDelta,
+                    units: $state.data.units,
+                    alarm: $state.alarm,
+                    lowGlucose: $state.data.lowGlucose,
+                    highGlucose: $state.data.highGlucose,
+                    alwaysUseColors: $state.alwaysUseColors,
+                    displayDelta: $state.displayDelta,
+                    scrolling: $displayGlucose, displaySAGE: $state.displaySAGE,
+                    displayExpiration: $state.displayExpiration,
+                    sensordays: $state.sensorDays,
+                    timerDate: $state.data.timerDate,
+                    displayeventualBG: $state.displayeventualBG
+                )
+                .onTapGesture {
+                    if state.alarm == nil {
+                        state.openCGM()
+                    } else {
+                        state.showModal(for: .snooze)
+                    }
+                }
+                .onLongPressGesture {
+                    let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                    impactHeavy.impactOccurred()
+                    if state.alarm == nil {
+                        state.showModal(for: .snooze)
+                    } else {
+                        state.openCGM()
+                    }
+                }
+            }
+        }
+
+        /// Breathing Orb variant — Zen Breath humane-redesign glucose display.
+        private var breathingOrbView: some View {
+            let recent = state.recentGlucose
+            let glucoseMgDl = Decimal(recent?.glucose ?? 0)
+            let displayValue: Decimal = state.data.units == .mmolL
+                ? glucoseMgDl.asMmolL
+                : glucoseMgDl
+            // Show "minutes since last loop" rather than "minutes since last CGM tick" —
+            // the loop status is what tells the user the system is alive.
+            let minutesSinceLoop: Double? = state.lastLoopDate == .distantPast
+                ? nil
+                : -1 * state.lastLoopDate.timeIntervalSinceNow / 60
+
+            return BreathingGlucoseOrb(
+                glucose: displayValue,
+                units: state.data.units,
+                lowThreshold: state.data.lowGlucose,
+                highThreshold: state.data.highGlucose,
+                direction: recent?.direction,
+                delta: state.displayDelta ? state.glucoseDelta : nil,
+                minutesAgo: minutesSinceLoop,
+                size: 160
             )
-            .onTapGesture {
-                if state.alarm == nil {
-                    state.openCGM()
-                } else {
-                    state.showModal(for: .snooze)
-                }
-            }
-            .onLongPressGesture {
-                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                impactHeavy.impactOccurred()
-                if state.alarm == nil {
-                    state.showModal(for: .snooze)
-                } else {
-                    state.openCGM()
-                }
-            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 4)
         }
 
         var pumpView: some View {
@@ -506,16 +553,22 @@ extension Home {
                                         .fill(
                                             LinearGradient(
                                                 gradient: Gradient(colors: colorScheme == .dark ? [
-                                                    Color(red: 0.4, green: 0.7, blue: 1.0).opacity(0.6),
-                                                    Color(red: 0.1, green: 0.4, blue: 0.9).opacity(0.8),
-                                                    Color(red: 0.0, green: 0.2, blue: 0.7).opacity(1.0)
+                                                    ZenPalette.salbei.opacity(0.35),
+                                                    ZenPalette.daemmer.opacity(0.55)
                                                 ] : [
-                                                    Color(red: 0.7, green: 0.9, blue: 0.5).opacity(0.10),
-                                                    Color(red: 0.3, green: 0.8, blue: 0.6).opacity(0.15),
-                                                    Color(red: 0.1, green: 0.6, blue: 0.9).opacity(0.20)
+                                                    ZenPalette.salbei.opacity(0.18),
+                                                    ZenPalette.daemmer.opacity(0.22)
                                                 ]),
                                                 startPoint: .topLeading,
                                                 endPoint: .bottomTrailing
+                                            )
+                                        )
+                                        .overlay(
+                                            Circle().stroke(
+                                                colorScheme == .dark
+                                                    ? ZenPalette.strokeDark
+                                                    : ZenPalette.strokeLight,
+                                                lineWidth: 0.5
                                             )
                                         )
                                 )

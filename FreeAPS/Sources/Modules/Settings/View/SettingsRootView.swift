@@ -68,6 +68,16 @@ extension Settings {
                     } header: { Text("Devices") }
 
                     Section {
+                        Button {
+                            UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+                            state.runLoop()
+                        } label: {
+                            Label("Run Loop", systemImage: "arrow.clockwise")
+                        }
+                        Text("Statistics").navigationLink(to: .statistics, from: self)
+                    } header: { Text("Actions") }
+
+                    Section {
                         Text("Nightscout").navigationLink(to: .nighscoutConfig, from: self)
                         if HKHealthStore.isHealthDataAvailable() {
                             Text("Apple Health").navigationLink(to: .healthkit, from: self)

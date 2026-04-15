@@ -155,6 +155,7 @@
 		3811DE5D25C9D4D500A708ED /* Publisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3811DE5525C9D4D500A708ED /* Publisher.swift */; };
 		3811DE5F25C9D4D500A708ED /* ProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3811DE5725C9D4D500A708ED /* ProgressBar.swift */; };
 		3811DE6125C9D4D500A708ED /* ViewModifiers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3811DE5925C9D4D500A708ED /* ViewModifiers.swift */; };
+		BEA71B0000000000000000B1 /* ZenPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA71B0000000000000000B2 /* ZenPalette.swift */; };
 		3811DE8F25C9D80400A708ED /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3811DE8E25C9D80400A708ED /* User.swift */; };
 		3811DEA925C9D88300A708ED /* AppearanceManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3811DE9325C9D88200A708ED /* AppearanceManager.swift */; };
 		3811DEAB25C9D88300A708ED /* HTTPResponseStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3811DE9625C9D88300A708ED /* HTTPResponseStatus.swift */; };
@@ -228,6 +229,7 @@
 		38A504A425DD9C4000C5B9E8 /* UserDefaultsExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38A5049125DD9C4000C5B9E8 /* UserDefaultsExtensions.swift */; };
 		38A9260525F012D8009E3739 /* CarbRatios.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38A9260425F012D8009E3739 /* CarbRatios.swift */; };
 		38AAF85525FFF846004AF583 /* CurrentGlucoseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38AAF85425FFF846004AF583 /* CurrentGlucoseView.swift */; };
+		BEA71B0000000000000000A1 /* BreathingGlucoseOrb.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA71B0000000000000000A2 /* BreathingGlucoseOrb.swift */; };
 		38AAF8712600C1B0004AF583 /* MainChartView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38AAF8702600C1B0004AF583 /* MainChartView.swift */; };
 		38AEE73D25F0200C0013F05B /* FreeAPSSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38AEE73C25F0200C0013F05B /* FreeAPSSettings.swift */; };
 		38AEE75225F022080013F05B /* SettingsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38AEE75125F022080013F05B /* SettingsManager.swift */; };
@@ -848,6 +850,7 @@
 		3811DE5525C9D4D500A708ED /* Publisher.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Publisher.swift; sourceTree = "<group>"; };
 		3811DE5725C9D4D500A708ED /* ProgressBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ProgressBar.swift; sourceTree = "<group>"; };
 		3811DE5925C9D4D500A708ED /* ViewModifiers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ViewModifiers.swift; sourceTree = "<group>"; };
+		BEA71B0000000000000000B2 /* ZenPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZenPalette.swift; sourceTree = "<group>"; };
 		3811DE8E25C9D80400A708ED /* User.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 		3811DE9325C9D88200A708ED /* AppearanceManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppearanceManager.swift; sourceTree = "<group>"; };
 		3811DE9625C9D88300A708ED /* HTTPResponseStatus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HTTPResponseStatus.swift; sourceTree = "<group>"; };
@@ -929,6 +932,7 @@
 		38A5049125DD9C4000C5B9E8 /* UserDefaultsExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtensions.swift; sourceTree = "<group>"; };
 		38A9260425F012D8009E3739 /* CarbRatios.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CarbRatios.swift; sourceTree = "<group>"; };
 		38AAF85425FFF846004AF583 /* CurrentGlucoseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrentGlucoseView.swift; sourceTree = "<group>"; };
+		BEA71B0000000000000000A2 /* BreathingGlucoseOrb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingGlucoseOrb.swift; sourceTree = "<group>"; };
 		38AAF8702600C1B0004AF583 /* MainChartView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainChartView.swift; sourceTree = "<group>"; };
 		38AEE73C25F0200C0013F05B /* FreeAPSSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FreeAPSSettings.swift; sourceTree = "<group>"; };
 		38AEE75125F022080013F05B /* SettingsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsManager.swift; sourceTree = "<group>"; };
@@ -2065,6 +2069,7 @@
 			children = (
 				383420D525FFE38C002D46C1 /* LoopView.swift */,
 				38AAF85425FFF846004AF583 /* CurrentGlucoseView.swift */,
+				BEA71B0000000000000000A2 /* BreathingGlucoseOrb.swift */,
 				38DAB27F260CBB7F00F74C1A /* PumpView.swift */,
 				7987958C2F75B05A00DAE1A1 /* TopStatusPill.swift */,
 			);
@@ -2111,6 +2116,7 @@
 				38DF1785276A73D400B3528F /* TagCloudView.swift */,
 				389ECDFD2601061500D86C4F /* View+Snapshot.swift */,
 				3811DE5925C9D4D500A708ED /* ViewModifiers.swift */,
+				BEA71B0000000000000000B2 /* ZenPalette.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -3624,6 +3630,7 @@
 				38EA05DA261F6E7C0064E39B /* SimpleLogReporter.swift in Sources */,
 				F2C73D642EB6603900B700AB /* MainChartConfigProvider.swift in Sources */,
 				3811DE6125C9D4D500A708ED /* ViewModifiers.swift in Sources */,
+				BEA71B0000000000000000B1 /* ZenPalette.swift in Sources */,
 				3811DEAC25C9D88300A708ED /* NightscoutManager.swift in Sources */,
 				19A910302A24BF6300C8951B /* StatsView.swift in Sources */,
 				BD7DA9A92AE06E9200601B20 /* BolusCalculatorStateModel.swift in Sources */,
@@ -3851,6 +3858,7 @@
 				8BC2F5A29AD1ED08AC0EE013 /* AddTempTargetRootView.swift in Sources */,
 				38A00B1F25FC00F7006BC0B0 /* Autotune.swift in Sources */,
 				38AAF85525FFF846004AF583 /* CurrentGlucoseView.swift in Sources */,
+				BEA71B0000000000000000A1 /* BreathingGlucoseOrb.swift in Sources */,
 				F2159A4C2BA60A8E00A0B716 /* ContactTrickRootView.swift in Sources */,
 				041D1E995A6AE92E9289DC49 /* BolusDataFlow.swift in Sources */,
 				23888883D4EA091C88480FF2 /* BolusProvider.swift in Sources */,

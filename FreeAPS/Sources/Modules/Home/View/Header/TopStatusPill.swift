@@ -370,16 +370,19 @@ extension Home {
             ZStack(alignment: .leading) {
                 if colorScheme != .dark {
                     LinearGradient(gradient: Gradient(colors: [
-                        Color(red: 0.7, green: 0.9, blue: 0.5).opacity(0.1),
-                        Color(red: 0.1, green: 0.6, blue: 0.9).opacity(0.1)
+                        ZenPalette.salbei.opacity(0.12),
+                        ZenPalette.daemmer.opacity(0.14)
                     ]), startPoint: .topLeading, endPoint: .bottomTrailing)
                 } else {
-                    Color.white.opacity(0.05)
+                    LinearGradient(gradient: Gradient(colors: [
+                        ZenPalette.salbei.opacity(0.10),
+                        ZenPalette.daemmer.opacity(0.14)
+                    ]), startPoint: .topLeading, endPoint: .bottomTrailing)
                 }
 
                 if isBolusing, let progress = state.bolusProgress {
                     GeometryReader { geo in
-                        Color.blue.opacity(0.2)
+                        ZenPalette.daemmer.opacity(0.22)
                             .frame(width: geo.size.width * CGFloat(truncating: progress as NSNumber))
                     }
                 }

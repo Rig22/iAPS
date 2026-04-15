@@ -74,6 +74,7 @@ extension Home {
         @Published var tddActualAverage: Decimal = 0
         @Published var skipGlucoseChart: Bool = false
         @Published var displayDelta: Bool = false
+        @Published var useBreathingOrb: Bool = false
         @Published var openAPSSettings: Preferences?
         @Published var maxIOB: Decimal = 0
         @Published var maxCOB: Decimal = 0
@@ -220,6 +221,7 @@ extension Home {
             data.useCarbBars = settingsManager.settings.useCarbBars
             skipGlucoseChart = settingsManager.settings.skipGlucoseChart
             displayDelta = settingsManager.settings.displayDelta
+            useBreathingOrb = settingsManager.settings.useBreathingOrb
             maxIOB = settingsManager.preferences.maxIOB
             maxCOB = settingsManager.preferences.maxCOB
             autoisf = settingsManager.settings.autoisf
@@ -877,6 +879,7 @@ extension Home.StateModel:
         data.useCarbBars = settingsManager.settings.useCarbBars
         skipGlucoseChart = settingsManager.settings.skipGlucoseChart
         displayDelta = settingsManager.settings.displayDelta
+        useBreathingOrb = settingsManager.settings.useBreathingOrb
         maxIOB = settingsManager.preferences.maxIOB
         maxCOB = settingsManager.preferences.maxCOB
         autoisf = settingsManager.settings.autoisf
