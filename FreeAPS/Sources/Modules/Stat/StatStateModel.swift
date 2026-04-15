@@ -444,45 +444,21 @@ extension Stat {
                 hourlyValues[hour, default: []].append(Double(reading.glucose) * convert)
             }
 
+            // Only include hours that have actual readings — skip future/empty hours
             var result: [AGPSlot] = []
             let sortedHours = hourlyValues.sorted { $0.key < $1.key }
             for (idx, entry) in sortedHours.enumerated() {
                 let values = entry.value
-                if !values.isEmpty {
-                    let sorted = values.sorted()
-                    result.append(AGPSlot(
-                        id: idx, date: entry.key,
-                        p10: Self.percentile(sorted, 0.10),
-                        p25: Self.percentile(sorted, 0.25),
-                        p50: Self.percentile(sorted, 0.50),
-                        p75: Self.percentile(sorted, 0.75),
-                        p90: Self.percentile(sorted, 0.90)
-                    ))
-                } else {
-                    result.append(AGPSlot(id: idx, date: entry.key, p10: 0, p25: 0, p50: 0, p75: 0, p90: 0))
-                }
-            }
-
-            // Interpolate empty slots
-            let filledIds = Set(sortedHours.enumerated().filter { !$0.element.value.isEmpty }.map(\.offset))
-            for i in 0 ..< result.count where !filledIds.contains(i) {
-                let prev = (0 ..< i).last(where: { filledIds.contains($0) }).map { result[$0] }
-                let next = ((i + 1) ..< result.count).first(where: { filledIds.contains($0) }).map { result[$0] }
-                if let p = prev, let n = next {
-                    let t = Double(i - p.id) / Double(n.id - p.id)
-                    result[i] = AGPSlot(
-                        id: i, date: result[i].date,
-                        p10: p.p10 + (n.p10 - p.p10) * t,
-                        p25: p.p25 + (n.p25 - p.p25) * t,
-                        p50: p.p50 + (n.p50 - p.p50) * t,
-                        p75: p.p75 + (n.p75 - p.p75) * t,
-                        p90: p.p90 + (n.p90 - p.p90) * t
-                    )
-                } else if let p = prev {
-                    result[i] = AGPSlot(id: i, date: result[i].date, p10: p.p10, p25: p.p25, p50: p.p50, p75: p.p75, p90: p.p90)
-                } else if let n = next {
-                    result[i] = AGPSlot(id: i, date: result[i].date, p10: n.p10, p25: n.p25, p50: n.p50, p75: n.p75, p90: n.p90)
-                }
+                guard !values.isEmpty else { continue }
+                let sorted = values.sorted()
+                result.append(AGPSlot(
+                    id: idx, date: entry.key,
+                    p10: Self.percentile(sorted, 0.10),
+                    p25: Self.percentile(sorted, 0.25),
+                    p50: Self.percentile(sorted, 0.50),
+                    p75: Self.percentile(sorted, 0.75),
+                    p90: Self.percentile(sorted, 0.90)
+                ))
             }
 
             return result

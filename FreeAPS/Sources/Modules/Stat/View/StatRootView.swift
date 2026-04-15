@@ -601,52 +601,9 @@ struct GlucoseAGPCard: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                     Chart {
-                        // 10th–90th percentile band (only for W/M/3M)
-                        if showBands {
-                            ForEach(agpData) { slot in
-                                AreaMark(
-                                    x: .value("Time", slot.date),
-                                    yStart: .value("P10", slot.p10),
-                                    yEnd: .value("P90", slot.p90),
-                                    series: .value("Band", "10-90")
-                                )
-                                .foregroundStyle(by: .value("Series", "10-90%"))
-                                .opacity(slot.p50 > 0 ? 0.3 : 0)
-                            }
-
-                            // 25th–75th percentile band
-                            ForEach(agpData) { slot in
-                                AreaMark(
-                                    x: .value("Time", slot.date),
-                                    yStart: .value("P25", slot.p25),
-                                    yEnd: .value("P75", slot.p75),
-                                    series: .value("Band", "25-75")
-                                )
-                                .foregroundStyle(by: .value("Series", "25-75%"))
-                                .opacity(slot.p50 > 0 ? 0.5 : 0)
-                            }
-                        }
-
-                        // Median / Glucose line
-                        ForEach(agpData) { slot in
-                            if slot.p50 > 0 {
-                                LineMark(
-                                    x: .value("Time", slot.date),
-                                    y: .value("Median", slot.p50),
-                                    series: .value("Line", "Median")
-                                )
-                                .foregroundStyle(by: .value("Series", "Median"))
-                                .lineStyle(StrokeStyle(lineWidth: 2))
-                            }
-                        }
-
-                        // Threshold lines
-                        RuleMark(y: .value("High", highThreshold))
-                            .foregroundStyle(.yellow)
-                            .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
-                        RuleMark(y: .value("Low", lowThreshold))
-                            .foregroundStyle(.red)
-                            .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
+                        agpBands(showBands: showBands)
+                        agpMedianLine
+                        agpThresholds(high: highThreshold, low: lowThreshold)
                     }
                     .chartForegroundStyleScale([
                         "10-90%": Color.blue.opacity(0.3),
@@ -654,6 +611,13 @@ struct GlucoseAGPCard: View {
                         "Median": Color.blue
                     ])
                     .chartLegend(.hidden)
+                    .if(selectedInterval == .today) {
+                        $0
+                            .chartXScale(
+                                domain: Calendar.current.startOfDay(for: Date()) ... Calendar.current
+                                    .startOfDay(for: Date()).addingTimeInterval(86400)
+                            )
+                    }
                     .chartXAxis {
                         AxisMarks(values: .stride(by: .hour, count: 3)) { value in
                             if let date = value.as(Date.self) {
@@ -675,7 +639,7 @@ struct GlucoseAGPCard: View {
                             RoundedRectangle(cornerRadius: 1)
                                 .fill(.blue)
                                 .frame(width: 14, height: 2.5)
-                            Text(showBands ? "Median" : NSLocalizedString("Glucose", comment: ""))
+                            Text(showBands ? "Median" : NSLocalizedString("Glucose (Median/h)", comment: ""))
                         }
                         if showBands {
                             HStack(spacing: 4) {
@@ -697,6 +661,57 @@ struct GlucoseAGPCard: View {
                 }
             }
         }
+    }
+
+    // MARK: - Chart Content Helpers
+
+    @ChartContentBuilder private func agpBands(showBands: Bool) -> some ChartContent {
+        if showBands {
+            ForEach(agpData) { slot in
+                AreaMark(
+                    x: .value("Time", slot.date),
+                    yStart: .value("P10", slot.p10),
+                    yEnd: .value("P90", slot.p90),
+                    series: .value("Band", "10-90")
+                )
+                .foregroundStyle(by: .value("Series", "10-90%"))
+                .opacity(slot.p50 > 0 ? 0.3 : 0)
+            }
+
+            ForEach(agpData) { slot in
+                AreaMark(
+                    x: .value("Time", slot.date),
+                    yStart: .value("P25", slot.p25),
+                    yEnd: .value("P75", slot.p75),
+                    series: .value("Band", "25-75")
+                )
+                .foregroundStyle(by: .value("Series", "25-75%"))
+                .opacity(slot.p50 > 0 ? 0.5 : 0)
+            }
+        }
+    }
+
+    @ChartContentBuilder private var agpMedianLine: some ChartContent {
+        ForEach(agpData) { slot in
+            if slot.p50 > 0 {
+                LineMark(
+                    x: .value("Time", slot.date),
+                    y: .value("Median", slot.p50),
+                    series: .value("Line", "Median")
+                )
+                .foregroundStyle(by: .value("Series", "Median"))
+                .lineStyle(StrokeStyle(lineWidth: 2))
+            }
+        }
+    }
+
+    @ChartContentBuilder private func agpThresholds(high: Double, low: Double) -> some ChartContent {
+        RuleMark(y: .value("High", high))
+            .foregroundStyle(.yellow)
+            .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
+        RuleMark(y: .value("Low", low))
+            .foregroundStyle(.red)
+            .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
     }
 }
 
