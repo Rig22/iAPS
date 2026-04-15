@@ -148,41 +148,8 @@ extension Home {
             _state = StateObject(wrappedValue: StateModel(resolver: resolver))
         }
 
-        @ViewBuilder var glucoseView: some View {
-            if state.useBreathingOrb {
-                breathingOrbView
-                    .onTapGesture {
-                        if state.alarm == nil {
-                            state.openCGM()
-                        } else {
-                            state.showModal(for: .snooze)
-                        }
-                    }
-                    .onLongPressGesture {
-                        let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                        impactHeavy.impactOccurred()
-                        if state.alarm == nil {
-                            state.showModal(for: .snooze)
-                        } else {
-                            state.openCGM()
-                        }
-                    }
-            } else {
-                CurrentGlucoseView(
-                    recentGlucose: $state.recentGlucose,
-                    delta: $state.glucoseDelta,
-                    units: $state.data.units,
-                    alarm: $state.alarm,
-                    lowGlucose: $state.data.lowGlucose,
-                    highGlucose: $state.data.highGlucose,
-                    alwaysUseColors: $state.alwaysUseColors,
-                    displayDelta: $state.displayDelta,
-                    scrolling: $displayGlucose, displaySAGE: $state.displaySAGE,
-                    displayExpiration: $state.displayExpiration,
-                    sensordays: $state.sensorDays,
-                    timerDate: $state.data.timerDate,
-                    displayeventualBG: $state.displayeventualBG
-                )
+        var glucoseView: some View {
+            breathingOrbView
                 .onTapGesture {
                     if state.alarm == nil {
                         state.openCGM()
@@ -199,7 +166,6 @@ extension Home {
                         state.openCGM()
                     }
                 }
-            }
         }
 
         /// Breathing Orb variant — Zen Breath humane-redesign glucose display.

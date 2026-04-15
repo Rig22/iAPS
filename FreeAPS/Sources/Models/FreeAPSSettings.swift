@@ -89,8 +89,6 @@ struct FreeAPSSettings: JSON, Equatable {
     var birthDate = Date.distantPast
     var sexSetting: Int = 3
     var displayDelta: Bool = false
-    /// Zen Breath — use the Breathing Glucose Orb as primary glucose display.
-    var useBreathingOrb: Bool = false
     var profileID: String = "Hypo Treatment"
     var allowDilution: Bool = false
     var hideInsulinBadge: Bool = false
@@ -546,10 +544,6 @@ extension FreeAPSSettings: Decodable {
 
         if let displayDelta = try? container.decode(Bool.self, forKey: .displayDelta) {
             settings.displayDelta = displayDelta
-        }
-
-        if let useBreathingOrb = try? container.decode(Bool.self, forKey: .useBreathingOrb) {
-            settings.useBreathingOrb = useBreathingOrb
         }
 
         if let profileID = try? container.decode(String.self, forKey: .profileID) {
