@@ -145,6 +145,11 @@ extension Settings {
             nightscoutManager.uploadProfileAndSettings(force)
         }
 
+        func uploadPreviousDayLog() {
+            NSLog("SettingsState Upload Previous Day Log")
+            nightscoutManager.uploadPreviousDayLog()
+        }
+
         func hideSettingsModal() {
             hideModal()
         }

@@ -34,6 +34,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var high: Decimal = 145
     var low: Decimal = 70
     var uploadStats: Bool = false
+    var uploadLogs: Bool = false
     var hours: Int = 6
     var xGridLines: Bool = true
     var yGridLines: Bool = true
@@ -723,6 +724,10 @@ extension FreeAPSSettings: Decodable {
 
         if let displayeventualBG = try? container.decode(Bool.self, forKey: .displayeventualBG) {
             settings.displayeventualBG = displayeventualBG }
+
+        if let uploadLogs = try? container.decode(Bool.self, forKey: .uploadLogs) {
+            settings.uploadLogs = uploadLogs
+        }
 
         self = settings
     }
