@@ -219,7 +219,7 @@ private struct FoodItemsSelectorItemRow: View {
                             FoodItemThumbnail(imageURL: foodItem.imageURL)
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color.blue.opacity(0.3), lineWidth: 1)
+                                        .stroke(BreathePalette.daemmer.opacity(0.3), lineWidth: 1)
                                 )
                         } else {
                             RoundedRectangle(cornerRadius: 8)
@@ -265,7 +265,7 @@ private struct FoodItemsSelectorItemRow: View {
                         Button(action: isAdded ? onRemove : onAdd) {
                             Image(systemName: isAdded ? "checkmark.circle.fill" : "plus.circle.fill")
                                 .font(.system(size: 28))
-                                .foregroundColor(isAdded ? .green : .accentColor)
+                                .foregroundColor(isAdded ? BreathePalette.salbei : BreathePalette.daemmer)
                                 .symbolRenderingMode(.hierarchical)
                         }
                         .buttonStyle(.plain)
@@ -327,7 +327,7 @@ private struct FoodItemsSelectorItemRow: View {
                 } label: {
                     Label("Edit", systemImage: "pencil")
                 }
-                .tint(.orange)
+                .tint(BreathePalette.kamille)
             }
         }
         .when(onDelete != nil) { view in

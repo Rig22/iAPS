@@ -62,10 +62,10 @@ struct MealStatsView: View {
 
             // Legend
             HStack(spacing: 16) {
-                StatChartUtils.legendItem(label: NSLocalizedString("Carbs", comment: ""), color: .orange)
+                StatChartUtils.legendItem(label: NSLocalizedString("Carbs", comment: ""), color: BreathePalette.kamille)
                 if hasFatProtein {
-                    StatChartUtils.legendItem(label: NSLocalizedString("Fat", comment: ""), color: .red)
-                    StatChartUtils.legendItem(label: NSLocalizedString("Protein", comment: ""), color: .yellow)
+                    StatChartUtils.legendItem(label: NSLocalizedString("Fat", comment: ""), color: BreathePalette.daemmer)
+                    StatChartUtils.legendItem(label: NSLocalizedString("Protein", comment: ""), color: BreathePalette.flieder)
                 }
             }
 
@@ -78,7 +78,7 @@ struct MealStatsView: View {
                         x: .value("Date", stat.date, unit: selectedInterval.isHourly ? .hour : .day),
                         y: .value("Carbs", stat.carbs)
                     )
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(BreathePalette.kamille)
                     .cornerRadius(3)
                     .opacity(dimmed ? 0.35 : 1.0)
 
@@ -87,7 +87,7 @@ struct MealStatsView: View {
                             x: .value("Date", stat.date, unit: selectedInterval.isHourly ? .hour : .day),
                             y: .value("Fat", stat.fat)
                         )
-                        .foregroundStyle(.red)
+                        .foregroundStyle(BreathePalette.daemmer)
                         .cornerRadius(3)
                         .opacity(dimmed ? 0.35 : 1.0)
 
@@ -95,7 +95,7 @@ struct MealStatsView: View {
                             x: .value("Date", stat.date, unit: selectedInterval.isHourly ? .hour : .day),
                             y: .value("Protein", stat.protein)
                         )
-                        .foregroundStyle(.yellow)
+                        .foregroundStyle(BreathePalette.flieder)
                         .cornerRadius(3)
                         .opacity(dimmed ? 0.35 : 1.0)
                     }
@@ -131,7 +131,7 @@ struct MealStatsView: View {
                         : sel.date.formatted(.dateTime.weekday(.wide).day().month(.abbreviated))
                     InsulinBarDetailPopover(
                         title: title,
-                        color: .orange,
+                        color: BreathePalette.kamille,
                         items: mealPopoverItems(for: sel)
                     )
                     .transition(.scale.combined(with: .opacity))
@@ -186,9 +186,9 @@ struct MacroDistributionDonut: View {
     var body: some View {
         let total = carbs + fat + protein
         let slices: [MacroSlice] = [
-            MacroSlice(label: NSLocalizedString("Carbs", comment: ""), grams: carbs, color: .orange),
-            MacroSlice(label: NSLocalizedString("Fat", comment: ""), grams: fat, color: .red),
-            MacroSlice(label: NSLocalizedString("Protein", comment: ""), grams: protein, color: .yellow)
+            MacroSlice(label: NSLocalizedString("Carbs", comment: ""), grams: carbs, color: BreathePalette.kamille),
+            MacroSlice(label: NSLocalizedString("Fat", comment: ""), grams: fat, color: BreathePalette.daemmer),
+            MacroSlice(label: NSLocalizedString("Protein", comment: ""), grams: protein, color: BreathePalette.flieder)
         ]
 
         let totalKcal = carbs * 4 + protein * 4 + fat * 9
@@ -247,9 +247,9 @@ struct MacroDistributionDonut: View {
 
             // Kcal reference legend
             HStack(spacing: 12) {
-                kcalRefItem(color: .orange, text: "1 g " + NSLocalizedString("Carbs", comment: "") + " = 4 kcal")
-                kcalRefItem(color: .yellow, text: "1 g " + NSLocalizedString("Protein", comment: "") + " = 4 kcal")
-                kcalRefItem(color: .red, text: "1 g " + NSLocalizedString("Fat", comment: "") + " = 9 kcal")
+                kcalRefItem(color: BreathePalette.kamille, text: "1 g " + NSLocalizedString("Carbs", comment: "") + " = 4 kcal")
+                kcalRefItem(color: BreathePalette.flieder, text: "1 g " + NSLocalizedString("Protein", comment: "") + " = 4 kcal")
+                kcalRefItem(color: BreathePalette.daemmer, text: "1 g " + NSLocalizedString("Fat", comment: "") + " = 9 kcal")
             }
             .font(.system(size: 10, weight: .medium, design: .rounded))
             .foregroundStyle(.secondary)
@@ -276,7 +276,7 @@ struct MacroDistributionDonut: View {
         )
         .overlay(
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(Color.orange.opacity(0.25), lineWidth: 1)
+                .stroke(BreathePalette.kamille.opacity(0.25), lineWidth: 1)
         )
     }
 

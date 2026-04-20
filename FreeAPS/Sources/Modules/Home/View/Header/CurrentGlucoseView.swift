@@ -195,12 +195,12 @@ struct CurrentGlucoseView: View {
 
     private var colorOfGlucose: Color {
         let whichGlucose = recentGlucose?.glucose ?? 0
-        guard lowGlucose < highGlucose else { return ZenPalette.salbei }
+        guard lowGlucose < highGlucose else { return BreathePalette.salbei }
 
-        // Zen Breath palette — comparison stays in mg/dL (thresholds
+        // Breathe palette — comparison stays in mg/dL (thresholds
         // are stored in mg/dL in this view's bindings). Soft transition
         // band keeps the color from snapping at the boundary.
-        return ZenPalette.zoneColor(
+        return BreathePalette.zoneColor(
             value: Double(whichGlucose),
             low: NSDecimalNumber(decimal: lowGlucose).doubleValue,
             high: NSDecimalNumber(decimal: highGlucose).doubleValue,

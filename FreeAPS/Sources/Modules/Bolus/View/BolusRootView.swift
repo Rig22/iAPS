@@ -100,7 +100,7 @@ extension Bolus {
                         label: { Text(!(state.amount > state.maxBolus) ? "Enact bolus" : "Max Bolus exceeded!") }
                             .frame(maxWidth: .infinity, alignment: .center)
                             .disabled(state.amount > state.maxBolus)
-                            .listRowBackground((state.amount <= state.maxBolus) ? Color(.systemBlue) : Color(.systemGray4))
+                            .listRowBackground((state.amount <= state.maxBolus) ? BreathePalette.daemmer : Color(.systemGray4))
                             .tint(.white)
                     } else {
                         Button {

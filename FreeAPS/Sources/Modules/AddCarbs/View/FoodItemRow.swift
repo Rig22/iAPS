@@ -139,7 +139,7 @@ struct FoodItemRow: View {
                 } label: {
                     Label("Edit Portion", systemImage: "slider.horizontal.3")
                 }
-                .tint(.orange)
+                .tint(BreathePalette.kamille)
             }
         }
         .when(onPortionChange != nil) { view in

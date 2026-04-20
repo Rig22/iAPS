@@ -16,7 +16,7 @@ struct NoSearchesView: View {
                         }) {
                             CapabilityCard(
                                 icon: FoodItemSource.database.icon,
-                                iconColor: .orange,
+                                iconColor: BreathePalette.kamille,
                                 title: "Saved Foods",
                                 description: "Quick access to your frequently used foods",
                                 isDisabled: false
@@ -26,7 +26,7 @@ struct NoSearchesView: View {
                     } else {
                         CapabilityCard(
                             icon: FoodItemSource.database.icon,
-                            iconColor: .orange,
+                            iconColor: BreathePalette.kamille,
                             title: "Saved Foods",
                             description: "No saved foods",
                             isDisabled: true
@@ -36,7 +36,7 @@ struct NoSearchesView: View {
 
                 CapabilityCard(
                     icon: FoodItemSource.aiText.icon,
-                    iconColor: .blue,
+                    iconColor: BreathePalette.daemmer,
                     title: "Text Search",
                     description: "Search databases or describe food for AI analysis",
                     isDisabled: false
@@ -47,7 +47,7 @@ struct NoSearchesView: View {
                 }) {
                     CapabilityCard(
                         icon: FoodItemSource.barcode.icon,
-                        iconColor: .blue,
+                        iconColor: BreathePalette.daemmer,
                         title: "Barcode Scanner",
                         description: "Scan packaged foods for nutrition information",
                         isDisabled: false
@@ -60,7 +60,7 @@ struct NoSearchesView: View {
                 }) {
                     CapabilityCard(
                         icon: "camera.fill",
-                        iconColor: .purple,
+                        iconColor: BreathePalette.flieder,
                         title: "Photo Analysis",
                         description: "Snap a picture for AI-powered nutrition analysis. Long-press to choose from library.",
                         isDisabled: false
@@ -73,7 +73,7 @@ struct NoSearchesView: View {
                 }) {
                     CapabilityCard(
                         icon: FoodItemSource.manual.icon,
-                        iconColor: .green,
+                        iconColor: BreathePalette.salbei,
                         title: "Manual Entry",
                         description: "Enter nutrition information manually",
                         isDisabled: false
@@ -87,7 +87,7 @@ struct NoSearchesView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "camera.metering.center.weighted")
                         .font(.system(size: 14))
-                        .foregroundColor(.purple)
+                        .foregroundColor(BreathePalette.flieder)
                     Text("Photography Tips")
                         .font(.subheadline)
                         .fontWeight(.semibold)

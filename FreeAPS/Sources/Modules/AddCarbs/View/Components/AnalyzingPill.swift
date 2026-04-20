@@ -38,12 +38,14 @@ struct AnalyzingPill: View {
         // Local constants for palette and sizing
         let baseColors: [Color] = [
             Color.gray.opacity(0.22), Color.gray.opacity(0.22),
-            Color.teal.opacity(0.45), Color.yellow.opacity(0.45), Color.red.opacity(0.45), Color.purple.opacity(0.45),
+            BreathePalette.daemmer.opacity(0.45), BreathePalette.salbei.opacity(0.45),
+            BreathePalette.kamille.opacity(0.45), BreathePalette.flieder.opacity(0.45),
             Color.gray.opacity(0.22), Color.gray.opacity(0.22)
         ]
         let waveColors: [Color] = [
             .clear, .clear,
-            Color.teal.opacity(0.7), Color.yellow.opacity(0.7), Color.red.opacity(0.7), Color.purple.opacity(0.7),
+            BreathePalette.daemmer.opacity(0.7), BreathePalette.salbei.opacity(0.7),
+            BreathePalette.kamille.opacity(0.7), BreathePalette.flieder.opacity(0.7),
             .clear, .clear
         ]
 
@@ -159,7 +161,7 @@ struct AnalyzingPill: View {
             // Progress bar underneath the inner glow
             .background(
                 GeometryReader { geometry in
-                    let progressColor = progressState.isFinished ? Color.green : Color.cyan
+                    let progressColor = progressState.isFinished ? BreathePalette.salbei : BreathePalette.daemmer
                     let progressWidth = geometry.size.width * progress
 
                     Capsule()

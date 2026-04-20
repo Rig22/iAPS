@@ -162,7 +162,7 @@ extension AddCarbs {
                 }) {
                     Label("New", systemImage: "plus.circle.fill")
                         .font(.body.weight(.semibold))
-                        .foregroundColor(.blue)
+                        .foregroundColor(BreathePalette.daemmer)
                 }
             }
         }
@@ -225,7 +225,7 @@ extension AddCarbs {
                             } label: { Text("Now") }.buttonStyle(.borderless).foregroundColor(.secondary).padding(.trailing, 5)
                         } else {
                             Button { state.date = state.date.addingTimeInterval(-15.minutes.timeInterval) }
-                            label: { Image(systemName: "minus.circle") }.tint(.blue).buttonStyle(.borderless)
+                            label: { Image(systemName: "minus.circle") }.tint(BreathePalette.daemmer).buttonStyle(.borderless)
                             DatePicker(
                                 "Time",
                                 selection: $state.date,
@@ -235,7 +235,7 @@ extension AddCarbs {
                             Button {
                                 state.date = state.date.addingTimeInterval(15.minutes.timeInterval)
                             }
-                            label: { Image(systemName: "plus.circle") }.tint(.blue).buttonStyle(.borderless)
+                            label: { Image(systemName: "plus.circle") }.tint(BreathePalette.daemmer).buttonStyle(.borderless)
                         }
                     }
                 }
@@ -277,7 +277,7 @@ extension AddCarbs {
                         ) }
                         .disabled(empty)
                         .frame(maxWidth: .infinity, alignment: .center)
-                }.listRowBackground(!empty ? Color(.systemBlue) : Color(.systemGray4))
+                }.listRowBackground(!empty ? BreathePalette.daemmer : Color(.systemGray4))
                     .tint(.white)
             }
             .sheet(isPresented: $presentPresets, content: { presetView })
@@ -354,7 +354,7 @@ extension AddCarbs {
 
         @ViewBuilder private func proteinAndFat() -> some View {
             HStack {
-                Text("Fat").foregroundColor(.blue)
+                Text("Fat").foregroundColor(BreathePalette.daemmer)
                 Spacer()
                 DecimalTextField(
                     "0",
@@ -366,7 +366,7 @@ extension AddCarbs {
                 Text("grams").foregroundColor(.secondary)
             }
             HStack {
-                Text("Protein").foregroundColor(.green)
+                Text("Protein").foregroundColor(BreathePalette.salbei)
                 Spacer()
                 DecimalTextField(
                     "0",
@@ -525,7 +525,7 @@ extension AddCarbs {
                                 )
                             }
                         }.frame(maxWidth: .infinity, alignment: .center)
-                            .listRowBackground(Color(.systemBlue)).tint(.white)
+                            .listRowBackground(BreathePalette.daemmer).tint(.white)
                     }
                     header: { Text("Save") }
                 }
@@ -729,7 +729,7 @@ extension AddCarbs {
                     Button { save() }
                     label: { Text("Save") }
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .listRowBackground(!disabled ? Color(.systemBlue) : Color(.systemGray4))
+                        .listRowBackground(!disabled ? BreathePalette.daemmer : Color(.systemGray4))
                         .tint(.white)
                         .disabled(disabled)
                 }

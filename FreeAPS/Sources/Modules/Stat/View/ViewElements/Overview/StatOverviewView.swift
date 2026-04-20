@@ -287,7 +287,7 @@ private struct OverviewGlucoseCard: View {
         MiniCard(
             title: NSLocalizedString("Glucose", comment: ""),
             icon: "drop.fill",
-            color: .green,
+            color: BreathePalette.salbei,
             navigate: navigate
         ) {
             if total > 0 {
@@ -303,21 +303,21 @@ private struct OverviewGlucoseCard: View {
                             outerRadius: .ratio(0.88),
                             angularInset: 1.5
                         )
-                        .foregroundStyle(.orange).cornerRadius(4)
+                        .foregroundStyle(BreathePalette.kamille).cornerRadius(4)
                         SectorMark(
                             angle: .value("In Range", inRangeCount),
                             innerRadius: .ratio(0.618),
                             outerRadius: .ratio(0.88),
                             angularInset: 1.5
                         )
-                        .foregroundStyle(.green).cornerRadius(4)
+                        .foregroundStyle(BreathePalette.salbei).cornerRadius(4)
                         SectorMark(
                             angle: .value("Low", lowCount),
                             innerRadius: .ratio(0.618),
                             outerRadius: .ratio(0.88),
                             angularInset: 1.5
                         )
-                        .foregroundStyle(.red).cornerRadius(4)
+                        .foregroundStyle(BreathePalette.daemmer).cornerRadius(4)
                     }
                 }
 
@@ -337,7 +337,7 @@ private struct OverviewGlucoseCard: View {
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
             } else {
-                MiniNoData(icon: "drop.fill", color: .green)
+                MiniNoData(icon: "drop.fill", color: BreathePalette.salbei)
             }
         }
     }
@@ -354,7 +354,7 @@ private struct OverviewGlucoseCard: View {
 
         return PopoverData(
             title: NSLocalizedString("Glucose Details", comment: ""),
-            color: .green,
+            color: BreathePalette.salbei,
             items: [
                 (
                     NSLocalizedString("High", comment: "") + " (>\(formatGlucoseDecimal(highLimit)))",
@@ -420,14 +420,14 @@ private struct OverviewInsulinCard: View {
         MiniCard(
             title: NSLocalizedString("Insulin", comment: ""),
             icon: "syringe.fill",
-            color: Color(.insulin),
+            color: BreathePalette.daemmer,
             navigate: navigate
         ) {
             if hasData {
                 InteractiveDonut(showPopover: {
                     showPopover(PopoverData(
                         title: NSLocalizedString("Insulin Details", comment: ""),
-                        color: Color(.insulin),
+                        color: BreathePalette.daemmer,
                         items: [
                             (NSLocalizedString("Bolus", comment: ""), fmtU(todayBolus)),
                             (NSLocalizedString("Basal", comment: ""), fmtU(todayBasal)),
@@ -445,13 +445,13 @@ private struct OverviewInsulinCard: View {
                             innerRadius: .ratio(0.618), outerRadius: .ratio(0.88),
                             angularInset: 1.5
                         )
-                        .foregroundStyle(Color(.insulin)).cornerRadius(4)
+                        .foregroundStyle(BreathePalette.daemmer).cornerRadius(4)
                         SectorMark(
                             angle: .value("Basal", max(todayBasal, 0.001)),
                             innerRadius: .ratio(0.618), outerRadius: .ratio(0.88),
                             angularInset: 1.5
                         )
-                        .foregroundStyle(.cyan).cornerRadius(4)
+                        .foregroundStyle(BreathePalette.salbei).cornerRadius(4)
                     }
                 }
 
@@ -476,7 +476,7 @@ private struct OverviewInsulinCard: View {
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
             } else {
-                MiniNoData(icon: "syringe.fill", color: Color(.insulin))
+                MiniNoData(icon: "syringe.fill", color: BreathePalette.daemmer)
             }
         }
     }
@@ -516,7 +516,8 @@ private struct OverviewLoopingCard: View {
         let successful = loopStatuses.filter { $0.contains("Success") }.count
         let failed = total - successful
         let successPercent = total > 0 ? Double(successful) / Double(total) * 100 : 0
-        let badgeColor: Color = successPercent >= 95 ? .green : (successPercent >= 85 ? .orange : .red)
+        let badgeColor: Color = successPercent >= 95 ? BreathePalette.salbei :
+            (successPercent >= 85 ? BreathePalette.kamille : BreathePalette.daemmer)
 
         let durationArray = loopRecords.compactMap(\.duration)
         let medianDuration = StatChartUtils.medianCalculationDouble(array: durationArray) * 60
@@ -526,14 +527,14 @@ private struct OverviewLoopingCard: View {
         MiniCard(
             title: NSLocalizedString("Looping", comment: ""),
             icon: "arrow.triangle.2.circlepath",
-            color: .purple,
+            color: BreathePalette.flieder,
             navigate: navigate
         ) {
             if total > 0 {
                 InteractiveDonut(showPopover: {
                     showPopover(PopoverData(
                         title: NSLocalizedString("Loop Details", comment: ""),
-                        color: .purple,
+                        color: BreathePalette.flieder,
                         items: [
                             (NSLocalizedString("Successful", comment: ""), "\(successful)"),
                             (NSLocalizedString("Failed", comment: ""), "\(failed)"),
@@ -555,13 +556,13 @@ private struct OverviewLoopingCard: View {
                             innerRadius: .ratio(0.618), outerRadius: .ratio(0.88),
                             angularInset: 1.5
                         )
-                        .foregroundStyle(.purple).cornerRadius(4)
+                        .foregroundStyle(BreathePalette.flieder).cornerRadius(4)
                         SectorMark(
                             angle: .value("Failed", max(failed, 0)),
                             innerRadius: .ratio(0.618), outerRadius: .ratio(0.88),
                             angularInset: 1.5
                         )
-                        .foregroundStyle(.purple.opacity(0.35)).cornerRadius(4)
+                        .foregroundStyle(BreathePalette.flieder.opacity(0.35)).cornerRadius(4)
                     }
                 }
 
@@ -583,7 +584,7 @@ private struct OverviewLoopingCard: View {
                     .monospacedDigit()
                     .foregroundStyle(.secondary)
             } else {
-                MiniNoData(icon: "arrow.triangle.2.circlepath", color: .blue)
+                MiniNoData(icon: "arrow.triangle.2.circlepath", color: BreathePalette.flieder)
             }
         }
     }
@@ -603,7 +604,7 @@ private struct OverviewMealCard: View {
         MiniCard(
             title: NSLocalizedString("Meals", comment: ""),
             icon: "fork.knife",
-            color: .orange,
+            color: BreathePalette.kamille,
             navigate: navigate
         ) {
             if let stats, hasData {
@@ -614,7 +615,7 @@ private struct OverviewMealCard: View {
                 InteractiveDonut(showPopover: {
                     showPopover(PopoverData(
                         title: NSLocalizedString("Meal Details", comment: ""),
-                        color: .orange,
+                        color: BreathePalette.kamille,
                         items: mealPopoverItems(stats: stats, total: total, kcal: kcal),
                         origin: .bottomRight
                     ))
@@ -647,21 +648,21 @@ private struct OverviewMealCard: View {
                 }
 
                 HStack(spacing: 8) {
-                    macroDot(color: .orange, value: stats.carbs, total: total)
-                    if stats.fat > 0 { macroDot(color: .red, value: stats.fat, total: total) }
-                    if stats.protein > 0 { macroDot(color: .yellow, value: stats.protein, total: total) }
+                    macroDot(color: BreathePalette.kamille, value: stats.carbs, total: total)
+                    if stats.fat > 0 { macroDot(color: BreathePalette.daemmer, value: stats.fat, total: total) }
+                    if stats.protein > 0 { macroDot(color: BreathePalette.flieder, value: stats.protein, total: total) }
                 }
                 .font(.system(size: 11, weight: .medium, design: .rounded))
             } else {
-                MiniNoData(icon: "fork.knife", color: .orange)
+                MiniNoData(icon: "fork.knife", color: BreathePalette.kamille)
             }
         }
     }
 
     private func mealSections(_ stats: MealStats) -> [(value: Double, color: Color)] {
-        var result: [(value: Double, color: Color)] = [(.init(stats.carbs), .orange)]
-        if stats.fat > 0 { result.append((.init(stats.fat), .red)) }
-        if stats.protein > 0 { result.append((.init(stats.protein), .yellow)) }
+        var result: [(value: Double, color: Color)] = [(.init(stats.carbs), BreathePalette.kamille)]
+        if stats.fat > 0 { result.append((.init(stats.fat), BreathePalette.daemmer)) }
+        if stats.protein > 0 { result.append((.init(stats.protein), BreathePalette.flieder)) }
         return result
     }
 

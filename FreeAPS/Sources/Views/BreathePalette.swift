@@ -1,11 +1,7 @@
 import SwiftUI
 
-/// Central design palette for the Humane Redesign ("Zen Breath").
-///
-/// Single source of truth — any color that is part of the calm, humane
-/// design language should reference this enum instead of hardcoding RGB.
-/// Values were validated in `BreathingOrb.playground` before adoption.
-enum ZenPalette {
+/// Central design palette for the Humane Redesign ("Breathe").
+enum BreathePalette {
     // MARK: - Glucose zones
 
     /// In range — sage green. #8FB5A0
@@ -21,6 +17,25 @@ enum ZenPalette {
 
     /// Overrides / profiles — muted lavender. #B29ECC
     static let flieder = Color(red: 0.70, green: 0.62, blue: 0.80)
+
+    // MARK: - Swatch / status-tile variants
+
+    //
+    // Same hue family as the soft palette, but deeper and more saturated so
+    // white text reads cleanly even in light mode. The orb keeps the calm
+    // pastel originals — these are *only* for the status swatches.
+
+    /// IOB swatch — deeper dusk blue.
+    static let daemmerDeep = Color(red: 0.30, green: 0.44, blue: 0.66)
+
+    /// COB swatch — deeper sage.
+    static let salbeiDeep = Color(red: 0.40, green: 0.60, blue: 0.48)
+
+    /// Reservoir swatch — deeper warm tan.
+    static let kamilleDeep = Color(red: 0.82, green: 0.60, blue: 0.36)
+
+    /// Loop swatch — deeper lavender.
+    static let fliederDeep = Color(red: 0.58, green: 0.48, blue: 0.72)
 
     // MARK: - Surfaces
 

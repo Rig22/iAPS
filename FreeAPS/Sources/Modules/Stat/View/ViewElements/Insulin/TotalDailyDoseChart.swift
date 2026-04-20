@@ -60,7 +60,7 @@ struct TotalDailyDoseChart: View {
                         x: .value("Date", stat.date, unit: isHourly ? .hour : .day),
                         y: .value("TDD", stat.amount)
                     )
-                    .foregroundStyle(.blue.gradient)
+                    .foregroundStyle(BreathePalette.daemmer.gradient)
                     .cornerRadius(3)
                     .opacity(selectable && selectedStat != nil && selectedStat?.id != stat.id ? 0.35 : 1.0)
                 }
@@ -104,7 +104,7 @@ struct TotalDailyDoseChart: View {
                         : NSLocalizedString("TDD", comment: "")
                     InsulinBarDetailPopover(
                         title: title,
-                        color: .blue,
+                        color: BreathePalette.daemmer,
                         items: [
                             (
                                 label,

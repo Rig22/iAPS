@@ -23,11 +23,11 @@ struct LoopStatsView: View {
         HStack(alignment: .center, spacing: 14) {
             ZStack {
                 Circle()
-                    .fill(Color.purple.opacity(colorScheme == .dark ? 0.20 : 0.12))
+                    .fill(BreathePalette.flieder.opacity(colorScheme == .dark ? 0.20 : 0.12))
                     .frame(width: 56, height: 56)
                 Image(systemName: "arrow.triangle.2.circlepath")
                     .font(.system(size: 26, weight: .semibold))
-                    .foregroundStyle(Color.purple)
+                    .foregroundStyle(BreathePalette.flieder)
             }
 
             VStack(alignment: .leading, spacing: 2) {
@@ -52,7 +52,8 @@ struct LoopStatsView: View {
     }
 
     private func successBadge(percent: Double) -> some View {
-        let color: Color = percent >= 95 ? .green : (percent >= 85 ? .orange : .red)
+        let color: Color = percent >= 95 ? BreathePalette.salbei :
+            (percent >= 85 ? BreathePalette.kamille : BreathePalette.daemmer)
         return VStack(spacing: 2) {
             Text((percent / 100).formatted(.percent.grouping(.never).rounded().precision(.fractionLength(1))))
                 .font(.system(size: 16, weight: .bold, design: .rounded))
@@ -89,19 +90,19 @@ struct LoopStatsView: View {
         LazyVGrid(columns: columns, spacing: 10) {
             metricTile(
                 icon: "clock",
-                color: .cyan,
+                color: BreathePalette.salbei,
                 value: intervalText,
                 label: NSLocalizedString("Interval", comment: "")
             )
             metricTile(
                 icon: "timer",
-                color: .purple,
+                color: BreathePalette.flieder,
                 value: durationText,
                 label: NSLocalizedString("Duration", comment: "")
             )
             metricTile(
                 icon: "calendar",
-                color: .orange,
+                color: BreathePalette.kamille,
                 value: daysText,
                 label: NSLocalizedString("Days", comment: "")
             )

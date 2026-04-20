@@ -112,7 +112,7 @@ struct GlucoseSectorChart: View {
                 Text(formatPercentage(inRangePercentage))
                     .font(.system(size: 22, weight: .bold, design: .rounded))
                     .monospacedDigit()
-                    .foregroundStyle(.green)
+                    .foregroundStyle(BreathePalette.salbei)
                 Text(NSLocalizedString("Time in Range", comment: ""))
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
@@ -125,11 +125,11 @@ struct GlucoseSectorChart: View {
             } else {
                 ZStack {
                     Circle()
-                        .fill(Color.green.opacity(colorScheme == .dark ? 0.20 : 0.12))
+                        .fill(BreathePalette.salbei.opacity(colorScheme == .dark ? 0.20 : 0.12))
                         .frame(width: 56, height: 56)
                     Image(systemName: "drop.fill")
                         .font(.system(size: 26, weight: .semibold))
-                        .foregroundStyle(Color.green)
+                        .foregroundStyle(BreathePalette.salbei)
                 }
             }
         }
@@ -184,28 +184,28 @@ struct GlucoseSectorChart: View {
         LazyVGrid(columns: columns, spacing: 8) {
             metricTile(
                 icon: "arrow.down.circle.fill",
-                color: .red,
+                color: BreathePalette.daemmer,
                 value: formatPercentage(lowPercentage),
                 label: NSLocalizedString("Low", comment: ""),
                 sublabel: "< \(lowFormatted)"
             )
             metricTile(
                 icon: "checkmark.circle.fill",
-                color: .green,
+                color: BreathePalette.salbei,
                 value: formatPercentage(inRangePercentage),
                 label: NSLocalizedString("In Range", comment: ""),
                 sublabel: "\(lowFormatted)–\(highFormatted)"
             )
             metricTile(
                 icon: "arrow.up.circle.fill",
-                color: .orange,
+                color: BreathePalette.kamille,
                 value: formatPercentage(highPercentage),
                 label: NSLocalizedString("High", comment: ""),
                 sublabel: "> \(highFormatted)"
             )
             metricTile(
                 icon: "target",
-                color: .mint,
+                color: BreathePalette.salbei.opacity(0.7),
                 value: formatPercentage(tightPercentage),
                 label: NSLocalizedString("Tight Range", comment: ""),
                 sublabel: "\(tightLowFormatted)–\(tightHighFormatted)"
@@ -262,9 +262,9 @@ struct GlucoseSectorChart: View {
         let inRangeCount = total - highCount - lowCount
 
         return [
-            (.high, highCount, Decimal(highCount) / Decimal(total) * 100, .orange),
-            (.inRange, inRangeCount, Decimal(inRangeCount) / Decimal(total) * 100, .green),
-            (.low, lowCount, Decimal(lowCount) / Decimal(total) * 100, .red)
+            (.high, highCount, Decimal(highCount) / Decimal(total) * 100, BreathePalette.kamille),
+            (.inRange, inRangeCount, Decimal(inRangeCount) / Decimal(total) * 100, BreathePalette.salbei),
+            (.low, lowCount, Decimal(lowCount) / Decimal(total) * 100, BreathePalette.daemmer)
         ]
     }
 
@@ -292,7 +292,7 @@ struct GlucoseSectorChart: View {
 
             return RangeDetail(
                 title: NSLocalizedString("High Glucose", comment: ""),
-                color: .orange,
+                color: BreathePalette.kamille,
                 items: [
                     (
                         NSLocalizedString("Very High", comment: "") + " (>\(formatGlucoseInt(250)))",
@@ -315,7 +315,7 @@ struct GlucoseSectorChart: View {
 
             return RangeDetail(
                 title: NSLocalizedString("In Range", comment: ""),
-                color: .green,
+                color: BreathePalette.salbei,
                 items: [
                     (
                         NSLocalizedString("Normal", comment: ""),
@@ -339,7 +339,7 @@ struct GlucoseSectorChart: View {
 
             return RangeDetail(
                 title: NSLocalizedString("Low Glucose", comment: ""),
-                color: .red,
+                color: BreathePalette.daemmer,
                 items: [
                     (
                         NSLocalizedString("Low", comment: ""),

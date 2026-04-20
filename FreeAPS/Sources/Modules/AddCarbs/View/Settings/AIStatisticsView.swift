@@ -231,15 +231,15 @@ private struct StatTypeHeaderWithBadge: View {
                     .fontWeight(.semibold)
             }
             .foregroundColor(
-                stat.successRate >= 90 ? .green :
-                    stat.successRate >= 70 ? .orange : .red
+                stat.successRate >= 90 ? BreathePalette.salbei :
+                    stat.successRate >= 70 ? BreathePalette.kamille : BreathePalette.daemmer
             )
             .padding(.horizontal, 6)
             .padding(.vertical, 3)
             .background(
                 (
-                    stat.successRate >= 90 ? Color.green :
-                        stat.successRate >= 70 ? Color.orange : Color.red
+                    stat.successRate >= 90 ? BreathePalette.salbei :
+                        stat.successRate >= 70 ? BreathePalette.kamille : BreathePalette.daemmer
                 )
                 .opacity(0.15)
             )

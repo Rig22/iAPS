@@ -36,12 +36,15 @@ struct FoodSearchBar: View {
                             systemName: state.aiTextAnalysis ? FoodItemSource.aiText.icon : FoodItemSource.search.icon
                         )
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundColor(state.isBarcode ? .blue.opacity(0.5) : (state.aiTextAnalysis ? .purple : .blue))
+                        .foregroundColor(
+                            state.isBarcode ? BreathePalette.daemmer
+                                .opacity(0.5) : (state.aiTextAnalysis ? BreathePalette.flieder : BreathePalette.daemmer)
+                        )
                         .frame(width: 36, height: 36)
                         .background(
                             RoundedRectangle(cornerRadius: 10, style: .continuous)
                                 .fill(
-                                    (state.aiTextAnalysis ? Color.purple : Color.blue).opacity(0.12)
+                                    (state.aiTextAnalysis ? BreathePalette.flieder : BreathePalette.daemmer).opacity(0.12)
                                 )
                         )
                     }
@@ -128,11 +131,11 @@ struct FoodSearchBar: View {
                         } label: {
                             Image(systemName: FoodItemSource.manual.icon)
                                 .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.green)
+                                .foregroundColor(BreathePalette.salbei)
                                 .frame(width: 46, height: 46)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .fill(Color.green.opacity(0.12))
+                                        .fill(BreathePalette.salbei.opacity(0.12))
                                 )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -146,11 +149,11 @@ struct FoodSearchBar: View {
                         } label: {
                             Image(systemName: FoodItemSource.database.icon)
                                 .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.orange)
+                                .foregroundColor(BreathePalette.kamille)
                                 .frame(width: 46, height: 46)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .fill(Color.orange.opacity(0.12))
+                                        .fill(BreathePalette.kamille.opacity(0.12))
                                 )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -162,11 +165,11 @@ struct FoodSearchBar: View {
                         } label: {
                             Image(systemName: FoodItemSource.barcode.icon)
                                 .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.blue)
+                                .foregroundColor(BreathePalette.daemmer)
                                 .frame(width: 46, height: 46)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .fill(Color.blue.opacity(0.12))
+                                        .fill(BreathePalette.daemmer.opacity(0.12))
                                 )
                         }
                         .buttonStyle(PlainButtonStyle())
@@ -174,11 +177,11 @@ struct FoodSearchBar: View {
                         if rootState.ai {
                             Image(systemName: "camera.fill")
                                 .font(.system(size: 20, weight: .medium))
-                                .foregroundColor(.purple)
+                                .foregroundColor(BreathePalette.flieder)
                                 .frame(width: 46, height: 46)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .fill(Color.purple.opacity(0.12))
+                                        .fill(BreathePalette.flieder.opacity(0.12))
                                 )
                                 .contentShape(Rectangle())
                                 .onTapGesture {

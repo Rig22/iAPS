@@ -14,7 +14,7 @@ struct LoopBarChartView: View {
                     y: .value("Category", data.category.displayName)
                 )
                 .cornerRadius(5)
-                .foregroundStyle(data.category == .successfulLoop ? Color.purple : Color(red: 0.15, green: 0.2, blue: 0.55))
+                .foregroundStyle(data.category == .successfulLoop ? BreathePalette.flieder : BreathePalette.daemmer)
                 .annotation(position: .overlay) {
                     HStack {
                         Text(annotationText(for: data))

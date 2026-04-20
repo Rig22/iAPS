@@ -1,31 +1,22 @@
 import Foundation
 import SwiftUI
 
-private func adaptiveNutritionColor(_ color: Color, colorScheme: ColorScheme) -> Color {
-    guard colorScheme == .light else { return color }
-    switch color {
-    case .orange: return Color(red: 0.85, green: 0.45, blue: 0.0)
-    case .green: return Color(red: 0.0, green: 0.6, blue: 0.0)
-    case .red: return Color(red: 0.8, green: 0.0, blue: 0.0)
-    case .blue: return Color(red: 0.0, green: 0.4, blue: 0.8)
-    case .purple: return Color(red: 0.6, green: 0.0, blue: 0.6)
-    case .gray: return Color(red: 0.4, green: 0.4, blue: 0.4)
-    default: return color
-    }
+private func adaptiveNutritionColor(_ color: Color, colorScheme _: ColorScheme) -> Color {
+    color // BreathePalette colors are already adaptive
 }
 
 enum NutritionBadgeConfig {
-    static let caloriesColor = Color.gray
+    static let caloriesColor = Color.primary.opacity(0.45)
 }
 
 extension NutrientType {
     var badgeColor: Color {
         switch self {
-        case .carbs: Color.orange
-        case .protein: Color.green
-        case .fat: Color.blue
-        case .fiber: Color.purple
-        case .sugars: Color.purple
+        case .carbs: BreathePalette.kamille
+        case .protein: BreathePalette.salbei
+        case .fat: BreathePalette.daemmer
+        case .fiber: BreathePalette.flieder
+        case .sugars: BreathePalette.flieder
         }
     }
 }
@@ -33,9 +24,9 @@ extension NutrientType {
 extension ConfidenceLevel {
     var color: Color {
         switch self {
-        case .high: return .green
-        case .medium: return .orange
-        case .low: return .red
+        case .high: return BreathePalette.salbei
+        case .medium: return BreathePalette.kamille
+        case .low: return BreathePalette.daemmer
         }
     }
 

@@ -606,9 +606,9 @@ struct GlucoseAGPCard: View {
                         agpThresholds(high: highThreshold, low: lowThreshold)
                     }
                     .chartForegroundStyleScale([
-                        "10-90%": Color.blue.opacity(0.3),
-                        "25-75%": Color.blue.opacity(0.5),
-                        "Median": Color.blue
+                        "10-90%": BreathePalette.daemmer.opacity(0.3),
+                        "25-75%": BreathePalette.daemmer.opacity(0.5),
+                        "Median": BreathePalette.daemmer
                     ])
                     .chartLegend(.hidden)
                     .if(selectedInterval == .today) {
@@ -637,20 +637,20 @@ struct GlucoseAGPCard: View {
                     HStack(spacing: 14) {
                         HStack(spacing: 4) {
                             RoundedRectangle(cornerRadius: 1)
-                                .fill(.blue)
+                                .fill(BreathePalette.daemmer)
                                 .frame(width: 14, height: 2.5)
                             Text(showBands ? "Median" : NSLocalizedString("Glucose (Median/h)", comment: ""))
                         }
                         if showBands {
                             HStack(spacing: 4) {
                                 RoundedRectangle(cornerRadius: 2)
-                                    .fill(.blue.opacity(0.3))
+                                    .fill(BreathePalette.daemmer.opacity(0.3))
                                     .frame(width: 14, height: 10)
                                 Text("25–75%")
                             }
                             HStack(spacing: 4) {
                                 RoundedRectangle(cornerRadius: 2)
-                                    .fill(.blue.opacity(0.15))
+                                    .fill(BreathePalette.daemmer.opacity(0.15))
                                     .frame(width: 14, height: 10)
                                 Text("10–90%")
                             }
@@ -707,10 +707,10 @@ struct GlucoseAGPCard: View {
 
     @ChartContentBuilder private func agpThresholds(high: Double, low: Double) -> some ChartContent {
         RuleMark(y: .value("High", high))
-            .foregroundStyle(.yellow)
+            .foregroundStyle(BreathePalette.kamille)
             .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
         RuleMark(y: .value("Low", low))
-            .foregroundStyle(.red)
+            .foregroundStyle(BreathePalette.daemmer)
             .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 3]))
     }
 }
@@ -723,11 +723,11 @@ struct GlucoseDistributionCard: View {
     @Environment(\.colorScheme) private var colorScheme
 
     private let rangeColors: [(label: String, color: Color)] = [
-        (NSLocalizedString("Very High", comment: ""), Color.orange.opacity(0.85)),
-        (NSLocalizedString("High", comment: ""), Color.yellow.opacity(0.85)),
-        (NSLocalizedString("In Range", comment: ""), Color.green),
-        (NSLocalizedString("Low", comment: ""), Color.red.opacity(0.75)),
-        (NSLocalizedString("Very Low", comment: ""), Color.red)
+        (NSLocalizedString("Very High", comment: ""), BreathePalette.kamille),
+        (NSLocalizedString("High", comment: ""), BreathePalette.kamille.opacity(0.6)),
+        (NSLocalizedString("In Range", comment: ""), BreathePalette.salbei),
+        (NSLocalizedString("Low", comment: ""), BreathePalette.daemmer.opacity(0.7)),
+        (NSLocalizedString("Very Low", comment: ""), BreathePalette.daemmer)
     ]
 
     private var isHourly: Bool { selectedInterval.isHourly }
@@ -758,31 +758,31 @@ struct GlucoseDistributionCard: View {
                                 x: .value("Date", slot.date, unit: barUnit),
                                 y: .value("Very Low", slot.veryLow)
                             )
-                            .foregroundStyle(Color.red)
+                            .foregroundStyle(BreathePalette.daemmer)
 
                             BarMark(
                                 x: .value("Date", slot.date, unit: barUnit),
                                 y: .value("Low", slot.low)
                             )
-                            .foregroundStyle(Color.red.opacity(0.75))
+                            .foregroundStyle(BreathePalette.daemmer.opacity(0.7))
 
                             BarMark(
                                 x: .value("Date", slot.date, unit: barUnit),
                                 y: .value("In Range", slot.inRange)
                             )
-                            .foregroundStyle(Color.green)
+                            .foregroundStyle(BreathePalette.salbei)
 
                             BarMark(
                                 x: .value("Date", slot.date, unit: barUnit),
                                 y: .value("High", slot.high)
                             )
-                            .foregroundStyle(Color.yellow.opacity(0.85))
+                            .foregroundStyle(BreathePalette.kamille.opacity(0.6))
 
                             BarMark(
                                 x: .value("Date", slot.date, unit: barUnit),
                                 y: .value("Very High", slot.veryHigh)
                             )
-                            .foregroundStyle(Color.orange.opacity(0.85))
+                            .foregroundStyle(BreathePalette.kamille)
                         }
                     }
                     .chartXAxis {

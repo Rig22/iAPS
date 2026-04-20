@@ -85,16 +85,16 @@ struct CollapsibleTagsSection: View {
                                     .textCase(.uppercase)
                                     .kerning(0.5)
                             }
-                            .foregroundColor(.blue)
+                            .foregroundColor(BreathePalette.daemmer)
                             .padding(.horizontal, 10)
                             .padding(.vertical, 5)
                             .background(
                                 RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                    .fill(Color.blue.opacity(0.08))
+                                    .fill(BreathePalette.daemmer.opacity(0.08))
                             )
                             .overlay(
                                 RoundedRectangle(cornerRadius: 6, style: .continuous)
-                                    .strokeBorder(Color.blue.opacity(0.35), lineWidth: 1.0)
+                                    .strokeBorder(BreathePalette.daemmer.opacity(0.35), lineWidth: 1.0)
                             )
                         }
                         .buttonStyle(.plain)

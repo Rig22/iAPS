@@ -50,7 +50,7 @@ struct BreathingGlucoseOrb: View {
     /// Returns the orb's primary color, interpolating across a narrow band
     /// around each threshold so there are no visible "snaps" between zones.
     private var zoneColor: Color {
-        ZenPalette.zoneColor(
+        BreathePalette.zoneColor(
             value: NSDecimalNumber(decimal: glucose).doubleValue,
             low: NSDecimalNumber(decimal: lowThreshold).doubleValue,
             high: NSDecimalNumber(decimal: highThreshold).doubleValue,
@@ -94,17 +94,17 @@ struct BreathingGlucoseOrb: View {
         }
     }
 
-    /// Formatted delta string, or nil if delta is absent / too small to matter.
+    /// Formatted delta string. Always shown when a delta is available — it's
+    /// a primary signal (rate of change), not noise.
     private var deltaString: String? {
         guard let delta = delta else { return nil }
-        // Only surface a delta when it's actually a signal — otherwise it's noise.
         if units == .mmolL {
             let mmol = Double(delta) * 0.0555
-            if abs(mmol) < 0.3 { return nil }
+            if mmol == 0 { return "±0,0" }
             let sign = mmol > 0 ? "+" : "−"
-            return String(format: "%@%.1f", sign, abs(mmol))
+            return String(format: "%@%.1f", sign, abs(mmol)).replacingOccurrences(of: ".", with: ",")
         } else {
-            if abs(delta) < 5 { return nil }
+            if delta == 0 { return "±0" }
             let sign = delta > 0 ? "+" : "−"
             return "\(sign)\(abs(delta))"
         }
@@ -123,27 +123,19 @@ struct BreathingGlucoseOrb: View {
         VStack(spacing: 10) {
             orb
 
-            // Satellite row — arrow + minutes + delta, all tiny and humble.
+            // Satellite row — only trend arrow + minutes (delta moved into the orb).
             HStack(spacing: 8) {
                 if let angle = directionAngle {
                     Image(systemName: "arrow.up")
-                        .font(.system(size: 11, weight: .light))
+                        .font(.system(size: 12, weight: .regular))
                         .rotationEffect(.degrees(angle))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.primary)
                         .animation(.easeInOut(duration: 0.6), value: angle)
                 }
                 if let m = minutesAgoString {
                     Text(m)
                         .font(.system(size: 12, weight: .regular, design: .serif))
-                        .foregroundStyle(.secondary)
-                }
-                if let d = deltaString {
-                    Text("·")
-                        .font(.system(size: 12))
-                        .foregroundStyle(.tertiary)
-                    Text(d)
-                        .font(.system(size: 12, weight: .regular, design: .serif))
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(.primary.opacity(0.5))
                 }
             }
             .frame(minHeight: 16)
@@ -158,9 +150,9 @@ struct BreathingGlucoseOrb: View {
             ZStack {
                 // Outer soft glow — breathes slightly more than the orb itself.
                 Circle()
-                    .fill(color.opacity(0.18))
-                    .blur(radius: 24)
-                    .scaleEffect(scale * 1.08)
+                    .fill(color.opacity(0.10))
+                    .blur(radius: 18)
+                    .scaleEffect(scale * 1.06)
 
                 // Main orb — radial gradient, center slightly brighter.
                 Circle()
@@ -182,7 +174,7 @@ struct BreathingGlucoseOrb: View {
                 Circle()
                     .fill(
                         RadialGradient(
-                            colors: [Color.white.opacity(0.35), Color.white.opacity(0.0)],
+                            colors: [Color.white.opacity(0.16), Color.white.opacity(0.0)],
                             center: UnitPoint(x: 0.35, y: 0.3),
                             startRadius: 2,
                             endRadius: size / 3
@@ -191,11 +183,20 @@ struct BreathingGlucoseOrb: View {
                     .scaleEffect(scale)
                     .blendMode(.plusLighter)
 
-                // Glucose number — humanistic serif for warmth.
-                Text(glucoseString)
-                    .font(.system(size: size * 0.24, weight: .light, design: .serif))
-                    .foregroundStyle(Color.white.opacity(0.95))
-                    .shadow(color: .black.opacity(0.15), radius: 2, x: 0, y: 1)
+                // Glucose number + delta — stacked, both centered inside the orb.
+                VStack(spacing: 2) {
+                    Text(glucoseString)
+                        .font(.system(size: size * 0.24, weight: .light, design: .serif))
+                        .foregroundStyle(Color.white.opacity(0.95))
+                        .shadow(color: .black.opacity(0.15), radius: 2, x: 0, y: 1)
+                    if let d = deltaString {
+                        Text(d)
+                            .font(.system(size: size * 0.085, weight: .regular, design: .serif))
+                            .foregroundStyle(Color.white.opacity(0.85))
+                            .shadow(color: .black.opacity(0.12), radius: 1, x: 0, y: 1)
+                            .contentTransition(.numericText())
+                    }
+                }
             }
             .frame(width: size, height: size)
             .animation(.easeInOut(duration: 1.2), value: color)

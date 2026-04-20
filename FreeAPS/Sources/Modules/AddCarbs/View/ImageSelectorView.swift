@@ -270,7 +270,7 @@ struct ImageSelectorView: View {
 
                         Image(systemName: "photo.on.rectangle.angled")
                             .font(.system(size: 20, weight: .medium))
-                            .foregroundColor(.blue)
+                            .foregroundColor(BreathePalette.daemmer)
                     }
 
                     VStack(alignment: .leading, spacing: 2) {

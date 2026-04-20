@@ -29,11 +29,11 @@ struct InsulinStatsTileView: View {
         HStack(alignment: .center, spacing: 14) {
             ZStack {
                 Circle()
-                    .fill(Color(.insulin).opacity(colorScheme == .dark ? 0.20 : 0.12))
+                    .fill(BreathePalette.daemmer.opacity(colorScheme == .dark ? 0.20 : 0.12))
                     .frame(width: 56, height: 56)
                 Image(systemName: "syringe.fill")
                     .font(.system(size: 24, weight: .semibold))
-                    .foregroundStyle(Color(.insulin))
+                    .foregroundStyle(BreathePalette.daemmer)
             }
 
             VStack(alignment: .leading, spacing: 2) {
@@ -65,7 +65,7 @@ struct InsulinStatsTileView: View {
             Text("\(neg)")
                 .font(.system(size: 15, weight: .bold, design: .rounded))
                 .monospacedDigit()
-                .foregroundStyle(.red)
+                .foregroundStyle(BreathePalette.daemmer)
             Text(NSLocalizedString("neg min", comment: "Negative insulin minutes"))
                 .font(.system(size: 9, weight: .medium, design: .rounded))
                 .foregroundStyle(.secondary)
@@ -75,7 +75,7 @@ struct InsulinStatsTileView: View {
         .padding(.vertical, 6)
         .background(
             RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(Color.red.opacity(colorScheme == .dark ? 0.18 : 0.12))
+                .fill(BreathePalette.daemmer.opacity(colorScheme == .dark ? 0.18 : 0.12))
         )
     }
 
@@ -90,21 +90,21 @@ struct InsulinStatsTileView: View {
         return LazyVGrid(columns: columns, spacing: 8) {
             metricTile(
                 icon: "1.circle.fill",
-                color: .cyan,
+                color: BreathePalette.salbei,
                 value: formatTDD(tddYesterday),
                 unit: NSLocalizedString("U", comment: "Unit"),
                 label: NSLocalizedString("Yesterday", comment: "")
             )
             metricTile(
                 icon: "2.circle.fill",
-                color: .purple,
+                color: BreathePalette.flieder,
                 value: formatTDD(tdd2DaysAgo),
                 unit: NSLocalizedString("U", comment: "Unit"),
                 label: NSLocalizedString("2 Days", comment: "")
             )
             metricTile(
                 icon: "3.circle.fill",
-                color: .orange,
+                color: BreathePalette.kamille,
                 value: formatTDD(tdd3DaysAgo),
                 unit: NSLocalizedString("U", comment: "Unit"),
                 label: NSLocalizedString("3 Days", comment: "")
@@ -134,7 +134,7 @@ struct InsulinStatsTileView: View {
     private func deltaTile(value: Decimal, label: String) -> some View {
         let isUp = value > 0
         let isDown = value < 0
-        let color: Color = isUp ? .orange : (isDown ? .green : .secondary)
+        let color: Color = isUp ? BreathePalette.kamille : (isDown ? BreathePalette.salbei : .secondary)
         let icon: String = isUp ? "arrow.up.right" : (isDown ? "arrow.down.right" : "equal")
 
         return VStack(spacing: 3) {

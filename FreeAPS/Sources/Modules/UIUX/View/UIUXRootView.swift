@@ -43,15 +43,7 @@ extension UIUX {
                 } header: { Text("Main Chart") }
 
                 Section {
-                    /*   Toggle("Display Temp Targets Button", isOn: $state.useTargetButton)*/
-                    Toggle("Display Profile Override Button", isOn: $state.profileButton)
-                    Toggle("Display Meal Button", isOn: $state.carbButton)
-                } header: { Text("Home View Button Panel ") }
-
-                Section {
-                    /*   Toggle("Never display the small glucose chart when scrolling", isOn: $state.skipGlucoseChart)*/
-                    Toggle("Always Color Glucose Value (green, yellow etc)", isOn: $state.alwaysUseColors)
-                    Toggle("Display Glucose Delta", isOn: $state.displayDelta)
+                    /*   Toggle("Display Glucose Delta", isOn: $state.displayDelta)*/
                     Toggle("Display Eventual Glucose", isOn: $state.displayeventualBG)
                     Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
                     Toggle("Display Sensor Age", isOn: $state.displaySAGE)
@@ -79,9 +71,6 @@ extension UIUX {
                         DecimalTextField("0", value: $state.high, formatter: glucoseFormatter)
                         Text(state.units.rawValue).foregroundColor(.secondary)
                     }
-                    Toggle("Override HbA1c Unit", isOn: $state.overrideHbA1cUnit)
-                    Toggle("Standing / Laying TIR Chart", isOn: $state.oneDimensionalGraph)
-
                 } header: { Text("Statistics settings ") }
 
                 Section {

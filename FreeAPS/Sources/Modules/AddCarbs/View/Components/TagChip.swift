@@ -14,7 +14,7 @@ struct TagChip: View {
 
     private var tagColor: Color {
         if isFavorites {
-            return Color.purple
+            return BreathePalette.flieder
         }
         return stableColor(for: tag)
     }

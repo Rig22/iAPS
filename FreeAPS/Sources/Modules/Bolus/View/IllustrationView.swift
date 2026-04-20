@@ -171,7 +171,7 @@ struct IllustrationView: View {
                     } else {
                         Text(entry.formula)
                         Text((formatter.string(for: entry.insulin) ?? "") + NSLocalizedString(" U", comment: "Insulin unit"))
-                            .font(.title3).bold().foregroundStyle(.blue)
+                            .font(.title3).bold().foregroundStyle(BreathePalette.daemmer)
                     }
                 }
 

@@ -55,11 +55,11 @@ struct LoopingCard: View {
                                         .monospacedDigit()
                                 }
                                 .font(.system(size: 12, weight: .semibold, design: .rounded))
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(BreathePalette.kamille)
                                 .padding(.horizontal, 8)
                                 .padding(.vertical, 4)
                                 .background(
-                                    Capsule().fill(Color.orange.opacity(0.15))
+                                    Capsule().fill(BreathePalette.kamille.opacity(0.15))
                                 )
                             }
                             .buttonStyle(.plain)
@@ -170,7 +170,7 @@ private struct ErrorDetailsPopover: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
                 Image(systemName: "exclamationmark.triangle.fill")
-                    .foregroundStyle(.orange)
+                    .foregroundStyle(BreathePalette.kamille)
                 Text(NSLocalizedString("Most Frequent Error", comment: "Loop Statistics pop-up"))
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
             }

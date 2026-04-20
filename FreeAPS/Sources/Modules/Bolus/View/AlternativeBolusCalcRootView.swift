@@ -117,11 +117,11 @@ extension Bolus {
                             }, label: {
                                 Image(systemName: "info.bubble")
                                     .symbolRenderingMode(.palette)
-                                    .foregroundStyle(colorScheme == .light ? .black : .white, .blue)
+                                    .foregroundStyle(colorScheme == .light ? .black : .white, BreathePalette.daemmer)
                                     .font(.infoSymbolFont)
                                 Text("Calculations")
                             })
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(BreathePalette.daemmer)
                                 .font(.footnote)
                                 .buttonStyle(PlainButtonStyle())
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -203,7 +203,7 @@ extension Bolus {
                         label: { Text(exceededMaxBolus ? "Max Bolus exceeded!" : "Enact bolus") }
                             .frame(maxWidth: .infinity, alignment: .center)
                             .disabled(disabled)
-                            .listRowBackground(!disabled ? Color(.systemBlue) : Color(.systemGray4))
+                            .listRowBackground(!disabled ? BreathePalette.daemmer : Color(.systemGray4))
                             .tint(.white)
                     }
                     footer: {
@@ -231,14 +231,14 @@ extension Bolus {
                                 Text("Continue without bolus")
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .listRowBackground(Color(.systemBlue))
+                        .listRowBackground(BreathePalette.daemmer)
                         .tint(.white)
                     }
                     footer: {
                         if (-1 * state.loopDate.timeIntervalSinceNow / 60) > state.loopReminder, let string = state.lastLoop() {
                             Text(NSLocalizedString(string, comment: "Bolus View footer"))
                                 .padding(.top, 20).multilineTextAlignment(.center)
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(BreathePalette.kamille)
                         }
                     }
                 }
@@ -320,7 +320,7 @@ extension Bolus {
                 VStack {
                     Button { showInfo = false }
                     label: { Text("Hide") }.frame(maxWidth: .infinity, alignment: .center)
-                        .tint(.blue)
+                        .tint(BreathePalette.daemmer)
                 }.padding(.bottom, 20)
             }
             .background(

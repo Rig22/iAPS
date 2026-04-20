@@ -483,7 +483,7 @@ struct ElegantBackground: ViewModifier {
                             .fill(Color.white)
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .stroke(ZenPalette.strokeLight, lineWidth: 1)
+                                    .stroke(BreathePalette.strokeLight, lineWidth: 1)
                             )
                             .shadow(color: Color.black.opacity(0.06), radius: 12, x: 0, y: 8)
                             .shadow(color: Color.black.opacity(0.04), radius: 2, x: 0, y: 1)
@@ -492,7 +492,7 @@ struct ElegantBackground: ViewModifier {
                             .fill(Color.white.opacity(0.01))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                    .stroke(ZenPalette.strokeDark, lineWidth: 1)
+                                    .stroke(BreathePalette.strokeDark, lineWidth: 1)
                             )
                             .shadow(color: .black.opacity(0.05), radius: 4, x: 0, y: 2)
                     }

@@ -118,11 +118,11 @@ struct PortionAdjusterView: View {
                             unit
                     )
                     .font(.system(size: 32, weight: .bold))
-                    .foregroundColor(.orange)
+                    .foregroundColor(BreathePalette.kamille)
                 case .perServing:
                     Text(String(format: "%.2f×", sliderValue))
                         .font(.system(size: 32, weight: .bold))
-                        .foregroundColor(.orange)
+                        .foregroundColor(BreathePalette.kamille)
                 }
             }
 
@@ -131,17 +131,17 @@ struct PortionAdjusterView: View {
                     Button(action: stepDown) {
                         Image(systemName: "minus.circle.fill")
                             .font(.title2)
-                            .foregroundColor(sliderValue <= sliderMin ? .secondary : .orange)
+                            .foregroundColor(sliderValue <= sliderMin ? .secondary : BreathePalette.kamille)
                     }
                     .disabled(sliderValue <= sliderMin)
 
                     Slider(value: $sliderValue, in: sliderMin ... sliderUpperBound, step: sliderStep)
-                        .tint(.orange)
+                        .tint(BreathePalette.kamille)
 
                     Button(action: stepUp) {
                         Image(systemName: "plus.circle.fill")
                             .font(.title2)
-                            .foregroundColor(.orange)
+                            .foregroundColor(BreathePalette.kamille)
                     }
                 }
 
@@ -200,8 +200,8 @@ struct PortionAdjusterView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color.blue.opacity(0.1))
-                    .foregroundColor(.blue)
+                    .background(BreathePalette.daemmer.opacity(0.1))
+                    .foregroundColor(BreathePalette.daemmer)
                     .cornerRadius(10)
                 }
                 .padding(.horizontal)
@@ -218,8 +218,8 @@ struct PortionAdjusterView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)
-                    .background(Color.blue.opacity(0.1))
-                    .foregroundColor(.blue)
+                    .background(BreathePalette.daemmer.opacity(0.1))
+                    .foregroundColor(BreathePalette.daemmer)
                     .cornerRadius(10)
                 }
                 .padding(.horizontal)

@@ -145,10 +145,6 @@ extension Settings {
             nightscoutManager.uploadProfileAndSettings(force)
         }
 
-        func runLoop() {
-            provider.runLoop()
-        }
-
         func hideSettingsModal() {
             hideModal()
         }

@@ -563,7 +563,7 @@ private struct FoodItemGroupListSection: View {
                             HStack(spacing: 0) {
                                 Image(systemName: "info.circle")
                                     .font(.system(size: 18, weight: .medium))
-                                    .foregroundColor(.blue)
+                                    .foregroundColor(BreathePalette.daemmer)
                                     .frame(width: 44, height: 44)
                                     .contentShape(Rectangle())
                                 Image(systemName: foodItemGroup.source.icon)
@@ -690,7 +690,7 @@ private struct DeletedFoodItemRow: View {
                         .font(.caption)
                         .fontWeight(.medium)
                 }
-                .foregroundColor(.blue)
+                .foregroundColor(BreathePalette.daemmer)
                 .padding(.horizontal, 10)
                 .padding(.vertical, 6)
                 .background(Color.blue.opacity(0.15))

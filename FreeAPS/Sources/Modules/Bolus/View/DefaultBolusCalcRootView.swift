@@ -99,11 +99,11 @@ extension Bolus {
                             }, label: {
                                 Image(systemName: "info.bubble")
                                     .symbolRenderingMode(.palette)
-                                    .foregroundStyle(colorScheme == .light ? .black : .white, .blue)
+                                    .foregroundStyle(colorScheme == .light ? .black : .white, BreathePalette.daemmer)
                                     .font(.infoSymbolFont)
                                 Text("Calculations")
                             })
-                                .foregroundStyle(.blue)
+                                .foregroundStyle(BreathePalette.daemmer)
                                 .font(.footnote)
                                 .buttonStyle(PlainButtonStyle())
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -170,7 +170,7 @@ extension Bolus {
                         label: { Text(!(state.amount > state.maxBolus) ? "Enact bolus" : "Max Bolus exceeded!") }
                             .frame(maxWidth: .infinity, alignment: .center)
                             .disabled(disabled)
-                            .listRowBackground(!disabled ? Color(.systemBlue) : Color(.systemGray4))
+                            .listRowBackground(!disabled ? BreathePalette.daemmer : Color(.systemGray4))
                             .tint(.white)
                     }
                     footer: {
@@ -197,14 +197,14 @@ extension Bolus {
                                 Text("Save Meal without bolus") :
                                 Text("Continue without bolus") }
                             .frame(maxWidth: .infinity, alignment: .center)
-                            .listRowBackground(Color(.systemBlue))
+                            .listRowBackground(BreathePalette.daemmer)
                             .tint(.white)
                     }
                     footer: {
                         if abs(state.loopDate.timeIntervalSinceNow / 60) > state.loopReminder, let string = state.lastLoop() {
                             Text(NSLocalizedString(string, comment: "Bolus View footer"))
                                 .padding(.top, 20).multilineTextAlignment(.center)
-                                .foregroundStyle(.orange)
+                                .foregroundStyle(BreathePalette.kamille)
                         }
                     }
                 }
@@ -327,7 +327,7 @@ extension Bolus {
                                 " U",
                                 comment: "Unit in number of units delivered (keep the space character!)"
                             )
-                            let color: Color = (state.fraction != 1 && state.insulin > 0) ? .secondary : .blue
+                            let color: Color = (state.fraction != 1 && state.insulin > 0) ? .secondary : BreathePalette.daemmer
                             let fontWeight: Font.Weight = (state.fraction != 1 && state.insulin > 0) ? .regular : .bold
                             HStack {
                                 Text(NSLocalizedString("Insulin recommended", comment: "") + ":")
@@ -343,7 +343,7 @@ extension Bolus {
 
                                     Text(
                                         state.insulinCalculated.formatted() + unit
-                                    ).fontWeight(fontWeight).font(.title3).foregroundStyle(.blue).bold()
+                                    ).fontWeight(fontWeight).font(.title3).foregroundStyle(BreathePalette.daemmer).bold()
                                 }
                             }
                         }
@@ -369,7 +369,7 @@ extension Bolus {
                         VStack {
                             Button { presentInfo = false }
                             label: { Text("Hide") }.frame(maxWidth: .infinity, alignment: .center)
-                                .tint(.blue)
+                                .tint(BreathePalette.daemmer)
                         }.padding(.bottom, 10)
                     }
                 }

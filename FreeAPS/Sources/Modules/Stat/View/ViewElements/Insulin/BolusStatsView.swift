@@ -71,8 +71,8 @@ struct BolusStatsView: View {
 
             // Legend
             HStack(spacing: 16) {
-                StatChartUtils.legendItem(label: NSLocalizedString("Bolus", comment: ""), color: .blue)
-                StatChartUtils.legendItem(label: NSLocalizedString("Basal", comment: ""), color: .cyan)
+                StatChartUtils.legendItem(label: NSLocalizedString("Bolus", comment: ""), color: BreathePalette.daemmer)
+                StatChartUtils.legendItem(label: NSLocalizedString("Basal", comment: ""), color: BreathePalette.salbei)
             }
 
             // Chart
@@ -83,7 +83,7 @@ struct BolusStatsView: View {
                         x: .value("Date", stat.date, unit: isHourly ? .hour : .day),
                         y: .value("Bolus", stat.manualBolus)
                     )
-                    .foregroundStyle(.blue)
+                    .foregroundStyle(BreathePalette.daemmer)
                     .cornerRadius(3)
                     .opacity(dimmed ? 0.35 : 1.0)
 
@@ -91,7 +91,7 @@ struct BolusStatsView: View {
                         x: .value("Date", stat.date, unit: isHourly ? .hour : .day),
                         y: .value("Basal", stat.external)
                     )
-                    .foregroundStyle(.cyan)
+                    .foregroundStyle(BreathePalette.salbei)
                     .cornerRadius(3)
                     .opacity(dimmed ? 0.35 : 1.0)
                 }
@@ -132,7 +132,7 @@ struct BolusStatsView: View {
                         : sel.date.formatted(.dateTime.weekday(.wide).day().month(.abbreviated))
                     InsulinBarDetailPopover(
                         title: title,
-                        color: .blue,
+                        color: BreathePalette.daemmer,
                         items: [
                             (
                                 NSLocalizedString("Bolus", comment: ""),
