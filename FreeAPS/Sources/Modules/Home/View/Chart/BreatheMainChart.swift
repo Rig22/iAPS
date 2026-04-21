@@ -204,31 +204,25 @@ extension Home {
                     .foregroundStyle(.primary)
                     .padding(.horizontal, 10)
                     .padding(.vertical, 5)
-                    .background(
-                        Capsule()
-                            .fill(.thinMaterial)
-                            .overlay(Capsule().stroke(BreathePalette.daemmer.opacity(0.2), lineWidth: 0.5))
-                            .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
-                    )
+                /* .background(
+                     Capsule()
+                         .fill(.thinMaterial)
+                         .overlay(Capsule().stroke(BreathePalette.daemmer.opacity(0.2), lineWidth: 0.5))
+                         .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
+                 ) */
                 Spacer()
                 Button(action: cycleHours) {
-                    HStack(spacing: 5) {
-                        Image(systemName: "clock")
-                            .font(.system(size: 10, weight: .medium))
-                            .foregroundStyle(BreathePalette.daemmer)
-                        Text("\(data.screenHours) h")
-                            .font(.system(size: 11, weight: .regular, design: .serif))
-                            .foregroundStyle(.primary)
-                            .contentTransition(.numericText())
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .background(
-                        Capsule()
-                            .fill(.thinMaterial)
-                            .overlay(Capsule().stroke(BreathePalette.daemmer.opacity(0.2), lineWidth: 0.5))
-                            .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
-                    )
+                    Image(systemName: "clock")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(BreathePalette.daemmer)
+                        .padding(.horizontal, 8)
+                        .padding(.vertical, 5)
+                        .background(
+                            Capsule()
+                                .fill(.thinMaterial)
+                                .overlay(Capsule().stroke(BreathePalette.daemmer.opacity(0.2), lineWidth: 0.5))
+                                .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
+                        )
                 }
                 .buttonStyle(.plain)
             }
@@ -447,6 +441,28 @@ extension Home {
                 }()
 
                 ZStack {
+                    // Notenblatt-Andeutung: 5 dezente horizontale Linien im
+                    // Bereich der Bolus-Lanes, wie ein klassisches Notensystem.
+                    Canvas { ctx, size in
+                        let lineYs: [CGFloat] = [30, 42, 54, 66, 78]
+                        let color = labelColor.opacity(colorScheme == .dark ? 0.12 : 0.08)
+                        for y in lineYs {
+                            var p = Path()
+                            p.move(to: CGPoint(x: 0, y: y))
+                            p.addLine(to: CGPoint(x: size.width, y: y))
+                            ctx.stroke(p, with: .color(color), lineWidth: 0.4)
+                        }
+                    }
+                    .frame(width: w, height: eventStaveHeight)
+                    .allowsHitTesting(false)
+
+                    // Violinschlüssel links am Notensystem
+                    Text("𝄞")
+                        .font(.system(size: 58, weight: .regular))
+                        .foregroundStyle(labelColor.opacity(colorScheme == .dark ? 0.18 : 0.14))
+                        .position(x: 10, y: 52)
+                        .allowsHitTesting(false)
+
                     ForEach(events) { ev in
                         let frac = ev.date.timeIntervalSince(winStart) / total
                         if frac >= -0.05, frac <= 1.05 {

@@ -154,12 +154,12 @@ extension Home {
             breathingOrbView
                 .overlay(alignment: .topLeading) {
                     sensorBadgeView
-                        .padding(.leading, 20)
+                        .padding(.leading, 10)
                         .padding(.top, 6)
                 }
                 .overlay(alignment: .topTrailing) {
                     eventualBadgeView
-                        .padding(.trailing, 20)
+                        .padding(.trailing, 10)
                         .padding(.top, 6)
                 }
                 .onTapGesture {
