@@ -257,11 +257,12 @@ extension Home {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .background(
                 RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(.ultraThinMaterial)
+                    .fill(colorScheme == .dark ? Color.white.opacity(0.06) : Color.white)
             )
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .shadow(color: .black.opacity(colorScheme == .dark ? 0.22 : 0.07), radius: 8, y: 3)
             .padding(.horizontal, 10)
             .onAppear {
                 scrollPosition = visibleStart
