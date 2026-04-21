@@ -466,7 +466,8 @@ extension Home {
                     ForEach(events) { ev in
                         let frac = ev.date.timeIntervalSince(winStart) / total
                         if frac >= -0.05, frac <= 1.05 {
-                            let x = max(12, min(w - 12, frac * w))
+                            // Clef occupies ~36pt on the left — keep events clear of it.
+                            let x = max(38, min(w - 12, frac * w))
                             let y: Double = {
                                 switch ev.kind {
                                 case .bolus:
