@@ -463,11 +463,15 @@ extension Home {
                         .position(x: 10, y: 52)
                         .allowsHitTesting(false)
 
+                    // Schlüssel belegt ~38pt links; Events, deren echte X-Position
+                    // dort oder davor liegt, gelten als "hinter dem Schlüssel" und
+                    // werden nicht gezeichnet — kein Stau, sauberes Rein-/Rausscrollen.
+                    let clefEndX: Double = 38
                     ForEach(events) { ev in
                         let frac = ev.date.timeIntervalSince(winStart) / total
-                        if frac >= -0.05, frac <= 1.05 {
-                            // Clef occupies ~36pt on the left — keep events clear of it.
-                            let x = max(38, min(w - 12, frac * w))
+                        let naturalX = frac * w
+                        if naturalX >= clefEndX, naturalX <= w - 12 {
+                            let x = naturalX
                             let y: Double = {
                                 switch ev.kind {
                                 case .bolus:
