@@ -4265,7 +4265,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = "$(APP_VERSION)";
+				MARKETING_VERSION = 8.2.1;
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					CoreNFC,
@@ -4319,7 +4319,7 @@
 					"$(inherited)",
 					"$(SDKROOT)/usr/lib/swift",
 				);
-				MARKETING_VERSION = "$(APP_VERSION)";
+				MARKETING_VERSION = 8.2.1;
 				OTHER_LDFLAGS = (
 					"-weak_framework",
 					CoreNFC,
@@ -4374,7 +4374,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = "$(APP_VERSION)";
+				MARKETING_VERSION = 8.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_IDENTIFIER).watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -4418,7 +4418,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = "$(APP_VERSION)";
+				MARKETING_VERSION = 8.2.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "$(BUNDLE_IDENTIFIER).watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;

@@ -48,6 +48,16 @@ extension Settings {
                             )
                         }
 
+                        HStack {
+                            Text("Design by")
+                                .textCase(nil)
+                            Spacer()
+                            Image("rig22")
+                                .resizable()
+                                .aspectRatio(contentMode: .fit)
+                                .frame(height: 36)
+                        }
+
                         if let latest = fetchedVersionNumber.first, let nr = latest.nr, nr > state.versionNumber {
                             Text("Newer release availabe at GitHub: " + nr)
                                 .foregroundStyle(.orange).bold()

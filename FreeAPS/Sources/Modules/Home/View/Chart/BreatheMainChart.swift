@@ -9,6 +9,16 @@ extension Home {
         @State private var selectedEventID: String? = nil
         @State private var scrollPosition = Date()
 
+        /// Returns the currently selected event ID *only* when it still
+        /// points to an event that exists in the current `events` list.
+        /// Prevents a permanent "frosted glass" fade on all events when a
+        /// Loop refresh replaces the events array and the previously
+        /// selected ID is no longer present.
+        private var effectiveSelectedID: String? {
+            guard let sel = selectedEventID else { return nil }
+            return events.contains(where: { $0.id == sel }) ? sel : nil
+        }
+
         // MARK: Domain
 
         private var now: Date { Date() }
@@ -214,7 +224,7 @@ extension Home {
                 Button(action: cycleHours) {
                     Image(systemName: "clock")
                         .font(.system(size: 11, weight: .medium))
-                        .foregroundStyle(BreathePalette.daemmer)
+                        .foregroundStyle(.primary)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 5)
                         .background(
@@ -271,6 +281,21 @@ extension Home {
                 guard drift < Double(data.screenHours) * 1800 else { return }
                 withAnimation(.linear(duration: 0.25)) {
                     scrollPosition = liveStart
+                }
+            }
+            // Beim Scrollen eine evtl. noch stehende Event-Selektion löschen —
+            // so dass ein versehentlicher Tap auf den Event-Bereich (der nicht
+            // scrollt) nicht dauerhaft alle Icons dimmt.
+            .onChange(of: scrollPosition) { _, _ in
+                if selectedEventID != nil {
+                    selectedEventID = nil
+                }
+            }
+            // Wenn Loop/CoreData die Events austauschen, eine Selektion, die
+            // auf eine jetzt nicht mehr existierende ID zeigt, entsorgen.
+            .onChange(of: events.map(\.id)) { _, newIDs in
+                if let sel = selectedEventID, !newIDs.contains(sel) {
+                    selectedEventID = nil
                 }
             }
         }
@@ -484,7 +509,7 @@ extension Home {
                             }()
                             eventIcon(for: ev)
                                 .opacity(
-                                    selectedEventID == nil || selectedEventID == ev.id
+                                    effectiveSelectedID == nil || effectiveSelectedID == ev.id
                                         ? 1.0 : 0.35
                                 )
                                 .position(x: x, y: y)
@@ -495,7 +520,7 @@ extension Home {
                                 }
                         }
                     }
-                    if let selected = events.first(where: { $0.id == selectedEventID }) {
+                    if let selected = events.first(where: { $0.id == effectiveSelectedID }) {
                         let frac = selected.date.timeIntervalSince(winStart) / total
                         tooltip(for: selected)
                             .position(x: tooltipX(frac: frac, width: w), y: -4)
@@ -537,11 +562,7 @@ extension Home {
                     if showLabel {
                         Text(bolusLabel(ev.value))
                             .font(.system(size: 8, weight: .medium, design: .serif))
-                            .foregroundStyle(
-                                colorScheme == .dark
-                                    ? BreathePalette.daemmer.opacity(1.0)
-                                    : BreathePalette.daemmer.opacity(1.0)
-                            )
+                            .foregroundStyle(.primary)
                             .lineLimit(1)
                             .fixedSize()
                     }

@@ -18,6 +18,7 @@ extension Home {
         var pulseSubvalue: Bool = false
 
         @State private var pressed = false
+        @State private var longPressConsumed = false
         @Environment(\.colorScheme) private var colorScheme
 
         private var effectiveColor: Color {
@@ -26,6 +27,12 @@ extension Home {
 
         var body: some View {
             Button {
+                // Wenn zuvor ein Long-Press ausgelöst wurde, den nachfolgenden
+                // Button-Tap schlucken — sonst würden beide Handler feuern.
+                if longPressConsumed {
+                    longPressConsumed = false
+                    return
+                }
                 guard let onTap = onTap else { return }
                 withAnimation(.easeOut(duration: 0.12)) { pressed = true }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
@@ -82,6 +89,10 @@ extension Home {
             .simultaneousGesture(
                 LongPressGesture(minimumDuration: 0.6).onEnded { _ in
                     guard let onLongPress = onLongPress else { return }
+                    // Markiere diesen Long-Press als "konsumiert", damit der
+                    // gleichzeitig feuernde Button-Tap (simultaneousGesture)
+                    // im Button-Handler übersprungen wird.
+                    longPressConsumed = true
                     UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
                     onLongPress()
                 }
@@ -309,6 +320,17 @@ extension Home {
                     label: NSLocalizedString("Insulin aktiv", comment: "IOB swatch label"),
                     color: BreathePalette.daemmer,
                     onTap: {
+                        if state.bolusProgress != nil {
+                            // Bolus läuft bereits — Aufruf über StateModel-Flag
+                            // wie beim FAB-Plus-Button.
+                            return
+                        }
+                        state.showModal(for: .bolus(
+                            waitForSuggestion: state.useCalc ? true : false,
+                            fetch: false
+                        ))
+                    },
+                    onLongPress: {
                         withAnimation(.easeInOut(duration: 0.25)) {
                             showBasalInfo.toggle()
                         }
@@ -326,7 +348,10 @@ extension Home {
                     value: cobString,
                     subvalue: nil,
                     label: NSLocalizedString("Kohlenhydrate", comment: "COB swatch label"),
-                    color: BreathePalette.kamille
+                    color: BreathePalette.kamille,
+                    onTap: {
+                        state.showModal(for: .addCarbs(editMode: false, override: false, mode: .meal))
+                    }
                 )
                 BreatheStatusSwatch(
                     value: reservoirString,

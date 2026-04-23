@@ -53,11 +53,10 @@ extension Home {
         let isOverride: Bool
         let isTarget: Bool
 
-        let onBolus: () -> Void
-        let onCarbs: () -> Void
         let onProfile: () -> Void
         let onTempTarget: () -> Void
         let onStatistics: () -> Void
+        let onUIUX: () -> Void
         let onSettings: () -> Void
 
         private struct ActionItem: Identifiable {
@@ -72,20 +71,6 @@ extension Home {
         private var actions: [ActionItem] {
             [
                 ActionItem(
-                    title: NSLocalizedString("Bolus", comment: ""),
-                    icon: "syringe",
-                    color: BreathePalette.daemmer,
-                    active: false,
-                    perform: onBolus
-                ),
-                ActionItem(
-                    title: NSLocalizedString("Mahlzeit", comment: ""),
-                    icon: "fork.knife",
-                    color: BreathePalette.kamille,
-                    active: false,
-                    perform: onCarbs
-                ),
-                ActionItem(
                     title: NSLocalizedString("Profil", comment: ""),
                     icon: isOverride ? "person.fill" : "person",
                     color: BreathePalette.salbei,
@@ -95,7 +80,7 @@ extension Home {
                 ActionItem(
                     title: NSLocalizedString("Temp Target", comment: ""),
                     icon: "target",
-                    color: BreathePalette.flieder,
+                    color: BreathePalette.daemmer,
                     active: isTarget,
                     perform: onTempTarget
                 ),
@@ -105,6 +90,17 @@ extension Home {
                     color: BreathePalette.salbei,
                     active: false,
                     perform: onStatistics
+                ),
+                ActionItem(
+                    // Bewusst nicht lokalisiert — "UIUX" ist ein kurzes Marken-/
+                    // Kurzlabel und würde sonst in manchen Sprachen zu langen
+                    // Übersetzungen wie "Benutzeroberfläche / Benutzerfreundlichkeit"
+                    // expandieren, die die Kachel sprengen.
+                    title: "UIUX",
+                    icon: "paintbrush",
+                    color: BreathePalette.kamille,
+                    active: false,
+                    perform: onUIUX
                 ),
                 ActionItem(
                     title: NSLocalizedString("Einstellungen", comment: ""),

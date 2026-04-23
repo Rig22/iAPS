@@ -13,6 +13,7 @@ extension Home {
         @State var isStatusPopupPresented = false
         @State var showCancelAlert = false
         @State var showCancelTTAlert = false
+        @State var showBasalInfo = false
         @State var triggerUpdate = false
         @State var display = false
         @State var displayGlucose = false
@@ -22,7 +23,6 @@ extension Home {
         @State var displayAutoHistory = false
         @State var displayDynamicHistory = false
         @State var showActionSheet = false
-        @State var showBasalInfo = false
 
         let buttonFont = Font.custom("TimeButtonFont", size: 14)
         let viewPadding: CGFloat = 5
@@ -218,7 +218,7 @@ extension Home {
                     }
                 }()
                 Home.ActiveBadge(
-                    dotColor: BreathePalette.daemmer,
+                    dotColor: .primary,
                     text: text,
                     systemImage: "arrow.right"
                 )
@@ -755,30 +755,12 @@ extension Home {
                 isPresented: $showActionSheet,
                 isOverride: fetchedPercent.first?.enabled ?? false,
                 isTarget: state.tempTarget != nil,
-                onBolus: handleBolusTap,
-                onCarbs: handleCarbsTap,
                 onProfile: handleProfileTap,
                 onTempTarget: handleTempTargetTap,
                 onStatistics: handleStatisticsTap,
+                onUIUX: handleUIUXTap,
                 onSettings: handleSettingsTap
             )
-        }
-
-        private func handleBolusTap() {
-            showActionSheet = false
-            if state.bolusProgress != nil {
-                showBolusActiveAlert = true
-            } else {
-                state.showModal(for: .bolus(
-                    waitForSuggestion: state.useCalc ? true : false,
-                    fetch: false
-                ))
-            }
-        }
-
-        private func handleCarbsTap() {
-            showActionSheet = false
-            state.showModal(for: .addCarbs(editMode: false, override: false, mode: .meal))
         }
 
         private func handleProfileTap() {
@@ -798,6 +780,11 @@ extension Home {
         private func handleStatisticsTap() {
             showActionSheet = false
             state.showModal(for: .statistics)
+        }
+
+        private func handleUIUXTap() {
+            showActionSheet = false
+            state.showModal(for: .uiConfig)
         }
 
         private func handleSettingsTap() {
