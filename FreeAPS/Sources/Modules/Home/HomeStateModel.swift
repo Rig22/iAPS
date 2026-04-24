@@ -88,6 +88,7 @@ extension Home {
 
         @Published var isfView: Bool = true
         @Published var displayeventualBG: Bool = false
+        @Published var displayPartitur: Bool = false
 
         // Chart data
         var data = ChartModel(
@@ -230,6 +231,9 @@ extension Home {
 
             isfView = settingsManager.settings.isfView
             displayeventualBG = settingsManager.settings.displayeventualBG
+            displayPartitur =
+                settingsManager.settings.displayPartitur
+            data.displayPartitur = settingsManager.settings.displayPartitur
 
             updateSensorDays()
 
@@ -888,6 +892,9 @@ extension Home.StateModel:
         profileButton = settingsManager.settings.profileButton
         ai = settingsManager.settings.ai
         displayeventualBG = settingsManager.settings.displayeventualBG
+        displayPartitur =
+            settingsManager.settings.displayPartitur
+        data.displayPartitur = settingsManager.settings.displayPartitur
 
         updateSensorDays()
 

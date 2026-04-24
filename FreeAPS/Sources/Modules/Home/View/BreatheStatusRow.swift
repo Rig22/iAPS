@@ -78,9 +78,10 @@ extension Home {
                         ProgressView()
                             .progressViewStyle(.circular)
                             .controlSize(.mini)
+                            .scaleEffect(0.75)
                             .tint(Color.white)
-                            .padding(.top, 7)
-                            .padding(.trailing, 8)
+                            .padding(.top, 5)
+                            .padding(.trailing, 6)
                     }
                 }
                 .scaleEffect(pressed ? 0.97 : 1.0)
@@ -102,7 +103,6 @@ extension Home {
 
     // MARK: - Basal Info text helper
 
-    /// Computes the temp-basal string used by the badge below the watches.
     static func breatheTempBasalText(state: Home.StateModel) -> String {
         guard let tempRate = state.tempRate else { return "— U/h" }
         let fmt = NumberFormatter()
@@ -117,8 +117,6 @@ extension Home {
 
     // MARK: - Basal Info Badge
 
-    /// Small floating badge showing the current temp basal rate.
-    /// Rendered in the badge row directly below the watches (centered under the IOB tile).
     struct BasalInfoBadge: View {
         let text: String
 
@@ -143,9 +141,6 @@ extension Home {
 
     // MARK: - Non-standard Insulin Concentration Badge
 
-    /// Small red capsule badge that flags non-U100 insulin (U-200, U-300, …).
-    /// Appears on the Insulin watch when the active concentration is not 1.0
-    /// and the user has not hidden it via `hideInsulinBadge` in Settings.
     struct ConcentrationBadge: View {
         let concentration: Double
 
@@ -169,10 +164,6 @@ extension Home {
 
     // MARK: - Active-state Badge (Profil / Temporäres Ziel)
 
-    /// Small capsule badge with a colored status dot and a label.
-    /// Used in the badge row below the watches to show active profile
-    /// overrides or active temporary targets. Tapping runs `onTap`
-    /// (typically: present the cancel-confirmation dialog).
     struct ActiveBadge: View {
         let dotColor: Color
         let text: String

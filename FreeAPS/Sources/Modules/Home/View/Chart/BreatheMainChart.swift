@@ -466,32 +466,36 @@ extension Home {
                 }()
 
                 ZStack {
-                    // Notenblatt-Andeutung: 5 dezente horizontale Linien im
-                    // Bereich der Bolus-Lanes, wie ein klassisches Notensystem.
-                    Canvas { ctx, size in
-                        let lineYs: [CGFloat] = [30, 42, 54, 66, 78]
-                        let color = labelColor.opacity(colorScheme == .dark ? 0.12 : 0.08)
-                        for y in lineYs {
-                            var p = Path()
-                            p.move(to: CGPoint(x: 0, y: y))
-                            p.addLine(to: CGPoint(x: size.width, y: y))
-                            ctx.stroke(p, with: .color(color), lineWidth: 0.4)
+                    // Notenblatt-Andeutung: 5 dezente horizontale Linien plus
+                    // Violinschlüssel — nur wenn der Nutzer die "Partitur"-
+                    // Darstellung in den MainChart-Einstellungen aktiviert hat.
+                    if data.displayPartitur {
+                        Canvas { ctx, size in
+                            let lineYs: [CGFloat] = [30, 42, 54, 66, 78]
+                            let color = labelColor.opacity(colorScheme == .dark ? 0.12 : 0.08)
+                            for y in lineYs {
+                                var p = Path()
+                                p.move(to: CGPoint(x: 0, y: y))
+                                p.addLine(to: CGPoint(x: size.width, y: y))
+                                ctx.stroke(p, with: .color(color), lineWidth: 0.4)
+                            }
                         }
-                    }
-                    .frame(width: w, height: eventStaveHeight)
-                    .allowsHitTesting(false)
-
-                    // Violinschlüssel links am Notensystem
-                    Text("𝄞")
-                        .font(.system(size: 58, weight: .regular))
-                        .foregroundStyle(labelColor.opacity(colorScheme == .dark ? 0.18 : 0.14))
-                        .position(x: 10, y: 52)
+                        .frame(width: w, height: eventStaveHeight)
                         .allowsHitTesting(false)
 
-                    // Schlüssel belegt ~38pt links; Events, deren echte X-Position
-                    // dort oder davor liegt, gelten als "hinter dem Schlüssel" und
-                    // werden nicht gezeichnet — kein Stau, sauberes Rein-/Rausscrollen.
-                    let clefEndX: Double = 38
+                        // Violinschlüssel links am Notensystem
+                        Text("𝄞")
+                            .font(.system(size: 58, weight: .regular))
+                            .foregroundStyle(labelColor.opacity(colorScheme == .dark ? 0.18 : 0.14))
+                            .position(x: 10, y: 52)
+                            .allowsHitTesting(false)
+                    }
+
+                    // Links schützen wir einen schmalen Streifen vor dem Event-
+                    // Stau beim Rein-/Rausscrollen. Mit aktiver Partitur-Ansicht
+                    // muss zusätzlich der Violinschlüssel (~38pt) freigehalten
+                    // werden; ohne Partitur reicht ein dezenter Randabstand.
+                    let clefEndX: Double = data.displayPartitur ? 38 : 12
                     ForEach(events) { ev in
                         let frac = ev.date.timeIntervalSince(winStart) / total
                         let naturalX = frac * w

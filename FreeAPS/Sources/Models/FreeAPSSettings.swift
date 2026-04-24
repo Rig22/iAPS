@@ -150,6 +150,7 @@ struct FreeAPSSettings: JSON, Equatable {
 
     var isfView: Bool = false
     var displayeventualBG: Bool = false
+    var displayPartitur: Bool = false
 
     var nightTime = NightTimeConfiguration.default
     var autoisfEffective: Bool {
@@ -743,6 +744,9 @@ extension FreeAPSSettings: Decodable {
 
         if let displayeventualBG = try? container.decode(Bool.self, forKey: .displayeventualBG) {
             settings.displayeventualBG = displayeventualBG }
+
+        if let displayPartitur = try? container.decode(Bool.self, forKey: .displayPartitur) {
+            settings.displayPartitur = displayPartitur }
 
         if let uploadLogs = try? container.decode(Bool.self, forKey: .uploadLogs) {
             settings.uploadLogs = uploadLogs

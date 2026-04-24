@@ -157,6 +157,13 @@ extension MainChartConfig {
                             DecimalTextField("6", value: $state.hours, formatter: carbsFormatter)
                         }
                     }
+                    Toggle(isOn: $state.displayPartitur) {
+                        HStack(spacing: 6) {
+                            Text("𝄞")
+                                .font(.system(size: 26, weight: .regular))
+                            Text("Display Partitur Lines")
+                        }
+                    }
 
                     /* HStack {
                          ZStack {
@@ -203,22 +210,6 @@ extension MainChartConfig {
                          Toggle("Predictions legend", isOn: $state.showPredictionsLegend)
                      }*/
                 }
-
-                /*  Section {
-                     Toggle("Display Insulin Cloud", isOn: $state.showInsulinActivity)
-                     Toggle("Display COB Cloud", isOn: $state.showCobChart)
-                     /* if state.showInsulinActivity || state.showCobChart {
-                          Toggle("Secondary chart backdrop", isOn: $state.secondaryChartBackdrop)
-                      }
-
-                      if state.showInsulinActivity {
-                          Toggle("Insulin activity grid lines", isOn: $state.insulinActivityGridLines)
-                          Toggle("Insulin activity labels", isOn: $state.insulinActivityLabels)
-                      }*/
-                 } header: {
-                     Text("Activity Clouds")
-                     Text("")
-                 }*/
             }
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .navigationBarTitle("Main Chart settings")
