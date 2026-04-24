@@ -222,7 +222,7 @@ extension Home {
             displayDelta = settingsManager.settings.displayDelta
             maxIOB = settingsManager.preferences.maxIOB
             maxCOB = settingsManager.preferences.maxCOB
-            autoisf = settingsManager.settings.autoisf
+            autoisf = settingsManager.settings.autoisfEffective
             hours = settingsManager.settings.hours
             displayExpiration = settingsManager.settings.displayExpiration
             displaySAGE = settingsManager.settings.displaySAGE
@@ -879,7 +879,7 @@ extension Home.StateModel:
         displayDelta = settingsManager.settings.displayDelta
         maxIOB = settingsManager.preferences.maxIOB
         maxCOB = settingsManager.preferences.maxCOB
-        autoisf = settingsManager.settings.autoisf
+        autoisf = settingsManager.settings.autoisfEffective
         hours = settingsManager.settings.hours
         displayExpiration = settingsManager.settings.displayExpiration
         displaySAGE = settingsManager.settings.displaySAGE

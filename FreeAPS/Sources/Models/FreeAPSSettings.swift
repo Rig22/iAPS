@@ -150,6 +150,25 @@ struct FreeAPSSettings: JSON, Equatable {
 
     var isfView: Bool = false
     var displayeventualBG: Bool = false
+
+    var nightTime = NightTimeConfiguration.default
+    var autoisfEffective: Bool {
+        autoisf && !isNighttime
+    }
+
+    var isNighttime: Bool {
+        guard nightTime.enabled else { return false }
+
+        let calendar = Calendar.current.dateComponents([.hour, .minute], from: .now)
+        guard let h = calendar.hour, let m = calendar.minute else { return false }
+
+        let now = h * 60 + m
+        let start = nightTime.startHour * 60 + nightTime.startMinute
+        let end = nightTime.endHour * 60 + nightTime.endMinute
+
+        return (start > end && (now >= start || now < end)) ||
+            (start <= end && now >= start && now < end)
+    }
 }
 
 extension FreeAPSSettings: Decodable {
@@ -727,6 +746,10 @@ extension FreeAPSSettings: Decodable {
 
         if let uploadLogs = try? container.decode(Bool.self, forKey: .uploadLogs) {
             settings.uploadLogs = uploadLogs
+        }
+
+        if let nightTime = try? container.decode(NightTimeConfiguration.self, forKey: .nightTime) {
+            settings.nightTime = nightTime
         }
 
         self = settings
