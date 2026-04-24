@@ -613,9 +613,6 @@ extension Home {
             .popup(isPresented: state.isStatusPopupPresented, alignment: .bottom, direction: .bottom) {
                 popup
                     .padding(.bottom, 80)
-                    .onTapGesture {
-                        state.isStatusPopupPresented = false
-                    }
                     .gesture(
                         DragGesture(minimumDistance: 10, coordinateSpace: .local)
                             .onEnded { value in
@@ -792,62 +789,125 @@ extension Home {
             state.showModal(for: .settings)
         }
 
+        private var popupStatusBadgeColor: Color {
+            guard let suggestion = state.data.suggestion, suggestion.timestamp != nil else {
+                return .secondary
+            }
+            let delta = state.data.timerDate.timeIntervalSince(state.lastLoopDate) - 30
+
+            if delta <= 5.minutes.timeInterval {
+                guard suggestion.deliverAt != nil else { return .loopYellow }
+                return .loopGreen
+            } else if delta <= 10.minutes.timeInterval {
+                return .loopYellow
+            } else {
+                return .loopRed
+            }
+        }
+
+        private var popupStatusBadgeTextColor: Color {
+            if popupStatusBadgeColor == .secondary {
+                return .black
+            }
+            return colorScheme == .dark
+                ? Color(red: 25.0 / 255.0, green: 39.0 / 255.0, blue: 53.0 / 255.0, opacity: 1.0)
+                : .white
+        }
+
         private var popup: some View {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack {
+            VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Current Loop Status")
+                        .font(.headline)
+                        .bold()
+
                     Text(state.statusTitle)
-                        .font(.suggestionHeadline)
-                        .foregroundColor(.primary)
-                    Spacer()
-                }
-
-                if let suggestion = state.data.suggestion {
-                    TagCloudView(tags: suggestion.reasonParts)
-                        .animation(.none, value: false)
-
-                    Text(suggestion.reasonConclusion.capitalizingFirstLetter())
-                        .font(.suggestionSmallParts)
-                        .foregroundColor(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                } else {
-                    Text("No suggestion found")
-                        .font(.suggestionHeadline)
-                        .foregroundColor(.secondary)
+                        .font(.subheadline)
+                        .bold()
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .foregroundColor(popupStatusBadgeTextColor)
+                        .background(popupStatusBadgeColor)
+                        .clipShape(Capsule())
                 }
 
                 if let errorMessage = state.errorMessage, let date = state.errorDate {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("\(NSLocalizedString("Status at", comment: "")) \(dateFormatter.string(from: date))")
-                            .foregroundColor(.secondary)
-                            .font(.caption2)
-
+                        Text(
+                            "\(NSLocalizedString("Loop at", comment: "")) \(dateFormatter.string(from: date)) \(NSLocalizedString("failed.", comment: ""))"
+                        )
+                        .font(.subheadline)
+                        .bold()
+                        .foregroundColor(.loopRed)
                         Text(errorMessage)
-                            .font(.suggestionError)
-                            .fontWeight(.semibold)
-                            .foregroundColor(.orange)
+                            .font(.caption)
+                            .foregroundColor(.loopRed)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .padding(.top, 4)
                 } else if let suggestion = state.data.suggestion, (suggestion.bg ?? 100) == 400 {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Invalid CGM reading (HIGH).")
-                            .font(.suggestionError)
+                            .font(.subheadline)
                             .bold()
                             .foregroundColor(.red)
                         Text("SMBs and High Temps Disabled.")
                             .font(.caption)
                             .foregroundColor(.secondary)
                     }
-                    .padding(.top, 4)
                 }
+
+                if let suggestion = state.data.suggestion {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Latest Raw Algorithm Output")
+                            .font(.headline)
+                            .bold()
+
+                        Text("iAPS is currently using these metrics and values:")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        TagCloudView(tags: suggestion.reasonParts)
+                            .animation(.none, value: false)
+                    }
+
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Current Algorithm Reasoning")
+                            .font(.headline)
+                            .bold()
+
+                        Text(suggestion.reasonConclusion.capitalizingFirstLetter())
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                } else {
+                    Text("No suggestion found")
+                        .font(.subheadline)
+                        .foregroundColor(.secondary)
+                }
+
+                Button {
+                    state.isStatusPopupPresented = false
+                } label: {
+                    Text("Got it!")
+                        .bold()
+                        .frame(maxWidth: .infinity, minHeight: 32)
+                }
+                .buttonStyle(.bordered)
+                .padding(.top, 4)
             }
-            .padding(16)
+            .padding(18)
             .background(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(Color(UIColor.secondarySystemGroupedBackground))
-                    .shadow(color: .black.opacity(0.1), radius: 10, x: 0, y: 5)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(colorScheme == .light ? BreathePalette.dunstLight : BreathePalette.dunstDark)
+                    .shadow(
+                        color: .black.opacity(colorScheme == .dark ? 0.22 : 0.07),
+                        radius: 10, x: 0, y: 5
+                    )
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .stroke(Color.primary.opacity(0.1), lineWidth: 1)
             )
             .padding(.horizontal, 16)
