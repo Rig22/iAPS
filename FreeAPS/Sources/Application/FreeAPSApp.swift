@@ -62,6 +62,7 @@ import Swinject
             debug(.default, "APPLICATION PHASE: \(scenePhase)")
             if scenePhase == .active {
                 appServices.deviceManager.didBecomeActive()
+                appServices.autoBackupService.checkDailyTrigger()
             }
         }
     }

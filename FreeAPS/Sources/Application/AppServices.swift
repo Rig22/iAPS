@@ -7,6 +7,7 @@ class AppServices: ObservableObject {
     let carbsStorage: CarbsStorage
     let calendarManager: CalendarManager
     let apsManager: APSManager
+    let autoBackupService: AutoBackupService
 
     let resolver: Resolver
 
@@ -28,5 +29,6 @@ class AppServices: ObservableObject {
         carbsStorage = resolver.resolve(CarbsStorage.self)!
         calendarManager = resolver.resolve(CalendarManager.self)!
         _ = FreeAPSApp.resolver.resolve(CoreDataStorageGlucoseSaver.self)!
+        autoBackupService = resolver.resolve(AutoBackupService.self)!
     }
 }

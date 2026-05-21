@@ -7,8 +7,16 @@ extension BackupSettings {
         let resolver: Resolver
         @StateObject var state: StateModel
 
-        @State private var showFolderPicker = false
-        @State private var showRestorePicker = false
+        // Single picker state — SwiftUI breaks when more than one `.fileImporter`
+        // is attached to the same view, so we drive a single importer via a
+        // mode enum and present it for either folder or file picking.
+        private enum PickerMode {
+            case folder
+            case restore
+        }
+
+        @State private var pickerMode: PickerMode = .folder
+        @State private var showPicker = false
 
         init(resolver: Resolver) {
             self.resolver = resolver
@@ -29,19 +37,21 @@ extension BackupSettings {
                 ShareSheet(activityItems: [url])
             }
             .fileImporter(
-                isPresented: $showFolderPicker,
-                allowedContentTypes: [.folder]
+                isPresented: $showPicker,
+                allowedContentTypes: pickerMode == .folder ? [.folder] : [.json]
             ) { result in
-                if case let .success(url) = result {
-                    state.storeBackupFolder(url)
-                }
-            }
-            .fileImporter(
-                isPresented: $showRestorePicker,
-                allowedContentTypes: [.json]
-            ) { result in
-                if case let .success(url) = result {
-                    state.stageRestore(from: url)
+                let mode = pickerMode
+                switch result {
+                case let .success(url):
+                    NSLog("[Backup] picker SUCCESS mode=\(mode) url=\(url.path)")
+                    switch mode {
+                    case .folder:
+                        state.storeBackupFolder(url)
+                    case .restore:
+                        state.stageRestore(from: url)
+                    }
+                case let .failure(error):
+                    NSLog("[Backup] picker FAILED mode=\(mode): \(error)")
                 }
             }
             .alert(
@@ -89,6 +99,18 @@ extension BackupSettings {
             } message: { message in
                 Text(message)
             }
+            .alert(
+                "Folder Not Usable",
+                isPresented: Binding(
+                    get: { state.folderPickError != nil },
+                    set: { if !$0 { state.dismissFolderPickError() } }
+                ),
+                presenting: state.folderPickError
+            ) { _ in
+                Button("OK", action: state.dismissFolderPickError)
+            } message: { message in
+                Text("\(message)\n\nThis often happens on the iOS Simulator. Try a different folder, or test on a real device.")
+            }
         }
 
         // MARK: - Sections
@@ -118,7 +140,8 @@ extension BackupSettings {
                     Label("Export Backup Now", systemImage: "square.and.arrow.up")
                 }
                 Button {
-                    showRestorePicker = true
+                    pickerMode = .restore
+                    showPicker = true
                 } label: {
                     Label("Restore from Backup", systemImage: "square.and.arrow.down")
                 }
@@ -134,7 +157,8 @@ extension BackupSettings {
                 Toggle("Automatic Backup", isOn: $state.autoBackupEnabled)
                 if state.autoBackupEnabled {
                     Button {
-                        showFolderPicker = true
+                        pickerMode = .folder
+                        showPicker = true
                     } label: {
                         Label(
                             state.selectedFolderDisplayPath == nil ? "Choose Backup Folder" : "Change Backup Folder",

@@ -549,6 +549,7 @@
 		BACCAFE0000000000BAC000F /* BackupSettingsRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC000E /* BackupSettingsRootView.swift */; };
 		BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */; };
 		BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */; };
+		BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0016 /* AutoBackupService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1259,6 +1260,7 @@
 		BACCAFE0000000000BAC000E /* BackupSettingsRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsRootView.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunRestorePromptView.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarlyBackupRestore.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC0016 /* AutoBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoBackupService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3127,6 +3129,7 @@
 			children = (
 				BACCAFE0000000000BAC0005 /* BackupService.swift */,
 				BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */,
+				BACCAFE0000000000BAC0016 /* AutoBackupService.swift */,
 			);
 			path = Backup;
 			sourceTree = "<group>";
@@ -3891,6 +3894,7 @@
 				BACCAFE0000000000BAC000F /* BackupSettingsRootView.swift in Sources */,
 				BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */,
 				BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */,
+				BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
