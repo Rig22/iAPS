@@ -8,6 +8,10 @@ protocol SettingsManager: AnyObject {
     var preferences: Preferences { get }
     var pumpSettings: PumpSettings { get }
     func updateInsulinCurve(_ insulinType: InsulinType?)
+    /// Re-read FreeAPSSettings from disk and broadcast the change. Used after
+    /// a backup restore so the in-memory cache does not overwrite the freshly
+    /// restored file the next time a setting is saved.
+    func reloadFromDisk()
 }
 
 protocol SettingsObserver {
@@ -63,6 +67,16 @@ final class BaseSettingsManager: SettingsManager, Injectable {
         storage.retrieve(OpenAPS.Settings.settings, as: PumpSettings.self)
             ?? PumpSettings(from: OpenAPS.defaults(for: OpenAPS.Settings.settings))
             ?? PumpSettings(insulinActionCurve: 6, maxBolus: 10, maxBasal: 4)
+    }
+
+    func reloadFromDisk() {
+        let loaded = storage.retrieve(OpenAPS.FreeAPS.settings, as: FreeAPSSettings.self)
+            ?? FreeAPSSettings(from: OpenAPS.defaults(for: OpenAPS.FreeAPS.settings))
+            ?? FreeAPSSettings()
+        // Assigning through the setter triggers the didSet observer, which
+        // saves to disk again (idempotent — we just read from disk) and
+        // notifies all SettingsObservers so the rest of the app reacts.
+        settings = loaded
     }
 
     func updateInsulinCurve(_ insulinType: InsulinType?) {

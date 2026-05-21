@@ -147,6 +147,9 @@ struct FreeAPSSettings: JSON, Equatable {
     var allowOneMinuteGlucose: Bool = false // allow sending 1-minute readings to oref, even if loops are with 5-minute intervals
     var ai: Bool = true
     var nightTime = NightTimeConfiguration.default
+    // Backup
+    var autoBackupEnabled: Bool = false
+    var backupIncludeNightscoutCredentials: Bool = true
     var autoisfEffective: Bool {
         autoisf && !isNighttime
     }
@@ -734,6 +737,17 @@ extension FreeAPSSettings: Decodable {
 
         if let nightTime = try? container.decode(NightTimeConfiguration.self, forKey: .nightTime) {
             settings.nightTime = nightTime
+        }
+
+        // Backup
+        if let autoBackupEnabled = try? container.decode(Bool.self, forKey: .autoBackupEnabled) {
+            settings.autoBackupEnabled = autoBackupEnabled
+        }
+
+        if let backupIncludeNightscoutCredentials = try? container.decode(
+            Bool.self, forKey: .backupIncludeNightscoutCredentials
+        ) {
+            settings.backupIncludeNightscoutCredentials = backupIncludeNightscoutCredentials
         }
 
         self = settings
