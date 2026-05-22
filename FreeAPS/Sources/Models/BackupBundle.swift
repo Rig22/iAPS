@@ -24,6 +24,14 @@ struct BackupBundle: Codable, Sendable {
     /// user opted in at backup time. Omitted from JSON when nil.
     var nightscout: NightscoutCredentials?
 
+    /// User-created override profile presets, captured from Core Data.
+    /// Optional so older bundles (without this section) still decode cleanly.
+    var overridePresets: [BackupOverridePreset]?
+
+    /// User-created meal presets, captured from Core Data. Optional for the
+    /// same reason as overridePresets.
+    var mealPresets: [BackupMealPreset]?
+
     struct NightscoutCredentials: Codable, Sendable {
         var url: String?
         var secret: String?

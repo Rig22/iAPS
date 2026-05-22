@@ -550,6 +550,8 @@
 		BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */; };
 		BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */; };
 		BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0016 /* AutoBackupService.swift */; };
+		BACCAFE0000000000BAC0019 /* BackupPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0018 /* BackupPresets.swift */; };
+		BACCAFE0000000000BAC001B /* PresetsBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC001A /* PresetsBackup.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1261,6 +1263,8 @@
 		BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunRestorePromptView.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarlyBackupRestore.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0016 /* AutoBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoBackupService.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC0018 /* BackupPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupPresets.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC001A /* PresetsBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsBackup.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -2166,6 +2170,7 @@
 				388E5A5F25B6F2310019842D /* Autosens.swift */,
 				38A00B1E25FC00F7006BC0B0 /* Autotune.swift */,
 				BACCAFE0000000000BAC0001 /* BackupBundle.swift */,
+				BACCAFE0000000000BAC0018 /* BackupPresets.swift */,
 				19C3C74A2E97B2F10000BE4D /* BarcodeScanResult.swift */,
 				19F191E32BE686AE00F6297E /* BareMinimum.swift */,
 				388358C725EEF6D200E024B2 /* BasalProfileEntry.swift */,
@@ -3130,6 +3135,7 @@
 				BACCAFE0000000000BAC0005 /* BackupService.swift */,
 				BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */,
 				BACCAFE0000000000BAC0016 /* AutoBackupService.swift */,
+				BACCAFE0000000000BAC001A /* PresetsBackup.swift */,
 			);
 			path = Backup;
 			sourceTree = "<group>";
@@ -3895,6 +3901,8 @@
 				BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */,
 				BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */,
 				BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */,
+				BACCAFE0000000000BAC0019 /* BackupPresets.swift in Sources */,
+				BACCAFE0000000000BAC001B /* PresetsBackup.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

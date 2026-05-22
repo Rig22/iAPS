@@ -116,6 +116,16 @@ enum EarlyBackupRestore {
             NSLog("[Backup] early restore: nightscout credentials restored")
         }
 
+        if let overridePresets = bundle.overridePresets {
+            PresetsBackup.restoreOverridePresets(overridePresets)
+            NSLog("[Backup] early restore: \(overridePresets.count) override presets restored")
+        }
+
+        if let mealPresets = bundle.mealPresets {
+            PresetsBackup.restoreMealPresets(mealPresets)
+            NSLog("[Backup] early restore: \(mealPresets.count) meal presets restored")
+        }
+
         NSLog("[Backup] === early restore done — \(restoredCount) restored, \(skippedCount) skipped ===")
     }
 

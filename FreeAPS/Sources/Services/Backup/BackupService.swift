@@ -59,6 +59,9 @@ final class BaseBackupService: BackupService, Injectable {
             ? readNightscoutCredentials()
             : nil
 
+        let overridePresets = PresetsBackup.collectOverridePresets()
+        let mealPresets = PresetsBackup.collectMealPresets()
+
         return BackupBundle(
             schemaVersion: BackupBundle.currentSchemaVersion,
             createdAt: Date(),
@@ -67,7 +70,9 @@ final class BaseBackupService: BackupService, Injectable {
             bundleIdentifier: Bundle.main.bundleIdentifier ?? "",
             includesNightscoutCredentials: includingNightscoutCredentials && nightscout != nil,
             files: files,
-            nightscout: nightscout
+            nightscout: nightscout,
+            overridePresets: overridePresets.isEmpty ? nil : overridePresets,
+            mealPresets: mealPresets.isEmpty ? nil : mealPresets
         )
     }
 
@@ -110,6 +115,16 @@ final class BaseBackupService: BackupService, Injectable {
             writeNightscoutCredentials(credentials)
             NSLog("[Backup] NIGHTSCOUT credentials restored")
             summary.nightscoutRestored = true
+        }
+
+        if let overridePresets = bundle.overridePresets {
+            PresetsBackup.restoreOverridePresets(overridePresets)
+            NSLog("[Backup] restored \(overridePresets.count) override presets")
+        }
+
+        if let mealPresets = bundle.mealPresets {
+            PresetsBackup.restoreMealPresets(mealPresets)
+            NSLog("[Backup] restored \(mealPresets.count) meal presets")
         }
 
         NSLog(
