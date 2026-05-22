@@ -61,6 +61,7 @@ final class BaseBackupService: BackupService, Injectable {
 
         let overridePresets = PresetsBackup.collectOverridePresets()
         let mealPresets = PresetsBackup.collectMealPresets()
+        let mealImages = PresetsBackup.collectMealImages()
 
         return BackupBundle(
             schemaVersion: BackupBundle.currentSchemaVersion,
@@ -72,7 +73,8 @@ final class BaseBackupService: BackupService, Injectable {
             files: files,
             nightscout: nightscout,
             overridePresets: overridePresets.isEmpty ? nil : overridePresets,
-            mealPresets: mealPresets.isEmpty ? nil : mealPresets
+            mealPresets: mealPresets.isEmpty ? nil : mealPresets,
+            mealImages: mealImages.isEmpty ? nil : mealImages
         )
     }
 
@@ -125,6 +127,11 @@ final class BaseBackupService: BackupService, Injectable {
         if let mealPresets = bundle.mealPresets {
             PresetsBackup.restoreMealPresets(mealPresets)
             NSLog("[Backup] restored \(mealPresets.count) meal presets")
+        }
+
+        if let mealImages = bundle.mealImages {
+            PresetsBackup.restoreMealImages(mealImages)
+            NSLog("[Backup] restored \(mealImages.count) meal images")
         }
 
         NSLog(

@@ -12,6 +12,10 @@ import Foundation
 /// EarlyBackupRestore.applyIfPending) — `CoreDataStack.shared` is a static
 /// singleton with no Swinject dependencies.
 enum PresetsBackup {
+    /// Subdirectory under Documents/ where FoodImageStorageManager stores
+    /// user-captured meal thumbnails as PNG.
+    private static let foodImagesSubdir = "FoodItems"
+
     // MARK: - Collect (Core Data -> Codable)
 
     static func collectOverridePresets() -> [BackupOverridePreset] {
@@ -162,6 +166,57 @@ enum PresetsBackup {
             }
 
             try? context.save()
+        }
+    }
+
+    // MARK: - Meal thumbnail images
+
+    /// Read every PNG under Documents/FoodItems/ as raw Data, keyed by the
+    /// file's base name (the UUID part of `local://<UUID>` imageURLs).
+    /// Returns an empty dictionary if the directory doesn't exist — e.g. on
+    /// builds without FoodSearch or before any local image was captured.
+    static func collectMealImages() -> [String: Data] {
+        let fm = FileManager.default
+        guard let documents = fm.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return [:]
+        }
+        let folder = documents.appendingPathComponent(foodImagesSubdir, isDirectory: true)
+        guard fm.fileExists(atPath: folder.path) else { return [:] }
+
+        guard let contents = try? fm.contentsOfDirectory(
+            at: folder,
+            includingPropertiesForKeys: nil,
+            options: .skipsHiddenFiles
+        ) else { return [:] }
+
+        var result: [String: Data] = [:]
+        for url in contents where url.pathExtension.lowercased() == "png" {
+            guard let data = try? Data(contentsOf: url) else { continue }
+            let key = url.deletingPathExtension().lastPathComponent
+            result[key] = data
+        }
+        return result
+    }
+
+    /// Write the supplied PNG payloads back to Documents/FoodItems/<key>.png,
+    /// creating the directory if needed. Existing files with the same names
+    /// are overwritten (replace strategy, consistent with the rest of the
+    /// preset restore path).
+    static func restoreMealImages(_ images: [String: Data]) {
+        let fm = FileManager.default
+        guard let documents = fm.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return
+        }
+        let folder = documents.appendingPathComponent(foodImagesSubdir, isDirectory: true)
+        try? fm.createDirectory(at: folder, withIntermediateDirectories: true)
+
+        for (key, data) in images {
+            let fileURL = folder.appendingPathComponent("\(key).png")
+            do {
+                try data.write(to: fileURL, options: .atomic)
+            } catch {
+                NSLog("[Backup] failed to write meal image \(key).png: \(error)")
+            }
         }
     }
 }

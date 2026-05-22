@@ -32,6 +32,14 @@ struct BackupBundle: Codable, Sendable {
     /// same reason as overridePresets.
     var mealPresets: [BackupMealPreset]?
 
+    /// Locally stored thumbnail images for meal presets that use a
+    /// `local://<UUID>` imageURL (captured by the user via camera or photo
+    /// library, see `FoodImageStorageManager`). Keyed by UUID string,
+    /// values are PNG bytes (Codable-Base64-encoded in the bundle JSON).
+    /// External http(s) image URLs don't need to be backed up — they
+    /// re-download on demand after restore.
+    var mealImages: [String: Data]?
+
     struct NightscoutCredentials: Codable, Sendable {
         var url: String?
         var secret: String?

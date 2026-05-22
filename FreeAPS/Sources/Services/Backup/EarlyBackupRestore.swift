@@ -126,6 +126,11 @@ enum EarlyBackupRestore {
             NSLog("[Backup] early restore: \(mealPresets.count) meal presets restored")
         }
 
+        if let mealImages = bundle.mealImages {
+            PresetsBackup.restoreMealImages(mealImages)
+            NSLog("[Backup] early restore: \(mealImages.count) meal images restored")
+        }
+
         NSLog("[Backup] === early restore done — \(restoredCount) restored, \(skippedCount) skipped ===")
     }
 
