@@ -349,7 +349,7 @@ extension Home {
                         .ignoresSafeArea()
                         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 }
-                BreatheMainChart(data: state.data)
+                BreatheMainChart(data: state.data, displayBasal: state.displayMainChartBasalRate)
             }
             // .padding(.bottom, 5)
             .modal(for: .dataTable, from: self)

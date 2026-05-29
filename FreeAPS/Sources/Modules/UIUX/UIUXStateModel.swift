@@ -33,6 +33,7 @@ extension UIUX {
         @Published var ai: Bool = true
         @Published var skipSave: Bool = false
         @Published var displayeventualBG: Bool = false
+        @Published var displayMainChartBasalRate: Bool = false
 
         @Published var isfView: Bool = false
 
@@ -69,6 +70,7 @@ extension UIUX {
             subscribeSetting(\.ai, on: $ai) { ai = $0 }
             subscribeSetting(\.skipSave, on: $skipSave) { skipSave = $0 }
             subscribeSetting(\.displayeventualBG, on: $displayeventualBG) { displayeventualBG = $0 }
+            subscribeSetting(\.displayMainChartBasalRate, on: $displayMainChartBasalRate) { displayMainChartBasalRate = $0 }
             subscribeSetting(\.isfView, on: $isfView) { isfView = $0 }
 
             subscribeSetting(\.low, on: $low, initial: {

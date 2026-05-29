@@ -40,6 +40,7 @@ extension UIUX {
             Form {
                 Section {
                     Text("Main Chart settings").navigationLink(to: .mainChartConfig, from: self)
+                    Toggle("Display Basal Rate", isOn: $state.displayMainChartBasalRate)
                 } header: { Text("Main Chart") }
 
                 Section {
