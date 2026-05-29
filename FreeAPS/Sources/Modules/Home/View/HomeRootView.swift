@@ -23,6 +23,7 @@ extension Home {
         @State var displayAutoHistory = false
         @State var displayDynamicHistory = false
         @State var showActionSheet = false
+        @State var showFirstRunBackupPrompt = false
 
         let buttonFont = Font.custom("TimeButtonFont", size: 14)
         let viewPadding: CGFloat = 5
@@ -596,6 +597,7 @@ extension Home {
             }
             .onAppear {
                 if onboarded.first?.firstRun ?? true {
+                    showFirstRunBackupPrompt = true
                     state.fetchPreferences()
                 }
             }
@@ -609,6 +611,12 @@ extension Home {
             .sheet(isPresented: $displayDynamicHistory) {
                 DynamicHistoryView(units: state.data.units)
                     .environment(\.colorScheme, colorScheme)
+            }
+            .fullScreenCover(isPresented: $showFirstRunBackupPrompt) {
+                FirstRunRestorePromptView(resolver: resolver) {
+                    CoreDataStorage().saveOnbarding()
+                    showFirstRunBackupPrompt = false
+                }
             }
             .popup(isPresented: state.isStatusPopupPresented, alignment: .bottom, direction: .bottom) {
                 popup

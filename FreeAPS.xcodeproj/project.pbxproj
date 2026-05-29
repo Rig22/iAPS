@@ -551,6 +551,18 @@
 		FEFA5C0F299F810B00765C17 /* Core_Data.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = FEFA5C0D299F810B00765C17 /* Core_Data.xcdatamodeld */; };
 		FEFA5C11299F814A00765C17 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEFA5C10299F814A00765C17 /* CoreDataStack.swift */; };
 		FEFFA7A22929FE49007B8193 /* UIDevice+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEFFA7A12929FE49007B8193 /* UIDevice+Extensions.swift */; };
+		BACCAFE0000000000BAC0002 /* BackupBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0001 /* BackupBundle.swift */; };
+		BACCAFE0000000000BAC0004 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0003 /* JSONValue.swift */; };
+		BACCAFE0000000000BAC0006 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0005 /* BackupService.swift */; };
+		BACCAFE0000000000BAC0009 /* BackupSettingsDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0008 /* BackupSettingsDataFlow.swift */; };
+		BACCAFE0000000000BAC000B /* BackupSettingsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC000A /* BackupSettingsProvider.swift */; };
+		BACCAFE0000000000BAC000D /* BackupSettingsStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC000C /* BackupSettingsStateModel.swift */; };
+		BACCAFE0000000000BAC000F /* BackupSettingsRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC000E /* BackupSettingsRootView.swift */; };
+		BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */; };
+		BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */; };
+		BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0016 /* AutoBackupService.swift */; };
+		BACCAFE0000000000BAC0019 /* BackupPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0018 /* BackupPresets.swift */; };
+		BACCAFE0000000000BAC001B /* PresetsBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC001A /* PresetsBackup.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1263,6 +1275,18 @@
 		FEFA5C0E299F810B00765C17 /* Core_Data.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Core_Data.xcdatamodel; sourceTree = "<group>"; };
 		FEFA5C10299F814A00765C17 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		FEFFA7A12929FE49007B8193 /* UIDevice+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extensions.swift"; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC0001 /* BackupBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupBundle.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC0003 /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC0005 /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC0008 /* BackupSettingsDataFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsDataFlow.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC000A /* BackupSettingsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsProvider.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC000C /* BackupSettingsStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsStateModel.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC000E /* BackupSettingsRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsRootView.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunRestorePromptView.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarlyBackupRestore.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC0016 /* AutoBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoBackupService.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC0018 /* BackupPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupPresets.swift; sourceTree = "<group>"; };
+		BACCAFE0000000000BAC001A /* PresetsBackup.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresetsBackup.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1712,6 +1736,7 @@
 				A9A4C88374496B3C89058A89 /* AddTempTarget */,
 				198F67B42CFCBD5D00E538CB /* AutoISF */,
 				672F63EEAE27400625E14BAD /* AutotuneConfig */,
+				BACCAFE0000000000BAC0010 /* BackupSettings */,
 				A42F1FEDFFD0DDE00AAD54D3 /* BasalProfileEditor */,
 				3811DE0425C9D32E00A708ED /* Base */,
 				C2C98283C436DB934D7E7994 /* Bolus */,
@@ -1871,6 +1896,7 @@
 				3811DE9825C9D88300A708ED /* Storage */,
 				F2C2EEA12F5C96A200A0AA7C /* FoodSearch */,
 				3811DEA525C9D88300A708ED /* UnlockManager */,
+				BACCAFE0000000000BAC0007 /* Backup */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -2166,6 +2192,8 @@
 				19DB781C2D332F73007BBB54 /* AutoISFsettings.swift */,
 				388E5A5F25B6F2310019842D /* Autosens.swift */,
 				38A00B1E25FC00F7006BC0B0 /* Autotune.swift */,
+				BACCAFE0000000000BAC0001 /* BackupBundle.swift */,
+				BACCAFE0000000000BAC0018 /* BackupPresets.swift */,
 				19C3C74A2E97B2F10000BE4D /* BarcodeScanResult.swift */,
 				19F191E32BE686AE00F6297E /* BareMinimum.swift */,
 				388358C725EEF6D200E024B2 /* BasalProfileEntry.swift */,
@@ -2190,6 +2218,7 @@
 				382C133625F13A1E00715CE1 /* InsulinSensitivities.swift */,
 				38887CCD25F5725200944304 /* IOBEntry.swift */,
 				F273F95F2DE73ABE00BF0FFC /* IOBTick0.swift */,
+				BACCAFE0000000000BAC0003 /* JSONValue.swift */,
 				193F6CDC2A512C8F001240FD /* Loops.swift */,
 				19012CDB291D2CB900FB8210 /* LoopStats.swift */,
 				19914CDB2EDDC08F00DC2051 /* MealData.swift */,
@@ -3180,6 +3209,37 @@
 			path = View;
 			sourceTree = "<group>";
 		};
+		BACCAFE0000000000BAC0007 /* Backup */ = {
+			isa = PBXGroup;
+			children = (
+				BACCAFE0000000000BAC0005 /* BackupService.swift */,
+				BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */,
+				BACCAFE0000000000BAC0016 /* AutoBackupService.swift */,
+				BACCAFE0000000000BAC001A /* PresetsBackup.swift */,
+			);
+			path = Backup;
+			sourceTree = "<group>";
+		};
+		BACCAFE0000000000BAC0011 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				BACCAFE0000000000BAC000E /* BackupSettingsRootView.swift */,
+				BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		BACCAFE0000000000BAC0010 /* BackupSettings */ = {
+			isa = PBXGroup;
+			children = (
+				BACCAFE0000000000BAC0008 /* BackupSettingsDataFlow.swift */,
+				BACCAFE0000000000BAC000A /* BackupSettingsProvider.swift */,
+				BACCAFE0000000000BAC000C /* BackupSettingsStateModel.swift */,
+				BACCAFE0000000000BAC0011 /* View */,
+			);
+			path = BackupSettings;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -3921,6 +3981,18 @@
 				6FFAE524D1D9C262F2407CAE /* SnoozeProvider.swift in Sources */,
 				8194B80890CDD6A3C13B0FEE /* SnoozeStateModel.swift in Sources */,
 				0437CE46C12535A56504EC19 /* SnoozeRootView.swift in Sources */,
+				BACCAFE0000000000BAC0002 /* BackupBundle.swift in Sources */,
+				BACCAFE0000000000BAC0004 /* JSONValue.swift in Sources */,
+				BACCAFE0000000000BAC0006 /* BackupService.swift in Sources */,
+				BACCAFE0000000000BAC0009 /* BackupSettingsDataFlow.swift in Sources */,
+				BACCAFE0000000000BAC000B /* BackupSettingsProvider.swift in Sources */,
+				BACCAFE0000000000BAC000D /* BackupSettingsStateModel.swift in Sources */,
+				BACCAFE0000000000BAC000F /* BackupSettingsRootView.swift in Sources */,
+				BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */,
+				BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */,
+				BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */,
+				BACCAFE0000000000BAC0019 /* BackupPresets.swift in Sources */,
+				BACCAFE0000000000BAC001B /* PresetsBackup.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

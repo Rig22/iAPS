@@ -153,6 +153,9 @@ struct FreeAPSSettings: JSON, Equatable {
     var displayPartitur: Bool = false
 
     var nightTime = NightTimeConfiguration.default
+    // Backup
+    var autoBackupEnabled: Bool = false
+    var backupIncludeNightscoutCredentials: Bool = true
     var autoisfEffective: Bool {
         autoisf && !isNighttime
     }
@@ -754,6 +757,17 @@ extension FreeAPSSettings: Decodable {
 
         if let nightTime = try? container.decode(NightTimeConfiguration.self, forKey: .nightTime) {
             settings.nightTime = nightTime
+        }
+
+        // Backup
+        if let autoBackupEnabled = try? container.decode(Bool.self, forKey: .autoBackupEnabled) {
+            settings.autoBackupEnabled = autoBackupEnabled
+        }
+
+        if let backupIncludeNightscoutCredentials = try? container.decode(
+            Bool.self, forKey: .backupIncludeNightscoutCredentials
+        ) {
+            settings.backupIncludeNightscoutCredentials = backupIncludeNightscoutCredentials
         }
 
         self = settings

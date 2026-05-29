@@ -33,6 +33,15 @@ import Swinject
     @StateObject private var appServices = AppServices(assembler: assembler)
 
     init() {
+        // Two-phase backup restore: if a pending bundle was staged on the
+        // previous run, write all settings files to disk BEFORE any Swinject
+        // assembly or service initialization. This eliminates the race where
+        // a runtime restore could be overwritten by in-memory caches of
+        // SettingsManager / NightscoutManager / DeviceDataManager etc.
+        // Must run before anything that touches `FreeAPSApp.resolver` or
+        // `appServices`, both of which trigger the lazy assembler init.
+        EarlyBackupRestore.applyIfPending()
+
         debug(
             .default,
             "iAPS Started: v\(Bundle.main.releaseVersionNumber ?? "")(\(Bundle.main.buildVersionNumber ?? "")) [buildDate: \(Bundle.main.buildDate)] [buildExpires: \(Bundle.main.profileExpiration ?? "")]"
@@ -54,6 +63,7 @@ import Swinject
             debug(.default, "APPLICATION PHASE: \(scenePhase)")
             if scenePhase == .active {
                 appServices.deviceManager.didBecomeActive()
+                appServices.autoBackupService.checkDailyTrigger()
             }
         }
     }
