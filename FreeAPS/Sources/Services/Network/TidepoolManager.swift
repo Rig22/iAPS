@@ -19,6 +19,8 @@ protocol TidepoolManager {
     func uploadCarbs() async
     func uploadInsulin() async
     func uploadSettings() async
+    func deleteCarbs(at date: Date)
+    func deleteInsulin(syncId: String)
     func forceTidepoolDataUpload()
 }
 
@@ -304,6 +306,61 @@ final class BaseTidepoolManager: TidepoolManager, Injectable {
                     debug(.service, "Tidepool settings upload failed: \(error)")
                 }
                 continuation.resume()
+            }
+        }
+    }
+
+    // MARK: - Deletion
+
+    /// Deletes carbs from Tidepool. Must be called BEFORE the entry is removed from
+    /// `carbsStorage`, so we can look it up by date and reconstruct the same sync identifier
+    /// that was used during upload. Mirrors the upload filter (non-FPU entries only).
+    func deleteCarbs(at date: Date) {
+        guard let service = tidepoolService else { return }
+        let provenance = hostIdentifier
+
+        let deleted: [SyncCarbObject] = carbsStorage.recent()
+            .filter { !$0.isFPUEntry }
+            .filter { $0.createdAt == date || $0.actualDate == date }
+            .map { $0.asSyncCarbObject(provenance: provenance, operation: .delete) }
+
+        guard !deleted.isEmpty else { return }
+
+        processQueue.async {
+            service.uploadCarbData(created: [], updated: [], deleted: deleted) { result in
+                switch result {
+                case .success:
+                    debug(.service, "Tidepool carbs delete OK (\(deleted.count))")
+                case let .failure(error):
+                    debug(.service, "Tidepool carbs delete failed: \(error)")
+                }
+            }
+        }
+    }
+
+    /// Deletes a bolus dose from Tidepool. Must be called BEFORE the event is removed from
+    /// `pumpHistoryStorage`. We look up the original event and run it through the SAME converter
+    /// used at upload — Tidepool derives the delete selector from the datum *type* (normal vs.
+    /// automated bolus), which depends on the dose's `automatic` flag. Rebuilding the dose
+    /// manually would target the wrong datum type and silently fail to delete.
+    func deleteInsulin(syncId: String) {
+        guard let service = tidepoolService, !syncId.isEmpty else { return }
+
+        guard let event = pumpHistoryStorage.recent().first(where: { $0.id == syncId }),
+              let dose = event.asBolusDoseEntry(provenance: hostIdentifier)
+        else {
+            debug(.service, "Tidepool insulin delete skipped: event \(syncId) not found in storage")
+            return
+        }
+
+        processQueue.async {
+            service.uploadDoseData(created: [], deleted: [dose]) { result in
+                switch result {
+                case .success:
+                    debug(.service, "Tidepool insulin delete OK (\(syncId))")
+                case let .failure(error):
+                    debug(.service, "Tidepool insulin delete failed: \(error)")
+                }
             }
         }
     }

@@ -264,6 +264,7 @@ extension DataTable {
                 OverrideStorage().DeleteBatch(identifier: deleteOld.id, entity: "Carbohydrates")
             }
 
+            provider.deleteCarbsFromTidepool(at: old.creationDate)
             nightscout.deleteCarbs(old.creationDate)
             carbStorage.storeCarbs([newCarbs])
             debug(.apsManager, "Carbs updated: \(old.amountText) -> \(meal.carbs) g")
