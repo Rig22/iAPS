@@ -82,6 +82,7 @@ extension Settings {
                         if HKHealthStore.isHealthDataAvailable() {
                             Text("Apple Health").navigationLink(to: .healthkit, from: self)
                         }
+                        Text("Tidepool").navigationLink(to: .tidepoolConfig, from: self)
                         Text("Notifications").navigationLink(to: .notificationsConfig, from: self)
                     } header: { Text("Services") }
 

@@ -30,5 +30,8 @@ class AppServices: ObservableObject {
         calendarManager = resolver.resolve(CalendarManager.self)!
         _ = FreeAPSApp.resolver.resolve(CoreDataStorageGlucoseSaver.self)!
         autoBackupService = resolver.resolve(AutoBackupService.self)!
+        // Eagerly instantiate so the Tidepool manager registers its storage observers
+        // at launch and uploads in the background even before the settings screen opens.
+        _ = FreeAPSApp.resolver.resolve(TidepoolManager.self)!
     }
 }
