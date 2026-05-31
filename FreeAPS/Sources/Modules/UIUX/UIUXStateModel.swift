@@ -34,7 +34,7 @@ extension UIUX {
         @Published var skipSave: Bool = false
         @Published var displayeventualBG: Bool = false
         @Published var displayMainChartBasalRate: Bool = false
-
+        @Published var displayTBR: Bool = false
         @Published var isfView: Bool = false
 
         var units: GlucoseUnits = .mmolL
@@ -71,6 +71,7 @@ extension UIUX {
             subscribeSetting(\.skipSave, on: $skipSave) { skipSave = $0 }
             subscribeSetting(\.displayeventualBG, on: $displayeventualBG) { displayeventualBG = $0 }
             subscribeSetting(\.displayMainChartBasalRate, on: $displayMainChartBasalRate) { displayMainChartBasalRate = $0 }
+            subscribeSetting(\.displayTBR, on: $displayTBR) { displayTBR = $0 }
             subscribeSetting(\.isfView, on: $isfView) { isfView = $0 }
 
             subscribeSetting(\.low, on: $low, initial: {

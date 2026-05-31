@@ -25,7 +25,6 @@ extension MainChartConfig {
         @Published var showCobChart: Bool = false
         @Published var hidePredictions: Bool = false
         @Published var useCarbBars: Bool = false
-        @Published var displayPartitur: Bool = false
 
         var units: GlucoseUnits = .mmolL
 
@@ -54,7 +53,6 @@ extension MainChartConfig {
             subscribeSetting(\.showCobChart, on: $showCobChart) { showCobChart = $0 }
             subscribeSetting(\.hidePredictions, on: $hidePredictions) { hidePredictions = $0 }
             subscribeSetting(\.useCarbBars, on: $useCarbBars) { useCarbBars = $0 }
-            subscribeSetting(\.displayPartitur, on: $displayPartitur) { displayPartitur = $0 }
 
             subscribeSetting(\.hours, on: $hours.map(Int.init), initial: {
                 let value = max(min($0, 24), 2)

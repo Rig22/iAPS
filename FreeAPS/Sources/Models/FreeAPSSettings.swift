@@ -151,7 +151,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var isfView: Bool = false
     var displayeventualBG: Bool = false
     var displayMainChartBasalRate: Bool = false
-    var displayPartitur: Bool = false
+    var displayTBR: Bool = false
 
     var nightTime = NightTimeConfiguration.default
     // Backup
@@ -752,8 +752,8 @@ extension FreeAPSSettings: Decodable {
         if let displayMainChartBasalRate = try? container.decode(Bool.self, forKey: .displayMainChartBasalRate) {
             settings.displayMainChartBasalRate = displayMainChartBasalRate }
 
-        if let displayPartitur = try? container.decode(Bool.self, forKey: .displayPartitur) {
-            settings.displayPartitur = displayPartitur }
+        if let displayTBR = try? container.decode(Bool.self, forKey: .displayTBR) {
+            settings.displayTBR = displayTBR }
 
         if let uploadLogs = try? container.decode(Bool.self, forKey: .uploadLogs) {
             settings.uploadLogs = uploadLogs

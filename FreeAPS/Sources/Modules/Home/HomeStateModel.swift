@@ -89,7 +89,7 @@ extension Home {
         @Published var isfView: Bool = true
         @Published var displayeventualBG: Bool = false
         @Published var displayMainChartBasalRate: Bool = false
-        @Published var displayPartitur: Bool = false
+        @Published var displayTBR: Bool = false
 
         // Chart data
         var data = ChartModel(
@@ -233,9 +233,7 @@ extension Home {
             isfView = settingsManager.settings.isfView
             displayeventualBG = settingsManager.settings.displayeventualBG
             displayMainChartBasalRate = settingsManager.settings.displayMainChartBasalRate
-            displayPartitur =
-                settingsManager.settings.displayPartitur
-            data.displayPartitur = settingsManager.settings.displayPartitur
+            displayTBR = settingsManager.settings.displayTBR
 
             updateSensorDays()
 
@@ -900,9 +898,7 @@ extension Home.StateModel:
         ai = settingsManager.settings.ai
         displayeventualBG = settingsManager.settings.displayeventualBG
         displayMainChartBasalRate = settingsManager.settings.displayMainChartBasalRate
-        displayPartitur =
-            settingsManager.settings.displayPartitur
-        data.displayPartitur = settingsManager.settings.displayPartitur
+        displayTBR = settingsManager.settings.displayTBR
 
         updateSensorDays()
 

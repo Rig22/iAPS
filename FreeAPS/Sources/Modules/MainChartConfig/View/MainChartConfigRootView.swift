@@ -157,14 +157,6 @@ extension MainChartConfig {
                             DecimalTextField("6", value: $state.hours, formatter: carbsFormatter)
                         }
                     }
-                    Toggle(isOn: $state.displayPartitur) {
-                        HStack(spacing: 6) {
-                            Text("𝄞")
-                                .font(.system(size: 26, weight: .regular))
-                            Text("Display Partitur Lines")
-                        }
-                    }
-
                     /* HStack {
                          ZStack {
                              Image("chartBase")

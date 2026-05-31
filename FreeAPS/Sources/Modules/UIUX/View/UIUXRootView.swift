@@ -40,12 +40,13 @@ extension UIUX {
             Form {
                 Section {
                     Text("Main Chart settings").navigationLink(to: .mainChartConfig, from: self)
-                    Toggle("Display Basal Rate", isOn: $state.displayMainChartBasalRate)
+                    Toggle("Display Basal Rate in Chart", isOn: $state.displayMainChartBasalRate)
                 } header: { Text("Main Chart") }
 
                 Section {
                     /*   Toggle("Display Glucose Delta", isOn: $state.displayDelta)*/
                     Toggle("Display Eventual Glucose", isOn: $state.displayeventualBG)
+                    Toggle("Display Temp Basal", isOn: $state.displayTBR)
                     Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
                     Toggle("Display Sensor Age", isOn: $state.displaySAGE)
                     Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)

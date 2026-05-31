@@ -50,7 +50,6 @@ class ChartModel: ObservableObject {
     @Published var iob: Decimal?
     @Published var hidePredictions: Bool
     @Published var useCarbBars: Bool
-    @Published var displayPartitur: Bool = false
 
     init(
         suggestion: Suggestion?,

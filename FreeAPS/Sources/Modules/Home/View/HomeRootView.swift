@@ -163,6 +163,11 @@ extension Home {
                         .padding(.trailing, 10)
                         .padding(.top, 6)
                 }
+                .overlay(alignment: .bottomLeading) {
+                    tbrBadgeView
+                        .padding(.leading, 10)
+                        .padding(.bottom, 6)
+                }
                 .onTapGesture {
                     if state.alarm == nil {
                         state.openCGM()
@@ -224,6 +229,25 @@ extension Home {
                     systemImage: "arrow.right"
                 )
                 .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .topTrailing)))
+            }
+        }
+
+        /// Bottom-left badge showing the current temporary basal rate. Same
+        /// look as the sensor / eventual-BG pills, placed below the breathing
+        /// orb on the leading side. Controlled by the `displayTBR` setting.
+        @ViewBuilder private var tbrBadgeView: some View {
+            if state.displayTBR {
+                let rateString = state.tempRate
+                    .flatMap { numberFormatter.string(from: $0 as NSNumber) } ?? "—"
+                let manual = state.apsManager.isManualTempBasal
+                    ? " " + NSLocalizedString("Manual", comment: "Manual Temp basal")
+                    : ""
+                Home.ActiveBadge(
+                    dotColor: .primary,
+                    text: rateString + " U/hr" + manual,
+                    systemImage: "chart.bar.fill"
+                )
+                .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .bottomLeading)))
             }
         }
 
