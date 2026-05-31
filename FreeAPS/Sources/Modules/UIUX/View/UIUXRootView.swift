@@ -50,7 +50,7 @@ extension UIUX {
                     Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
                     Toggle("Display Sensor Age", isOn: $state.displaySAGE)
                     Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)
-                    Toggle("Hide isfView", isOn: $state.isfView)
+                    Toggle("Display isfView", isOn: $state.isfView)
 
                 } header: { Text("Header settings") }
                     ._onBindingChange($state.displaySAGE) { enabled in

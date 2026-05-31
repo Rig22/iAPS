@@ -86,7 +86,7 @@ extension Home {
         @Published var mealData = MealData()
         @Published var ai: Bool = false
 
-        @Published var isfView: Bool = true
+        @Published var isfView: Bool = false
         @Published var displayeventualBG: Bool = false
         @Published var displayMainChartBasalRate: Bool = false
         @Published var displayTBR: Bool = false
