@@ -168,6 +168,12 @@ extension Home {
                         .padding(.leading, 10)
                         .padding(.bottom, 6)
                 }
+                .overlay(alignment: .bottomTrailing) {
+                    isfBadgeView
+                        .padding(.trailing, 10)
+                        .padding(.bottom, 6)
+                }
+                .animation(.easeInOut(duration: 0.25), value: state.isfView)
                 .onTapGesture {
                     if state.alarm == nil {
                         state.openCGM()
@@ -245,7 +251,7 @@ extension Home {
                 Home.ActiveBadge(
                     dotColor: .primary,
                     text: rateString + " U/hr" + manual,
-                    systemImage: "chart.bar.fill"
+                    systemImage: "chart.bar"
                 )
                 .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .bottomLeading)))
             }
@@ -505,14 +511,6 @@ extension Home {
                     }
                 }
                 .frame(maxWidth: .infinity, minHeight: 28)
-
-                ZStack {
-                    if state.isfView {
-                        isfView
-                    }
-                }
-                .frame(maxWidth: .infinity, minHeight: 28)
-                .animation(.easeInOut(duration: 0.25), value: state.isfView)
             }
             .padding(.horizontal, 10)
             .animation(.easeInOut(duration: 0.25), value: showBasalInfo)
@@ -548,6 +546,15 @@ extension Home {
                 return NSLocalizedString("No SMB", comment: "Profile badge: SMBs off")
             }
             return NSLocalizedString("Override", comment: "Profile badge default label")
+        }
+
+        /// Bottom-right counterpart to the TBR badge: the ISF-ratio pill,
+        /// gated by the `displayisfView` setting.
+        @ViewBuilder private var isfBadgeView: some View {
+            if state.isfView {
+                isfView
+                    .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .bottomTrailing)))
+            }
         }
 
         private var isfView: some View {
