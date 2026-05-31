@@ -767,7 +767,9 @@ extension Home {
             return (ratio * 100)
         }
 
-        func calculateSensorInfo() -> (text: String, color: Color, priority: Int, timeToShow: TimeInterval)? {
+        func calculateSensorInfo()
+            -> (text: String, color: Color, priority: Int, timeToShow: TimeInterval, expiresIn: TimeInterval)?
+        {
             guard let sessionDate = recentGlucose?.sessionStartDate else { return nil }
 
             let nun = Date()
@@ -783,7 +785,10 @@ extension Home {
 
             let limitInSeconds = daysLimit * 86400.0
             let expirationInSeconds = limitInSeconds - diffInSeconds
-            let timeToShow = displayExpiration ? expirationInSeconds : diffInSeconds
+            // When ≤ 24 h remain, always show remaining time so the
+            // auto-surfaced pill is meaningful — not sensor age.
+            let nearExpiry = expirationInSeconds <= 24 * 3600
+            let timeToShow = (displayExpiration || nearExpiry) ? expirationInSeconds : diffInSeconds
 
             let text: String
             let color: Color
@@ -808,7 +813,7 @@ extension Home {
                 priority = 100
             }
 
-            return (text, color, priority, timeToShow)
+            return (text, color, priority, timeToShow, expirationInSeconds)
         }
     }
 }

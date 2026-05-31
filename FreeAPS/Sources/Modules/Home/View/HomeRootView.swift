@@ -182,21 +182,21 @@ extension Home {
         }
 
         @ViewBuilder private var sensorBadgeView: some View {
-            if state.displaySAGE || state.displayExpiration,
-               let info = state.calculateSensorInfo()
+            if let info = state.calculateSensorInfo(),
+               state.displaySAGE || state.displayExpiration || info.expiresIn <= 24 * 3600
             {
                 let dotColor: Color = {
-                    if info.timeToShow <= 0 { return .red }
-                    if info.timeToShow < 6 * 3600 { return .orange }
-                    if info.timeToShow < 24 * 3600 { return BreathePalette.kamille }
-                    return .primary.opacity(0.5)
+                    if info.expiresIn <= 0 { return .red }
+                    if info.expiresIn < 6 * 3600 { return .orange }
+                    if info.expiresIn < 24 * 3600 { return BreathePalette.kamille }
+                    return .primary
                 }()
                 let text = info.text
                     .replacingOccurrences(of: "Sensor: ", with: "")
                 Home.ActiveBadge(
                     dotColor: dotColor,
                     text: text,
-                    systemImage: "sensor.tag.radiowaves.forward.fill"
+                    systemImage: "sensor.tag.radiowaves.forward"
                 )
                 .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .topTrailing)))
             }
