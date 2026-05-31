@@ -13,7 +13,6 @@ extension Home {
         @State var isStatusPopupPresented = false
         @State var showCancelAlert = false
         @State var showCancelTTAlert = false
-        @State var showBasalInfo = false
         @State var triggerUpdate = false
         @State var display = false
         @State var displayGlucose = false
@@ -22,8 +21,6 @@ extension Home {
         @State var showBolusActiveAlert = false
         @State var displayAutoHistory = false
         @State var displayDynamicHistory = false
-        @State var showActionSheet = false
-        @State var showFirstRunBackupPrompt = false
 
         let buttonFont = Font.custom("TimeButtonFont", size: 14)
         let viewPadding: CGFloat = 5
@@ -58,14 +55,6 @@ extension Home {
             entity: TempTargetsSlider.entity(),
             sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
         ) var enactedSliderTT: FetchedResults<TempTargetsSlider>
-
-        @FetchRequest(
-            entity: InsulinConcentration.entity(),
-            sortDescriptors: [NSSortDescriptor(
-                key: "date",
-                ascending: true
-            )]
-        ) var concentration: FetchedResults<InsulinConcentration>
 
         @FetchRequest(
             entity: Onboarding.entity(),
@@ -117,33 +106,11 @@ extension Home {
             return dateFormatter
         }()
 
-        private var remainingTimeFormatter: DateComponentsFormatter {
-            let formatter = DateComponentsFormatter()
-            formatter.allowedUnits = [.day, .hour]
-            formatter.unitsStyle = .abbreviated
-            return formatter
-        }
-
-        private var remainingTimeFormatterDays: DateComponentsFormatter {
-            let formatter = DateComponentsFormatter()
-            formatter.allowedUnits = [.day]
-            formatter.unitsStyle = .abbreviated
-            return formatter
-        }
-
         private var spriteScene: SKScene {
             let scene = SnowScene()
             scene.scaleMode = .resizeFill
             scene.backgroundColor = .clear
             return scene
-        }
-
-        private var glucoseFormatter: NumberFormatter {
-            let formatter = NumberFormatter()
-            formatter.numberStyle = .decimal
-            formatter.minimumFractionDigits = 0
-            formatter.maximumFractionDigits = 1
-            return formatter
         }
 
         init(resolver: Resolver) {
@@ -152,124 +119,36 @@ extension Home {
         }
 
         var glucoseView: some View {
-            breathingOrbView
-                .overlay(alignment: .topLeading) {
-                    sensorBadgeView
-                        .padding(.leading, 10)
-                        .padding(.top, 6)
-                }
-                .overlay(alignment: .topTrailing) {
-                    eventualBadgeView
-                        .padding(.trailing, 10)
-                        .padding(.top, 6)
-                }
-                .overlay(alignment: .bottomLeading) {
-                    tbrBadgeView
-                        .padding(.leading, 10)
-                        .padding(.bottom, 6)
-                }
-                .onTapGesture {
-                    if state.alarm == nil {
-                        state.openCGM()
-                    } else {
-                        state.showModal(for: .snooze)
-                    }
-                }
-                .onLongPressGesture {
-                    let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                    impactHeavy.impactOccurred()
-                    if state.alarm == nil {
-                        state.showModal(for: .snooze)
-                    } else {
-                        state.openCGM()
-                    }
-                }
-        }
-
-        @ViewBuilder private var sensorBadgeView: some View {
-            if let info = state.calculateSensorInfo(),
-               state.displaySAGE || state.displayExpiration || info.expiresIn <= 24 * 3600
-            {
-                let dotColor: Color = {
-                    if info.expiresIn <= 0 { return .red }
-                    if info.expiresIn < 6 * 3600 { return .orange }
-                    if info.expiresIn < 24 * 3600 { return BreathePalette.kamille }
-                    return .primary
-                }()
-                let text = info.text
-                    .replacingOccurrences(of: "Sensor: ", with: "")
-                Home.ActiveBadge(
-                    dotColor: dotColor,
-                    text: text,
-                    systemImage: "sensor.tag.radiowaves.forward"
-                )
-                .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .topTrailing)))
-            }
-        }
-
-        /// Top-right badge showing the predicted "eventual" glucose from the
-        /// last loop suggestion. Controlled by the `displayeventualBG` setting.
-        @ViewBuilder private var eventualBadgeView: some View {
-            if state.displayeventualBG, let eventual = state.eventualBG {
-                let isMmol = state.data.units == .mmolL
-                let converted: Double = isMmol
-                    ? Double(eventual) * 0.0555
-                    : Double(eventual)
-                let text: String = {
-                    if isMmol {
-                        return String(format: "%.1f", converted)
-                            .replacingOccurrences(of: ".", with: ",")
-                    } else {
-                        return "\(Int(converted.rounded()))"
-                    }
-                }()
-                Home.ActiveBadge(
-                    dotColor: .primary,
-                    text: text,
-                    systemImage: "arrow.right"
-                )
-                .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .topTrailing)))
-            }
-        }
-
-        /// Bottom-left badge showing the current temporary basal rate. Same
-        /// look as the sensor / eventual-BG pills, placed below the breathing
-        /// orb on the leading side. Controlled by the `displayTBR` setting.
-        @ViewBuilder private var tbrBadgeView: some View {
-            if state.displayTBR {
-                let rateString = state.tempRate
-                    .flatMap { numberFormatter.string(from: $0 as NSNumber) } ?? "—"
-                let manual = state.apsManager.isManualTempBasal
-                    ? " " + NSLocalizedString("Manual", comment: "Manual Temp basal")
-                    : ""
-                Home.ActiveBadge(
-                    dotColor: .primary,
-                    text: rateString + " U/hr" + manual,
-                    systemImage: "chart.bar.fill"
-                )
-                .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .bottomLeading)))
-            }
-        }
-
-        /// Breathing Orb variant — Breathe humane-redesign glucose display.
-        private var breathingOrbView: some View {
-            let recent = state.recentGlucose
-            let glucoseMgDl = Decimal(recent?.glucose ?? 0)
-            let displayValue: Decimal = state.data.units == .mmolL
-                ? glucoseMgDl.asMmolL
-                : glucoseMgDl
-            return BreathingGlucoseOrb(
-                glucose: displayValue,
-                units: state.data.units,
-                lowThreshold: state.data.lowGlucose,
-                highThreshold: state.data.highGlucose,
-                direction: recent?.direction,
-                delta: state.glucoseDelta,
-                minutesAgo: nil,
-                size: 160
+            CurrentGlucoseView(
+                recentGlucose: $state.recentGlucose,
+                delta: $state.glucoseDelta,
+                units: $state.data.units,
+                alarm: $state.alarm,
+                lowGlucose: $state.data.lowGlucose,
+                highGlucose: $state.data.highGlucose,
+                alwaysUseColors: $state.alwaysUseColors,
+                displayDelta: $state.displayDelta,
+                scrolling: $displayGlucose, displaySAGE: $state.displaySAGE,
+                displayExpiration: $state.displayExpiration,
+                sensordays: $state.sensorDays,
+                timerDate: $state.data.timerDate
             )
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 4)
+            .onTapGesture {
+                if state.alarm == nil {
+                    state.openCGM()
+                } else {
+                    state.showModal(for: .snooze)
+                }
+            }
+            .onLongPressGesture {
+                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                impactHeavy.impactOccurred()
+                if state.alarm == nil {
+                    state.showModal(for: .snooze)
+                } else {
+                    state.openCGM()
+                }
+            }
         }
 
         var pumpView: some View {
@@ -287,6 +166,25 @@ extension Home {
                 }
             }
             .offset(y: 1)
+        }
+
+        var loopView: some View {
+            LoopView(
+                suggestion: $state.data.suggestion,
+                enactedSuggestion: $state.enactedSuggestion,
+                closedLoop: $state.closedLoop,
+                timerDate: $state.data.timerDate,
+                isLooping: $state.isLooping,
+                lastLoopDate: $state.lastLoopDate,
+                manualTempBasal: $state.manualTempBasal
+            )
+            .onTapGesture {
+                state.isStatusPopupPresented.toggle()
+            }.onLongPressGesture {
+                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                impactHeavy.impactOccurred()
+                state.runLoop()
+            }
         }
 
         var tempBasalString: String {
@@ -373,43 +271,344 @@ extension Home {
                         .ignoresSafeArea()
                         .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0, maxHeight: .infinity)
                 }
-                BreatheMainChart(data: state.data, displayBasal: state.displayMainChartBasalRate)
+                MainChartView(data: state.data, triggerUpdate: $triggerUpdate)
             }
-            // .padding(.bottom, 5)
+            .padding(.bottom, 5)
             .modal(for: .dataTable, from: self)
         }
 
-        var chart: some View {
-            // let ratio = 2.8
-
-            // let chartRatio: CGFloat = 3.6
-            let chartRatio: CGFloat = 3.4
-            let chartMinHeight = UIScreen.main.bounds.height / chartRatio
-
-            return mainChart
-                .frame(minHeight: chartMinHeight)
+        @ViewBuilder private func buttonPanel(_ geo: GeometryProxy) -> some View {
+            ZStack {
+                addHeaderBackground()
+                    .frame(height: 50 + geo.safeAreaInsets.bottom)
+                let isOverride = fetchedPercent.first?.enabled ?? false
+                let isTarget = (state.tempTarget != nil)
+                VStack {
+                    Divider()
+                    HStack {
+                        if state.carbButton {
+                            Button { state.showModal(for: .addCarbs(editMode: false, override: false, mode: .meal)) }
+                            label: {
+                                ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
+                                    Image(systemName: "fork.knife")
+                                        .renderingMode(.template)
+                                        .font(.custom("Buttons", size: 24))
+                                        .foregroundStyle(colorScheme == .dark ? .loopYellow : .orange)
+                                        .padding(8)
+                                    if let carbsReq = state.carbsRequired {
+                                        Text(numberFormatter.string(from: carbsReq as NSNumber)!)
+                                            .font(.caption)
+                                            .foregroundStyle(.white)
+                                            .padding(4)
+                                            .background(Capsule().fill(Color.red))
+                                    }
+                                }
+                            }
+                            .contextMenu {
+                                Button {
+                                    state.showModal(for: .addCarbs(editMode: false, override: false, mode: .presets)) }
+                                label: { Label("Meal Presets", systemImage: "menucard")
+                                }
+                                Button {
+                                    state.showModal(for: .addCarbs(editMode: false, override: false, mode: .barcode)) }
+                                label: { Label("Barcode", systemImage: "barcode.viewfinder")
+                                }
+                                if state.ai {
+                                    Button {
+                                        state.showModal(for: .addCarbs(editMode: false, override: false, mode: .image)) }
+                                    label: { Label("AI Image Analysis", systemImage: "photo.badge.magnifyingglass")
+                                    }
+                                }
+                                Button {
+                                    state.showModal(for: .addCarbs(editMode: false, override: false, mode: .meal)) }
+                                label: { Label("Add Meal", systemImage: "birthday.cake")
+                                }
+                            }
+                            Spacer()
+                        }
+                        Button {
+                            (state.bolusProgress != nil) ? showBolusActiveAlert = true :
+                                state.showModal(for: .bolus(
+                                    waitForSuggestion: state.useCalc ? true : false,
+                                    fetch: false
+                                ))
+                        }
+                        label: {
+                            Image(systemName: "syringe")
+                                .renderingMode(.template)
+                                .font(.custom("Buttons", size: 24))
+                        }
+                        .buttonStyle(.borderless)
+                        .foregroundStyle(.insulin)
+                        Spacer()
+                        if state.allowManualTemp {
+                            Button { state.showModal(for: .manualTempBasal) }
+                            label: {
+                                Image("bolus1")
+                                    .renderingMode(.template)
+                                    .resizable()
+                                    .frame(width: IAPSconfig.buttonSize, height: IAPSconfig.buttonSize, alignment: .bottom)
+                            }
+                            .foregroundStyle(.insulin)
+                            Spacer()
+                        }
+                        if state.profileButton {
+                            ZStack(alignment: Alignment(horizontal: .trailing, vertical: .bottom)) {
+                                Image(systemName: isOverride ? "person.fill" : "person")
+                                    .symbolRenderingMode(.palette)
+                                    .font(.custom("Buttons", size: 28))
+                                    .foregroundStyle(.purple)
+                                    .padding(8)
+                                    .background(isOverride ? .purple.opacity(0.15) : .clear)
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
+                            .onTapGesture {
+                                if isOverride {
+                                    showCancelAlert.toggle()
+                                } else {
+                                    state.showModal(for: .overrideProfilesConfig)
+                                }
+                            }
+                            .onLongPressGesture {
+                                state.showModal(for: .overrideProfilesConfig)
+                            }
+                            Spacer()
+                        }
+                        if state.useTargetButton {
+                            Image(systemName: "target")
+                                .renderingMode(.template)
+                                .font(.custom("Buttons", size: 24))
+                                .padding(8)
+                                .foregroundStyle(.loopGreen)
+                                .background(isTarget ? .green.opacity(0.15) : .clear)
+                                .clipShape(RoundedRectangle(cornerRadius: 10))
+                                .onTapGesture {
+                                    if isTarget {
+                                        showCancelTTAlert.toggle()
+                                    } else {
+                                        state.showModal(for: .addTempTarget)
+                                    }
+                                }
+                                .onLongPressGesture {
+                                    state.showModal(for: .addTempTarget)
+                                }
+                            Spacer()
+                        }
+                        Button { state.showModal(for: .settings) }
+                        label: {
+                            Image(systemName: "gear")
+                                .renderingMode(.template)
+                                .font(.custom("Buttons", size: 24))
+                        }
+                        .buttonStyle(.borderless)
+                        .foregroundStyle(.gray)
+                    }
+                    .padding(.horizontal, state.allowManualTemp ? 10 : 24)
+                    .padding(.bottom, geo.safeAreaInsets.bottom)
+                }
+            }
+            .dynamicTypeSize(...DynamicTypeSize.xxLarge)
+            .confirmationDialog("Cancel Profile Override", isPresented: $showCancelAlert) {
+                Button("Cancel Profile Override", role: .destructive) {
+                    state.cancelProfile()
+                    triggerUpdate.toggle()
+                }
+            }
+            .confirmationDialog("Cancel Temporary Target", isPresented: $showCancelTTAlert) {
+                Button("Cancel Temporary Target", role: .destructive) {
+                    state.cancelTempTarget()
+                }
+            }
+            .confirmationDialog("Bolus already in Progress", isPresented: $showBolusActiveAlert) {
+                Button("Bolus already in Progress!", role: .destructive) {
+                    showBolusActiveAlert = false
+                }
+            }
         }
 
-        // MARK: - Statistik & Info Panels
+        var chart: some View {
+            let ratio = 1.96
+            let ratio2 = 2.0
+
+            return addColouredBackground().shadow(radius: 3, y: 3)
+                .overlay {
+                    mainChart
+                }
+                .frame(minHeight: UIScreen.main.bounds.height / (fontSize < .extraExtraLarge ? ratio : ratio2))
+        }
+
+        var carbsAndInsulinView: some View {
+            HStack {
+                // A temporary ugly(?) workaround for displaying last real IOB and COB computation
+                let opacity: CGFloat = colorScheme == .dark ? 0.2 : 0.65
+                let materialOpacity: CGFloat = colorScheme == .dark ? 0.25 : 0.10
+                // Carbs on Board
+                HStack {
+                    let substance = Double(state.data.suggestion?.cob ?? 0)
+                    let max = max(Double(state.maxCOB), 1)
+                    let fraction: Double = 1 - (substance / max)
+                    let fill = CGFloat(min(Swift.max(fraction, 0.05), substance > 0 ? 0.92 : 1))
+                    TestTube(
+                        opacity: opacity,
+                        amount: fill,
+                        colourOfSubstance: .loopYellow,
+                        materialOpacity: materialOpacity
+                    )
+                    .frame(width: 12, height: 38)
+                    .offset(y: -5)
+                    HStack(spacing: 0) {
+                        if let loop = state.data.suggestion, let cob = loop.cob {
+                            Text(numberFormatter.string(from: cob as NSNumber) ?? "0")
+                                .font(.statusFont).bold()
+                            // Display last loop, unless very old
+                        } else {
+                            Text("?").font(.statusFont).bold()
+                        }
+                        Text(NSLocalizedString(" g", comment: "gram of carbs")).font(.statusFont).foregroundStyle(.secondary)
+                    }.offset(y: 5)
+                }
+                // Instead of Spacer
+                Text(" ")
+
+                // Insulin on Board
+                HStack {
+                    let substance = Double(state.data.iob ?? 0)
+                    let max = max(Double(state.maxIOB), 1)
+                    let fraction: Double = 1 - abs(substance) / max
+                    let fill = CGFloat(min(Swift.max(fraction, 0.05), 1))
+                    TestTube(
+                        opacity: opacity,
+                        amount: fill,
+                        colourOfSubstance: substance < 0 ? .red : .insulin,
+                        materialOpacity: materialOpacity
+                    )
+                    .frame(width: 12, height: 38)
+                    .offset(y: -5)
+                    HStack(spacing: 0) {
+                        if let iob = state.data.iob {
+                            Text(
+                                targetFormatter.string(from: iob as NSNumber) ?? "0"
+                            ).font(.statusFont).bold()
+                        } else {
+                            Text("?").font(.statusFont).bold()
+                        }
+                        Text(NSLocalizedString(" U", comment: "Insulin unit")).font(.statusFont).foregroundStyle(.secondary)
+                    }.offset(y: 5)
+                }
+            }.offset(x: 5, y: 5)
+        }
+
+        var preview: some View {
+            addBackground()
+                .frame(minHeight: 200)
+                .overlay {
+                    PreviewChart(
+                        readings: $state.readings,
+                        lowLimit: $state.data.lowGlucose,
+                        highLimit: $state.data.highGlucose
+                    )
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .addShadows()
+                .padding(.horizontal, 10)
+                .blur(radius: animateTIRView ? 2 : 0)
+                .onTapGesture {
+                    timeIsNowTIR()
+                    state.showModal(for: .statistics)
+                }
+                .overlay {
+                    if animateTIRView {
+                        animation.asAny()
+                    }
+                }
+        }
+
+        var infoPanelView: some View {
+            addBackground()
+                .frame(height: 30)
+                .overlay {
+                    HStack {
+                        info
+                    }
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .addShadows()
+                .padding(.horizontal, 10)
+        }
 
         var activeIOBView: some View {
-            VStack {
-                ActiveIOBView(data: $state.iobData)
-                    .padding(15)
-            }
-            .frame(minHeight: 190)
-            .elegantShadow(scheme: colorScheme)
-            .padding(.horizontal, 10)
+            addBackground()
+                .frame(minHeight: 190)
+                .overlay {
+                    ActiveIOBView(
+                        data: $state.iobData,
+                    )
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .addShadows()
+                .padding(.horizontal, 10)
         }
 
         var activeCOBView: some View {
-            VStack {
-                ActiveCOBView(data: $state.iobData)
-                    .padding(15)
-            }
-            .frame(minHeight: 190)
-            .elegantShadow(scheme: colorScheme)
-            .padding(.horizontal, 10)
+            addBackground()
+                .frame(minHeight: 190)
+                .overlay {
+                    ActiveCOBView(data: $state.iobData)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .addShadows()
+                .padding(.horizontal, 10)
+        }
+
+        var insulinView: some View {
+            addBackground()
+                .frame(minHeight: 280)
+                .overlay {
+                    InsulinSummaryView(
+                        neg: $state.neg,
+                        tddChange: $state.tddChange,
+                        tddAverage: $state.tddAverage,
+                        tddYesterday: $state.tddYesterday,
+                        tdd2DaysAgo: $state.tdd2DaysAgo,
+                        tdd3DaysAgo: $state.tdd3DaysAgo,
+                        tddActualAverage: $state.tddActualAverage
+                    )
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .addShadows()
+                .padding(.horizontal, 10)
+        }
+
+        var mealsView: some View {
+            addBackground()
+                .frame(minHeight: 190)
+                .overlay {
+                    MealsSummaryView(data: $state.mealData)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .addShadows()
+                .padding(.horizontal, 10)
+        }
+
+        var loopPreview: some View {
+            addBackground()
+                .frame(minHeight: 160)
+                .overlay {
+                    LoopsView(loopStatistics: $state.loopStatistics)
+                }
+                .clipShape(RoundedRectangle(cornerRadius: 15))
+                .addShadows()
+                .padding(.horizontal, 10)
+                .blur(radius: animateLoopView ? 2.5 : 0)
+                .onTapGesture {
+                    timeIsNowLoop()
+                    state.showModal(for: .statistics)
+                }
+                .overlay {
+                    if animateLoopView {
+                        animation.asAny()
+                    }
+                }
         }
 
         var profileView: some View {
@@ -449,131 +648,164 @@ extension Home {
             }
         }
 
+        func bolusProgressView(progress: Decimal, amount: Decimal) -> some View {
+            ZStack {
+                VStack {
+                    HStack {
+                        let bolused = targetFormatter.string(from: (amount * progress) as NSNumber) ?? ""
+                        Text("Bolusing")
+                        Text(
+                            bolused + " " + NSLocalizedString("of", comment: "") + " " + amount
+                                .formatted() + NSLocalizedString(" U", comment: "")
+                        )
+                    }.frame(width: 250, height: 25).font(.bolusProgressBarFont)
+                    HStack(alignment: .bottom, spacing: 5) {
+                        ProgressView(value: Double(progress)).progressViewStyle(BolusProgressViewStyle())
+                            .overlay {
+                                Image(systemName: "pause.fill")
+                                    .symbolRenderingMode(.palette)
+                                    .foregroundStyle(.white, .blue)
+                                    .font(.bolusProgressStopFont)
+                            }
+                    }
+                    .onTapGesture { state.cancelBolus() }
+                }
+                .dynamicTypeSize(...DynamicTypeSize.large)
+                .padding(.bottom, 8)
+            }
+        }
+
         @ViewBuilder private func headerView(_ geo: GeometryProxy) -> some View {
-            VStack(spacing: 2) {
-                Color.clear
-                    .frame(height: geo.safeAreaInsets.top + 5)
-
-                glucoseView
-                    .padding(.vertical, 10)
-                    .padding(.horizontal, 20)
-                    .padding(.top, 15)
-                    .padding(.bottom, 25)
-            }
-            .background(Color.clear)
-        }
-
-        /// Row of small badges directly under the four watches.
-        /// Slot 1 — Basal/Temp-Target badge centered under Insulin tile
-        ///          (toggled by tapping the Insulin tile).
-        /// Slot 2 — Active profile override badge (tap → cancel dialog).
-        /// Slot 3 — Active temporary target badge (tap → cancel dialog).
-        /// Slot 4 — ISF badge centered under Loop tile
-        ///          (toggled via Settings switch — `state.isfView`).
-        private var breatheBadgeRow: some View {
-            HStack(spacing: 10) {
-                ZStack {
-                    if showBasalInfo {
-                        Home.BasalInfoBadge(text: Home.breatheTempBasalText(state: state))
-                            .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .top)))
-                    }
-                }
-                .frame(maxWidth: .infinity, minHeight: 28)
-
-                ZStack {
-                    if profileActive {
-                        ActiveBadge(
-                            dotColor: BreathePalette.salbei,
-                            text: profileBadgeText
-                        ) {
-                            showCancelAlert = true
+            let height: CGFloat = displayGlucose ? 140 : 210
+            addHeaderBackground()
+                .frame(
+                    height: fontSize < .extraExtraLarge ? height + geo.safeAreaInsets.top : height + 10 + geo
+                        .safeAreaInsets.top
+                )
+                .overlay {
+                    VStack {
+                        ZStack {
+                            if !displayGlucose {
+                                glucoseView.frame(maxHeight: .infinity, alignment: .center).offset(y: -5)
+                                loopView
+                                    .frame(
+                                        maxWidth: .infinity,
+                                        maxHeight: .infinity,
+                                        alignment: .topLeading
+                                    )
+                                    .padding(20)
+                                    .offset(x: 5, y: -10)
+                            }
+                            if displayGlucose {
+                                glucoseView.frame(maxHeight: .infinity, alignment: .center).offset(y: -10)
+                            } else {
+                                HStack {
+                                    carbsAndInsulinView
+                                        .frame(maxHeight: .infinity, alignment: .bottom)
+                                    Spacer()
+                                    pumpView
+                                        .frame(maxHeight: .infinity, alignment: .bottom)
+                                }
+                                .dynamicTypeSize(...DynamicTypeSize.xLarge)
+                                .padding(.horizontal, 10)
+                                .padding(.bottom, 5)
+                            }
                         }
-                        .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .top)))
-                    }
-                }
-                .frame(maxWidth: .infinity, minHeight: 28)
 
-                ZStack {
-                    if let tt = tempTargetString {
-                        ActiveBadge(
-                            dotColor: BreathePalette.flieder,
-                            text: tt
-                        ) {
-                            showCancelTTAlert = true
+                        if displayGlucose {
+                            glucosePreview
+                        } else {
+                            infoPanelView
                         }
-                        .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .top)))
-                    }
-                }
-                .frame(maxWidth: .infinity, minHeight: 28)
 
-                ZStack {
-                    if !state.isfView {
-                        isfView
+                        Divider()
                     }
+                    .padding(.top, geo.safeAreaInsets.top)
                 }
-                .frame(maxWidth: .infinity, minHeight: 28)
-            }
-            .padding(.horizontal, 10)
-            .animation(.easeInOut(duration: 0.25), value: showBasalInfo)
-            .animation(.easeInOut(duration: 0.25), value: profileActive)
-            .animation(.easeInOut(duration: 0.25), value: tempTargetString)
         }
 
-        /// Whether a profile override is currently enabled.
-        private var profileActive: Bool {
-            fetchedPercent.first?.enabled ?? false
+        var glucosePreview: some View {
+            let data = state.data.glucose
+            let minimum = data.compactMap(\.glucose).min() ?? 0
+            let minimumRange = Double(minimum) * 0.8
+            let maximum = Double(data.compactMap(\.glucose).max() ?? 0) * 1.1
+
+            let high = state.data.highGlucose
+            let low = state.data.lowGlucose
+            let veryHigh = 198
+
+            return Chart(data) {
+                PointMark(
+                    x: .value("Time", $0.dateString),
+                    y: .value("Glucose", Double($0.glucose ?? 0) * (state.data.units == .mmolL ? 0.0555 : 1.0))
+                )
+                .foregroundStyle(
+                    (($0.glucose ?? 0) > veryHigh || Decimal($0.glucose ?? 0) < low) ? Color(.red) : Decimal($0.glucose ?? 0) >
+                        high ? Color(.yellow) : Color(.darkGreen)
+                )
+                .symbolSize(5)
+            }
+            .chartXAxis(.hidden)
+            .chartYAxis {
+                AxisMarks(values: .automatic(desiredCount: 3))
+            }
+            .chartYScale(
+                domain: minimumRange * (state.data.units == .mmolL ? 0.0555 : 1.0) ... maximum *
+                    (state.data.units == .mmolL ? 0.0555 : 1.0)
+            )
+            .chartXScale(
+                domain: Date.now.addingTimeInterval(-1.days.timeInterval) ... Date.now
+            )
+            .frame(height: 50)
+            .padding(.leading, 30)
+            .padding(.trailing, 32)
+            .padding(.top, 15)
+            .dynamicTypeSize(DynamicTypeSize.medium ... DynamicTypeSize.large)
         }
 
-        /// Label text for the active-profile badge. Mirrors the logic of
-        /// `profileView` but collapses everything into a single compact string.
-        private var profileBadgeText: String {
-            guard let override = fetchedPercent.first, override.enabled else {
-                return NSLocalizedString("Profil", comment: "Profile badge fallback")
-            }
-            if override.isPreset {
-                if let profile = fetchedProfiles.first(where: { $0.id == override.id }),
-                   let name = profile.name,
-                   name != "EMPTY", name.nonEmpty != nil, name != "", name != "\u{0022}\u{0022}"
-                {
-                    return name.count > 14 ? String(name.prefix(14)) : name
+        var timeSetting: some View {
+            let hourLabel = NSLocalizedString("\(state.hours) hours", comment: "") + "   "
+
+            return Menu(hourLabel) {
+                ForEach([3, 6, 9, 12, 24], id: \.self) { value in
+                    let label = NSLocalizedString("\(value) hours", comment: "")
+                    Button(label, action: { state.hours = value })
                 }
-                return NSLocalizedString("Profil", comment: "Profile badge fallback")
+
+                Button("UI/UX Settings", action: {
+                    state.showModal(for: .uiConfig)
+                })
             }
-            if override.percentage != 100 {
-                let pct = tirFormatter.string(from: override.percentage as NSNumber) ?? ""
-                return "\(pct) %"
-            }
-            if override.smbIsOff {
-                return NSLocalizedString("No SMB", comment: "Profile badge: SMBs off")
-            }
-            return NSLocalizedString("Override", comment: "Profile badge default label")
+            .buttonStyle(.borderless)
+            .foregroundStyle(.primary)
+            .font(.timeSettingFont)
+            .padding(.vertical, 15)
+            .background(TimeEllipse(characters: hourLabel.count))
         }
 
         private var isfView: some View {
-            HStack(spacing: 5) {
-                Image(systemName: "divide")
-                    .font(.system(size: 10, weight: .medium))
-                Text(String(describing: state.data.suggestion?.sensitivityRatio ?? 1))
-                    .font(.system(size: 12, weight: .regular, design: .serif))
-                    .lineLimit(1)
-                    .fixedSize(horizontal: true, vertical: false)
-            }
-            .foregroundStyle(.primary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .background(
-                Capsule()
-                    .fill(.thinMaterial)
-                    .overlay(Capsule().stroke(BreathePalette.daemmer.opacity(0.2), lineWidth: 0.5))
-                    .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
-            )
-            .onTapGesture {
-                if (state.autoisf && !disabled()) || enabled() {
-                    displayAutoHistory.toggle()
-                } else {
-                    displayDynamicHistory.toggle()
+            ZStack {
+                HStack(spacing: 4) {
+                    Image(systemName: "divide")
+                        .font(.system(size: 16))
+                        .foregroundStyle(.teal)
+
+                    Text(String(describing: state.data.suggestion?.sensitivityRatio ?? 1))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1) // maximum 1 row
+                        .fixedSize(horizontal: true, vertical: false) // Prevent wrapping
+                }
+                .font(.timeSettingFont)
+                .background(TimeEllipse(characters: 10))
+                .onTapGesture {
+                    if (state.autoisf && !disabled()) || enabled() {
+                        displayAutoHistory.toggle()
+                    } else {
+                        displayDynamicHistory.toggle()
+                    }
                 }
             }
+            .offset(x: 130)
         }
 
         private func enabled() -> Bool {
@@ -616,12 +848,93 @@ extension Home {
                     /// If old iAPS user pre v5.7.1 OpenAPS settings will be reset, but can be restored in View below
                     importResetSettingsView(settings: openAPSSettings)
                 } else {
-                    mainScreen(geo: geo)
+                    VStack(spacing: 0) {
+                        // Header View
+                        headerView(geo)
+                        ScrollView {
+                            VStack {
+                                // Main Chart
+                                chart
+                                // Adjust hours visible (X-Axis) and ratio display
+                                timeSetting
+                                    .overlay { isfView }
+                                // TIR Chart
+                                if !state.data.glucose.isEmpty {
+                                    preview.padding(.top, 15)
+                                }
+                                // Loops Chart
+                                loopPreview.padding(.vertical, 15)
+
+                                // COB Chart
+                                if state.carbData > 0 {
+                                    activeCOBView.padding(.bottom, 15)
+                                }
+
+                                // IOB Chart
+                                if !state.iobData.isEmpty {
+                                    activeIOBView.padding(.bottom, 15)
+                                }
+
+                                // Summary Views
+                                insulinView.padding(.bottom, 15)
+                                mealsView.padding(.bottom, 15)
+                            }
+                            .background {
+                                // Track vertical scroll
+                                GeometryReader { proxy in
+                                    let scrollPosition = proxy.frame(in: .named("HomeScrollView")).minY
+                                    let yThreshold: CGFloat = -550
+                                    Color.clear
+                                        .onChange(of: scrollPosition) {
+                                            if scrollPosition < yThreshold, state.iobs > 0 || state.carbData > 0,
+                                               !state.skipGlucoseChart
+                                            {
+                                                withAnimation(.easeOut(duration: 0.3)) { displayGlucose = true }
+                                            } else {
+                                                withAnimation(.easeOut(duration: 0.4)) { displayGlucose = false }
+                                            }
+                                        }
+                                }
+                            }
+                        }.coordinateSpace(name: "HomeScrollView")
+                        // Buttons
+                        buttonPanel(geo)
+                    }
+                    .background(
+                        colorScheme == .light ? IAPSconfig.homeViewBackgroundLight : IAPSconfig.homeViewBackgrundDark
+                    )
+                    .ignoresSafeArea(edges: .vertical)
+                    .overlay {
+                        if let progress = state.bolusProgress, let amount = state.bolusAmount {
+                            ZStack {
+                                RoundedRectangle(cornerRadius: 15)
+                                    .fill(
+                                        colorScheme == .light ? IAPSconfig
+                                            .homeViewBackgroundLight : IAPSconfig
+                                            .homeViewBackgrundDark
+                                    )
+                                    .frame(maxWidth: 320, maxHeight: 90)
+                                bolusProgressView(progress: progress, amount: amount)
+                            }
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .offset(y: -100)
+                        }
+                    }
+                    .onChange(of: scenePhase) {
+                        switch scenePhase {
+                        case .active:
+                            state.startTimer()
+                        case .background,
+                             .inactive:
+                            state.stopTimer()
+                        default:
+                            break
+                        }
+                    }
                 }
             }
             .onAppear {
                 if onboarded.first?.firstRun ?? true {
-                    showFirstRunBackupPrompt = true
                     state.fetchPreferences()
                 }
             }
@@ -636,313 +949,51 @@ extension Home {
                 DynamicHistoryView(units: state.data.units)
                     .environment(\.colorScheme, colorScheme)
             }
-            .fullScreenCover(isPresented: $showFirstRunBackupPrompt) {
-                FirstRunRestorePromptView(resolver: resolver) {
-                    CoreDataStorage().saveOnbarding()
-                    showFirstRunBackupPrompt = false
-                }
-            }
             .popup(isPresented: state.isStatusPopupPresented, alignment: .bottom, direction: .bottom) {
                 popup
-                    .padding(.bottom, 80)
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 8, style: .continuous)
+                            .fill(Color.popUpGray)
+                    )
+                    .onTapGesture {
+                        state.isStatusPopupPresented = false
+                    }
                     .gesture(
                         DragGesture(minimumDistance: 10, coordinateSpace: .local)
                             .onEnded { value in
-                                if value.translation.height > 0 {
+                                if value.translation.height < 0 {
                                     state.isStatusPopupPresented = false
                                 }
                             }
                     )
-
-                    .alert("Bolus is already running", isPresented: $showBolusActiveAlert) {
-                        Button("OK", role: .cancel) {}
-                    } message: {
-                        Text("A bolus is already being administered. Please wait.")
-                    }
             }
-        }
-
-        // MARK: - Body decomposition (keeps type-checker budget sane)
-
-        @ViewBuilder private func mainScreen(geo: GeometryProxy) -> some View {
-            mainStack(geo: geo)
-                .overlay(alignment: .bottom) { bottomFAB(geo: geo) }
-                .overlay(alignment: .bottom) { bolusOverlay(geo: geo) }
-                .animation(.easeInOut(duration: 0.3), value: state.bolusProgress)
-                .sheet(isPresented: $showActionSheet) { actionSheetContent }
-                .confirmationDialog("Cancel Profile Override", isPresented: $showCancelAlert) {
-                    Button("Cancel Profile Override", role: .destructive) {
-                        state.cancelProfile()
-                        triggerUpdate.toggle()
-                    }
-                }
-                .confirmationDialog("Cancel Temporary Target", isPresented: $showCancelTTAlert) {
-                    Button("Cancel Temporary Target", role: .destructive) {
-                        state.cancelTempTarget()
-                        triggerUpdate.toggle()
-                    }
-                }
-                .confirmationDialog("Bolus already in Progress", isPresented: $showBolusActiveAlert) {
-                    Button("Bolus already in Progress!", role: .destructive) {
-                        showBolusActiveAlert = false
-                    }
-                }
-                .background(
-                    colorScheme == .light ? BreathePalette.dunstLight : BreathePalette.dunstDark
-                )
-                .sheet(isPresented: $displayAutoHistory) {
-                    AutoISFHistoryView(units: state.data.units)
-                        .environment(\.colorScheme, colorScheme)
-                }
-                .sheet(isPresented: $displayDynamicHistory) {
-                    DynamicHistoryView(units: state.data.units)
-                        .environment(\.colorScheme, colorScheme)
-                }
-                .overlay(statusPopupDimmer)
-                .ignoresSafeArea(edges: .vertical)
-                .onChange(of: scenePhase) {
-                    switch scenePhase {
-                    case .active:
-                        state.startTimer()
-                    case .background,
-                         .inactive:
-                        state.stopTimer()
-                    default:
-                        break
-                    }
-                }
-        }
-
-        @ViewBuilder private func mainStack(geo: GeometryProxy) -> some View {
-            VStack(spacing: 0) {
-                headerView(geo)
-                ScrollView {
-                    VStack {
-                        chart
-                        BreatheStatusRow(state: state, showBasalInfo: $showBasalInfo)
-                            .padding(.top, 28)
-                            .padding(.bottom, 8)
-                        breatheBadgeRow
-                            .padding(.bottom, 25)
-                    }
-                    .background { scrollTracker }
-                }
-                .coordinateSpace(name: "HomeScrollView")
-            }
-        }
-
-        private var scrollTracker: some View {
-            GeometryReader { proxy in
-                let scrollPosition = proxy.frame(in: .named("HomeScrollView")).minY
-                let yThreshold: CGFloat = -550
-                Color.clear
-                    .onChange(of: scrollPosition) {
-                        if scrollPosition < yThreshold, state.iobs > 0 || state.carbData > 0,
-                           !state.skipGlucoseChart
-                        {
-                            withAnimation(.easeOut(duration: 0.3)) { displayGlucose = true }
-                        } else {
-                            withAnimation(.easeOut(duration: 0.4)) { displayGlucose = false }
-                        }
-                    }
-            }
-        }
-
-        @ViewBuilder private func bottomFAB(geo: GeometryProxy) -> some View {
-            BreathePlusFAB { showActionSheet = true }
-                .padding(.bottom, geo.safeAreaInsets.bottom > 0 ? geo.safeAreaInsets.bottom + 8 : 24)
-        }
-
-        @ViewBuilder private func bolusOverlay(geo: GeometryProxy) -> some View {
-            if let progress = state.bolusProgress, progress > 0,
-               let amount = state.bolusAmount
-            {
-                let safeBottom = geo.safeAreaInsets.bottom > 0
-                    ? geo.safeAreaInsets.bottom + 8 : 24
-                BreatheBolusOverlay(
-                    progress: progress,
-                    delivered: amount * progress,
-                    total: amount,
-                    onCancel: { state.cancelBolus() }
-                )
-                .padding(.bottom, safeBottom + 64 + 14)
-            }
-        }
-
-        @ViewBuilder private var statusPopupDimmer: some View {
-            if state.isStatusPopupPresented {
-                Color.black.opacity(0.2)
-                    .ignoresSafeArea()
-                    .onTapGesture { state.isStatusPopupPresented = false }
-            }
-        }
-
-        // MARK: Action Sheet wiring
-
-        private var actionSheetContent: some View {
-            BreatheActionSheet(
-                isPresented: $showActionSheet,
-                isOverride: fetchedPercent.first?.enabled ?? false,
-                isTarget: state.tempTarget != nil,
-                onProfile: handleProfileTap,
-                onTempTarget: handleTempTargetTap,
-                onStatistics: handleStatisticsTap,
-                onUIUX: handleUIUXTap,
-                onSettings: handleSettingsTap
-            )
-        }
-
-        private func handleProfileTap() {
-            let active = fetchedPercent.first?.enabled ?? false
-            showActionSheet = false
-            if active { showCancelAlert = true }
-            else { state.showModal(for: .overrideProfilesConfig) }
-        }
-
-        private func handleTempTargetTap() {
-            let active = state.tempTarget != nil
-            showActionSheet = false
-            if active { showCancelTTAlert = true }
-            else { state.showModal(for: .addTempTarget) }
-        }
-
-        private func handleStatisticsTap() {
-            showActionSheet = false
-            state.showModal(for: .statistics)
-        }
-
-        private func handleUIUXTap() {
-            showActionSheet = false
-            state.showModal(for: .uiConfig)
-        }
-
-        private func handleSettingsTap() {
-            showActionSheet = false
-            state.showModal(for: .settings)
-        }
-
-        private var popupStatusBadgeColor: Color {
-            guard let suggestion = state.data.suggestion, suggestion.timestamp != nil else {
-                return .secondary
-            }
-            let delta = state.data.timerDate.timeIntervalSince(state.lastLoopDate) - 30
-
-            if delta <= 5.minutes.timeInterval {
-                guard suggestion.deliverAt != nil else { return .loopYellow }
-                return .loopGreen
-            } else if delta <= 10.minutes.timeInterval {
-                return .loopYellow
-            } else {
-                return .loopRed
-            }
-        }
-
-        private var popupStatusBadgeTextColor: Color {
-            if popupStatusBadgeColor == .secondary {
-                return .black
-            }
-            return colorScheme == .dark
-                ? Color(red: 25.0 / 255.0, green: 39.0 / 255.0, blue: 53.0 / 255.0, opacity: 1.0)
-                : .white
         }
 
         private var popup: some View {
-            VStack(alignment: .leading, spacing: 14) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Current Loop Status")
-                        .font(.headline)
-                        .bold()
-
-                    Text(state.statusTitle)
-                        .font(.subheadline)
-                        .bold()
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .foregroundColor(popupStatusBadgeTextColor)
-                        .background(popupStatusBadgeColor)
-                        .clipShape(Capsule())
-                }
-
-                if let errorMessage = state.errorMessage, let date = state.errorDate {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(
-                            "\(NSLocalizedString("Loop at", comment: "")) \(dateFormatter.string(from: date)) \(NSLocalizedString("failed.", comment: ""))"
-                        )
-                        .font(.subheadline)
-                        .bold()
-                        .foregroundColor(.loopRed)
-                        Text(errorMessage)
-                            .font(.caption)
-                            .foregroundColor(.loopRed)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                } else if let suggestion = state.data.suggestion, (suggestion.bg ?? 100) == 400 {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Invalid CGM reading (HIGH).")
-                            .font(.subheadline)
-                            .bold()
-                            .foregroundColor(.red)
-                        Text("SMBs and High Temps Disabled.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                }
-
+            VStack(alignment: .leading, spacing: 4) {
+                Text(state.statusTitle).font(.suggestionHeadline).foregroundColor(.white)
+                    .padding(.bottom, 4)
                 if let suggestion = state.data.suggestion {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Latest Raw Algorithm Output")
-                            .font(.headline)
-                            .bold()
+                    TagCloudView(tags: suggestion.reasonParts).animation(.none, value: false)
 
-                        Text("iAPS is currently using these metrics and values:")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        TagCloudView(tags: suggestion.reasonParts)
-                            .animation(.none, value: false)
-                    }
-
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Current Algorithm Reasoning")
-                            .font(.headline)
-                            .bold()
-
-                        Text(suggestion.reasonConclusion.capitalizingFirstLetter())
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+                    Text(suggestion.reasonConclusion.capitalizingFirstLetter()).font(.suggestionSmallParts)
+                        .foregroundColor(.white)
                 } else {
-                    Text("No suggestion found")
-                        .font(.subheadline)
-                        .foregroundColor(.secondary)
+                    Text("No suggestion found").font(.suggestionHeadline).foregroundColor(.white)
                 }
-
-                Button {
-                    state.isStatusPopupPresented = false
-                } label: {
-                    Text("Got it!")
-                        .bold()
-                        .frame(maxWidth: .infinity, minHeight: 32)
+                if let errorMessage = state.errorMessage, let date = state.errorDate {
+                    Text(NSLocalizedString("Status at", comment: "") + " " + dateFormatter.string(from: date))
+                        .foregroundColor(.white)
+                        .font(.suggestionError)
+                        .padding(.bottom, 4)
+                        .padding(.top, 8)
+                    Text(errorMessage).font(.suggestionError).fontWeight(.semibold).foregroundColor(.orange)
+                } else if let suggestion = state.data.suggestion, (suggestion.bg ?? 100) == 400 {
+                    Text("Invalid CGM reading (HIGH).").font(.suggestionError).bold().foregroundColor(.loopRed).padding(.top, 8)
+                    Text("SMBs and High Temps Disabled.").font(.suggestionParts).foregroundColor(.white).padding(.bottom, 4)
                 }
-                .buttonStyle(.bordered)
-                .padding(.top, 4)
             }
-            .padding(18)
-            .background(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .fill(colorScheme == .light ? BreathePalette.dunstLight : BreathePalette.dunstDark)
-                    .shadow(
-                        color: .black.opacity(colorScheme == .dark ? 0.22 : 0.07),
-                        radius: 10, x: 0, y: 5
-                    )
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(Color.primary.opacity(0.1), lineWidth: 1)
-            )
-            .padding(.horizontal, 16)
         }
 
         private func importResetSettingsView(settings: Preferences) -> some View {
