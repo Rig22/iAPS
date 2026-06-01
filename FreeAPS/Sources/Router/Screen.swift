@@ -50,7 +50,7 @@ extension Screen {
         case .loading:
             ProgressView()
         case .home:
-            Home.BreatheRootView(resolver: resolver)
+            Home.AuroraRootView(resolver: resolver)
         case .settings:
             Settings.RootView(resolver: resolver)
         case let .configEditor(file):

@@ -1,19 +1,6 @@
 import SwiftUI
 
 extension Home {
-    // MARK: - Breathe Bolus Overlay
-
-    /// A calm, Breathe-style banner that floats above the home view while a
-    /// bolus is in progress. Replaces the old `TopStatusPill` progress bar.
-    ///
-    /// Shows:
-    ///   · drop icon with a subtle pulse
-    ///   · "Bolus läuft" title
-    ///   · delivered / total in units (e.g. "1,5 / 3,0 E")
-    ///   · horizontal progress track in daemmer
-    ///   · "Stoppen" button (heavy haptic, confirms via tap → parent handles cancel)
-    ///
-    /// Transition: slides in from the top with a soft opacity fade.
     struct BreatheBolusOverlay: View {
         let progress: Decimal // 0 ... 1
         let delivered: Decimal // units already given
