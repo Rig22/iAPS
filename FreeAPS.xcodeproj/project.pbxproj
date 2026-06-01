@@ -14,7 +14,7 @@
 		056EB4802B4C8B3D00CDE36E /* SystemSoundsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056EB47D2B4C8B3D00CDE36E /* SystemSoundsManager.swift */; };
 		056EB4812B4C8B3D00CDE36E /* SystemSoundsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 056EB47D2B4C8B3D00CDE36E /* SystemSoundsManager.swift */; };
 		05EFE2EE40BD7B41738EFF23 /* AuroraStatusRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7612F56D37DDE25BF5370982 /* AuroraStatusRow.swift */; };
-		0B24B481945B68E0E9CED5F4 /* AuroraRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20F102ADE877F14A2EF2628 /* AuroraRootView.swift */; };
+		0B24B481945B68E0E9CED5F4 /* AuroraHomeRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20F102ADE877F14A2EF2628 /* AuroraHomeRootView.swift */; };
 		0CEA2EA070AB041AF3E3745B /* BolusRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A0C32B0DAB52726EF9B6D9 /* BolusRootView.swift */; };
 		0D9A5E34A899219C5C4CDFAF /* DataTableStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9455FA2D92E77A6C4AFED8A3 /* DataTableStateModel.swift */; };
 		0F7A65FBD2CD8D6477ED4539 /* NotificationsConfigProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = E625985B47742D498CB1681A /* NotificationsConfigProvider.swift */; };
@@ -418,12 +418,7 @@
 		BD7DA9AC2AE06EB900601B20 /* BolusCalculatorConfigRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BD7DA9AB2AE06EB900601B20 /* BolusCalculatorConfigRootView.swift */; };
 		BDFD165A2AE40438007F0DDA /* AlternativeBolusCalcRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFD16592AE40438007F0DDA /* AlternativeBolusCalcRootView.swift */; };
 		BDFD165C2AE40688007F0DDA /* DefaultBolusCalcRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDFD165B2AE40688007F0DDA /* DefaultBolusCalcRootView.swift */; };
-		BEA71B0000000000000000A1 /* BreathingGlucoseOrb.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA71B0000000000000000A2 /* BreathingGlucoseOrb.swift */; };
 		BEA71B0000000000000000B1 /* BreathePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA71B0000000000000000B2 /* BreathePalette.swift */; };
-		BEA71B0000000000000000C1 /* BreatheStatusRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA71B0000000000000000C2 /* BreatheStatusRow.swift */; };
-		BEA71B0000000000000000D1 /* BreathePlusFAB.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA71B0000000000000000D2 /* BreathePlusFAB.swift */; };
-		BEA71B0000000000000000E1 /* BreatheMainChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA71B0000000000000000E2 /* BreatheMainChart.swift */; };
-		BEA71B0000000000000000F1 /* BreatheBolusOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEA71B0000000000000000F2 /* BreatheBolusOverlay.swift */; };
 		BF1667ADE69E4B5B111CECAE /* ManualTempBasalProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 680C4420C9A345D46D90D06C /* ManualTempBasalProvider.swift */; };
 		C23D3DFEC1C965836D642046 /* AuroraSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EBB8FBD70A791F99E1E36FF /* AuroraSegmentedControl.swift */; };
 		C967DACD3B1E638F8B43BE06 /* ManualTempBasalStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFCFE0781F9074C2917890E8 /* ManualTempBasalStateModel.swift */; };
@@ -1173,12 +1168,7 @@
 		BDFD16592AE40438007F0DDA /* AlternativeBolusCalcRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlternativeBolusCalcRootView.swift; sourceTree = "<group>"; };
 		BDFD165B2AE40688007F0DDA /* DefaultBolusCalcRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultBolusCalcRootView.swift; sourceTree = "<group>"; };
 		BE70B1E6E7995773AD72C4B2 /* AuroraPrimaryButton.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuroraPrimaryButton.swift; sourceTree = "<group>"; };
-		BEA71B0000000000000000A2 /* BreathingGlucoseOrb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathingGlucoseOrb.swift; sourceTree = "<group>"; };
 		BEA71B0000000000000000B2 /* BreathePalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathePalette.swift; sourceTree = "<group>"; };
-		BEA71B0000000000000000C2 /* BreatheStatusRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreatheStatusRow.swift; sourceTree = "<group>"; };
-		BEA71B0000000000000000D2 /* BreathePlusFAB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreathePlusFAB.swift; sourceTree = "<group>"; };
-		BEA71B0000000000000000E2 /* BreatheMainChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreatheMainChart.swift; sourceTree = "<group>"; };
-		BEA71B0000000000000000F2 /* BreatheBolusOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BreatheBolusOverlay.swift; sourceTree = "<group>"; };
 		BF8BCB0C37DEB5EC377B9612 /* BasalProfileEditorRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BasalProfileEditorRootView.swift; sourceTree = "<group>"; };
 		C083D46B1F96F1A38AF922F8 /* AuroraPalette.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuroraPalette.swift; sourceTree = "<group>"; };
 		C19984D62EFC0035A9E9644D /* BolusProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BolusProvider.swift; sourceTree = "<group>"; };
@@ -1250,7 +1240,7 @@
 		E26904AACA8D9C15D229D675 /* SnoozeStateModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SnoozeStateModel.swift; sourceTree = "<group>"; };
 		E625985B47742D498CB1681A /* NotificationsConfigProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationsConfigProvider.swift; sourceTree = "<group>"; };
 		E9AAB83FB6C3B41EFD1846A0 /* AddTempTargetRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AddTempTargetRootView.swift; sourceTree = "<group>"; };
-		F20F102ADE877F14A2EF2628 /* AuroraRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuroraRootView.swift; sourceTree = "<group>"; };
+		F20F102ADE877F14A2EF2628 /* AuroraHomeRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuroraHomeRootView.swift; sourceTree = "<group>"; };
 		F2159A492BA60A6000A0B716 /* ContactTrickDataFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactTrickDataFlow.swift; sourceTree = "<group>"; };
 		F2159A4B2BA60A8E00A0B716 /* ContactTrickRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactTrickRootView.swift; sourceTree = "<group>"; };
 		F2159A4D2BA60AC000A0B716 /* ContactTrickProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactTrickProvider.swift; sourceTree = "<group>"; };
@@ -1465,7 +1455,7 @@
 				ACFB0749D1992E87C36D782D /* AuroraBackground.swift */,
 				6CA3430CF6026B0C85C8610F /* AuroraGlass.swift */,
 				C083D46B1F96F1A38AF922F8 /* AuroraPalette.swift */,
-				F20F102ADE877F14A2EF2628 /* AuroraRootView.swift */,
+				F20F102ADE877F14A2EF2628 /* AuroraHomeRootView.swift */,
 				77EB182D48EEAC3A419C2195 /* AuroraStatBadge.swift */,
 				DB49C97BC718AF2665FAB34C /* AuroraStatus.swift */,
 				7612F56D37DDE25BF5370982 /* AuroraStatusRow.swift */,
@@ -1954,9 +1944,6 @@
 			isa = PBXGroup;
 			children = (
 				790B2C092FCC24B70064CC50 /* HomeRootView.swift */,
-				BEA71B0000000000000000C2 /* BreatheStatusRow.swift */,
-				BEA71B0000000000000000D2 /* BreathePlusFAB.swift */,
-				BEA71B0000000000000000F2 /* BreatheBolusOverlay.swift */,
 				3833B51E260264AC003021B3 /* Chart */,
 				3833B51F260264B6003021B3 /* Header */,
 				194D7E6C2B974EA4007A38C1 /* Previews */,
@@ -2180,7 +2167,6 @@
 		3833B51E260264AC003021B3 /* Chart */ = {
 			isa = PBXGroup;
 			children = (
-				BEA71B0000000000000000E2 /* BreatheMainChart.swift */,
 			);
 			path = Chart;
 			sourceTree = "<group>";
@@ -2190,7 +2176,6 @@
 			children = (
 				383420D525FFE38C002D46C1 /* LoopView.swift */,
 				38AAF85425FFF846004AF583 /* CurrentGlucoseView.swift */,
-				BEA71B0000000000000000A2 /* BreathingGlucoseOrb.swift */,
 				38DAB27F260CBB7F00F74C1A /* PumpView.swift */,
 			);
 			path = Header;
@@ -3909,7 +3894,6 @@
 				F2159A572BA6239F00A0B716 /* ContactTrickManager.swift in Sources */,
 				193339772E05BC8400E80EF5 /* DynamicHistoryView.swift in Sources */,
 				38DF179027733EAD00B3528F /* SnowScene.swift in Sources */,
-				BEA71B0000000000000000E1 /* BreatheMainChart.swift in Sources */,
 				195F00482B5C267D00DAC71A /* DescriptionView.swift in Sources */,
 				F2EE83C32E739AF200D7177E /* CalendarShareProvider.swift in Sources */,
 				19DC677F29CA675700FD9EC4 /* OverrideProfilesDataFlow.swift in Sources */,
@@ -4039,9 +4023,6 @@
 				F21957B12EF48B8E003C9F09 /* Debug.swift in Sources */,
 				E4984C5262A90469788754BB /* PreferencesEditorProvider.swift in Sources */,
 				DD399FB31EACB9343C944C4C /* PreferencesEditorStateModel.swift in Sources */,
-				BEA71B0000000000000000C1 /* BreatheStatusRow.swift in Sources */,
-				BEA71B0000000000000000D1 /* BreathePlusFAB.swift in Sources */,
-				BEA71B0000000000000000F1 /* BreatheBolusOverlay.swift in Sources */,
 				F2159A4E2BA60AC000A0B716 /* ContactTrickProvider.swift in Sources */,
 				19E1F7EA29D082ED005C8D20 /* IconConfigProvider.swift in Sources */,
 				44190F0BBA464D74B857D1FB /* PreferencesEditorRootView.swift in Sources */,
@@ -4078,7 +4059,6 @@
 				8BC2F5A29AD1ED08AC0EE013 /* AddTempTargetRootView.swift in Sources */,
 				38A00B1F25FC00F7006BC0B0 /* Autotune.swift in Sources */,
 				38AAF85525FFF846004AF583 /* CurrentGlucoseView.swift in Sources */,
-				BEA71B0000000000000000A1 /* BreathingGlucoseOrb.swift in Sources */,
 				F2159A4C2BA60A8E00A0B716 /* ContactTrickRootView.swift in Sources */,
 				041D1E995A6AE92E9289DC49 /* BolusDataFlow.swift in Sources */,
 				23888883D4EA091C88480FF2 /* BolusProvider.swift in Sources */,
@@ -4187,7 +4167,7 @@
 				37A1E50092CA8C9789CDA982 /* AuroraBackground.swift in Sources */,
 				56A106C68A5648B2093CE496 /* AuroraGlass.swift in Sources */,
 				ADD5C6E169B5E6D3DEFA56CA /* AuroraPalette.swift in Sources */,
-				0B24B481945B68E0E9CED5F4 /* AuroraRootView.swift in Sources */,
+				0B24B481945B68E0E9CED5F4 /* AuroraHomeRootView.swift in Sources */,
 				74EFB04A06E146AA34BB6BC1 /* AuroraStatBadge.swift in Sources */,
 				92FDB353A4AF855DCE14D284 /* AuroraStatus.swift in Sources */,
 				05EFE2EE40BD7B41738EFF23 /* AuroraStatusRow.swift in Sources */,

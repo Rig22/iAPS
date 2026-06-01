@@ -8,9 +8,8 @@ struct AuroraRing: View {
     let glucose: Double // mg/dL
     let delta: Int? // mg/dL
     let trendCaption: String? // e.g. "Leicht steigend"
-    /// 0…1 while a bolus is in flight, `nil` otherwise. When set, a thin
-    /// outer halo arc fills clockwise as the bolus progresses — a calm,
-    /// non-intrusive live indicator that complements the bolus banner.
+
+    var direction: BloodGlucose.Direction? = nil
     var bolusProgress: Double? = nil
 
     var size = CGSize(width: 300, height: 250)
@@ -121,11 +120,37 @@ struct AuroraRing: View {
                     .foregroundStyle(AuroraPalette.textMuted(scheme))
             }
 
-            Text(trendCaption ?? status.caption)
-                .font(.system(size: 12.5, weight: .semibold))
-                .foregroundStyle(AuroraPalette.textFaint(scheme))
+            // Slot below the delta: either a CGM trend arrow (preferred)
+            // or an optional caption if the caller really wants text.
+            if let symbol = trendArrowSymbol {
+                Image(systemName: symbol)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(AuroraPalette.textMuted(scheme))
+            } else if let caption = trendCaption {
+                Text(caption)
+                    .font(.system(size: 12.5, weight: .semibold))
+                    .foregroundStyle(AuroraPalette.textFaint(scheme))
+            }
         }
         .position(x: center.x, y: center.y)
+    }
+
+    private var trendArrowSymbol: String? {
+        switch direction {
+        case .doubleUp,
+             .tripleUp: return "arrow.up"
+        case .singleUp: return "arrow.up.right"
+        case .fortyFiveUp: return "arrow.up.right"
+        case .flat: return "arrow.right"
+        case .fortyFiveDown: return "arrow.down.right"
+        case .singleDown: return "arrow.down.right"
+        case .doubleDown,
+             .tripleDown: return "arrow.down"
+        case nil,
+             .notComputable,
+             .rateOutOfRange,
+             .some(.none): return nil
+        }
     }
 
     private var formattedGlucose: String {

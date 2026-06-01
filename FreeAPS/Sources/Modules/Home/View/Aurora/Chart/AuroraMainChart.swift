@@ -520,6 +520,16 @@ struct AuroraMainChart: View {
         let selCarb = selectedCarb
 
         return Chart {
+            // 0. Target band — soft Status-Color wash between low and high
+            //    thresholds spanning the full timeline.
+            RectangleMark(
+                xStart: .value("tbs", dataStart),
+                xEnd: .value("tbe", xEnd),
+                yStart: .value("tbl", lowThreshold),
+                yEnd: .value("tbh", highThreshold)
+            )
+            .foregroundStyle(status.main.opacity(scheme == .dark ? 0.08 : 0.06))
+
             // 1. Basal bars — hang from top edge of plot, length = rate / maxRate
             if displayBasal {
                 ForEach(basals) { s in
@@ -582,6 +592,28 @@ struct AuroraMainChart: View {
             RuleMark(x: .value("now", now))
                 .lineStyle(StrokeStyle(lineWidth: 0.6, dash: [2, 4]))
                 .foregroundStyle(AuroraPalette.textFaint(scheme))
+
+            // 4b. Area fill under the glucose curve — single Status-Color
+            //     series so the wash stays cohesive even where the line itself
+            //     turns grey (out-of-range). Fades top → bottom.
+            ForEach(pts) { p in
+                AreaMark(
+                    x: .value("t", p.date),
+                    yStart: .value("yLow", yLow),
+                    yEnd: .value("g", p.value),
+                    series: .value("series", "area")
+                )
+                .interpolationMethod(.linear)
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [
+                            status.main.opacity(scheme == .dark ? 0.32 : 0.24),
+                            status.main.opacity(0)
+                        ],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                )
+            }
 
             // 5. Glucose line — split at every threshold crossing so the
             //    in-range parts carry the live status color while out-of-range

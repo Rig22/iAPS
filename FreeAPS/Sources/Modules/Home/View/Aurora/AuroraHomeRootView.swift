@@ -6,7 +6,7 @@ extension Home {
     /// The Aurora skin's home screen — glassmorphism redesign.
     /// Replaces the previous Breathe layout. Reuses `Home.StateModel`,
     /// `HomeProvider`, and the existing routing.
-    struct AuroraRootView: BaseView {
+    struct AuroraHomeRootView: BaseView {
         let resolver: Resolver
 
         @StateObject var state: StateModel
@@ -352,6 +352,7 @@ extension Home {
                     glucose: glucoseValue,
                     delta: glucoseDelta,
                     trendCaption: nil,
+                    direction: state.recentGlucose?.direction,
                     bolusProgress: state.bolusProgress.map { NSDecimalNumber(decimal: $0).doubleValue }
                 )
                 .contentShape(Rectangle())
@@ -374,15 +375,11 @@ extension Home {
             }
             .frame(maxWidth: .infinity)
             .overlay(alignment: .topLeading) {
-                if let s = sensorInfo {
-                    infoPill(
-                        icon: "sensor.tag.radiowaves.forward",
-                        text: s.text,
-                        iconColor: s.color
-                    )
-                    .padding(.leading, 18)
-                    .padding(.top, 4)
-                    .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .topLeading)))
+                if let txt = tbrText {
+                    infoPill(icon: "chart.bar", text: txt)
+                        .padding(.leading, 18)
+                        .padding(.top, 4)
+                        .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .topLeading)))
                 }
             }
             .overlay(alignment: .topTrailing) {
@@ -394,11 +391,15 @@ extension Home {
                 }
             }
             .overlay(alignment: .bottomLeading) {
-                if let txt = tbrText {
-                    infoPill(icon: "chart.bar", text: txt)
-                        .padding(.leading, 18)
-                        .padding(.bottom, 4)
-                        .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .bottomLeading)))
+                if let s = sensorInfo {
+                    infoPill(
+                        icon: "sensor.tag.radiowaves.forward",
+                        text: s.text,
+                        iconColor: s.color
+                    )
+                    .padding(.leading, 18)
+                    .padding(.bottom, 4)
+                    .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .bottomLeading)))
                 }
             }
             .overlay(alignment: .bottomTrailing) {

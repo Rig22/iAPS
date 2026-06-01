@@ -91,8 +91,8 @@ struct AuroraTabBar: View {
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
             onSettings()
         }, label: {
-            Image(systemName: "plus")
-                .font(.system(size: 28, weight: .semibold))
+            Image(systemName: "gearshape.fill")
+                .font(.system(size: 24, weight: .semibold))
                 .foregroundStyle(Color.white)
                 .frame(width: 62, height: 62)
                 .background(
