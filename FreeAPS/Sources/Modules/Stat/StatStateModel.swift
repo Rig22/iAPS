@@ -78,11 +78,11 @@ extension Stat {
         /// Computes the daily TDD summary values exactly the same way HomeRootView does,
         /// so the values shown in the Stat insulin summary card always match the home view.
         private func setupInsulinSummary() {
-            let tdds = CoreDataStorage().fetchTDD(interval: DateFilter().tenDays)
+            let tdds = CoreDataStorage().fetchTDD(interval: DateFilter.tenDays.startDate)
             let yesterday = (tdds.first(where: {
                 ($0.timestamp ?? .distantFuture) <= Date().addingTimeInterval(-24.hours.timeInterval)
             })?.tdd ?? 0) as Decimal
-            let oneDaysAgo = CoreDataStorage().fetchTDD(interval: DateFilter().today).last
+            let oneDaysAgo = CoreDataStorage().fetchTDD(interval: DateFilter.today.startDate).last
 
             tddChange = ((tdds.first?.tdd ?? 0) as Decimal) - yesterday
             tddYesterday = (oneDaysAgo?.tdd ?? 0) as Decimal
@@ -328,7 +328,7 @@ extension Stat {
 
         private func setupMealStats() {
             let context = CoreDataStack.shared.persistentContainer.viewContext
-            let request = NSFetchRequest<Carbohydrates>(entityName: "Carbohydrates")
+            let request = NSFetchRequest<Meals>(entityName: "Meals")
             request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
             request.predicate = NSPredicate(format: "date > %@", Date().addingTimeInterval(-90 * 24 * 3600) as NSDate)
 

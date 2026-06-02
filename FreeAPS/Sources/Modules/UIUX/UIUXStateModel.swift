@@ -36,6 +36,7 @@ extension UIUX {
         @Published var displayMainChartBasalRate: Bool = false
         @Published var displayTBR: Bool = false
         @Published var isfView: Bool = false
+        @Published var mealViewMicronutrients: Bool = true
 
         var units: GlucoseUnits = .mmolL
 
@@ -73,6 +74,7 @@ extension UIUX {
             subscribeSetting(\.displayMainChartBasalRate, on: $displayMainChartBasalRate) { displayMainChartBasalRate = $0 }
             subscribeSetting(\.displayTBR, on: $displayTBR) { displayTBR = $0 }
             subscribeSetting(\.isfView, on: $isfView) { isfView = $0 }
+            subscribeSetting(\.mealViewMicronutrients, on: $mealViewMicronutrients) { mealViewMicronutrients = $0 }
 
             subscribeSetting(\.low, on: $low, initial: {
                 let value = max(min($0, 90), 40)

@@ -153,6 +153,7 @@ struct FreeAPSSettings: JSON, Equatable {
     var displayMainChartBasalRate: Bool = false
     var displayTBR: Bool = false
 
+    var mealViewMicronutrients: Bool = false
     var nightTime = NightTimeConfiguration.default
     // Backup
     var autoBackupEnabled: Bool = false
@@ -754,6 +755,10 @@ extension FreeAPSSettings: Decodable {
 
         if let displayTBR = try? container.decode(Bool.self, forKey: .displayTBR) {
             settings.displayTBR = displayTBR }
+
+        if let mealViewMicronutrients = try? container.decode(Bool.self, forKey: .mealViewMicronutrients) {
+            settings.mealViewMicronutrients = mealViewMicronutrients
+        }
 
         if let uploadLogs = try? container.decode(Bool.self, forKey: .uploadLogs) {
             settings.uploadLogs = uploadLogs

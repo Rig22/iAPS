@@ -83,6 +83,7 @@ extension UIUX {
                     if state.ai {
                         Toggle("Don't ask for saving search result as meal preset", isOn: $state.skipSave)
                     }
+                    Toggle("Allow Meal View Micronutrients and Dietary Fibers entries", isOn: $state.mealViewMicronutrients)
                 } header: { Text("Add Meal View settings ") }
 
                 Section {
