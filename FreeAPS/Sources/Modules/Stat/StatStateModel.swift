@@ -329,8 +329,10 @@ extension Stat {
         private func setupMealStats() {
             let context = CoreDataStack.shared.persistentContainer.viewContext
             let request = NSFetchRequest<Meals>(entityName: "Meals")
-            request.sortDescriptors = [NSSortDescriptor(key: "date", ascending: true)]
-            request.predicate = NSPredicate(format: "date > %@", Date().addingTimeInterval(-90 * 24 * 3600) as NSDate)
+            // Meals rows store their timestamp in createdAt/actualDate; the `date`
+            // attribute is never populated, so filter/sort on createdAt instead.
+            request.sortDescriptors = [NSSortDescriptor(key: "createdAt", ascending: true)]
+            request.predicate = NSPredicate(format: "createdAt > %@", Date().addingTimeInterval(-90 * 24 * 3600) as NSDate)
 
             guard let results = try? context.fetch(request) else { return }
 
@@ -339,7 +341,7 @@ extension Stat {
             // Daily
             var dailyMap: [Date: (carbs: Double, fat: Double, protein: Double)] = [:]
             for record in results {
-                guard let date = record.date else { continue }
+                guard let date = record.actualDate ?? record.createdAt else { continue }
                 let day = calendar.startOfDay(for: date)
                 dailyMap[day, default: (0, 0, 0)].carbs += Double(truncating: record.carbs ?? 0)
                 dailyMap[day, default: (0, 0, 0)].fat += Double(truncating: record.fat ?? 0)
@@ -365,7 +367,7 @@ extension Stat {
             }
             // Overlay actual data
             for record in results {
-                guard let date = record.date, date > dayAgo else { continue }
+                guard let date = record.actualDate ?? record.createdAt, date > dayAgo else { continue }
                 let hour = calendar.date(from: calendar.dateComponents([.year, .month, .day, .hour], from: date))!
                 hourlyMap[hour, default: (0, 0, 0)].carbs += Double(truncating: record.carbs ?? 0)
                 hourlyMap[hour, default: (0, 0, 0)].fat += Double(truncating: record.fat ?? 0)
