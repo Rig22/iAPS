@@ -504,6 +504,8 @@ extension Home {
                 glucose: glucoseValue,
                 showOverride: state.profileButton,
                 showTempTarget: state.useTargetButton,
+                profileActive: profileActive,
+                targetActive: state.tempTarget != nil,
                 onCarbs: {
                     state.showModal(for: .addCarbs(editMode: false, override: false, mode: .meal))
                 },

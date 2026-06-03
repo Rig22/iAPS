@@ -14,6 +14,10 @@ struct AuroraTabBar: View {
     let glucose: Double // drives FAB color
     var showOverride: Bool = true
     var showTempTarget: Bool = true
+    /// Tint Profil / Ziel in the live status color when one is currently
+    /// running, so the bar surfaces what's bending the loop at a glance.
+    var profileActive: Bool = false
+    var targetActive: Bool = false
     let onCarbs: () -> Void
     let onBolus: () -> Void
     let onDataTable: () -> Void
@@ -77,13 +81,21 @@ struct AuroraTabBar: View {
                 onStatistics()
             }
             if showOverride {
-                actionButton(icon: "person.fill", accessibility: "Profil") {
+                actionButton(
+                    icon: "person.fill",
+                    accessibility: "Profil",
+                    tint: profileActive ? status.main : nil
+                ) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     onProfile()
                 }
             }
             if showTempTarget {
-                actionButton(icon: "target", accessibility: "Temporäres Ziel") {
+                actionButton(
+                    icon: "target",
+                    accessibility: "Temporäres Ziel",
+                    tint: targetActive ? status.main : nil
+                ) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     onTarget()
                 }
@@ -124,12 +136,13 @@ struct AuroraTabBar: View {
     private func actionButton(
         icon: String,
         accessibility: String,
+        tint: Color? = nil,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action, label: {
             Image(systemName: icon)
-                .font(.system(size: 22, weight: .regular))
-                .foregroundStyle(AuroraPalette.textMuted(scheme))
+                .font(.system(size: 22, weight: tint == nil ? .regular : .semibold))
+                .foregroundStyle(tint ?? AuroraPalette.textMuted(scheme))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         })
             .buttonStyle(.plain)
