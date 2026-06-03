@@ -99,11 +99,21 @@ extension Home {
             concentration.last?.concentration ?? 1
         }
 
+        /// Pods can't report an exact reservoir level above 50 U — the pump
+        /// layer substitutes this sentinel (see KnownPlugins.pumpReservoir).
+        private static let reservoirSentinel = Decimal(0xDEAD_BEEF)
+
         private var reservoirString: String {
             guard let r = state.reservoir else { return "—" }
+            let conc = insulinConcentration
+            // Pod sentinel: show a capped "50+" (scaled for concentration),
+            // mirroring PumpView, instead of formatting the raw sentinel int.
+            if r == Self.reservoirSentinel {
+                return String(format: "%.0f+", 50 * conc)
+            }
             // Reservoir is stored U100-equivalent; scale to the real delivered
             // units for diluted/concentrated insulin (e.g. U200 → ×2).
-            let scaled = r * Decimal(insulinConcentration)
+            let scaled = r * Decimal(conc)
             return String(format: "%.0f", NSDecimalNumber(decimal: scaled).doubleValue)
         }
 
