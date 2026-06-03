@@ -38,6 +38,8 @@ struct AuroraTabBar: View {
 
     // MARK: - Left pill (Carbs + Bolus)
 
+    private var moveDataTableRight: Bool { !showOverride && !showTempTarget }
+
     private var leftPill: some View {
         HStack(spacing: 0) {
             actionButton(icon: "fork.knife", accessibility: "Kohlenhydrate") {
@@ -48,9 +50,11 @@ struct AuroraTabBar: View {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onBolus()
             }
-            actionButton(icon: "list.bullet.rectangle", accessibility: "Behandlungen") {
-                UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                onDataTable()
+            if !moveDataTableRight {
+                actionButton(icon: "list.bullet.rectangle", accessibility: "Behandlungen") {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    onDataTable()
+                }
             }
         }
         .frame(height: 58)
@@ -62,6 +66,12 @@ struct AuroraTabBar: View {
 
     private var rightPill: some View {
         HStack(spacing: 0) {
+            if moveDataTableRight {
+                actionButton(icon: "list.bullet.rectangle", accessibility: "Behandlungen") {
+                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                    onDataTable()
+                }
+            }
             actionButton(icon: "chart.bar.xaxis", accessibility: "Statistik") {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onStatistics()
