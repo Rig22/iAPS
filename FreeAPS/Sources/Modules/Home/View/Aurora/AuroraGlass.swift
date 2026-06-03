@@ -75,4 +75,54 @@ extension View {
     func auroraGlass(radius: CGFloat = 26, shine: Bool = false) -> some View {
         modifier(AuroraGlass(radius: radius, shine: shine))
     }
+
+    /// Capsule-shaped Aurora glass — same tint/border palette as the cards
+    /// but with a smaller shadow appropriate for compact pills (corner pills
+    /// around the ring, loop pill, active override/temp-target badges).
+    func auroraGlassPill() -> some View {
+        modifier(AuroraGlassPill())
+    }
+}
+
+/// Capsule variant of `AuroraGlass` — slim shadow profile, same material +
+/// theme tint + hairline border so pills sit in the same visual vocabulary as
+/// the larger glass cards (main chart, action bar, stat badges).
+struct AuroraGlassPill: ViewModifier {
+    @Environment(\.colorScheme) private var scheme
+
+    func body(content: Content) -> some View {
+        content
+            .background {
+                ZStack {
+                    Capsule(style: .continuous).fill(.ultraThinMaterial)
+                    Capsule(style: .continuous).fill(tint)
+                }
+            }
+            .overlay {
+                Capsule(style: .continuous).stroke(border, lineWidth: 0.5)
+            }
+            .clipShape(Capsule(style: .continuous))
+            .shadow(color: shadowColor, radius: shadowRadius, x: 0, y: shadowY)
+    }
+
+    private var tint: Color {
+        scheme == .dark
+            ? Color(red: 46 / 255, green: 46 / 255, blue: 52 / 255).opacity(0.55)
+            : Color.white.opacity(0.66)
+    }
+
+    private var border: Color {
+        scheme == .dark
+            ? Color.white.opacity(0.13)
+            : Color.white.opacity(0.9)
+    }
+
+    private var shadowColor: Color {
+        scheme == .dark
+            ? Color.black.opacity(0.30)
+            : Color(red: 31 / 255, green: 41 / 255, blue: 55 / 255).opacity(0.10)
+    }
+
+    private var shadowRadius: CGFloat { 8 }
+    private var shadowY: CGFloat { 3 }
 }

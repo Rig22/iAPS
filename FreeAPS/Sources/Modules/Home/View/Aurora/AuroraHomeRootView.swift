@@ -331,12 +331,7 @@ extension Home {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 5)
-            .background(
-                Capsule()
-                    .fill(.ultraThinMaterial)
-                    .overlay(Capsule().stroke(AuroraPalette.hairline(scheme), lineWidth: 0.5))
-                    .shadow(color: Color.black.opacity(0.12), radius: 4, y: 1)
-            )
+            .auroraGlassPill()
         }
 
         /// "Stage" around the Aurora ring: the ring is centered in a full-width
@@ -426,7 +421,7 @@ extension Home {
             HStack(spacing: 8) {
                 Text(loopCaption)
                     .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(AuroraPalette.textMuted(scheme))
+                    .foregroundStyle(AuroraPalette.textPrimary(scheme))
                 ZStack {
                     Circle()
                         .fill(loopStatus.color)
@@ -447,12 +442,7 @@ extension Home {
             }
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(
-                Capsule()
-                    .fill(.ultraThinMaterial)
-                    .overlay(Capsule().stroke(AuroraPalette.hairline(scheme), lineWidth: 0.5))
-                    .shadow(color: Color.black.opacity(0.12), radius: 4, y: 1)
-            )
+            .auroraGlassPill()
             .contentShape(Rectangle())
             .onTapGesture {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -514,8 +504,23 @@ extension Home {
                 },
                 onDataTable: { state.showModal(for: .dataTable) },
                 onStatistics: { state.showModal(for: .statistics) },
-                onProfile: { state.showModal(for: .overrideProfilesConfig) },
-                onTarget: { state.showModal(for: .addTempTarget) },
+                onProfile: {
+                    // If an override is already running, tapping the icon
+                    // offers to end it (same dialog as the active badge).
+                    // Otherwise open the config modal as before.
+                    if profileActive {
+                        showCancelOverrideAlert = true
+                    } else {
+                        state.showModal(for: .overrideProfilesConfig)
+                    }
+                },
+                onTarget: {
+                    if state.tempTarget != nil {
+                        showCancelTempTargetAlert = true
+                    } else {
+                        state.showModal(for: .addTempTarget)
+                    }
+                },
                 onSettings: { state.showModal(for: .settings) }
             )
         }
@@ -592,12 +597,7 @@ extension Home {
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
-                .background(
-                    Capsule()
-                        .fill(.ultraThinMaterial)
-                        .overlay(Capsule().stroke(AuroraPalette.hairline(scheme), lineWidth: 0.5))
-                        .shadow(color: Color.black.opacity(0.12), radius: 4, y: 1)
-                )
+                .auroraGlassPill()
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text(accessibility))
@@ -711,15 +711,7 @@ struct AuroraBolusOverlay: View {
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 11)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(.ultraThinMaterial)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(AuroraPalette.hairline(scheme), lineWidth: 0.5)
-                )
-                .shadow(color: Color.black.opacity(0.18), radius: 10, x: 0, y: 4)
-        )
+        .auroraGlass(radius: 18)
         .onAppear { pulse = true }
     }
 }

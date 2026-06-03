@@ -61,6 +61,13 @@ extension UIUX {
                     }
 
                 Section {
+                    Toggle("Profil-Tab (Override) anzeigen", isOn: $state.profileButton)
+                    Toggle("Ziel-Tab (Temp Target) anzeigen", isOn: $state.useTargetButton)
+                } header: { Text("Aurora Tab Bar") } footer: {
+                    Text("Steuert, welche Buttons rechts und links neben dem FAB in der Aurora-Tab-Leiste erscheinen.")
+                }
+
+                Section {
                     HStack {
                         Text("Low")
                         Spacer()
@@ -93,13 +100,6 @@ extension UIUX {
                         }
                     }
                 } header: { Text("Light / Dark Mode") }
-
-                Section {
-                    Toggle("Profil-Tab (Override) anzeigen", isOn: $state.profileButton)
-                    Toggle("Ziel-Tab (Temp Target) anzeigen", isOn: $state.useTargetButton)
-                } header: { Text("Aurora Tab Bar") } footer: {
-                    Text("Steuert, welche Buttons rechts und links neben dem FAB in der Aurora-Tab-Leiste erscheinen.")
-                }
             }
             .dynamicTypeSize(...DynamicTypeSize.xxLarge)
             .navigationBarTitle("UI/UX")
