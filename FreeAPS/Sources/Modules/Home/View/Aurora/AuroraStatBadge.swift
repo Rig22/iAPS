@@ -10,6 +10,11 @@ struct AuroraStatBadge: View {
     let unit: String
     let label: String
     var sub: String? = nil
+    /// Optional corner pill, e.g. "U200" for non-standard insulin.
+    var badge: String? = nil
+    /// Fill color for the corner pill — bound to glucose status so it blends
+    /// with green/amber instead of clashing red.
+    var badgeColor: Color = .red
     var onTap: (() -> Void)? = nil
 
     @Environment(\.colorScheme) private var scheme
@@ -67,5 +72,16 @@ struct AuroraStatBadge: View {
         .padding(.horizontal, 12)
         .frame(minHeight: 76)
         .auroraGlass(radius: 22)
+        .overlay(alignment: .topTrailing) {
+            if let badge = badge {
+                Text(badge)
+                    .font(.system(size: 9, weight: .bold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, 5)
+                    .padding(.vertical, 2)
+                    .background(Capsule().fill(badgeColor))
+                    .offset(x: 4, y: -6)
+            }
+        }
     }
 }

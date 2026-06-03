@@ -34,6 +34,11 @@ extension Home {
             sortDescriptors: [NSSortDescriptor(key: "date", ascending: false)]
         ) private var fetchedAISF: FetchedResults<Auto_ISF>
 
+        @FetchRequest(
+            entity: InsulinConcentration.entity(),
+            sortDescriptors: [NSSortDescriptor(key: "date", ascending: true)]
+        ) private var concentration: FetchedResults<InsulinConcentration>
+
         @Environment(\.colorScheme) private var scheme
         @Environment(\.scenePhase) private var scenePhase
 
@@ -89,9 +94,29 @@ extension Home {
             return "\(v)"
         }
 
+        /// Insulin concentration factor (1.0 = U100, 2.0 = U200, …).
+        private var insulinConcentration: Double {
+            concentration.last?.concentration ?? 1
+        }
+
         private var reservoirString: String {
             guard let r = state.reservoir else { return "—" }
-            return String(format: "%.0f", NSDecimalNumber(decimal: r).doubleValue)
+            // Reservoir is stored U100-equivalent; scale to the real delivered
+            // units for diluted/concentrated insulin (e.g. U200 → ×2).
+            let scaled = r * Decimal(insulinConcentration)
+            return String(format: "%.0f", NSDecimalNumber(decimal: scaled).doubleValue)
+        }
+
+        /// Red "U200"-style badge text when a non-standard concentration is set
+        /// and the user hasn't hidden it. `nil` for standard U100.
+        private var reservoirBadge: String? {
+            guard insulinConcentration != 1,
+                  !state.settingsManager.settings.hideInsulinBadge
+            else { return nil }
+            let f = NumberFormatter()
+            f.numberStyle = .decimal
+            f.maximumFractionDigits = 0
+            return "U" + (f.string(from: insulinConcentration * 100 as NSNumber) ?? "")
         }
 
         private var pumpSub: String? {
@@ -477,6 +502,8 @@ extension Home {
                     unit: "E",
                     label: pumpSub.map { "\($0) Pumpe" } ?? "Pumpe",
                     sub: nil,
+                    badge: reservoirBadge,
+                    badgeColor: AuroraGlucoseStatus(mgdl: glucoseValue).main,
                     onTap: {
                         // Mirror breath: only open settings when a pump is
                         // actually connected — otherwise the modal has nothing
