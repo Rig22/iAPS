@@ -35,6 +35,8 @@ extension UIUX {
         @Published var displayeventualBG: Bool = false
         @Published var displayMainChartBasalRate: Bool = false
         @Published var displayTBR: Bool = false
+        @Published var displayChartCarbs: Bool = false
+        @Published var displayChartBoluses: Bool = false
         @Published var isfView: Bool = false
         @Published var mealViewMicronutrients: Bool = true
 
@@ -73,6 +75,8 @@ extension UIUX {
             subscribeSetting(\.displayeventualBG, on: $displayeventualBG) { displayeventualBG = $0 }
             subscribeSetting(\.displayMainChartBasalRate, on: $displayMainChartBasalRate) { displayMainChartBasalRate = $0 }
             subscribeSetting(\.displayTBR, on: $displayTBR) { displayTBR = $0 }
+            subscribeSetting(\.displayChartCarbs, on: $displayChartCarbs) { displayChartCarbs = $0 }
+            subscribeSetting(\.displayChartBoluses, on: $displayChartBoluses) { displayChartBoluses = $0 }
             subscribeSetting(\.isfView, on: $isfView) { isfView = $0 }
             subscribeSetting(\.mealViewMicronutrients, on: $mealViewMicronutrients) { mealViewMicronutrients = $0 }
 

@@ -92,6 +92,8 @@ extension Home {
         @Published var displayeventualBG: Bool = false
         @Published var displayMainChartBasalRate: Bool = false
         @Published var displayTBR: Bool = false
+        @Published var displayChartCarbs: Bool = false
+        @Published var displayChartBoluses: Bool = false
 
         // Chart data
         var data = ChartModel(
@@ -238,6 +240,8 @@ extension Home {
             isfView = settingsManager.settings.isfView
             displayeventualBG = settingsManager.settings.displayeventualBG
             displayMainChartBasalRate = settingsManager.settings.displayMainChartBasalRate
+            displayChartCarbs = settingsManager.settings.displayChartCarbs
+            displayChartBoluses = settingsManager.settings.displayChartBoluses
             displayTBR = settingsManager.settings.displayTBR
 
             updateSensorDays()
@@ -915,6 +919,8 @@ extension Home.StateModel:
         ai = settingsManager.settings.ai
         displayeventualBG = settingsManager.settings.displayeventualBG
         displayMainChartBasalRate = settingsManager.settings.displayMainChartBasalRate
+        displayChartCarbs = settingsManager.settings.displayChartCarbs
+        displayChartBoluses = settingsManager.settings.displayChartBoluses
         displayTBR = settingsManager.settings.displayTBR
 
         individual.sex = Sex.savedSettings(settingsManager.settings.sexSetting)

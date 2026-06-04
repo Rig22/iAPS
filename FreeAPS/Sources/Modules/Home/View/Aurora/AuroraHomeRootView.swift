@@ -290,6 +290,8 @@ extension Home {
                     AuroraMainChart(
                         data: state.data,
                         displayBasal: state.displayMainChartBasalRate,
+                        displayCarbs: state.displayChartCarbs,
+                        displayBoluses: state.displayChartBoluses,
                         glucoseNow: glucoseValue
                     )
                     .padding(.horizontal, 18)

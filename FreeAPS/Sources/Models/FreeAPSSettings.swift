@@ -152,6 +152,8 @@ struct FreeAPSSettings: JSON, Equatable {
     var displayeventualBG: Bool = false
     var displayMainChartBasalRate: Bool = false
     var displayTBR: Bool = false
+    var displayChartCarbs: Bool = false
+    var displayChartBoluses: Bool = false
 
     var mealViewMicronutrients: Bool = false
     var nightTime = NightTimeConfiguration.default
@@ -755,6 +757,12 @@ extension FreeAPSSettings: Decodable {
 
         if let displayTBR = try? container.decode(Bool.self, forKey: .displayTBR) {
             settings.displayTBR = displayTBR }
+
+        if let displayChartCarbs = try? container.decode(Bool.self, forKey: .displayChartCarbs) {
+            settings.displayChartCarbs = displayChartCarbs }
+
+        if let displayChartBoluses = try? container.decode(Bool.self, forKey: .displayChartBoluses) {
+            settings.displayChartBoluses = displayChartBoluses }
 
         if let mealViewMicronutrients = try? container.decode(Bool.self, forKey: .mealViewMicronutrients) {
             settings.mealViewMicronutrients = mealViewMicronutrients

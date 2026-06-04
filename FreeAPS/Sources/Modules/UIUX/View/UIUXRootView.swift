@@ -41,6 +41,8 @@ extension UIUX {
                 Section {
                     Text("Main Chart settings").navigationLink(to: .mainChartConfig, from: self)
                     Toggle("Display Basal Rate in Chart", isOn: $state.displayMainChartBasalRate)
+                    Toggle("Display Carbs in Chart", isOn: $state.displayChartCarbs)
+                    Toggle("Display Boluses in Chart", isOn: $state.displayChartBoluses)
                 } header: { Text("Main Chart") }
 
                 Section {

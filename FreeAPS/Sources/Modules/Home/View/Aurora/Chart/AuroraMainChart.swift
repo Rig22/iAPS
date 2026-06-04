@@ -9,6 +9,8 @@ import SwiftUI
 struct AuroraMainChart: View {
     @ObservedObject var data: ChartModel
     var displayBasal: Bool = false
+    var displayCarbs: Bool = false
+    var displayBoluses: Bool = false
     let glucoseNow: Double // mg/dL — drives status color
     var onOpenDataTable: (() -> Void)? = nil
 
@@ -325,6 +327,67 @@ struct AuroraMainChart: View {
             .min(by: { abs($0.date.timeIntervalSince(target)) < abs($1.date.timeIntervalSince(target)) })
     }
 
+    // MARK: - Permanent bolus / carb hits (drawn when toggles are on)
+
+    /// All bolus events in the loaded 24 h window. Anchored to the glucose
+    /// curve so the dot sits visually on the reading at delivery time.
+    private var bolusHits: [EventHit] {
+        data.boluses.compactMap { ev -> EventHit? in
+            guard ev.type == .bolus,
+                  let amt = ev.amount, amt > 0,
+                  ev.timestamp >= dataStart else { return nil }
+            return EventHit(date: ev.timestamp, amount: NSDecimalNumber(decimal: amt).doubleValue)
+        }
+    }
+
+    /// All real carb entries (no FPUs) in the loaded 24 h window.
+    private var carbHits: [EventHit] {
+        data.carbs.compactMap { c -> EventHit? in
+            guard (c.isFPU ?? false) == false, c.carbs > 0 else { return nil }
+            let when = c.actualDate ?? c.createdAt
+            guard when >= dataStart else { return nil }
+            return EventHit(date: when, amount: NSDecimalNumber(decimal: c.carbs).doubleValue)
+        }
+    }
+
+    /// Snap an event's y-coordinate to the nearest glucose reading so the
+    /// marker sits on the curve. Falls back to the in-range mid-point if no
+    /// reading is close enough (e.g. event near dataStart with no glucose yet).
+    private func glucoseY(at date: Date) -> Double {
+        let mid = (lowThreshold + highThreshold) / 2
+        let pts = gluPoints
+        guard let nearest = pts.min(by: {
+            abs($0.date.timeIntervalSince(date)) < abs($1.date.timeIntervalSince(date))
+        }) else { return mid }
+        if abs(nearest.date.timeIntervalSince(date)) > 15 * 60 { return mid }
+        return nearest.value
+    }
+
+    /// Dot sizes scale with dose — SMBs (~0.1 E) stay subtle, meal boluses
+    /// grow visibly. Carbs use a flatter slope since gram amounts can run high.
+    private func bolusSymbolSize(_ amount: Double) -> Double {
+        min(150, max(20, 20 + amount * 22))
+    }
+
+    private func carbSymbolSize(_ amount: Double) -> Double {
+        min(140, max(20, 20 + amount * 1.4))
+    }
+
+    /// Approximate vertical pixel offset expressed in y-domain units.
+    /// Chart height is fixed at 150 pt; y-domain spans yHigh − yLow.
+    /// Lets us nudge bolus/carb dots above/below the glucose curve so they
+    /// don't sit directly on top of it.
+    private func yOffset(pixels: Double) -> Double {
+        pixels * (yHigh - yLow) / 150.0
+    }
+
+    /// Bolus / carb dots both ride the live glucose status color (green /
+    /// amber / red) so the chart stays in the Aurora monochrome system.
+    /// Boli render slightly stronger than carbs to keep the two types
+    /// distinguishable at a glance.
+    private var bolusDotColor: Color { status.main.opacity(0.75) }
+    private var carbDotColor: Color { status.main.opacity(0.40) }
+
     // MARK: - Basal segments
 
     private struct BasalSegment: Identifiable {
@@ -487,6 +550,8 @@ struct AuroraMainChart: View {
                 .accessibilityLabel(Text("Behandlungen"))
             }
 
+            chartLegend
+
             Spacer()
 
             Button(action: {
@@ -506,6 +571,34 @@ struct AuroraMainChart: View {
                     )
             }
             .buttonStyle(.plain)
+        }
+    }
+
+    /// Compact legend that sits in the chart header next to the data-table
+    /// button, on the same row as the hours switch. Only shows the entries
+    /// whose toggle is on, so the legend stays empty when no markers render.
+    @ViewBuilder private var chartLegend: some View {
+        if displayCarbs || displayBoluses {
+            HStack(spacing: 10) {
+                if displayBoluses {
+                    legendItem(label: "Boli", color: bolusDotColor)
+                }
+                if displayCarbs {
+                    legendItem(label: "Carbs", color: carbDotColor)
+                }
+            }
+            .padding(.leading, 8)
+        }
+    }
+
+    private func legendItem(label: String, color: Color) -> some View {
+        HStack(spacing: 5) {
+            Circle()
+                .fill(color)
+                .frame(width: 7, height: 7)
+            Text(label)
+                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .foregroundStyle(AuroraPalette.textMuted(scheme))
         }
     }
 
@@ -654,6 +747,34 @@ struct AuroraMainChart: View {
             // 6. (No per-reading dots — the segmented line already
             //     communicates in-range vs out-of-range, and stray dots
             //     fight visually with the calm hero line.)
+
+            // 6b. Permanent carb dots — sit ~20 pt BELOW the curve.
+            if displayCarbs {
+                let drop = yOffset(pixels: 20)
+                ForEach(carbHits, id: \.date) { c in
+                    PointMark(
+                        x: .value("t", c.date),
+                        y: .value("g", max(yLow, glucoseY(at: c.date) - drop))
+                    )
+                    .symbol(.circle)
+                    .symbolSize(carbSymbolSize(c.amount))
+                    .foregroundStyle(carbDotColor)
+                }
+            }
+
+            // 6c. Permanent bolus dots — sit ~20 pt ABOVE the curve.
+            if displayBoluses {
+                let lift = yOffset(pixels: 20)
+                ForEach(bolusHits, id: \.date) { b in
+                    PointMark(
+                        x: .value("t", b.date),
+                        y: .value("g", min(yHigh, glucoseY(at: b.date) + lift))
+                    )
+                    .symbol(.circle)
+                    .symbolSize(bolusSymbolSize(b.amount))
+                    .foregroundStyle(bolusDotColor)
+                }
+            }
 
             // 7. Finger-drag selection — vertical guide + larger highlight dot
             if let sel = selGlu {
