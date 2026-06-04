@@ -133,9 +133,23 @@ extension Home {
             guard let exp = state.pumpExpiresAtDate else { return nil }
             let interval = exp.timeIntervalSinceNow
             guard interval > 0 else { return "abgelaufen" }
+            // Under an hour the "0 T 0 h" readout is useless — switch to minutes.
+            if interval < 3600 {
+                return "\(Int(interval / 60)) min"
+            }
             let days = Int(interval / 86400)
             let hours = Int((interval - Double(days) * 86400) / 3600)
             return "\(days) T \(hours) h"
+        }
+
+        /// Imminent pump/pod expiry warning for the pump tile's leading shield.
+        /// `show` once ≤ 4 h of life remain (or expired), `pulsing` once < 2 h
+        /// remain (or expired). Returns nil when no expiry date is reported.
+        private var pumpExpiryWarning: (show: Bool, pulsing: Bool) {
+            guard let exp = state.pumpExpiresAtDate else { return (false, false) }
+            let interval = exp.timeIntervalSinceNow
+            guard interval <= 4 * 3600 else { return (false, false) }
+            return (true, interval < 2 * 3600)
         }
 
         // MARK: - Ring-corner pills (gated via UIUX toggles)
@@ -165,6 +179,16 @@ extension Home {
             let days = Int(state.sensorDays.rounded())
             guard days > 0 else { return nil }
             return ("\(days)d", AuroraPalette.textPrimary(scheme))
+        }
+
+        /// Imminent sensor expiry warning for the sensor pill's shield.
+        /// `show` once ≤ 12 h of session remain (or expired) — sensors run for
+        /// days, so we warn earlier than the pump. `pulsing` once < 2 h remain.
+        private var sensorExpiryWarning: (show: Bool, pulsing: Bool) {
+            guard let info = state.calculateSensorInfo() else { return (false, false) }
+            let interval = info.expiresIn
+            guard interval <= 12 * 3600 else { return (false, false) }
+            return (true, interval < 2 * 3600)
         }
 
         /// Top-right: predicted eventual glucose from the latest suggestion.
@@ -427,6 +451,17 @@ extension Home {
                         text: s.text,
                         iconColor: s.color
                     )
+                    .overlay(alignment: .topLeading) {
+                        let warning = sensorExpiryWarning
+                        if warning.show {
+                            PulsingWarningShield(
+                                color: AuroraGlucoseStatus(mgdl: glucoseValue).main,
+                                pulsing: warning.pulsing,
+                                size: 12
+                            )
+                            .offset(x: -5, y: -7)
+                        }
+                    }
                     .padding(.leading, 18)
                     .padding(.bottom, 4)
                     .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .bottomLeading)))
@@ -514,6 +549,9 @@ extension Home {
                     sub: nil,
                     badge: reservoirBadge,
                     badgeColor: AuroraGlucoseStatus(mgdl: glucoseValue).main,
+                    warning: pumpExpiryWarning.show,
+                    warningPulsing: pumpExpiryWarning.pulsing,
+                    warningColor: AuroraGlucoseStatus(mgdl: glucoseValue).main,
                     onTap: {
                         // Mirror breath: only open settings when a pump is
                         // actually connected — otherwise the modal has nothing
