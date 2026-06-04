@@ -16,6 +16,14 @@ extension Stat {
         @Published var layingChart: Bool = false
         @Published var units: GlucoseUnits = .mmolL
 
+        /// Age/sex used for EFSA RDI percentages, mirrors HomeStateModel.
+        var individual: Individual {
+            Individual(
+                age: Int((settingsManager.settings.birthDate.timeIntervalSinceNow.hours / (365 * 24)).rounded(.towardZero)),
+                sex: Sex.savedSettings(settingsManager.settings.sexSetting)
+            )
+        }
+
         // Selected view and chart types
         @Published var selectedView: StatisticViewType = .overview
         @Published var selectedGlucoseChartType: GlucoseChartType = .percentileByTime
@@ -36,6 +44,7 @@ extension Stat {
         @Published var hourlyBolusStats: [BolusStats] = []
         @Published var dailyMealStats: [MealStats] = []
         @Published var hourlyMealStats: [MealStats] = []
+        @Published var microMeals: [MicroMealRecord] = []
         @Published var last24hHourlyTDDStats: [TDDStats] = []
         @Published var last24hHourlyBolusStats: [BolusStats] = []
         @Published var loopStats: [LoopStatsProcessedData] = []
@@ -144,6 +153,41 @@ extension Stat {
         var filteredDailyMealStats: [MealStats] {
             let cutoff = filterDate(for: selectedIntervalForMealStats) as Date
             return dailyMealStats.filter { $0.date >= cutoff }
+        }
+
+        /// Aggregated micronutrient intake for the selected meal interval, sorted by
+        /// descending RDI fulfillment. For hourly intervals (Today/Day) the summed
+        /// total is returned; for multi-day intervals the average per logged day.
+        var mealMicronutrients: [(nutrient: MicroNutrient, perInterval: Decimal)] {
+            let cutoff = filterDate(for: selectedIntervalForMealStats) as Date
+            let records = microMeals.filter { $0.date >= cutoff }
+            guard !records.isEmpty else { return [] }
+
+            var totals: [MicroNutrient: Decimal] = [:]
+            for record in records {
+                for (nutrient, amount) in record.micros {
+                    totals[nutrient, default: 0] += amount
+                }
+            }
+
+            let isHourly = selectedIntervalForMealStats.isHourly
+            let dayCount = isHourly
+                ? 1
+                : max(Set(records.map { Calendar.current.startOfDay(for: $0.date) }).count, 1)
+
+            func percent(_ nutrient: MicroNutrient, _ amount: Decimal) -> Double {
+                MicronutrientProgress.progress(
+                    nutrient: nutrient,
+                    amount: NSDecimalNumber(decimal: amount).doubleValue,
+                    age: individual.age,
+                    sex: individual.sex
+                ).percent
+            }
+
+            return totals
+                .filter { $0.value > 0 }
+                .map { (nutrient: $0.key, perInterval: isHourly ? $0.value : $0.value / Decimal(dayCount)) }
+                .sorted { percent($0.nutrient, $0.perInterval) > percent($1.nutrient, $1.perInterval) }
         }
 
         /// Hourly meal stats filtered to today only (from midnight), with all 24h slots filled
@@ -337,6 +381,15 @@ extension Stat {
             guard let results = try? context.fetch(request) else { return }
 
             let calendar = Calendar.current
+
+            // Micronutrients: keep one record per meal so the view can aggregate
+            // over whichever interval the user selects.
+            microMeals = results.compactMap { record in
+                guard let date = record.actualDate ?? record.createdAt else { return nil }
+                let micros = record.micronutrientTotals.filter { $0.value > 0 }
+                guard !micros.isEmpty else { return nil }
+                return MicroMealRecord(date: date, micros: micros)
+            }
 
             // Daily
             var dailyMap: [Date: (carbs: Double, fat: Double, protein: Double)] = [:]

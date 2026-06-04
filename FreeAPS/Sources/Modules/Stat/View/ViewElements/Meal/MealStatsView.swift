@@ -289,3 +289,86 @@ struct MacroDistributionDonut: View {
         }
     }
 }
+
+// MARK: - Micronutrient Overview
+
+struct MicronutrientStatsView: View {
+    let nutrients: [(nutrient: MicroNutrient, perInterval: Decimal)]
+    let isHourly: Bool
+    let individual: Individual
+
+    var body: some View {
+        let vitamins = nutrients.filter { $0.nutrient.type == .vitamin }
+        let minerals = nutrients.filter { $0.nutrient.type == .mineral }
+        let prefix = isHourly ? "Σ " : "Ø "
+        let suffix = isHourly ? "" : "/d"
+
+        VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text(NSLocalizedString("Micronutrients", comment: ""))
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                Spacer()
+                Text(prefix + "\(nutrients.count)" + suffix)
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+
+            if !vitamins.isEmpty {
+                sectionHeader(NSLocalizedString("Vitamins", comment: ""))
+                ForEach(vitamins, id: \.nutrient) { row(for: $0) }
+            }
+
+            if !minerals.isEmpty {
+                sectionHeader(NSLocalizedString("Minerals", comment: ""))
+                ForEach(minerals, id: \.nutrient) { row(for: $0) }
+            }
+
+            Text(NSLocalizedString("% of EFSA reference daily intake", comment: ""))
+                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .foregroundStyle(.secondary)
+                .padding(.top, 2)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func sectionHeader(_ title: String) -> some View {
+        Text(title.uppercased())
+            .font(.system(size: 11, weight: .semibold, design: .rounded))
+            .foregroundStyle(.secondary)
+            .padding(.top, 4)
+    }
+
+    private func row(for item: (nutrient: MicroNutrient, perInterval: Decimal)) -> some View {
+        let progress = MicronutrientProgress.progress(
+            nutrient: item.nutrient,
+            amount: NSDecimalNumber(decimal: item.perInterval).doubleValue,
+            age: individual.age,
+            sex: individual.sex
+        )
+        return VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 8) {
+                Text(item.nutrient.displayName)
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                Spacer(minLength: 8)
+                Text("\(Int(progress.percent.rounded())) %")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(progress.color)
+                    .monospacedDigit()
+                Text(formatted(item.perInterval) + " " + item.nutrient.unit)
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            NutrientProgressBar(progress: progress)
+        }
+    }
+
+    private func formatted(_ value: Decimal) -> String {
+        let d = NSDecimalNumber(decimal: value).doubleValue
+        let digits = d > 0 && d < 10 ? 1 : 0
+        return d.formatted(.number.grouping(.automatic).precision(.fractionLength(digits)))
+    }
+}

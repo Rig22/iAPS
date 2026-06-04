@@ -146,6 +146,13 @@ struct MealStats: Identifiable {
     let protein: Double
 }
 
+/// Per-meal micronutrient contribution, kept alongside `MealStats` so the Meal
+/// tab can aggregate intake over any selected interval.
+struct MicroMealRecord {
+    let date: Date
+    let micros: [MicroNutrient: Decimal]
+}
+
 struct HourlyStats: Equatable {
     let hour: Int
     let median: Double

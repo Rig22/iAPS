@@ -50,20 +50,6 @@ extension Stat {
             .navigationBarTitle("Statistics")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if state.selectedView != .overview {
-                        Button {
-                            state.selectedView = .overview
-                        } label: {
-                            HStack(spacing: 4) {
-                                Image(systemName: "chevron.left")
-                                    .font(.system(size: 13, weight: .semibold))
-                                Text(NSLocalizedString("Back", comment: ""))
-                                    .font(.system(size: 14, weight: .medium, design: .rounded))
-                            }
-                        }
-                    }
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Close", action: state.hideModal)
                 }
@@ -320,6 +306,18 @@ extension Stat {
                             showAverage: !interval.isHourly
                         )
                     }
+                }
+            }
+
+            // Micronutrient overview card
+            let micronutrients = state.mealMicronutrients
+            if !micronutrients.isEmpty {
+                StatCard {
+                    MicronutrientStatsView(
+                        nutrients: micronutrients,
+                        isHourly: state.selectedIntervalForMealStats.isHourly,
+                        individual: state.individual
+                    )
                 }
             }
         }

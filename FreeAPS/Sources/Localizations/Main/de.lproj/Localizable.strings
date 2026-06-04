@@ -1393,6 +1393,12 @@ Enact a temp Basal or a temp target */
 
 "Micronutrients" = "Micronutrients";
 
+"Vitamins" = "Vitamine";
+
+"Minerals" = "Mineralstoffe";
+
+"% of EFSA reference daily intake" = "% des EFSA-Referenzwerts/Tag";
+
 "Allow Meal View Micronutrients and Dietary Fibers entries" = "Allow Meal View Micronutrients and Dietary Fibers entries";
 
 // --------- AI ---------
