@@ -18,6 +18,10 @@ extension Home {
         @State private var showCancelOverrideAlert = false
         @State private var showCancelTempTargetAlert = false
 
+        // Backup first-run prompt is handled centrally in Main.RootView so the
+        // home view never instantiates on a fresh install. No Onboarding
+        // FetchRequest or fullScreenCover needed here.
+
         @FetchRequest(
             entity: OverridePresets.entity(),
             sortDescriptors: [NSSortDescriptor(key: "name", ascending: true)],
