@@ -67,7 +67,17 @@ enum PresetsBackup {
             let request = Presets.fetchRequest() as NSFetchRequest<Presets>
             guard let items = try? context.fetch(request) else { return }
             result = items.map { item in
-                BackupMealPreset(
+                let micronutrients = (item.micronutrient ?? []).compactMap { entry -> BackupPresetMicronutrient? in
+                    guard let name = entry.micronutrient.name else { return nil }
+                    return BackupPresetMicronutrient(
+                        name: name,
+                        type: entry.micronutrient.type,
+                        unit: entry.micronutrient.unit ?? "",
+                        amount: (entry.amount ?? 0) as Decimal,
+                        per100: entry.per100
+                    )
+                }
+                return BackupMealPreset(
                     dish: item.dish ?? "",
                     carbs: (item.carbs ?? 0) as Decimal,
                     fat: (item.fat ?? 0) as Decimal,
@@ -83,7 +93,8 @@ enum PresetsBackup {
                     standardName: item.standardName,
                     standardServing: item.standardServing,
                     standardServingSize: (item.standardServingSize ?? 0) as Decimal,
-                    tags: item.tags
+                    tags: item.tags,
+                    micronutrients: micronutrients.isEmpty ? nil : micronutrients
                 )
             }
         }
@@ -163,6 +174,21 @@ enum PresetsBackup {
                     entity.standardServingSize = standardServingSize as NSDecimalNumber
                 }
                 entity.tags = preset.tags
+
+                // Rebuild micronutrient join rows + shared definitions.
+                // setMicronutrient does fetch-or-create on the Micronutrient
+                // definition (by name), so definitions are deduplicated across
+                // presets within this batch.
+                for micro in preset.micronutrients ?? [] {
+                    try? entity.setMicronutrient(
+                        name: micro.name,
+                        type: micro.type,
+                        unit: micro.unit,
+                        amount: micro.amount,
+                        per100: micro.per100,
+                        context: context
+                    )
+                }
             }
 
             try? context.save()
