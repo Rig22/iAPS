@@ -9,6 +9,7 @@ extension Stat {
         let resolver: Resolver
         @StateObject var state: StateModel
         @Environment(\.colorScheme) var colorScheme
+        @State private var showNutritionEditor = false
 
         init(resolver: Resolver) {
             self.resolver = resolver
@@ -53,6 +54,12 @@ extension Stat {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Close", action: state.hideModal)
                 }
+            }
+            .sheet(isPresented: $showNutritionEditor) {
+                NutritionProfileEditor(
+                    profile: $state.nutritionProfile,
+                    onDone: state.saveNutritionProfile
+                )
             }
         }
 
@@ -306,6 +313,20 @@ extension Stat {
                             showAverage: !interval.isHourly
                         )
                     }
+                }
+            }
+
+            // Macronutrient RDI card
+            if let macros = state.mealMacronutrients {
+                StatCard {
+                    MacroNutrientStatsView(
+                        carbs: macros.carbs,
+                        protein: macros.protein,
+                        fat: macros.fat,
+                        isHourly: state.selectedIntervalForMealStats.isHourly,
+                        profile: state.nutritionProfile,
+                        onEditProfile: { showNutritionEditor = true }
+                    )
                 }
             }
 

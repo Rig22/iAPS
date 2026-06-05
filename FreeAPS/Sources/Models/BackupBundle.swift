@@ -67,7 +67,8 @@ extension BackupBundle {
         OpenAPS.Settings.contactTrick,
         OpenAPS.Settings.autoisf,
         OpenAPS.FreeAPS.tempTargetsPresets,
-        OpenAPS.FreeAPS.calibrations
+        OpenAPS.FreeAPS.calibrations,
+        OpenAPS.FreeAPS.nutritionProfile
     ]
 
     /// Suggested filename for a backup taken at the given moment.

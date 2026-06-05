@@ -351,6 +351,7 @@
 		6B1A8D2E2B156EEF00E76752 /* LiveActivityBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B1A8D2D2B156EEF00E76752 /* LiveActivityBridge.swift */; };
 		6B1F539F9FF75646D1606066 /* SnoozeDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36A708CDB546692C2230B385 /* SnoozeDataFlow.swift */; };
 		6B780EDA95786184548CB51D /* TidepoolServiceKitUI.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 25622446393E224141CC3832 /* TidepoolServiceKitUI.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		6B8409023237DB3C5C42F28C /* NutritionProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EFECDFE5F831132ABED2114 /* NutritionProfile.swift */; };
 		6B9625766B697D1C98E455A2 /* PumpSettingsEditorStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72778B68C3004F71F6E79BDC /* PumpSettingsEditorStateModel.swift */; };
 		6BCF84DD2B16843A003AD46E /* LiveActitiyShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCF84DC2B16843A003AD46E /* LiveActitiyShared.swift */; };
 		6BCF84DE2B16843A003AD46E /* LiveActitiyShared.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BCF84DC2B16843A003AD46E /* LiveActitiyShared.swift */; };
@@ -398,6 +399,7 @@
 		AF726E72F41ADAB80FAC499E /* TidepoolManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 626D56EDD3670C39B0AA93A8 /* TidepoolManager.swift */; };
 		AFD3583274477B570A4151C0 /* AuroraMainChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DF1F671069A9ACFCEEFFE6B /* AuroraMainChart.swift */; };
 		B33BF1A164D4B4E1EB28089E /* TidepoolServiceKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5856ED3FC5A31C9E7F86FDE5 /* TidepoolServiceKit.framework */; };
+		B5C8087AD3DDEE94990BD213 /* NutritionProfileEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A3D2492A94BB561C07A63C8 /* NutritionProfileEditor.swift */; };
 		B7C465E9472624D8A2BE2A6A /* CalibrationsDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA241FB1663EC96FDBE64C8A /* CalibrationsDataFlow.swift */; };
 		B9CAAEFC2AE70836000F68BC /* branch.txt in Resources */ = {isa = PBXBuildFile; fileRef = B9CAAEFB2AE70836000F68BC /* branch.txt */; };
 		B9EC779F76121E6F0DAB4AC5 /* AuroraPrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE70B1E6E7995773AD72C4B2 /* AuroraPrimaryButton.swift */; };
@@ -870,9 +872,10 @@
 		19F95FF429F10FCF00314DDC /* StatProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatProvider.swift; sourceTree = "<group>"; };
 		19F95FF629F10FEE00314DDC /* StatStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatStateModel.swift; sourceTree = "<group>"; };
 		19F95FF929F1102A00314DDC /* StatRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatRootView.swift; sourceTree = "<group>"; };
-		1C370B033074C201B7693FDA /* AuroraListRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuroraListRow.swift; sourceTree = "<group>"; };
 		19FFF08B2FCB3442009DBC48 /* NutrientProgressBars.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NutrientProgressBars.swift; sourceTree = "<group>"; };
+		1C370B033074C201B7693FDA /* AuroraListRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuroraListRow.swift; sourceTree = "<group>"; };
 		1CAE81192B118804DCD23034 /* SnoozeProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SnoozeProvider.swift; sourceTree = "<group>"; };
+		1EFECDFE5F831132ABED2114 /* NutritionProfile.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NutritionProfile.swift; sourceTree = "<group>"; };
 		1F3F1C803B5BD5291CA46E39 /* AuroraToast.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuroraToast.swift; sourceTree = "<group>"; };
 		212E8BFE6D66EE65AA26A114 /* CalibrationsProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalibrationsProvider.swift; sourceTree = "<group>"; };
 		223EC0494F55A91E3EA69EF4 /* BolusStateModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BolusStateModel.swift; sourceTree = "<group>"; };
@@ -1078,6 +1081,7 @@
 		44080E4709E3AE4B73054563 /* ConfigEditorProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ConfigEditorProvider.swift; sourceTree = "<group>"; };
 		44F041261DCDE6D309EF8C29 /* PumpHistoryEvent+Tidepool.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "PumpHistoryEvent+Tidepool.swift"; sourceTree = "<group>"; };
 		47DFCE895C930F784EF11843 /* CalibrationsStateModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalibrationsStateModel.swift; sourceTree = "<group>"; };
+		4A3D2492A94BB561C07A63C8 /* NutritionProfileEditor.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NutritionProfileEditor.swift; sourceTree = "<group>"; };
 		4C88DBC07AC0074639151984 /* TherapySettings+Tidepool.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "TherapySettings+Tidepool.swift"; sourceTree = "<group>"; };
 		4DD795BA46B193644D48138C /* TargetsEditorRootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TargetsEditorRootView.swift; sourceTree = "<group>"; };
 		4DF1F671069A9ACFCEEFFE6B /* AuroraMainChart.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuroraMainChart.swift; sourceTree = "<group>"; };
@@ -2347,6 +2351,7 @@
 				3871F39B25ED892B0013ECB5 /* TempTarget.swift */,
 				3811DE8E25C9D80400A708ED /* User.swift */,
 				191A9D152BED00A500028D48 /* Version.swift */,
+				1EFECDFE5F831132ABED2114 /* NutritionProfile.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -2792,6 +2797,7 @@
 			isa = PBXGroup;
 			children = (
 				7940BF632F83D87D00E56268 /* MealStatsView.swift */,
+				4A3D2492A94BB561C07A63C8 /* NutritionProfileEditor.swift */,
 			);
 			path = Meal;
 			sourceTree = "<group>";
@@ -4201,6 +4207,8 @@
 				63674004D8B04802B82E753C /* AuroraBolusSheet.swift in Sources */,
 				E95C4D97FDE9395E4CDF78E5 /* AuroraCarbSheet.swift in Sources */,
 				47FBC51B1C8CE4A7E51697B8 /* AuroraQuickAddSheet.swift in Sources */,
+				6B8409023237DB3C5C42F28C /* NutritionProfile.swift in Sources */,
+				B5C8087AD3DDEE94990BD213 /* NutritionProfileEditor.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

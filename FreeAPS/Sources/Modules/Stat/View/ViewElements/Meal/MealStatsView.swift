@@ -290,6 +290,89 @@ struct MacroDistributionDonut: View {
     }
 }
 
+// MARK: - Macronutrient Overview
+
+struct MacroNutrientStatsView: View {
+    let carbs: Decimal
+    let protein: Decimal
+    let fat: Decimal
+    let isHourly: Bool
+    let profile: NutritionProfile
+    var onEditProfile: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 8) {
+                Text(NSLocalizedString("Macronutrients", comment: ""))
+                    .font(.system(size: 16, weight: .semibold, design: .rounded))
+                Spacer()
+                Text(
+                    isHourly
+                        ? NSLocalizedString("Total", comment: "")
+                        : NSLocalizedString("Ø / Day", comment: "")
+                )
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(.secondary)
+                Button(action: onEditProfile) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+
+            row(.protein, label: "Protein", amount: protein, color: BreathePalette.flieder)
+            row(.carbs, label: "Carbs", amount: carbs, color: BreathePalette.kamille)
+            row(.fat, label: "Fat", amount: fat, color: BreathePalette.daemmer)
+
+            Text(
+                profile.weightKg > 0
+                    ? NSLocalizedString("% of your weight-based daily target", comment: "")
+                    : NSLocalizedString("% of EFSA reference daily intake", comment: "")
+            )
+            .font(.system(size: 10, weight: .medium, design: .rounded))
+            .foregroundStyle(.secondary)
+            .padding(.top, 2)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func row(_ nutrient: MacroNutrient, label: String, amount: Decimal, color: Color) -> some View {
+        let amountValue = NSDecimalNumber(decimal: amount).doubleValue
+        let target = nutrient.referenceValue(profile: profile)
+        let progress = MicronutrientProgress.progress(
+            macro: nutrient,
+            amount: amountValue,
+            profile: profile
+        )
+        return VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 8) {
+                Circle()
+                    .fill(color)
+                    .frame(width: 9, height: 9)
+                Text(NSLocalizedString(label, comment: ""))
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(.primary)
+                    .lineLimit(1)
+                Spacer(minLength: 8)
+                Text("\(Int(progress.percent.rounded())) %")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(progress.color)
+                    .monospacedDigit()
+                Text(grams(amountValue) + " / " + grams(target) + " g")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            NutrientProgressBar(progress: progress)
+        }
+    }
+
+    private func grams(_ value: Double) -> String {
+        value.formatted(.number.grouping(.automatic).rounded().precision(.fractionLength(0)))
+    }
+}
+
 // MARK: - Micronutrient Overview
 
 struct MicronutrientStatsView: View {
@@ -348,7 +431,7 @@ struct MicronutrientStatsView: View {
         )
         return VStack(alignment: .leading, spacing: 3) {
             HStack(spacing: 8) {
-                Text(item.nutrient.displayName)
+                Text(NSLocalizedString(item.nutrient.displayName, comment: ""))
                     .font(.system(size: 13, weight: .medium, design: .rounded))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
@@ -357,7 +440,7 @@ struct MicronutrientStatsView: View {
                     .font(.system(size: 12, weight: .semibold, design: .rounded))
                     .foregroundStyle(progress.color)
                     .monospacedDigit()
-                Text(formatted(item.perInterval) + " " + item.nutrient.unit)
+                Text(formatted(item.perInterval) + " " + NSLocalizedString(item.nutrient.unit, comment: ""))
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
                     .monospacedDigit()

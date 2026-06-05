@@ -13,10 +13,21 @@ enum MicronutrientType: String, CaseIterable, Codable {
 /// Only needed for EFSA RDI values
 enum MacroNutrient {
     case protein
+    case carbs
+    case fat
     case fiber
 
+    /// Protein and fiber: more is good (no upper warning).
+    /// Carbs and fat: target around the reference, warn on excess.
     var shouldLimitExcess: Bool {
-        false
+        switch self {
+        case .carbs,
+             .fat:
+            return true
+        case .fiber,
+             .protein:
+            return false
+        }
     }
 }
 
@@ -582,6 +593,14 @@ enum EFSAReferenceIntakes {
             default:
                 return .init(value: 52, unit: "g")
             }
+
+        // EU Reference Intakes (Reg. EU 1169/2011, Annex XIII), EFSA-aligned,
+        // based on a 2000 kcal reference diet. Not split by age/sex.
+        case .carbs:
+            return .init(value: 260, unit: "g")
+
+        case .fat:
+            return .init(value: 70, unit: "g")
 
         case .fiber:
             switch group {

@@ -1421,6 +1421,21 @@ Enact a temp Basal or a temp target */
 "Iodine" = "Iodine";
 "Salt" = "Salt";
 
+"Macronutrients" = "Macronutrients";
+"Vitamins" = "Vitamins";
+"Minerals" = "Minerals";
+"% of EFSA reference daily intake" = "% of EFSA reference daily intake";
+"% of your weight-based daily target" = "% of your weight-based daily target";
+"Ø / Day" = "Ø / Day";
+"Nutrition Profile" = "Nutrition Profile";
+"Body Data" = "Body Data";
+"Body weight" = "Body weight";
+"Not set" = "Not set";
+"Age" = "Age";
+"Macro Targets (g/kg/day)" = "Macro Targets (g/kg/day)";
+"Used only for the nutrient targets in the Meal statistics. Independent from Share & Backup." = "Used only for the nutrient targets in the Meal statistics. Independent from Share & Backup.";
+"When a body weight is set, each macro target = weight × factor. Protein: EFSA min ~0.83, health/sport 1.2–2.0 g/kg. Without a body weight, the fixed EFSA / EU reference values are used." = "When a body weight is set, each macro target = weight × factor. Protein: EFSA min ~0.83, health/sport 1.2–2.0 g/kg. Without a body weight, the fixed EFSA / EU reference values are used.";
+
 "Allow Meal View Micronutrients and Dietary Fibers entries" = "Allow Meal View Micronutrients and Dietary Fibers entries";
 
 // --------- AI ---------

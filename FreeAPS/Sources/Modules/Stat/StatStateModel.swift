@@ -8,6 +8,7 @@ extension Stat {
     final class StateModel: BaseStateModel<Provider> {
         @Injected() var settings: SettingsManager!
         @Injected() var pumpHistoryStorage: PumpHistoryStorage!
+        @Injected() var fileStorage: FileStorage!
 
         // Settings
         @Published var highLimit: Decimal = 10 / 0.0555
@@ -16,12 +17,29 @@ extension Stat {
         @Published var layingChart: Bool = false
         @Published var units: GlucoseUnits = .mmolL
 
-        /// Age/sex used for EFSA RDI percentages, mirrors HomeStateModel.
+        /// Self-contained body data for the Meal tab's nutrient RDI calculations.
+        /// Edited via the gear on the Meal card, persisted independently from the
+        /// Sharing settings (seeded from them on first use as a convenience).
+        @Published var nutritionProfile: NutritionProfile = .default
+
+        /// Age/sex used for EFSA RDI percentages, driven by `nutritionProfile`.
         var individual: Individual {
-            Individual(
-                age: Int((settingsManager.settings.birthDate.timeIntervalSinceNow.hours / (365 * 24)).rounded(.towardZero)),
-                sex: Sex.savedSettings(settingsManager.settings.sexSetting)
-            )
+            nutritionProfile.individual
+        }
+
+        /// Saves the current nutrition profile to its independent store.
+        func saveNutritionProfile() {
+            NutritionProfileStore.save(nutritionProfile, fileStorage)
+        }
+
+        /// Age derived from the Sharing settings, or 35 if no valid birth date is set.
+        private var ageFromSharingSettings: Int {
+            let birthDate = settingsManager.settings.birthDate
+            guard birthDate > Calendar.current.date(from: DateComponents(year: 1900))! else {
+                return NutritionProfile.default.age
+            }
+            let age = Int((birthDate.timeIntervalSinceNow.hours / (365 * 24)).rounded(.towardZero))
+            return (1 ... 120).contains(age) ? age : NutritionProfile.default.age
         }
 
         // Selected view and chart types
@@ -75,6 +93,12 @@ extension Stat {
             units = settingsManager.settings.units
             overrideUnit = settingsManager.settings.overrideHbA1cUnit
             layingChart = settingsManager.settings.oneDimensionalGraph
+
+            nutritionProfile = NutritionProfileStore.loadOrSeed(
+                fileStorage,
+                fallbackAge: ageFromSharingSettings,
+                fallbackSex: Sex.savedSettings(settingsManager.settings.sexSetting)
+            )
 
             setupInsulinStats()
             setupInsulinSummary()
@@ -153,6 +177,33 @@ extension Stat {
         var filteredDailyMealStats: [MealStats] {
             let cutoff = filterDate(for: selectedIntervalForMealStats) as Date
             return dailyMealStats.filter { $0.date >= cutoff }
+        }
+
+        /// Aggregated macronutrient intake (carbs/protein/fat) for the selected meal
+        /// interval. For hourly intervals (Today/Day) the summed total is returned;
+        /// for multi-day intervals the average per logged day.
+        var mealMacronutrients: (carbs: Decimal, protein: Decimal, fat: Decimal)? {
+            let interval = selectedIntervalForMealStats
+            let stats: [MealStats] = interval.isHourly
+                ? (interval == .today ? todayHourlyMealStats : hourlyMealStats)
+                : filteredDailyMealStats
+            let withData = stats.filter { $0.carbs > 0 || $0.fat > 0 || $0.protein > 0 }
+            guard !withData.isEmpty else { return nil }
+
+            let totalCarbs = withData.map(\.carbs).reduce(0, +)
+            let totalFat = withData.map(\.fat).reduce(0, +)
+            let totalProtein = withData.map(\.protein).reduce(0, +)
+
+            if interval.isHourly {
+                return (Decimal(totalCarbs), Decimal(totalProtein), Decimal(totalFat))
+            }
+
+            let dayCount = max(Set(withData.map { Calendar.current.startOfDay(for: $0.date) }).count, 1)
+            return (
+                Decimal(totalCarbs / Double(dayCount)),
+                Decimal(totalProtein / Double(dayCount)),
+                Decimal(totalFat / Double(dayCount))
+            )
         }
 
         /// Aggregated micronutrient intake for the selected meal interval, sorted by
