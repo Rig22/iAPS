@@ -44,12 +44,13 @@ struct AuroraMainChart: View {
 
     private var now: Date { Date() }
     private var dataStart: Date { now.addingTimeInterval(-24 * 3600) }
-    private var xEnd: Date { now.addingTimeInterval(3600) }
+    private var xEnd: Date { now.addingTimeInterval(2 * 3600) }
     private var visibleStart: Date { now.addingTimeInterval(-Double(data.screenHours) * 3600) }
 
-    /// Visible window length (including a 1 h "future" lane). At 24 h the
-    /// window matches the whole data range so scrolling has nothing to do.
-    private var visibleDomainLength: Int { (data.screenHours + 1) * 3600 }
+    /// Visible window length (including a 2 h "future" lane for the forecast
+    /// line). At 24 h the window matches the whole data range so scrolling has
+    /// nothing to do.
+    private var visibleDomainLength: Int { (data.screenHours + 2) * 3600 }
     private var isScrollable: Bool { data.screenHours < 24 }
 
     private var isMmolL: Bool { data.units == .mmolL }
@@ -100,6 +101,45 @@ struct AuroraMainChart: View {
             // tracks `currentInRange` left-to-right along the timeline.
             .sorted { $0.date < $1.date }
     }
+
+    // MARK: - Prediction line (reduced, single combined forecast)
+
+    private struct PredPoint: Identifiable {
+        var id: Date { date }
+        let date: Date
+        let value: Double
+    }
+
+    /// A single reduced forecast line drawn into the 2 h future lane, right of
+    /// the now-line. For each 5-minute step we take the **minimum** predicted
+    /// glucose across the available COB/IOB/ZT/UAM arrays — the same combined
+    /// representation the orbital chart used — so the line stays calm instead
+    /// of fanning out into four clouds. Anchored at `deliverAt` (≈ now) so it
+    /// visually continues the live glucose curve. Clipped to `xEnd` so only the
+    /// near-future portion shows. Respects the `hidePredictions` toggle.
+    private var predictionPoints: [PredPoint] {
+        guard !data.hidePredictions,
+              let preds = data.suggestion?.predictions else { return [] }
+        let start = data.suggestion?.deliverAt ?? now
+
+        let arrays = [preds.cob, preds.iob, preds.zt, preds.uam].compactMap { $0 }
+        let maxCount = arrays.map(\.count).max() ?? 0
+        guard maxCount > 1 else { return [] }
+
+        var points: [PredPoint] = []
+        for index in 0 ..< maxCount {
+            let candidates = arrays.compactMap { index < $0.count ? $0[index] : nil }
+            guard let value = candidates.min() else { continue }
+            let date = start.addingTimeInterval(TimeInterval(index) * 300)
+            guard date <= xEnd else { break }
+            points.append(PredPoint(date: date, value: display(value)))
+        }
+        return points
+    }
+
+    /// Forecast line rides the live status color but stays faint so it reads as
+    /// a projection, not a measurement.
+    private var predictionColor: Color { status.main.opacity(0.40) }
 
     // MARK: - Glucose line segments (split at threshold crossings)
 
@@ -742,6 +782,20 @@ struct AuroraMainChart: View {
                             .opacity(0.95)
                     )
                 }
+            }
+
+            // 5b. Reduced forecast line — single combined prediction in the
+            //     future lane, faint status color, dashed so it reads as a
+            //     projection rather than a measured reading.
+            ForEach(predictionPoints) { p in
+                LineMark(
+                    x: .value("t", p.date),
+                    y: .value("g", p.value),
+                    series: .value("series", "prediction")
+                )
+                .interpolationMethod(.monotone)
+                .lineStyle(StrokeStyle(lineWidth: 2.0, lineCap: .round, dash: [3, 4]))
+                .foregroundStyle(predictionColor)
             }
 
             // 6. (No per-reading dots — the segmented line already
