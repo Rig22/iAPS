@@ -716,8 +716,8 @@ struct AuroraMainChart: View {
             if data.displayXgridLines {
                 ForEach(hourGridDates, id: \.self) { d in
                     RuleMark(x: .value("hour", d))
-                        .lineStyle(StrokeStyle(lineWidth: 0.4, dash: [2, 3]))
-                        .foregroundStyle(AuroraPalette.hairline(scheme).opacity(0.7))
+                        .lineStyle(StrokeStyle(lineWidth: 0.8, dash: [3, 4]))
+                        .foregroundStyle(AuroraPalette.hairline(scheme))
                 }
             }
 

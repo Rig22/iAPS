@@ -193,10 +193,10 @@ extension MainChartConfig {
                         DecimalTextField("0.2", value: $state.minimumSMB, formatter: insulinFormatter)
                         Text("U").foregroundColor(.secondary)
                     }
-                    Toggle("Display carb equivalents", isOn: $state.fpus)
-                    if state.fpus {
-                        Toggle("Display carb equivalent amount", isOn: $state.fpuAmounts)
-                    }
+                    /*    Toggle("Display carb equivalents", isOn: $state.fpus)
+                     if state.fpus {
+                         Toggle("Display carb equivalent amount", isOn: $state.fpuAmounts)
+                     }*/
                     /*   Toggle("Hide Predictions", isOn: $state.hidePredictions)
                      if !state.hidePredictions {
                          Toggle("Predictions legend", isOn: $state.showPredictionsLegend)

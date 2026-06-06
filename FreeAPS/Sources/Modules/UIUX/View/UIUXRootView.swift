@@ -39,7 +39,18 @@ extension UIUX {
         var body: some View {
             Form {
                 Section {
-                    Text("Main Chart settings").navigationLink(to: .mainChartConfig, from: self)
+                    Toggle("Vertical grid lines", isOn: $state.xGridLines)
+                    HStack {
+                        Text("Horizontal Scroll View Visible hours")
+                        Spacer()
+                        DecimalTextField("6", value: $state.hours, formatter: carbsFormatter)
+                    }
+                    HStack {
+                        Text("Hide the bolus amount strings when amount is under")
+                        Spacer()
+                        DecimalTextField("0.2", value: $state.minimumSMB, formatter: insulinFormatter)
+                        Text("U").foregroundColor(.secondary)
+                    }
                     Toggle("Display Basal Rate in Chart", isOn: $state.displayMainChartBasalRate)
                     Toggle("Display Carbs in Chart", isOn: $state.displayChartCarbs)
                     Toggle("Display Boluses in Chart", isOn: $state.displayChartBoluses)
