@@ -39,12 +39,12 @@ struct NutritionProfileEditor: View {
                 Section {
                     Stepper(value: weightProxy, in: 0 ... 250, step: 1) {
                         HStack {
-                            Text("Body weight")
+                            Text(verbatim: "Body weight")
                             Spacer()
                             Text(
                                 profile.weightKg > 0
                                     ? "\(Int(weightProxy.wrappedValue)) kg"
-                                    : NSLocalizedString("Not set", comment: "")
+                                    : "Not set"
                             )
                             .foregroundStyle(.secondary)
                         }
@@ -52,7 +52,7 @@ struct NutritionProfileEditor: View {
 
                     Stepper(value: $profile.age, in: 1 ... 120) {
                         HStack {
-                            Text("Age")
+                            Text(verbatim: "Age")
                             Spacer()
                             Text("\(profile.age)")
                                 .foregroundStyle(.secondary)
@@ -65,9 +65,9 @@ struct NutritionProfileEditor: View {
                         }
                     }
                 } header: {
-                    Text("Body Data")
+                    Text(verbatim: "Body Data")
                 } footer: {
-                    Text("Used only for the nutrient targets in the Meal statistics. Independent from Share & Backup.")
+                    Text(verbatim: "Used only for the nutrient targets in the Meal statistics. Independent from Share & Backup.")
                 }
 
                 Section {
@@ -90,14 +90,14 @@ struct NutritionProfileEditor: View {
                         range: 0.3 ... 2.5
                     )
                 } header: {
-                    Text("Macro Targets (g/kg/day)")
+                    Text(verbatim: "Macro Targets (g/kg/day)")
                 } footer: {
                     Text(
-                        "When a body weight is set, each macro target = weight × factor. Protein: EFSA min ~0.83, health/sport 1.2–2.0 g/kg. Without a body weight, the fixed EFSA / EU reference values are used."
+                        verbatim: "When a body weight is set, each macro target = weight × factor. Protein: EFSA min ~0.83, health/sport 1.2–2.0 g/kg. Without a body weight, the fixed EFSA / EU reference values are used."
                     )
                 }
             }
-            .navigationTitle("Nutrition Profile")
+            .navigationTitle(Text(verbatim: "Nutrition Profile"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {

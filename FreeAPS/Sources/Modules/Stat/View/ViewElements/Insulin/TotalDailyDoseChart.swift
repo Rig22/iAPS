@@ -39,7 +39,7 @@ struct TotalDailyDoseChart: View {
                     )
                 } else {
                     StatChartUtils.statView(
-                        title: NSLocalizedString("Ø / Day", comment: "Average per day"),
+                        title: "Ø / Day",
                         value: average.formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) + " U"
                     )
                     Spacer()

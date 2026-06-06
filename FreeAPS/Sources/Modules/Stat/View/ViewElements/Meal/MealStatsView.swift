@@ -239,7 +239,7 @@ struct MacroDistributionDonut: View {
                 )
                 if showAverage {
                     caloriesTile(
-                        label: NSLocalizedString("Ø / Day", comment: ""),
+                        label: "Ø / Day",
                         value: avgKcalPerDay
                     )
                 }
@@ -303,13 +303,13 @@ struct MacroNutrientStatsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                Text(NSLocalizedString("Macronutrients", comment: ""))
+                Text(verbatim: "Macronutrients")
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                 Spacer()
                 Text(
                     isHourly
                         ? NSLocalizedString("Total", comment: "")
-                        : NSLocalizedString("Ø / Day", comment: "")
+                        : "Ø / Day"
                 )
                 .font(.system(size: 12, weight: .medium, design: .rounded))
                 .foregroundStyle(.secondary)
@@ -327,8 +327,8 @@ struct MacroNutrientStatsView: View {
 
             Text(
                 profile.weightKg > 0
-                    ? NSLocalizedString("% of your weight-based daily target", comment: "")
-                    : NSLocalizedString("% of EFSA reference daily intake", comment: "")
+                    ? "% of your weight-based daily target"
+                    : "% of EFSA reference daily intake"
             )
             .font(.system(size: 10, weight: .medium, design: .rounded))
             .foregroundStyle(.secondary)
@@ -398,16 +398,16 @@ struct MicronutrientStatsView: View {
             }
 
             if !vitamins.isEmpty {
-                sectionHeader(NSLocalizedString("Vitamins", comment: ""))
+                sectionHeader("Vitamins")
                 ForEach(vitamins, id: \.nutrient) { row(for: $0) }
             }
 
             if !minerals.isEmpty {
-                sectionHeader(NSLocalizedString("Minerals", comment: ""))
+                sectionHeader("Minerals")
                 ForEach(minerals, id: \.nutrient) { row(for: $0) }
             }
 
-            Text(NSLocalizedString("% of EFSA reference daily intake", comment: ""))
+            Text(verbatim: "% of EFSA reference daily intake")
                 .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(.secondary)
                 .padding(.top, 2)

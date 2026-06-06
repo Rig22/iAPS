@@ -1393,34 +1393,6 @@ Enact a temp Basal or a temp target */
 
 "Micronutrients" = "Micronutrients";
 
-"Macronutrients" = "Makronährstoffe";
-
-"Ø / Day" = "Ø / Tag";
-
-"Vitamins" = "Vitamine";
-
-"Minerals" = "Mineralstoffe";
-
-"% of EFSA reference daily intake" = "% des EFSA-Referenzwerts/Tag";
-
-"% of your weight-based daily target" = "% deines gewichtsbasierten Tagesziels";
-
-"Nutrition Profile" = "Ernährungsprofil";
-
-"Body Data" = "Körperdaten";
-
-"Body weight" = "Körpergewicht";
-
-"Not set" = "Nicht gesetzt";
-
-"Age" = "Alter";
-
-"Macro Targets (g/kg/day)" = "Makro-Ziele (g/kg/Tag)";
-
-"Used only for the nutrient targets in the Meal statistics. Independent from Share & Backup." = "Wird nur für die Nährstoff-Ziele in der Meal-Statistik verwendet. Unabhängig von Teilen & Backup.";
-
-"When a body weight is set, each macro target = weight × factor. Protein: EFSA min ~0.83, health/sport 1.2–2.0 g/kg. Without a body weight, the fixed EFSA / EU reference values are used." = "Wenn ein Körpergewicht gesetzt ist, gilt: Makro-Ziel = Gewicht × Faktor. Protein: EFSA-Minimum ~0,83, Gesundheit/Sport 1,2–2,0 g/kg. Ohne Körpergewicht werden die festen EFSA-/EU-Referenzwerte verwendet.";
-
 "Allow Meal View Micronutrients and Dietary Fibers entries" = "Allow Meal View Micronutrients and Dietary Fibers entries";
 
 // --------- AI ---------
