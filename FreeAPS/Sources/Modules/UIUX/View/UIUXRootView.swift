@@ -48,6 +48,10 @@ extension UIUX {
                     Toggle("Display Basal Rate in Chart", isOn: $state.displayMainChartBasalRate)
                     Toggle("Display Carbs in Chart", isOn: $state.displayChartCarbs)
                     Toggle("Display Boluses in Chart", isOn: $state.displayChartBoluses)
+                    Toggle("Display Prediction Line", isOn: Binding(
+                        get: { !state.hidePredictions },
+                        set: { state.hidePredictions = !$0 }
+                    ))
                     HStack {
                         Text("Hide the bolus amount strings when amount is under")
                         Spacer()
