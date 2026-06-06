@@ -23,23 +23,6 @@ struct AuroraMainChart: View {
 
     // MARK: - Hour grid (vertical lines when UIUX toggle is on)
 
-    private var hourGridDates: [Date] {
-        let cal = Calendar.current
-        guard let firstHour = cal.nextDate(
-            after: dataStart.addingTimeInterval(-1),
-            matching: DateComponents(minute: 0, second: 0),
-            matchingPolicy: .nextTime
-        ) else { return [] }
-        var dates: [Date] = []
-        var d = firstHour
-        let step = Double(hourStride) * 3600
-        while d <= xEnd {
-            dates.append(d)
-            d = d.addingTimeInterval(step)
-        }
-        return dates
-    }
-
     // MARK: - Domain
 
     private var now: Date { Date() }
@@ -77,6 +60,14 @@ struct AuroraMainChart: View {
         case 8 ..< 16: return 3
         default: return 6
         }
+    }
+
+    /// Fixed "9:00" style axis label — no "Uhr"/AM-PM suffix, 24 h clock.
+    private var hourAxisFormat: Date.FormatStyle {
+        Date.FormatStyle()
+            .hour(.defaultDigits(amPM: .omitted))
+            .minute(.twoDigits)
+            .locale(Locale(identifier: "de_DE"))
     }
 
     // MARK: - Glucose points
@@ -712,14 +703,9 @@ struct AuroraMainChart: View {
                 .lineStyle(StrokeStyle(lineWidth: 0.5, dash: [4, 6]))
                 .foregroundStyle(AuroraPalette.hairline(scheme))
 
-            // 3. Optional vertical hour grid (UIUX toggle: data.displayXgridLines)
-            if data.displayXgridLines {
-                ForEach(hourGridDates, id: \.self) { d in
-                    RuleMark(x: .value("hour", d))
-                        .lineStyle(StrokeStyle(lineWidth: 0.8, dash: [3, 4]))
-                        .foregroundStyle(AuroraPalette.hairline(scheme))
-                }
-            }
+            // 3. Vertical hour grid is drawn as AxisGridLine inside chartXAxis
+            //    (UIUX toggle: data.displayXgridLines) so the lines align
+            //    exactly with the hour labels.
 
             // 4. Now vertical line
             RuleMark(x: .value("now", now))
@@ -870,10 +856,21 @@ struct AuroraMainChart: View {
         .chartXVisibleDomain(length: visibleDomainLength)
         .chartScrollPosition(x: $scrollPosition)
         .chartXAxis {
-            AxisMarks(values: .stride(by: .hour, count: hourStride)) { _ in
-                AxisValueLabel(format: .dateTime.hour(.defaultDigits(amPM: .omitted)))
-                    .font(.system(size: 9, weight: .semibold))
-                    .foregroundStyle(AuroraPalette.textFaint(scheme))
+            AxisMarks(values: .stride(by: .hour, count: hourStride)) { value in
+                if data.displayXgridLines {
+                    AxisGridLine(stroke: StrokeStyle(lineWidth: 0.8, dash: [3, 4]))
+                        .foregroundStyle(AuroraPalette.hairline(scheme))
+                }
+                AxisValueLabel {
+                    if let d = value.as(Date.self) {
+                        Text(d, format: hourAxisFormat)
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundStyle(AuroraPalette.textFaint(scheme))
+                            // Nudge label horizontally so it sits centered under
+                            // its grid line (Swift Charts anchors it off to the side).
+                            .offset(x: -15)
+                    }
+                }
             }
         }
         .chartYAxis {
