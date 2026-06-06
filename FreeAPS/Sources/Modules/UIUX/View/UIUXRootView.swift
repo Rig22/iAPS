@@ -45,15 +45,15 @@ extension UIUX {
                         Spacer()
                         DecimalTextField("6", value: $state.hours, formatter: carbsFormatter)
                     }
+                    Toggle("Display Basal Rate in Chart", isOn: $state.displayMainChartBasalRate)
+                    Toggle("Display Carbs in Chart", isOn: $state.displayChartCarbs)
+                    Toggle("Display Boluses in Chart", isOn: $state.displayChartBoluses)
                     HStack {
                         Text("Hide the bolus amount strings when amount is under")
                         Spacer()
                         DecimalTextField("0.2", value: $state.minimumSMB, formatter: insulinFormatter)
                         Text("U").foregroundColor(.secondary)
                     }
-                    Toggle("Display Basal Rate in Chart", isOn: $state.displayMainChartBasalRate)
-                    Toggle("Display Carbs in Chart", isOn: $state.displayChartCarbs)
-                    Toggle("Display Boluses in Chart", isOn: $state.displayChartBoluses)
                 } header: { Text("Main Chart") }
 
                 Section {

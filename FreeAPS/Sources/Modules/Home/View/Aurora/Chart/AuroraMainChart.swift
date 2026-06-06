@@ -363,9 +363,14 @@ struct AuroraMainChart: View {
     /// All bolus events in the loaded 24 h window. Anchored to the glucose
     /// curve so the dot sits visually on the reading at delivery time.
     private var bolusHits: [EventHit] {
-        data.boluses.compactMap { ev -> EventHit? in
+        // "Hide the bolus amount strings when amount is under" (UI/UX setting):
+        // suppress dots for tiny boluses / SMBs below the threshold so the
+        // chart stays uncluttered. Tapping still surfaces them via the card.
+        let minAmount = NSDecimalNumber(decimal: data.minimumSMB).doubleValue
+        return data.boluses.compactMap { ev -> EventHit? in
             guard ev.type == .bolus,
                   let amt = ev.amount, amt > 0,
+                  NSDecimalNumber(decimal: amt).doubleValue >= minAmount,
                   ev.timestamp >= dataStart else { return nil }
             return EventHit(date: ev.timestamp, amount: NSDecimalNumber(decimal: amt).doubleValue)
         }
