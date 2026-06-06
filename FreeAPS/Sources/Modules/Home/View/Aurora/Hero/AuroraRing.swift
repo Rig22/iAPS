@@ -11,12 +11,14 @@ struct AuroraRing: View {
 
     var direction: BloodGlucose.Direction? = nil
     var bolusProgress: Double? = nil
+    var bolusTotal: Double? = nil
 
     var size = CGSize(width: 300, height: 250)
     var radius: CGFloat = 118
     var strokeWidth: CGFloat = 14
 
     @Environment(\.colorScheme) private var scheme
+    @StateObject private var bolusSmooth = AuroraBolusProgressAnimator()
 
     private var status: AuroraGlucoseStatus { AuroraGlucoseStatus(mgdl: glucose) }
 
@@ -63,7 +65,7 @@ struct AuroraRing: View {
             // Bolus progress halo — thin outer arc that fills with the bolus.
             // Drawn under the tick dot so the dot stays visually on top.
             if let p = bolusProgress, p > 0 {
-                let f = max(0, min(1, p))
+                let f = bolusSmooth.fraction
                 let outerRadius = radius + 9
                 ArcShape(startCSS: -120, endCSS: 120, radius: outerRadius)
                     .stroke(
@@ -75,7 +77,6 @@ struct AuroraRing: View {
                         status.main.opacity(0.85),
                         style: StrokeStyle(lineWidth: 2.5, lineCap: .round)
                     )
-                    .animation(.easeInOut(duration: 0.4), value: f)
             }
 
             // Center text stack
@@ -83,6 +84,8 @@ struct AuroraRing: View {
         }
         .frame(width: size.width, height: size.height)
         .compositingGroup()
+        .onAppear { bolusSmooth.sync(real: bolusProgress, total: bolusTotal) }
+        .onChange(of: bolusProgress) { _ in bolusSmooth.sync(real: bolusProgress, total: bolusTotal) }
     }
 
     private var valueGradient: LinearGradient {

@@ -14,25 +14,33 @@ struct AuroraBolusSheet: View {
 
     var body: some View {
         VStack(spacing: 18) {
-            sheetTitle("Bolus abgeben")
+            sheetTitle(NSLocalizedString("Enact bolus", comment: "Aurora bolus sheet title"))
 
             HStack(spacing: 28) {
-                stat(label: "Empfehlung", value: recommendation.map { String(format: "%.1f E", $0) } ?? "—")
-                stat(label: "Aktives Insulin", value: String(format: "%.1f E", iob))
+                stat(
+                    label: NSLocalizedString("Recommendation", comment: "Aurora bolus sheet recommendation label"),
+                    value: recommendation
+                        .map { String(format: "%.1f%@", $0, NSLocalizedString(" U", comment: "Insulin unit")) } ?? "—"
+                )
+                stat(
+                    label: NSLocalizedString("Insulin on Board", comment: "Aurora bolus sheet IOB label"),
+                    value: String(format: "%.1f%@", iob, NSLocalizedString(" U", comment: "Insulin unit"))
+                )
             }
 
             AuroraStepper(
                 value: $units,
                 step: 0.1,
                 range: 0 ... 25,
-                unit: "E",
+                unit: NSLocalizedString(" U", comment: "Insulin unit").trimmingCharacters(in: .whitespaces),
                 accent: accent,
                 format: "%.1f"
             )
             .padding(.vertical, 8)
 
             AuroraPrimaryButton(
-                title: String(format: "%.1f E abgeben", units),
+                title: NSLocalizedString("Enact bolus", comment: "Aurora bolus sheet deliver button")
+                    + String(format: " (%.1f%@)", units, NSLocalizedString(" U", comment: "Insulin unit")),
                 accent: accent,
                 action: {
                     onDeliver(units)

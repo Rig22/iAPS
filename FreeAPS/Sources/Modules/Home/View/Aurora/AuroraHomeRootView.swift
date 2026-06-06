@@ -413,7 +413,8 @@ extension Home {
                     delta: glucoseDelta,
                     trendCaption: nil,
                     direction: state.recentGlucose?.direction,
-                    bolusProgress: state.bolusProgress.map { NSDecimalNumber(decimal: $0).doubleValue }
+                    bolusProgress: state.bolusProgress.map { NSDecimalNumber(decimal: $0).doubleValue },
+                    bolusTotal: state.bolusAmount.map { NSDecimalNumber(decimal: $0).doubleValue }
                 )
                 .contentShape(Rectangle())
                 .onTapGesture {
@@ -700,10 +701,12 @@ struct AuroraBolusOverlay: View {
 
     @State private var pulse = false
     @State private var cancelPressed = false
+    @StateObject private var smooth = AuroraBolusProgressAnimator()
 
     @Environment(\.colorScheme) private var scheme
 
-    private var fraction: Double {
+    /// Truthful pump fraction — drives the numeric "delivered" readout.
+    private var realFraction: Double {
         let p = NSDecimalNumber(decimal: progress).doubleValue
         return min(1.0, max(0.0, p))
     }
@@ -720,7 +723,7 @@ struct AuroraBolusOverlay: View {
             HStack(spacing: 10) {
                 Image(systemName: "drop.fill")
                     .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(AuroraPalette.textPrimary(scheme))
+                    .foregroundStyle(AuroraPalette.textMuted(scheme))
                     .scaleEffect(pulse ? 1.08 : 0.92)
                     .opacity(pulse ? 1.0 : 0.75)
                     .animation(
@@ -784,8 +787,7 @@ struct AuroraBolusOverlay: View {
                                 startPoint: .leading, endPoint: .trailing
                             )
                         )
-                        .frame(width: max(6, geo.size.width * fraction))
-                        .animation(.easeInOut(duration: 0.4), value: fraction)
+                        .frame(width: max(6, geo.size.width * smooth.fraction))
                 }
             }
             .frame(height: 5)
@@ -793,7 +795,13 @@ struct AuroraBolusOverlay: View {
         .padding(.horizontal, 14)
         .padding(.vertical, 11)
         .auroraGlass(radius: 18)
-        .onAppear { pulse = true }
+        .onAppear {
+            pulse = true
+            smooth.sync(real: realFraction, total: NSDecimalNumber(decimal: total).doubleValue)
+        }
+        .onChange(of: progress) { _ in
+            smooth.sync(real: realFraction, total: NSDecimalNumber(decimal: total).doubleValue)
+        }
     }
 }
 
