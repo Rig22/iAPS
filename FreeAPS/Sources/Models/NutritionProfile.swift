@@ -2,6 +2,47 @@ import Foundation
 
 extension Sex: Codable {}
 
+/// Physical activity level → PAL multiplier applied to BMR for the TDEE estimate.
+enum ActivityLevel: String, Codable, CaseIterable, Identifiable, Sendable {
+    case sedentary
+    case light
+    case moderate
+    case active
+    case veryActive
+
+    var id: String { rawValue }
+
+    var factor: Double {
+        switch self {
+        case .sedentary: return 1.2
+        case .light: return 1.375
+        case .moderate: return 1.55
+        case .active: return 1.725
+        case .veryActive: return 1.9
+        }
+    }
+
+    var title: String {
+        switch self {
+        case .sedentary: return "Sedentary"
+        case .light: return "Light"
+        case .moderate: return "Moderate"
+        case .active: return "Active"
+        case .veryActive: return "Very active"
+        }
+    }
+
+    var detail: String {
+        switch self {
+        case .sedentary: return "Little or no exercise"
+        case .light: return "1–3 days/week"
+        case .moderate: return "3–5 days/week"
+        case .active: return "6–7 days/week"
+        case .veryActive: return "Hard exercise / physical job"
+        }
+    }
+}
+
 /// Self-contained body data used **only** for the Meal tab's RDI calculations
 /// (macro + micronutrient progress). Stored independently from the Sharing
 /// settings so users who never fill those in still get sensible nutrient targets,
@@ -9,44 +50,104 @@ extension Sex: Codable {}
 struct NutritionProfile: Codable, Equatable, Sendable {
     var age: Int
     var sex: Sex
-    /// Body weight in kg. `0` means "not set" → all macros fall back to the
-    /// weight-independent EFSA / EU reference values.
+    /// Body weight in kg. `0` means "not set" → macros fall back to the fixed
+    /// EFSA / EU reference values.
     var weightKg: Decimal
-    /// Macro targets in g per kg body weight per day. When a weight is set, each
-    /// macro reference = weightKg × factor.
-    /// Protein: EFSA min ~0.83, health/sport ~1.2–2.0 (default 1.5).
-    /// Carbs/fat defaults (3.0 / 1.0) roughly match the EU reference intakes at ~85 kg.
+    /// Body height in cm, used for the Mifflin-St Jeor BMR.
+    var heightCm: Decimal
+    var activityLevel: ActivityLevel
+    /// Protein target in g per kg body weight per day (EFSA min ~0.83, sport ~1.2–2.0).
     var proteinPerKg: Decimal
-    var carbsPerKg: Decimal
-    var fatPerKg: Decimal
+    /// Fat target as a percentage of daily energy (TDEE).
+    var fatPercent: Decimal
 
     static let `default` = NutritionProfile(
         age: 35,
         sex: .woman,
         weightKg: 75,
+        heightCm: 175,
+        activityLevel: .moderate,
         proteinPerKg: 1.5,
-        carbsPerKg: 3.0,
-        fatPerKg: 1.0
+        fatPercent: 30
     )
+
+    init(
+        age: Int,
+        sex: Sex,
+        weightKg: Decimal,
+        heightCm: Decimal,
+        activityLevel: ActivityLevel,
+        proteinPerKg: Decimal,
+        fatPercent: Decimal
+    ) {
+        self.age = age
+        self.sex = sex
+        self.weightKg = weightKg
+        self.heightCm = heightCm
+        self.activityLevel = activityLevel
+        self.proteinPerKg = proteinPerKg
+        self.fatPercent = fatPercent
+    }
+
+    enum CodingKeys: String, CodingKey {
+        case age
+        case sex
+        case weightKg
+        case heightCm
+        case activityLevel
+        case proteinPerKg
+        case fatPercent
+    }
+
+    /// Tolerant decode so older stored profiles (without height/activity/fatPercent,
+    /// or with the previous carbs/fat per-kg factors) still load; missing fields
+    /// fall back to the defaults.
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let d = NutritionProfile.default
+        age = try c.decodeIfPresent(Int.self, forKey: .age) ?? d.age
+        sex = try c.decodeIfPresent(Sex.self, forKey: .sex) ?? d.sex
+        weightKg = try c.decodeIfPresent(Decimal.self, forKey: .weightKg) ?? d.weightKg
+        heightCm = try c.decodeIfPresent(Decimal.self, forKey: .heightCm) ?? d.heightCm
+        activityLevel = try c.decodeIfPresent(ActivityLevel.self, forKey: .activityLevel) ?? d.activityLevel
+        proteinPerKg = try c.decodeIfPresent(Decimal.self, forKey: .proteinPerKg) ?? d.proteinPerKg
+        fatPercent = try c.decodeIfPresent(Decimal.self, forKey: .fatPercent) ?? d.fatPercent
+    }
 }
 
 extension NutritionProfile {
-    func perKgFactor(for macro: MacroNutrient) -> Decimal {
-        switch macro {
-        case .protein: return proteinPerKg
-        case .carbs: return carbsPerKg
-        case .fat: return fatPerKg
-        case .fiber: return 0
-        }
+    private var weight: Double { NSDecimalNumber(decimal: weightKg).doubleValue }
+    private var height: Double { NSDecimalNumber(decimal: heightCm).doubleValue }
+
+    /// Whether weight + height are set so a TDEE-based target can be computed.
+    var hasBodyData: Bool { weightKg > 0 && heightCm > 0 }
+
+    /// Basal metabolic rate (kcal/day), Mifflin-St Jeor.
+    var bmr: Double {
+        let base = 10 * weight + 6.25 * height - 5 * Double(age)
+        return sex == .man ? base + 5 : base - 161
     }
 
-    /// Resolved daily target (g/day) for a macro: weight-based when a weight is
-    /// set, otherwise the weight-independent EFSA / EU reference value.
+    /// Total daily energy expenditure (kcal/day) = BMR × activity factor.
+    var tdee: Double { max(bmr * activityLevel.factor, 0) }
+
+    /// Resolved daily target (g/day) for a macro, derived from the TDEE:
+    /// protein = weight × g/kg, fat = TDEE × fat% / 9 kcal, carbs = remaining kcal / 4.
+    /// Falls back to the fixed EFSA / EU reference when body data is missing.
     func targetGrams(for macro: MacroNutrient) -> Double {
-        if weightKg > 0, macro != .fiber {
-            return NSDecimalNumber(decimal: weightKg * perKgFactor(for: macro)).doubleValue
+        guard hasBodyData, macro != .fiber else {
+            return EFSAReferenceIntakes.value(for: macro, age: age, sex: sex).value
         }
-        return EFSAReferenceIntakes.value(for: macro, age: age, sex: sex).value
+        let proteinG = weight * NSDecimalNumber(decimal: proteinPerKg).doubleValue
+        let fatKcal = tdee * NSDecimalNumber(decimal: fatPercent).doubleValue / 100
+        let carbsKcal = max(tdee - proteinG * 4 - fatKcal, 0)
+
+        switch macro {
+        case .protein: return proteinG
+        case .fat: return fatKcal / 9
+        case .carbs: return carbsKcal / 4
+        case .fiber: return EFSAReferenceIntakes.value(for: .fiber, age: age, sex: sex).value
+        }
     }
 
     /// Resolved protein target (g/day).

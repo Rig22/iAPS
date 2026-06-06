@@ -76,7 +76,7 @@ struct AuroraTabBar: View {
                     onDataTable()
                 }
             }
-            actionButton(icon: "chart.bar.xaxis", accessibility: "Statistik") {
+            actionButton(icon: "chart.pie.fill", accessibility: "Statistik") {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onStatistics()
             }

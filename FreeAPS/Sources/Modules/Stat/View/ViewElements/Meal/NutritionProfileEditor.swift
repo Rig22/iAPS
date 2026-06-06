@@ -1,22 +1,15 @@
 import SwiftUI
 
-/// Editor for the Meal tab's body data (age, sex, weight) and protein goal.
-/// Independent from the Sharing settings — changes here only affect the Meal
-/// tab's nutrient RDI calculations.
+/// Editor for the Meal tab's body data (weight, height, age, sex, activity) and
+/// macro goals. Independent from the Sharing settings — changes here only affect
+/// the Meal tab's nutrient targets.
 struct NutritionProfileEditor: View {
     @Binding var profile: NutritionProfile
     var onDone: () -> Void
 
     @Environment(\.dismiss) private var dismiss
 
-    private var weightProxy: Binding<Double> {
-        Binding(
-            get: { NSDecimalNumber(decimal: profile.weightKg).doubleValue },
-            set: { profile.weightKg = Decimal($0) }
-        )
-    }
-
-    private func factorProxy(_ keyPath: WritableKeyPath<NutritionProfile, Decimal>) -> Binding<Double> {
+    private func decimalProxy(_ keyPath: WritableKeyPath<NutritionProfile, Decimal>) -> Binding<Double> {
         Binding(
             get: { NSDecimalNumber(decimal: profile[keyPath: keyPath]).doubleValue },
             set: { profile[keyPath: keyPath] = Decimal($0) }
@@ -37,28 +30,21 @@ struct NutritionProfileEditor: View {
         NavigationView {
             Form {
                 Section {
-                    Stepper(value: weightProxy, in: 0 ... 250, step: 1) {
-                        HStack {
-                            Text(verbatim: "Body weight")
-                            Spacer()
-                            Text(
-                                profile.weightKg > 0
-                                    ? "\(Int(weightProxy.wrappedValue)) kg"
-                                    : "Not set"
-                            )
-                            .foregroundStyle(.secondary)
-                        }
+                    Stepper(value: decimalProxy(\.weightKg), in: 0 ... 250, step: 1) {
+                        labeledValue(
+                            "Body weight",
+                            profile.weightKg > 0 ? "\(Int(profile.doubleWeight)) kg" : "Not set"
+                        )
                     }
-
+                    Stepper(value: decimalProxy(\.heightCm), in: 0 ... 230, step: 1) {
+                        labeledValue(
+                            "Height",
+                            profile.heightCm > 0 ? "\(Int(profile.doubleHeight)) cm" : "Not set"
+                        )
+                    }
                     Stepper(value: $profile.age, in: 1 ... 120) {
-                        HStack {
-                            Text(verbatim: "Age")
-                            Spacer()
-                            Text("\(profile.age)")
-                                .foregroundStyle(.secondary)
-                        }
+                        labeledValue("Age", "\(profile.age)")
                     }
-
                     Picker("Sex", selection: sexProxy) {
                         ForEach(selectableSexes) { sex in
                             Text(NSLocalizedString(sex.rawValue, comment: "")).tag(sex)
@@ -71,29 +57,41 @@ struct NutritionProfileEditor: View {
                 }
 
                 Section {
-                    factorRow(
-                        title: "Protein",
-                        macro: .protein,
-                        binding: factorProxy(\.proteinPerKg),
-                        range: 0.5 ... 3.0
-                    )
-                    factorRow(
-                        title: "Carbs",
-                        macro: .carbs,
-                        binding: factorProxy(\.carbsPerKg),
-                        range: 1.0 ... 8.0
-                    )
-                    factorRow(
-                        title: "Fat",
-                        macro: .fat,
-                        binding: factorProxy(\.fatPerKg),
-                        range: 0.3 ... 2.5
-                    )
+                    Picker(selection: $profile.activityLevel) {
+                        ForEach(ActivityLevel.allCases) { level in
+                            Text(verbatim: "\(level.title) · \(level.detail)").tag(level)
+                        }
+                    } label: {
+                        Text(verbatim: "Activity")
+                    }
+
+                    if profile.hasBodyData {
+                        labeledValue("Daily energy", kcal(profile.tdee), valueColor: .primary)
+                        labeledValue("Basal (BMR)", kcal(profile.bmr))
+                    }
                 } header: {
-                    Text(verbatim: "Macro Targets (g/kg/day)")
+                    Text(verbatim: "Activity & Energy")
+                } footer: {
+                    Text(verbatim: "Estimated daily calorie need (Mifflin-St Jeor × activity factor).")
+                }
+
+                Section {
+                    Stepper(value: decimalProxy(\.proteinPerKg), in: 0.5 ... 3.0, step: 0.1) {
+                        macroLabel(
+                            "Protein",
+                            macro: .protein,
+                            trailing: profile.doubleProteinPerKg.formatted(.number.precision(.fractionLength(1))) + " g/kg"
+                        )
+                    }
+                    Stepper(value: decimalProxy(\.fatPercent), in: 15 ... 45, step: 1) {
+                        macroLabel("Fat", macro: .fat, trailing: "\(Int(profile.doubleFatPercent)) %")
+                    }
+                    macroLabel("Carbs", macro: .carbs, trailing: carbsPercentText)
+                } header: {
+                    Text(verbatim: "Macro Targets")
                 } footer: {
                     Text(
-                        verbatim: "When a body weight is set, each macro target = weight × factor. Protein: EFSA min ~0.83, health/sport 1.2–2.0 g/kg. Without a body weight, the fixed EFSA / EU reference values are used."
+                        verbatim: "Protein from body weight, fat as a share of daily energy, carbs fill the rest. Without body weight & height the fixed EFSA / EU reference values are used."
                     )
                 }
             }
@@ -110,25 +108,42 @@ struct NutritionProfileEditor: View {
         }
     }
 
-    @ViewBuilder private func factorRow(
-        title: String,
-        macro: MacroNutrient,
-        binding: Binding<Double>,
-        range: ClosedRange<Double>
-    ) -> some View {
-        Stepper(value: binding, in: range, step: 0.1) {
-            HStack {
-                Text(NSLocalizedString(title, comment: ""))
-                Spacer()
-                if profile.weightKg > 0 {
-                    Text("\(Int(profile.targetGrams(for: macro).rounded())) g")
-                        .foregroundStyle(.primary)
-                    Text("·")
-                        .foregroundStyle(.secondary)
-                }
-                Text(binding.wrappedValue.formatted(.number.precision(.fractionLength(1))) + " g/kg")
-                    .foregroundStyle(.secondary)
-            }
+    private var carbsPercentText: String {
+        guard profile.hasBodyData, profile.tdee > 0 else { return "rest" }
+        let pct = profile.targetGrams(for: .carbs) * 4 / profile.tdee * 100
+        return "\(Int(pct.rounded())) %"
+    }
+
+    private func kcal(_ value: Double) -> String {
+        value.formatted(.number.grouping(.automatic).rounded().precision(.fractionLength(0))) + " kcal"
+    }
+
+    private func labeledValue(_ label: String, _ value: String, valueColor: Color = .secondary) -> some View {
+        HStack {
+            Text(verbatim: label)
+            Spacer()
+            Text(verbatim: value).foregroundStyle(valueColor)
         }
     }
+
+    /// Macro name (shared, localized) + resolved grams + a trailing detail.
+    private func macroLabel(_ name: String, macro: MacroNutrient, trailing: String) -> some View {
+        HStack(spacing: 8) {
+            Text(NSLocalizedString(name, comment: ""))
+            Spacer(minLength: 8)
+            if profile.hasBodyData {
+                Text(verbatim: "\(Int(profile.targetGrams(for: macro).rounded())) g")
+                    .foregroundStyle(.primary)
+                Text(verbatim: "·").foregroundStyle(.secondary)
+            }
+            Text(verbatim: trailing).foregroundStyle(.secondary)
+        }
+    }
+}
+
+private extension NutritionProfile {
+    var doubleWeight: Double { NSDecimalNumber(decimal: weightKg).doubleValue }
+    var doubleHeight: Double { NSDecimalNumber(decimal: heightCm).doubleValue }
+    var doubleProteinPerKg: Double { NSDecimalNumber(decimal: proteinPerKg).doubleValue }
+    var doubleFatPercent: Double { NSDecimalNumber(decimal: fatPercent).doubleValue }
 }

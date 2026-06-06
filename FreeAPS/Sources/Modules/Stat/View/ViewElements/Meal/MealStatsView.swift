@@ -306,13 +306,6 @@ struct MacroNutrientStatsView: View {
                 Text(verbatim: "Macronutrients")
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                 Spacer()
-                Text(
-                    isHourly
-                        ? NSLocalizedString("Total", comment: "")
-                        : "Ø / Day"
-                )
-                .font(.system(size: 12, weight: .medium, design: .rounded))
-                .foregroundStyle(.secondary)
                 Button(action: onEditProfile) {
                     Image(systemName: "gearshape.fill")
                         .font(.system(size: 14))
@@ -321,13 +314,21 @@ struct MacroNutrientStatsView: View {
                 .buttonStyle(.plain)
             }
 
+            if profile.hasBodyData {
+                let consumedKcal = NSDecimalNumber(decimal: carbs).doubleValue * 4
+                    + NSDecimalNumber(decimal: protein).doubleValue * 4
+                    + NSDecimalNumber(decimal: fat).doubleValue * 9
+                energyRow(consumed: consumedKcal, target: profile.tdee)
+                Divider().opacity(0.4)
+            }
+
             row(.protein, label: "Protein", amount: protein, color: BreathePalette.flieder)
             row(.carbs, label: "Carbs", amount: carbs, color: BreathePalette.kamille)
             row(.fat, label: "Fat", amount: fat, color: BreathePalette.daemmer)
 
             Text(
-                profile.weightKg > 0
-                    ? "% of your weight-based daily target"
+                profile.hasBodyData
+                    ? "% of your daily macro target"
                     : "% of EFSA reference daily intake"
             )
             .font(.system(size: 10, weight: .medium, design: .rounded))
@@ -335,6 +336,41 @@ struct MacroNutrientStatsView: View {
             .padding(.top, 2)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func energyRow(consumed: Double, target: Double) -> some View {
+        let pct = target > 0 ? consumed / target * 100 : 0
+        let color = energyColor(pct)
+        return VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 8) {
+                Image(systemName: "flame.fill")
+                    .font(.system(size: 12))
+                    .foregroundStyle(color)
+                Text(verbatim: "Energy")
+                    .font(.system(size: 13, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.primary)
+                Spacer(minLength: 8)
+                Text("\(Int(pct.rounded())) %")
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(color)
+                    .monospacedDigit()
+                Text(grams(consumed) + " / " + grams(target) + " kcal")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundStyle(.secondary)
+                    .monospacedDigit()
+            }
+            NutrientProgressBar(progress: NutrientProgress(percent: pct, color: color))
+        }
+    }
+
+    private func energyColor(_ pct: Double) -> Color {
+        switch pct {
+        case ..<50: return .orange
+        case 50 ..< 90: return .cyan
+        case 90 ... 110: return .mint
+        case 110 ... 150: return .yellow
+        default: return .orange
+        }
     }
 
     private func row(_ nutrient: MacroNutrient, label: String, amount: Decimal, color: Color) -> some View {
