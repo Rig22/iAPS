@@ -26,6 +26,7 @@ enum Icon_: String, CaseIterable, Identifiable {
     case appIcon21
     case appIcon22
     case appIcon23
+    case appIcon24
     var id: String { rawValue }
 
     var preview: String {
@@ -53,6 +54,7 @@ enum Icon_: String, CaseIterable, Identifiable {
         case .appIcon21: "Image 21"
         case .appIcon22: "Image 22"
         case .appIcon23: "Image 23"
+        case .appIcon24: "Image 24"
         }
     }
 }
