@@ -17,6 +17,7 @@ extension Home {
         @State private var displayDynamicHistory = false
         @State private var showCancelOverrideAlert = false
         @State private var showCancelTempTargetAlert = false
+        @State private var showExpirationAlert = false
 
         // Backup first-run prompt is handled centrally in Main.RootView so the
         // home view never instantiates on a fresh install. No Onboarding
@@ -369,12 +370,37 @@ extension Home {
             }
             .onChange(of: scenePhase) { phase in
                 switch phase {
-                case .active: state.startTimer()
+                case .active:
+                    state.startTimer()
+                    checkBuildExpiration()
                 case .background,
                      .inactive: state.stopTimer()
                 default: break
                 }
             }
+            .onAppear { checkBuildExpiration() }
+            .alert(
+                BuildExpirationManager.shared.alertTitle,
+                isPresented: $showExpirationAlert
+            ) {
+                Button("OK", role: .cancel) {}
+                Button("Mehr Infos") {
+                    if let url = URL(string: "https://github.com/Artificial-Pancreas/iAPS/releases") {
+                        UIApplication.shared.open(url)
+                    }
+                }
+            } message: {
+                Text(BuildExpirationManager.shared.alertMessage)
+            }
+        }
+
+        /// Throttled 90-day TestFlight build-expiration warning, mirroring the
+        /// standard HomeRootView behaviour for the Aurora skin.
+        private func checkBuildExpiration() {
+            let manager = BuildExpirationManager.shared
+            guard manager.shouldShowAlert else { return }
+            manager.markAlertShown()
+            showExpirationAlert = true
         }
 
         /// Small glass pill anchored to a corner of the Aurora ring.
