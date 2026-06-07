@@ -173,7 +173,9 @@ extension Home {
                 let color: Color = {
                     if info.expiresIn <= 0 { return .red }
                     if info.expiresIn < 6 * 3600 { return .orange }
-                    if info.expiresIn < 24 * 3600 { return Color(red: 1.0, green: 0.85, blue: 0.4) }
+                    // No amber stage: it reads poorly on light backgrounds, and
+                    // the exclamation-mark shield already signals the upcoming
+                    // change clearly enough. Use the standard icon color.
                     return AuroraPalette.textPrimary(scheme)
                 }()
                 return (text, color)
@@ -464,9 +466,9 @@ extension Home {
                             PulsingWarningShield(
                                 color: AuroraGlucoseStatus(mgdl: glucoseValue).main,
                                 pulsing: warning.pulsing,
-                                size: 12
+                                size: 16
                             )
-                            .offset(x: -5, y: -7)
+                            .offset(x: -6, y: -8)
                         }
                     }
                     .padding(.leading, 18)
@@ -552,7 +554,7 @@ extension Home {
                     iconColor: AuroraPalette.textMuted(scheme),
                     value: reservoirString,
                     unit: "E",
-                    label: pumpSub.map { "\($0) Pumpe" } ?? "Pumpe",
+                    label: pumpSub.map { "Pumpe \($0)" } ?? "Pumpe",
                     sub: nil,
                     badge: reservoirBadge,
                     badgeColor: AuroraGlucoseStatus(mgdl: glucoseValue).main,

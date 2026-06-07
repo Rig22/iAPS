@@ -28,6 +28,11 @@ extension Stat {
                 .padding(.horizontal)
                 .padding(.top, 6)
 
+                // Interval picker (Today/D/W/M/3M) lives in the fixed header so
+                // it stays visible while scrolling the cards below. Overview has
+                // no interval dimension, so it shows nothing here.
+                intervalPicker
+
                 ScrollView {
                     VStack(spacing: 16) {
                         switch state.selectedView {
@@ -63,16 +68,40 @@ extension Stat {
             }
         }
 
+        // MARK: - Interval picker (pinned in header)
+
+        /// The Today/D/W/M/3M segmented picker for the currently selected stat
+        /// view. Rendered in the fixed header (not inside the ScrollView) so it
+        /// stays visible while scrolling. Overview has no interval dimension.
+        @ViewBuilder private var intervalPicker: some View {
+            switch state.selectedView {
+            case .overview:
+                EmptyView()
+            case .glucose:
+                durationPicker(selection: $state.selectedIntervalForGlucoseStats)
+            case .looping:
+                durationPicker(selection: $state.selectedIntervalForLoopStats)
+            case .insulin:
+                durationPicker(selection: $state.selectedIntervalForInsulinStats)
+            case .meals:
+                durationPicker(selection: $state.selectedIntervalForMealStats)
+            }
+        }
+
+        private func durationPicker(selection: Binding<StatsTimeIntervalWithToday>) -> some View {
+            Picker("Duration", selection: selection) {
+                ForEach(StatsTimeIntervalWithToday.allCases) { interval in
+                    Text(interval.displayName).tag(interval)
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal)
+            .padding(.top, 8)
+        }
+
         // MARK: - Glucose
 
         @ViewBuilder var glucoseView: some View {
-            // Duration picker
-            Picker("Duration", selection: $state.selectedIntervalForGlucoseStats) {
-                ForEach(StatsTimeIntervalWithToday.allCases) { interval in
-                    Text(interval.displayName)
-                }
-            }.pickerStyle(.segmented)
-
             let filter = state.filterDate(for: state.selectedIntervalForGlucoseStats)
 
             // Chart type picker
@@ -172,12 +201,6 @@ extension Stat {
                 .fixedSize(horizontal: true, vertical: false)
             }.padding(.horizontal)
 
-            Picker("Duration", selection: $state.selectedIntervalForInsulinStats) {
-                ForEach(StatsTimeIntervalWithToday.allCases) { interval in
-                    Text(interval.displayName).tag(interval)
-                }
-            }.pickerStyle(.segmented)
-
             insulinChartCard
             insulinSummaryCard
         }
@@ -248,12 +271,6 @@ extension Stat {
         // MARK: - Looping
 
         @ViewBuilder var loopingView: some View {
-            Picker("Duration", selection: $state.selectedIntervalForLoopStats) {
-                ForEach(StatsTimeIntervalWithToday.allCases) { interval in
-                    Text(interval.displayName)
-                }
-            }.pickerStyle(.segmented)
-
             let filter = state.filterDate(for: state.selectedIntervalForLoopStats)
             LoopingCard(filter: filter, selectedInterval: state.selectedIntervalForLoopStats)
         }
@@ -261,12 +278,6 @@ extension Stat {
         // MARK: - Meals
 
         @ViewBuilder var mealsView: some View {
-            Picker("Duration", selection: $state.selectedIntervalForMealStats) {
-                ForEach(StatsTimeIntervalWithToday.allCases) { interval in
-                    Text(interval.displayName).tag(interval)
-                }
-            }.pickerStyle(.segmented)
-
             let mealData = state.selectedIntervalForMealStats.isHourly ?
                 (state.selectedIntervalForMealStats == .today ? state.todayHourlyMealStats : state.hourlyMealStats) :
                 state.filteredDailyMealStats
