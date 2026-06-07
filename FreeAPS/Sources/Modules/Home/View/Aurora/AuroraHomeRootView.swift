@@ -160,7 +160,8 @@ extension Home {
 
         /// Top-left: sensor — age or time-remaining depending on UIUX toggles,
         /// auto-surfaces when expiry is within 24 h regardless of toggles.
-        /// Icon-color escalates red / orange / amber as expiry approaches.
+        /// The icon keeps the standard color; the exclamation-mark shield
+        /// signals imminent expiry.
         ///
         /// Fallback: if the CGM did not report a `sessionStartDate` (so
         /// `calculateSensorInfo()` returns nil), we still show the configured
@@ -170,15 +171,10 @@ extension Home {
                 let showPill = state.displaySAGE || state.displayExpiration || info.expiresIn <= 24 * 3600
                 guard showPill else { return nil }
                 let text = info.text.replacingOccurrences(of: "Sensor: ", with: "")
-                let color: Color = {
-                    if info.expiresIn <= 0 { return .red }
-                    if info.expiresIn < 6 * 3600 { return .orange }
-                    // No amber stage: it reads poorly on light backgrounds, and
-                    // the exclamation-mark shield already signals the upcoming
-                    // change clearly enough. Use the standard icon color.
-                    return AuroraPalette.textPrimary(scheme)
-                }()
-                return (text, color)
+                // No color escalation (red/orange/amber): tints read poorly on
+                // light backgrounds and the exclamation-mark shield already
+                // signals the upcoming change. Always use the standard icon color.
+                return (text, AuroraPalette.textPrimary(scheme))
             }
             // Fallback when sessionStartDate is missing
             guard state.displaySAGE || state.displayExpiration else { return nil }
