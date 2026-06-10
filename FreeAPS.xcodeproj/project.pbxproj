@@ -413,6 +413,18 @@
 		BACCAFE0000000000BAC000B /* BackupSettingsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC000A /* BackupSettingsProvider.swift */; };
 		BACCAFE0000000000BAC000D /* BackupSettingsStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC000C /* BackupSettingsStateModel.swift */; };
 		BACCAFE0000000000BAC000F /* BackupSettingsRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC000E /* BackupSettingsRootView.swift */; };
+		A1AB000000000000A1AB0002 /* AIHubDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0001 /* AIHubDataFlow.swift */; };
+		A1AB000000000000A1AB0004 /* AIHubProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0003 /* AIHubProvider.swift */; };
+		A1AB000000000000A1AB0006 /* AIHubStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0005 /* AIHubStateModel.swift */; };
+		A1AB000000000000A1AB0008 /* AIHubRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0007 /* AIHubRootView.swift */; };
+		A1AB000000000000A1AB000C /* AIHubChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB000B /* AIHubChatService.swift */; };
+		A1AB000000000000A1AB000E /* AIHubChatContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB000D /* AIHubChatContext.swift */; };
+		A1AB000000000000A1AB0010 /* AIHubChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB000F /* AIHubChatView.swift */; };
+		A1AB000000000000A1AB0012 /* AIHubSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */; };
+		A1AB000000000000A1AB0014 /* AIHubTherapyAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */; };
+		A1AB000000000000A1AB0016 /* AIHubTherapyInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0015 /* AIHubTherapyInsightsView.swift */; };
+		A1AB000000000000A1AB0018 /* AIHubRecap.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0017 /* AIHubRecap.swift */; };
+		A1AB000000000000A1AB001A /* AIHubRecapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0019 /* AIHubRecapView.swift */; };
 		BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */; };
 		BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */; };
 		BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0016 /* AutoBackupService.swift */; };
@@ -1171,6 +1183,18 @@
 		BACCAFE0000000000BAC000A /* BackupSettingsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsProvider.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC000C /* BackupSettingsStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsStateModel.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC000E /* BackupSettingsRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsRootView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0001 /* AIHubDataFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubDataFlow.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0003 /* AIHubProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubProvider.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0005 /* AIHubStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubStateModel.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0007 /* AIHubRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubRootView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB000B /* AIHubChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubChatService.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB000D /* AIHubChatContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubChatContext.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB000F /* AIHubChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubChatView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubSettingsView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyAnalysis.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0015 /* AIHubTherapyInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyInsightsView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0017 /* AIHubRecap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubRecap.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0019 /* AIHubRecapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubRecapView.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunRestorePromptView.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarlyBackupRestore.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0016 /* AutoBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoBackupService.swift; sourceTree = "<group>"; };
@@ -1840,6 +1864,7 @@
 		3811DE0325C9D31700A708ED /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				A1AB000000000000A1AB0009 /* AIHub */,
 				6DC5D590658EF8B8DF94F9F5 /* AddCarbs */,
 				A9A4C88374496B3C89058A89 /* AddTempTarget */,
 				198F67B42CFCBD5D00E538CB /* AutoISF */,
@@ -2933,6 +2958,33 @@
 				BACCAFE0000000000BAC001A /* PresetsBackup.swift */,
 			);
 			path = Backup;
+			sourceTree = "<group>";
+		};
+		A1AB000000000000A1AB0009 /* AIHub */ = {
+			isa = PBXGroup;
+			children = (
+				A1AB000000000000A1AB000D /* AIHubChatContext.swift */,
+				A1AB000000000000A1AB000B /* AIHubChatService.swift */,
+				A1AB000000000000A1AB0001 /* AIHubDataFlow.swift */,
+				A1AB000000000000A1AB0003 /* AIHubProvider.swift */,
+				A1AB000000000000A1AB0017 /* AIHubRecap.swift */,
+				A1AB000000000000A1AB0005 /* AIHubStateModel.swift */,
+				A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */,
+				A1AB000000000000A1AB000A /* View */,
+			);
+			path = AIHub;
+			sourceTree = "<group>";
+		};
+		A1AB000000000000A1AB000A /* View */ = {
+			isa = PBXGroup;
+			children = (
+				A1AB000000000000A1AB000F /* AIHubChatView.swift */,
+				A1AB000000000000A1AB0019 /* AIHubRecapView.swift */,
+				A1AB000000000000A1AB0007 /* AIHubRootView.swift */,
+				A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */,
+				A1AB000000000000A1AB0015 /* AIHubTherapyInsightsView.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		BACCAFE0000000000BAC0010 /* BackupSettings */ = {
@@ -4177,6 +4229,18 @@
 				BACCAFE0000000000BAC000B /* BackupSettingsProvider.swift in Sources */,
 				BACCAFE0000000000BAC000D /* BackupSettingsStateModel.swift in Sources */,
 				BACCAFE0000000000BAC000F /* BackupSettingsRootView.swift in Sources */,
+				A1AB000000000000A1AB0002 /* AIHubDataFlow.swift in Sources */,
+				A1AB000000000000A1AB0004 /* AIHubProvider.swift in Sources */,
+				A1AB000000000000A1AB0006 /* AIHubStateModel.swift in Sources */,
+				A1AB000000000000A1AB0008 /* AIHubRootView.swift in Sources */,
+				A1AB000000000000A1AB000C /* AIHubChatService.swift in Sources */,
+				A1AB000000000000A1AB000E /* AIHubChatContext.swift in Sources */,
+				A1AB000000000000A1AB0010 /* AIHubChatView.swift in Sources */,
+				A1AB000000000000A1AB0012 /* AIHubSettingsView.swift in Sources */,
+				A1AB000000000000A1AB0014 /* AIHubTherapyAnalysis.swift in Sources */,
+				A1AB000000000000A1AB0016 /* AIHubTherapyInsightsView.swift in Sources */,
+				A1AB000000000000A1AB0018 /* AIHubRecap.swift in Sources */,
+				A1AB000000000000A1AB001A /* AIHubRecapView.swift in Sources */,
 				BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */,
 				BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */,
 				BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */,

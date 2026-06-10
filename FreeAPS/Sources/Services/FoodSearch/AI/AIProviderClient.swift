@@ -32,19 +32,10 @@ struct AIProviderClient: Sendable {
                 }
             #endif
 
-            let (data, response): (Data, URLResponse) = try await performRequestWithRetry(
+            let (data, httpResponse): (Data, HTTPURLResponse) = try await performRequestWithRetry(
                 request: urlRequest,
                 telemetryCallback: telemetryCallback
             )
-
-            saveDebugDataToTempFile(description: "AI response", fileName: "ai-response.txt", data: data)
-
-            guard let httpResponse = response as? HTTPURLResponse else {
-                print("Expected HTTPURLResponse but got \(type(of: response))")
-                throw AIFoodAnalysisError.invalidResponse
-            }
-
-            try proto.handleErrorResponse(httpResponse: httpResponse, data: data, telemetryCallback: telemetryCallback)
 
             guard !data.isEmpty else {
                 print("AI response body is empty (HTTP \(httpResponse.statusCode))")
@@ -96,39 +87,60 @@ struct AIProviderClient: Sendable {
         }
     }
 
+    /// Führt den Request aus und validiert die Antwort über das Provider-
+    /// Protokoll. Die Status-Auswertung passiert bewusst INNERHALB der
+    /// Retry-Schleife: Überlastung (503/529 → `serviceUnavailable`) ist
+    /// transient und wird mit Backoff wiederholt, ebenso Timeouts (gemäß
+    /// `numberOfRetries` des Providers). Alle anderen Fehler brechen ab.
     private func performRequestWithRetry(
         request: URLRequest,
         telemetryCallback: ((String) -> Void)?
-    ) async throws -> (Data, URLResponse) {
-        let maxRetries = proto.numberOfRetries
-        var lastError: Error?
+    ) async throws -> (Data, HTTPURLResponse) {
+        let maxTimeoutAttempts = proto.numberOfRetries
+        let maxOverloadAttempts = 3
+        var timeoutAttempts = 0
+        var overloadAttempts = 0
 
-        for attempt in 1 ... maxRetries {
+        while true {
             do {
-                return try await performRequest(
+                let (data, response) = try await performRequest(
                     request: request,
-                    attempt: attempt,
-                    maxRetries: maxRetries,
+                    attempt: timeoutAttempts + overloadAttempts + 1,
+                    maxRetries: maxTimeoutAttempts,
                     telemetryCallback: telemetryCallback
                 )
 
-            } catch AIFoodAnalysisError.timeout {
-                print("Request timed out (attempt \(attempt)/\(maxRetries))")
-                lastError = AIFoodAnalysisError.timeout
+                saveDebugDataToTempFile(description: "AI response", fileName: "ai-response.txt", data: data)
 
-                if attempt < maxRetries {
-                    let backoffDelay = Double(attempt) * 2.0
-                    telemetryCallback?("⏳ retry in \(Int(backoffDelay))s …")
-                    try await Task.sleep(nanoseconds: UInt64(backoffDelay * 1_000_000_000))
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    print("Expected HTTPURLResponse but got \(type(of: response))")
+                    throw AIFoodAnalysisError.invalidResponse
                 }
-            } catch {
-                throw error
+
+                try proto.handleErrorResponse(httpResponse: httpResponse, data: data, telemetryCallback: telemetryCallback)
+
+                return (data, httpResponse)
+
+            } catch AIFoodAnalysisError.timeout {
+                timeoutAttempts += 1
+                print("Request timed out (attempt \(timeoutAttempts)/\(maxTimeoutAttempts))")
+                guard timeoutAttempts < maxTimeoutAttempts else {
+                    throw AIFoodAnalysisError.timeout
+                }
+                let backoffDelay = Double(timeoutAttempts) * 2.0
+                telemetryCallback?("⏳ retry in \(Int(backoffDelay))s …")
+                try await Task.sleep(nanoseconds: UInt64(backoffDelay * 1_000_000_000))
+
+            } catch let error as AIFoodAnalysisError {
+                guard case .serviceUnavailable = error else { throw error }
+                overloadAttempts += 1
+                print("Service overloaded (attempt \(overloadAttempts)/\(maxOverloadAttempts))")
+                guard overloadAttempts < maxOverloadAttempts else { throw error }
+                let backoffDelay = Double(overloadAttempts) * 3.0
+                telemetryCallback?("⏳ Service overloaded — retrying in \(Int(backoffDelay))s …")
+                try await Task.sleep(nanoseconds: UInt64(backoffDelay * 1_000_000_000))
             }
         }
-
-        print("All \(maxRetries) request attempts timed out")
-        throw AIFoodAnalysisError
-            .customError("requests timed out consistently. Last error: \(lastError?.localizedDescription ?? "unknown")")
     }
 }
 

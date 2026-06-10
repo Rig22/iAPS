@@ -6,10 +6,11 @@ import SwiftUI
 /// wires to `state.showModal(for:)` or similar.
 ///
 /// - Left pill:  always Carbs + Bolus.
-/// - FAB:        Settings.
+/// - FAB:        AI Hub.
 /// - Right pill: Profil (override) and/or Ziel (temp target), each individually
 ///   hideable via the `showOverride` / `showTempTarget` flags (driven from
-///   `UIUXStateModel.profileButton` / `.useTargetButton`).
+///   `UIUXStateModel.profileButton` / `.useTargetButton`), plus Settings as
+///   the fixed last button.
 struct AuroraTabBar: View {
     let glucose: Double // drives FAB color
     var showOverride: Bool = true
@@ -24,6 +25,7 @@ struct AuroraTabBar: View {
     let onStatistics: () -> Void
     let onProfile: () -> Void
     let onTarget: () -> Void
+    let onAIHub: () -> Void
     let onSettings: () -> Void
 
     @Environment(\.colorScheme) private var scheme
@@ -100,20 +102,24 @@ struct AuroraTabBar: View {
                     onTarget()
                 }
             }
+            actionButton(icon: "gearshape.fill", accessibility: "Einstellungen") {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                onSettings()
+            }
         }
         .frame(height: 58)
         .frame(maxWidth: .infinity)
         .auroraGlass(radius: 30)
     }
 
-    // MARK: - FAB (Settings)
+    // MARK: - FAB (AI Hub)
 
     private var fab: some View {
         Button(action: {
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-            onSettings()
+            onAIHub()
         }, label: {
-            Image(systemName: "gearshape.fill")
+            Image(systemName: "sparkles")
                 .font(.system(size: 24, weight: .semibold))
                 .foregroundStyle(Color.white)
                 .frame(width: 62, height: 62)
@@ -128,7 +134,7 @@ struct AuroraTabBar: View {
                 )
         })
             .buttonStyle(.plain)
-            .accessibilityLabel(Text("Einstellungen"))
+            .accessibilityLabel(Text("AI Hub"))
     }
 
     // MARK: - Helpers

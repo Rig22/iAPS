@@ -54,6 +54,11 @@ struct GeminiProtocol: AIProviderProtocol {
         telemetryCallback _: ((String) -> Void)?
     ) throws {
         guard httpResponse.statusCode == 200 else {
+            // 503 = overloaded/high demand — transient, retried by AIProviderClient.
+            if httpResponse.statusCode == 503 {
+                debug(.service, "Gemini API \(httpResponse.statusCode): service overloaded")
+                throw AIFoodAnalysisError.serviceUnavailable(provider: "Gemini")
+            }
             if let apiError = try? JSONDecoder().decode(GeminiErrorResponse.self, from: data) {
                 let message = apiError.error.message
                 let status = apiError.error.status ?? ""

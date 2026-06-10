@@ -41,6 +41,7 @@ enum Screen: Identifiable, Hashable {
     case sharing
     case autoISF
     case backupSettings
+    case aiHub
     var id: Int { String(reflecting: self).hashValue }
 }
 
@@ -123,6 +124,8 @@ extension Screen {
             AutoISF.RootView(resolver: resolver)
         case .backupSettings:
             BackupSettings.RootView(resolver: resolver)
+        case .aiHub:
+            AIHub.RootView(resolver: resolver)
         }
     }
 

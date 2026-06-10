@@ -627,6 +627,7 @@ extension Home {
                         state.showModal(for: .addTempTarget)
                     }
                 },
+                onAIHub: { state.showModal(for: .aiHub) },
                 onSettings: { state.showModal(for: .settings) }
             )
         }

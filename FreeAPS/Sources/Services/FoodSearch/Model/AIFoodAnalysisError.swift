@@ -13,6 +13,7 @@ enum AIFoodAnalysisError: Error, LocalizedError {
     case creditsExhausted(provider: String)
     case rateLimitExceeded(provider: String)
     case quotaExceeded(provider: String)
+    case serviceUnavailable(provider: String)
     case timeout
 
     var errorDescription: String? {
@@ -77,6 +78,14 @@ enum AIFoodAnalysisError: Error, LocalizedError {
                 format: NSLocalizedString(
                     "%@ quota exceeded. Please check your usage limits or upgrade your plan.",
                     comment: "Error when AI provider quota is exceeded"
+                ),
+                provider
+            )
+        case let .serviceUnavailable(provider):
+            return String(
+                format: NSLocalizedString(
+                    "%@ is temporarily overloaded. Please try again in a few minutes.",
+                    comment: "Error when AI provider is temporarily overloaded"
                 ),
                 provider
             )
