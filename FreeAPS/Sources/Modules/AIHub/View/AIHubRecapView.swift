@@ -14,9 +14,9 @@ struct AIHubRecapView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                Picker("Zeitraum", selection: $days) {
-                    Text("Woche").tag(7)
-                    Text("Monat").tag(30)
+                Picker("", selection: $days) {
+                    Text(hubT("recap.week")).tag(7)
+                    Text(hubT("recap.month")).tag(30)
                 }
                 .pickerStyle(.segmented)
 
@@ -78,9 +78,9 @@ struct AIHubRecapView: View {
                 VStack(spacing: 14) {
                     HStack(alignment: .firstTextBaseline) {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Time in Range")
+                            Text(hubT("recap.tir"))
                                 .font(.headline)
-                            Text(days == 7 ? "vs. Vorwoche" : "vs. Vormonat")
+                            Text(days == 7 ? hubT("recap.vs.week") : hubT("recap.vs.month"))
                                 .font(.caption)
                                 .foregroundStyle(.secondary)
                         }
@@ -91,13 +91,13 @@ struct AIHubRecapView: View {
                             current: current.tir * 100,
                             previous: summary.previous.map { $0.tir * 100 },
                             higherIsBetter: true,
-                            unit: " Pkt."
+                            unit: hubT("recap.points")
                         )
                     }
                     Divider()
                     HStack {
                         metricCell(
-                            title: "Mittelwert",
+                            title: hubT("recap.mean"),
                             value: AIHubTherapyAnalysis.formatGlucose(current.meanMgdl, isMmol: summary.isMmol),
                             current: current.meanMgdl,
                             previous: summary.previous?.meanMgdl,
@@ -111,7 +111,7 @@ struct AIHubRecapView: View {
                             higherIsBetter: false
                         )
                         metricCell(
-                            title: "Hypos",
+                            title: hubT("recap.hypos"),
                             value: "\(current.hypoEpisodes)",
                             current: Double(current.hypoEpisodes),
                             previous: summary.previous.map { Double($0.hypoEpisodes) },
@@ -129,7 +129,7 @@ struct AIHubRecapView: View {
             }
         } else if summary != nil {
             card {
-                Text("Zu wenig CGM-Daten im gewählten Zeitraum für einen Rückblick.")
+                Text(hubT("recap.toolittle"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -137,7 +137,7 @@ struct AIHubRecapView: View {
             card {
                 HStack {
                     ProgressView()
-                    Text("Berechne …").font(.subheadline).foregroundStyle(.secondary)
+                    Text(hubT("recap.computing")).font(.subheadline).foregroundStyle(.secondary)
                 }
             }
         }
@@ -197,7 +197,7 @@ struct AIHubRecapView: View {
         if let summary = summary, summary.bestBlockText != nil || summary.worstBlockText != nil {
             card {
                 VStack(alignment: .leading, spacing: 10) {
-                    Text("Tagesverlauf")
+                    Text(hubT("recap.dayflow"))
                         .font(.headline)
                     if let best = summary.bestBlockText {
                         highlightRow(best, icon: "checkmark.circle.fill", tint: .green)
@@ -227,7 +227,7 @@ struct AIHubRecapView: View {
                 HStack {
                     Image(systemName: "sparkles")
                         .foregroundStyle(.purple)
-                    Text("KI-Beobachtungen")
+                    Text(hubT("recap.ai.title"))
                         .font(.headline)
                     Spacer()
                     if narrative != nil, !isGenerating {
@@ -248,13 +248,13 @@ struct AIHubRecapView: View {
                 } else if isGenerating {
                     HStack {
                         ProgressView()
-                        Text("Formuliere Rückblick …")
+                        Text(hubT("recap.ai.generating"))
                             .font(.subheadline)
                             .foregroundStyle(.secondary)
                     }
                 } else if !AIHubChatService.isConfigured {
                     Text(
-                        "Für KI-Beobachtungen wird ein API-Key benötigt (AI-Hub-Einstellungen). Der Zahlen-Vergleich oben funktioniert auch ohne."
+                        hubT("recap.nokey")
                     )
                     .font(.footnote)
                     .foregroundStyle(.secondary)
@@ -262,7 +262,7 @@ struct AIHubRecapView: View {
                     Button {
                         generateNarrative()
                     } label: {
-                        Text("Rückblick erstellen")
+                        Text(hubT("recap.ai.generate"))
                             .font(.subheadline.bold())
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
@@ -284,7 +284,7 @@ struct AIHubRecapView: View {
     // MARK: - Bausteine
 
     private var disclaimer: some View {
-        Text("Geloggte Kohlenhydrate sind unvollständig — der Rückblick bewertet Glukose- und Loop-Daten, keine Ernährung.")
+        Text(hubT("recap.disclaimer"))
             .font(.caption2)
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)

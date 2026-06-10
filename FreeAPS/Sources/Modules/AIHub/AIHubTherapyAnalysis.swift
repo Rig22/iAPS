@@ -57,10 +57,10 @@ enum AIHubTherapyAnalysis {
         let value = Int((50 * tirFactor + 25 * lowFactor + 25 * cvFactor).rounded())
         let label: String
         switch value {
-        case 90...: label = "Exzellent"
-        case 75...: label = "Gut"
-        case 60...: label = "Solide"
-        default: label = "Verbesserungswürdig"
+        case 90...: label = hubT("ti.score.excellent")
+        case 75...: label = hubT("ti.score.good")
+        case 60...: label = hubT("ti.score.solid")
+        default: label = hubT("ti.score.needswork")
         }
         return (value, label)
     }
@@ -185,11 +185,13 @@ enum AIHubTherapyAnalysis {
                     currentRate: currentRate,
                     proposedRate: proposed,
                     confidence: confidence,
-                    rationale: "Zwischen \(hh(blockStart)) und \(hh(blockEnd)) Uhr gab es " +
-                        "\(blockEpisodes.count) Unterzuckerungs-Episoden, davon \(basalDrivenCount) " +
-                        "ohne nennenswertes Bolus-Insulin (IOB < 1) und ohne Kohlenhydrate — das spricht " +
-                        "für eine zu hohe Basalrate in diesem Zeitraum. Eine Senkung um ca. 10 % " +
-                        "reduziert das Hypo-Risiko, ohne die Mahlzeiten-Abdeckung zu verändern."
+                    rationale: hubT(
+                        "ti.rationale.decrease",
+                        hh(blockStart),
+                        hh(blockEnd),
+                        blockEpisodes.count,
+                        basalDrivenCount
+                    )
                 ))
                 continue
             }
@@ -222,12 +224,16 @@ enum AIHubTherapyAnalysis {
                     currentRate: currentRate,
                     proposedRate: proposed,
                     confidence: confidence,
-                    rationale: "Zwischen \(hh(blockStart)) und \(hh(blockEnd)) Uhr lag der Mittelwert bei " +
-                        "\(formatGlucose(blockMean, isMmol: isMmol)) — erhöht an \(elevatedDays) von " +
-                        "\(dayMeans.count) Tagen, bei minimalem Hypo-Risiko " +
-                        "(\(String(format: "%.1f", blockLowShare * 100)) % unter 70). Eine Anhebung der " +
-                        "Basalrate um ca. \(pct) % kann diesen Zeitraum sicher absenken. Kleine Schritte: " +
-                        "erst beobachten, dann ggf. nachjustieren."
+                    rationale: hubT(
+                        "ti.rationale.increase",
+                        hh(blockStart),
+                        hh(blockEnd),
+                        formatGlucose(blockMean, isMmol: isMmol),
+                        elevatedDays,
+                        dayMeans.count,
+                        String(format: "%.1f", blockLowShare * 100),
+                        pct
+                    )
                 ))
             }
         }

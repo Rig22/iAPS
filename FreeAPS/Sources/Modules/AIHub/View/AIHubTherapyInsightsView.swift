@@ -11,9 +11,9 @@ struct AIHubTherapyInsightsView: View {
     @State private var showSuggestions = false
     @State private var isAnalyzing = false
 
-    private let intervals: [(label: String, days: Int)] = [
-        ("3T", 3), ("7T", 7), ("14T", 14), ("30T", 30)
-    ]
+    private var intervals: [(label: String, days: Int)] {
+        [3, 7, 14, 30].map { (hubT("ti.days.format", $0), $0) }
+    }
 
     var body: some View {
         ScrollView {
@@ -83,7 +83,7 @@ struct AIHubTherapyInsightsView: View {
             card {
                 HStack(alignment: .center, spacing: 16) {
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Settings Score")
+                        Text(hubT("ti.score.title"))
                             .font(.headline)
                         Text(score.label)
                             .font(.subheadline)
@@ -96,13 +96,13 @@ struct AIHubTherapyInsightsView: View {
                 HStack {
                     statCell(String(format: "%.0f%%", stats.tir * 100), "TIR")
                     statCell(String(format: "%.1f%%", stats.gmi), "GMI")
-                    statCell(String(format: "%.1f%%", stats.below * 100), "Unter 70")
+                    statCell(String(format: "%.1f%%", stats.below * 100), hubT("ti.below70"))
                     statCell(String(format: "%.0f%%", stats.cv * 100), "CV")
                 }
             }
         } else if result != nil {
             card {
-                Text("Zu wenig CGM-Daten im gewählten Zeitraum für eine belastbare Analyse.")
+                Text(hubT("ti.toolittle"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -110,7 +110,7 @@ struct AIHubTherapyInsightsView: View {
             card {
                 HStack {
                     ProgressView()
-                    Text("Berechne …").font(.subheadline).foregroundStyle(.secondary)
+                    Text(hubT("ti.computing")).font(.subheadline).foregroundStyle(.secondary)
                 }
             }
         }
@@ -151,7 +151,7 @@ struct AIHubTherapyInsightsView: View {
                 } else {
                     Image(systemName: "sparkles")
                 }
-                Text("Einstellungen analysieren")
+                Text(hubT("ti.analyze"))
                     .font(.headline)
             }
             .foregroundStyle(.white)
@@ -177,7 +177,7 @@ struct AIHubTherapyInsightsView: View {
     @ViewBuilder private var suggestionsSection: some View {
         let suggestions = result?.suggestions ?? []
         VStack(alignment: .leading, spacing: 12) {
-            Text("VORSCHLÄGE")
+            Text(hubT("ti.suggestions"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.leading, 4)
@@ -187,7 +187,7 @@ struct AIHubTherapyInsightsView: View {
                         Image(systemName: "checkmark.seal.fill")
                             .font(.title3)
                             .foregroundStyle(.green)
-                        Text("Keine Auffälligkeiten gefunden — deine Basalraten passen zu den Daten des gewählten Zeitraums.")
+                        Text(hubT("ti.none"))
                             .font(.subheadline)
                     }
                 }
@@ -205,7 +205,7 @@ struct AIHubTherapyInsightsView: View {
                 HStack {
                     Image(systemName: "chart.xyaxis.line")
                         .foregroundStyle(.blue)
-                    Text("Basalrate")
+                    Text(hubT("ti.basal"))
                         .font(.headline)
                     Spacer()
                     Text("\(suggestion.confidence)%")
@@ -225,7 +225,7 @@ struct AIHubTherapyInsightsView: View {
                 }
                 HStack(spacing: 14) {
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Aktuell").font(.caption2).foregroundStyle(.secondary)
+                        Text(hubT("ti.current")).font(.caption2).foregroundStyle(.secondary)
                         Text(String(format: "%.2f U/h", suggestion.currentRate))
                             .font(.subheadline.bold())
                     }
@@ -233,7 +233,7 @@ struct AIHubTherapyInsightsView: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Vorschlag").font(.caption2).foregroundStyle(.secondary)
+                        Text(hubT("ti.proposed")).font(.caption2).foregroundStyle(.secondary)
                         Text(String(format: "%.2f U/h", suggestion.proposedRate))
                             .font(.subheadline.bold())
                             .foregroundStyle(.blue)
@@ -252,7 +252,7 @@ struct AIHubTherapyInsightsView: View {
 
     private var disclaimer: some View {
         Text(
-            "Vorschläge basieren auf statistischer Analyse deiner Loop-Daten. Änderungen an Basal, ISF oder CR sind deine Entscheidung — im Zweifel mit dem Behandlungsteam besprechen."
+            hubT("ti.disclaimer")
         )
         .font(.caption2)
         .foregroundStyle(.secondary)

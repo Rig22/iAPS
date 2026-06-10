@@ -175,13 +175,14 @@ enum AIHubRecap {
         guard blocks.count >= 2 else { return (nil, nil) }
 
         func label(_ block: (start: Int, inRange: Double, mean: Double), prefix: String) -> String {
-            let range = String(format: "%02d–%02d Uhr", block.start, (block.start + 3) % 24)
+            let range = hubT("time.range.format", block.start, (block.start + 3) % 24)
             let tir = String(format: "%.0f %% TIR", block.inRange * 100)
-            return "\(prefix) \(range) (\(tir), Mittel \(AIHubTherapyAnalysis.formatGlucose(block.mean, isMmol: isMmol)))"
+            let mean = AIHubTherapyAnalysis.formatGlucose(block.mean, isMmol: isMmol)
+            return "\(prefix) \(range) (\(tir), \(hubT("recap.mean")) \(mean))"
         }
 
-        let best = blocks.max { $0.inRange < $1.inRange }.map { label($0, prefix: "Stärkste Zeit:") }
-        let worst = blocks.min { $0.inRange < $1.inRange }.map { label($0, prefix: "Schwierigste Zeit:") }
+        let best = blocks.max { $0.inRange < $1.inRange }.map { label($0, prefix: hubT("recap.best.prefix")) }
+        let worst = blocks.min { $0.inRange < $1.inRange }.map { label($0, prefix: hubT("recap.worst.prefix")) }
         return (best, worst)
     }
 
@@ -192,7 +193,8 @@ enum AIHubRecap {
         lines.append(
             """
             You are the AI assistant inside iAPS (DIY closed-loop insulin app). Write a short \
-            "\(summary.days == 7 ? "weekly" : "monthly")" recap of the user's glucose data IN GERMAN.
+            "\(summary.days == 7 ? "weekly" : "monthly")" recap of the user's glucose data \
+            in \(AIHubL10n.aiAnswerLanguageName).
 
             Rules:
             - Exactly 3 to 4 observations as bullet points starting with "•", each 1–2 sentences.

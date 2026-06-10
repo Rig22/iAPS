@@ -12,14 +12,21 @@ struct AIHubSettingsView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var chatProvider = UserDefaults.standard.aiHubChatProvider
+    @State private var aiLanguage = UserDefaults.standard.userPreferredLanguageForAI ?? ""
     @State private var claudeKey = ""
     @State private var openAIKey = ""
     @State private var geminiKey = ""
 
+    /// Sprachen der iAPS-Localizations; "" = Systemsprache.
+    private let languageCodes = [
+        "ar", "ca", "da", "de", "el", "en", "es", "fi", "fr", "he", "hu", "it", "nb",
+        "nl", "pl", "pt", "pt-BR", "ru", "sk", "sv", "tr", "uk", "vi", "zh-Hans"
+    ]
+
     var body: some View {
         Form {
             Section {
-                Picker("Modell für den Chat", selection: $chatProvider) {
+                Picker(hubT("settings.model.label"), selection: $chatProvider) {
                     ForEach(AITextProvider.allCases, id: \.self) { provider in
                         HStack(spacing: 12) {
                             Text(provider.providerName)
@@ -34,7 +41,7 @@ struct AIHubSettingsView: View {
                             }
                             Spacer()
                             if let fast = provider.fast, fast {
-                                Text("Schnell")
+                                Text(hubT("settings.fast"))
                                     .font(.caption2)
                                     .padding(.horizontal, 6)
                                     .padding(.vertical, 2)
@@ -54,50 +61,65 @@ struct AIHubSettingsView: View {
                     UserDefaults.standard.aiHubChatProvider = newValue
                 }
             } header: {
-                Text("Modell")
+                Text(hubT("settings.model.section"))
             } footer: {
-                Text("Wird sofort übernommen. Unabhängig von der Modellwahl der KI-Essenserkennung.")
+                Text(hubT("settings.model.footer"))
+            }
+
+            Section {
+                Picker(hubT("settings.lang.label"), selection: $aiLanguage) {
+                    Text(hubT("settings.lang.system")).tag("")
+                    ForEach(languageCodes, id: \.self) { code in
+                        Text(languageDisplayName(code)).tag(code)
+                    }
+                }
+                .pickerStyle(.navigationLink)
+                // Sofort persistieren — gleicher onAppear-Effekt wie beim
+                // Modell-Picker (siehe oben).
+                .onChange(of: aiLanguage) { newValue in
+                    UserDefaults.standard.userPreferredLanguageForAI = newValue.isEmpty ? nil : newValue
+                }
+            } header: {
+                Text(hubT("settings.lang.section"))
+            } footer: {
+                Text(hubT("settings.lang.footer"))
             }
 
             Section {
                 keyRow(
                     title: "Claude API Key",
-                    hint: "Key unter console.anthropic.com erstellen.",
+                    hint: hubT("settings.key.claude.hint"),
                     text: $claudeKey
                 )
                 keyRow(
                     title: "Google Gemini API Key",
-                    hint: "Kostenlosen Key unter ai.google.dev erstellen.",
+                    hint: hubT("settings.key.gemini.hint"),
                     text: $geminiKey
                 )
                 keyRow(
                     title: "ChatGPT (OpenAI) API Key",
-                    hint: "Key unter platform.openai.com erstellen.",
+                    hint: hubT("settings.key.openai.hint"),
                     text: $openAIKey
                 )
             } header: {
-                Text("API Keys")
+                Text(hubT("settings.keys.section"))
             } footer: {
-                Text(
-                    "Dieselben Keys wie bei der KI-Essenserkennung — dort eingetragene Keys gelten auch hier. Es wird nur der Key des gewählten Anbieters verwendet."
-                )
+                Text(hubT("settings.keys.footer"))
             }
 
             Section {
-                Text(
-                    "KI-Antworten sind Schätzungen und können Fehler enthalten. Therapieänderungen immer selbst prüfen und im Zweifel mit dem Behandlungsteam besprechen."
-                )
-                .font(.footnote)
-                .foregroundStyle(.red)
+                Text(hubT("settings.note.text"))
+                    .font(.footnote)
+                    .foregroundStyle(.red)
             } header: {
-                Text("Hinweis")
+                Text(hubT("settings.note.section"))
             }
         }
-        .navigationTitle("AI-Hub-Einstellungen")
+        .navigationTitle(hubT("settings.title"))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .confirmationAction) {
-                Button("Speichern") {
+                Button(hubT("settings.save")) {
                     saveSettings()
                 }
             }
@@ -107,8 +129,14 @@ struct AIHubSettingsView: View {
         }
     }
 
+    /// Sprachname in der aktuellen UI-Sprache, z. B. "Niederländisch".
+    private func languageDisplayName(_ code: String) -> String {
+        (Locale.current.localizedString(forIdentifier: code) ?? code).capitalized
+    }
+
     private func readPersistedValues() {
         chatProvider = UserDefaults.standard.aiHubChatProvider
+        aiLanguage = UserDefaults.standard.userPreferredLanguageForAI ?? ""
         claudeKey = UserDefaults.standard.claudeAPIKey
         openAIKey = UserDefaults.standard.openAIAPIKey
         geminiKey = UserDefaults.standard.googleGeminiAPIKey

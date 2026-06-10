@@ -62,22 +62,22 @@ enum AIHubChatContext {
     // MARK: - Starter-Vorschläge
 
     /// Statische Defaults, bis die datengetriebenen Vorschläge geladen sind.
-    static let fallbackStarters = [
-        "Wie sind meine Nacht-Einstellungen?",
-        "Wo war ich diese Woche zu oft niedrig?",
-        "Passt mein Basal am Morgen?"
-    ]
+    static var fallbackStarters: [String] {
+        [hubT("chat.starter.night"), hubT("chat.starter.lows"), hubT("chat.starter.morningbasal")]
+    }
 
-    private static let starterPool = [
-        "Wie sind meine Nacht-Einstellungen?",
-        "Wo war ich diese Woche zu oft niedrig?",
-        "Passt mein Basal am Morgen?",
-        "Wie war meine letzte Woche insgesamt?",
-        "Welche Tageszeit läuft bei mir am schlechtesten?",
-        "Passt mein ISF zu meinen Korrekturen?",
-        "Wie stabil sind meine Nächte im Vergleich zum Tag?",
-        "Was waren diese Woche meine höchsten Werte?"
-    ]
+    private static var starterPool: [String] {
+        [
+            hubT("chat.starter.night"),
+            hubT("chat.starter.lows"),
+            hubT("chat.starter.morningbasal"),
+            hubT("chat.starter.week"),
+            hubT("chat.starter.worsttime"),
+            hubT("chat.starter.isf"),
+            hubT("chat.starter.nightsvsday"),
+            hubT("chat.starter.highs")
+        ]
+    }
 
     /// Datengetriebene Starter-Fragen für den leeren Chat: schaut auf die
     /// letzten 7 Tage und schlägt vor, was tatsächlich auffällig ist.
@@ -103,35 +103,35 @@ enum AIHubChatContext {
         if readings.count >= 100 {
             // Hypo-Häufung nach Tagesabschnitt (≥ 6 Readings ≈ ½ Stunde)
             let dayparts: [(name: String, range: Range<Int>)] = [
-                ("nachts", 0 ..< 6),
-                ("vormittags", 6 ..< 12),
-                ("nachmittags", 12 ..< 18),
-                ("abends", 18 ..< 24)
+                (hubT("time.night"), 0 ..< 6),
+                (hubT("time.morning"), 6 ..< 12),
+                (hubT("time.afternoon"), 12 ..< 18),
+                (hubT("time.evening"), 18 ..< 24)
             ]
             let lows = readings.filter { $0.glucose < 70 }
             if let worst = dayparts
                 .map({ part in (part.name, lows.filter { part.range.contains($0.hour) }.count) })
                 .max(by: { $0.1 < $1.1 }), worst.1 >= 6
             {
-                suggestions.append("Warum war ich diese Woche \(worst.0) öfter niedrig?")
+                suggestions.append(hubT("chat.dyn.lows", worst.0))
             }
 
             // Erhöhte Nächte
             let nightValues = readings.filter { $0.hour < 6 }.map(\.glucose)
             if !nightValues.isEmpty, nightValues.reduce(0, +) / nightValues.count > 150 {
-                suggestions.append("Warum bin ich nachts zu hoch?")
+                suggestions.append(hubT("chat.dyn.nighthigh"))
             }
 
             // TIR unter Ziel
             let inRange = readings.filter { $0.glucose >= 70 && $0.glucose <= 180 }.count
             if Double(inRange) / Double(readings.count) < 0.7 {
-                suggestions.append("Wie kann ich meine Time in Range verbessern?")
+                suggestions.append(hubT("chat.dyn.tir"))
             }
 
             // Viel Zeit über Range
             let high = readings.filter { $0.glucose > 180 }.count
             if Double(high) / Double(readings.count) > 0.25 {
-                suggestions.append("Zu welcher Tageszeit bin ich am häufigsten zu hoch?")
+                suggestions.append(hubT("chat.dyn.hightime"))
             }
         }
 

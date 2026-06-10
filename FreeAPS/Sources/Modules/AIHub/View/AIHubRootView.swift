@@ -36,6 +36,7 @@ extension AIHub {
                             }
                         }
                     }
+                    medicalDisclaimer
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 24)
@@ -70,6 +71,28 @@ extension AIHub {
             }
         }
 
+        private var medicalDisclaimer: some View {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 8) {
+                    Image(systemName: "cross.case")
+                        .font(.subheadline)
+                        .foregroundStyle(.red)
+                    Text(hubT("root.disclaimer.title"))
+                        .font(.footnote.bold())
+                }
+                Text(hubT("root.disclaimer.text"))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .fill(Color.red.opacity(colorScheme == .dark ? 0.12 : 0.06))
+            )
+        }
+
         private var header: some View {
             VStack(spacing: 10) {
                 Image(systemName: "sparkles")
@@ -83,7 +106,7 @@ extension AIHub {
                     )
                 Text("AI Hub")
                     .font(.largeTitle.bold())
-                Text("Wie kann ich dir heute helfen?")
+                Text(hubT("root.subtitle"))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
@@ -144,10 +167,10 @@ private extension AIHub.Feature {
 
     var subtitle: String {
         switch self {
-        case .chat: return "Fragen zu deinen Daten und Einstellungen stellen."
-        case .therapyInsights: return "Automatische Analyse von Basal, ISF und CR."
-        case .recap: return "Wöchentliche und monatliche Muster im Überblick."
-        case .foodSearch: return "Mahlzeiten per KI erkennen und Kohlenhydrate schätzen."
+        case .chat: return hubT("root.card.chat.sub")
+        case .therapyInsights: return hubT("root.card.insights.sub")
+        case .recap: return hubT("root.card.recap.sub")
+        case .foodSearch: return hubT("root.card.food.sub")
         }
     }
 

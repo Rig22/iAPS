@@ -75,9 +75,7 @@ struct AIHubChatService: Sendable {
         }
         let key = apiKey(for: provider).trimmingCharacters(in: .whitespacesAndNewlines)
         guard !key.isEmpty else {
-            throw AIFoodAnalysisError.customError(
-                NSLocalizedString("Kein API-Key für diesen Anbieter hinterlegt.", comment: "AI Hub missing key")
-            )
+            throw AIFoodAnalysisError.customError(hubT("chat.nokey.title"))
         }
 
         let proto: AIProviderProtocol = switch model {
@@ -91,6 +89,16 @@ struct AIHubChatService: Sendable {
     }
 
     static func buildPrompt(messages: [AIHubChat.Message], dataContext: String) -> String {
+        // Explizit gewählte Sprache gewinnt immer — sonst würde die
+        // Folge-dem-Nutzer-Heuristik sie überstimmen, sobald die Frage
+        // (z. B. über die lokalisierten Starter-Chips) in einer anderen
+        // Sprache gestellt wird. Nur bei "Systemsprache" bleibt es flexibel.
+        let languageRule = UserDefaults.standard.userPreferredLanguageForAI != nil
+            ? "- Always answer in \(AIHubL10n.aiAnswerLanguageName), regardless of the " +
+            "language the user writes in."
+            : "- Answer in \(AIHubL10n.aiAnswerLanguageName) unless the user's last message " +
+            "is clearly written in a different language — then follow the user."
+
         var lines: [String] = []
         lines.append(
             """
@@ -99,7 +107,7 @@ struct AIHubChatService: Sendable {
             diabetes data and loop settings.
 
             Rules:
-            - Answer in the language of the user's last message.
+            \(languageRule)
             - Be concise and specific. Reference concrete numbers and times of day from the data.
             - When the data suggests a settings change (basal, ISF, CR, targets), describe the \
             observation and a cautious proposal (small steps, max ~10% at once), and remind the \

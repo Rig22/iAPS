@@ -111,7 +111,7 @@ struct AIHubChatView: View {
                     if model.isSending {
                         HStack {
                             ProgressView()
-                            Text("Denkt nach …")
+                            Text(hubT("chat.thinking"))
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
@@ -146,14 +146,14 @@ struct AIHubChatView: View {
             Image(systemName: "bubble.left.and.bubble.right")
                 .font(.system(size: 36))
                 .foregroundStyle(.secondary)
-            Text("Stelle eine Frage zu deinen Daten")
+            Text(hubT("chat.empty.title"))
                 .font(.headline)
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(model.starters, id: \.self) { question in
                     suggestionButton(question)
                 }
             }
-            Text("KI-Antworten können Fehler enthalten. Therapieänderungen immer selbst prüfen.")
+            Text(hubT("chat.note"))
                 .font(.caption2)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)
@@ -215,7 +215,7 @@ struct AIHubChatView: View {
 
     private var inputBar: some View {
         HStack(spacing: 10) {
-            TextField("Frag etwas zu deinen Daten …", text: $model.input, axis: .vertical)
+            TextField(hubT("chat.input.placeholder"), text: $model.input, axis: .vertical)
                 .lineLimit(1 ... 4)
                 .textFieldStyle(.plain)
                 .padding(.horizontal, 14)
@@ -242,17 +242,15 @@ struct AIHubChatView: View {
             Image(systemName: "key.slash")
                 .font(.system(size: 40))
                 .foregroundStyle(.secondary)
-            Text("Kein API-Key hinterlegt")
+            Text(hubT("chat.nokey.title"))
                 .font(.title3.bold())
-            Text(
-                "Für den AI Chat wird ein API-Key des gewählten Anbieters benötigt. Anbieter und Key kannst du in den AI-Hub-Einstellungen festlegen — dieselben Keys wie bei der KI-Essenserkennung."
-            )
-            .font(.subheadline)
-            .foregroundStyle(.secondary)
-            .multilineTextAlignment(.center)
-            .padding(.horizontal, 24)
+            Text(hubT("chat.nokey.text"))
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, 24)
             NavigationLink(destination: AIHubSettingsView()) {
-                Text("Zu den Einstellungen")
+                Text(hubT("chat.nokey.button"))
                     .font(.headline)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 10)
