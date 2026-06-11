@@ -28,6 +28,13 @@ import SwiftUI
 
     @Published var forceShowCommentForNextImage = false
 
+    /// Query aus dem AI Hub, die nach dem Erscheinen des Suchfensters
+    /// automatisch per KI gesucht wird. Erst dort starten — ein Start aus
+    /// AddCarbs' onAppear läuft, bevor die FoodSearchView (und damit der
+    /// aiProgress-Cover) montiert ist, und mehrfaches onAppear cancelt
+    /// den laufenden Task (→ sofortiger „Network error").
+    @Published var pendingAIQuery: String?
+
     var searchResultsState = SearchResultsState.empty
 
     // analysis progress

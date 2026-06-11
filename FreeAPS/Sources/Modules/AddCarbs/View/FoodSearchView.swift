@@ -79,5 +79,14 @@ struct FoodSearchView: View {
                 )
             }
         }
+        .onAppear {
+            // Aus dem AI Hub mitgebrachte Query: erst jetzt starten, wenn
+            // diese View (Träger des aiProgress-Covers) montiert ist.
+            // One-shot — das Konsumieren verhindert Doppelstarts.
+            if let query = state.pendingAIQuery {
+                state.pendingAIQuery = nil
+                state.searchByText(query: query, useAI: true)
+            }
+        }
     }
 }
