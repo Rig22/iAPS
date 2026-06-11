@@ -26,6 +26,9 @@ extension AddCarbs {
 
         // Food Search States
         @State private var showCancelConfirmation = false
+        // onAppear feuert beim Präsentieren des aiProgress-Covers erneut —
+        // der Hub-Auto-Start darf trotzdem nur einmal ausgelöst werden.
+        @State private var didStartHubAISearch = false
 
         @State private var newPreset: (
             dish: String,
@@ -767,8 +770,11 @@ extension AddCarbs {
                 // AI-Hub-Einstieg: Suchfenster mit KI-Textsuche statt der
                 // konfigurierten Datenbank-Suche (USDA/OpenFoodFacts).
                 // Die Query startet erst in FoodSearchView.onAppear
-                // (pendingAIQuery) — siehe Kommentar am Property.
-                if state.ai {
+                // (pendingAIQuery) — und nur EINMAL: onAppear feuert beim
+                // Cover-Präsentieren erneut, ein zweiter Start würde den
+                // ersten Request canceln.
+                if state.ai, !didStartHubAISearch {
+                    didStartHubAISearch = true
                     foodSearchState.aiTextAnalysis = true
                     foodSearchState.showingFoodSearch = true
                     if let query, !query.isEmpty {

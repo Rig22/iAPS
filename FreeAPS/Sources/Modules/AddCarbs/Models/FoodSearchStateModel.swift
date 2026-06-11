@@ -312,12 +312,27 @@ import SwiftUI
             } catch is CancellationError {
                 // cancelled, already reset by cancelSearchTask()
             } catch {
+                // Abbrüche, die als URLError.cancelled (ggf. in networkError
+                // verpackt) ankommen, sind immer Folge eines bewussten
+                // Cancel/Neustarts — der abgebrochene Task darf den Zustand
+                // eines bereits laufenden Nachfolgers nicht überschreiben
+                // („Network error: Abgebrochen" mit totem Retry).
+                guard !Self.isCancellation(error) else { return }
                 try? await Task.sleep(for: .seconds(1))
                 self.analysisStart = nil
                 self.analysisEnd = nil
                 self.analysisError = error.localizedDescription
             }
         }
+    }
+
+    private static func isCancellation(_ error: Error) -> Bool {
+        if error is CancellationError { return true }
+        if let urlError = error as? URLError, urlError.code == .cancelled { return true }
+        if case let AIFoodAnalysisError.networkError(inner) = error {
+            return isCancellation(inner)
+        }
+        return false
     }
 
     private func handleTelemetry(_ message: String) {
