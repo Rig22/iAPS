@@ -137,7 +137,7 @@ extension Home {
         private var pumpSub: String? {
             guard let exp = state.pumpExpiresAtDate else { return nil }
             let interval = exp.timeIntervalSinceNow
-            guard interval > 0 else { return "abgelaufen" }
+            guard interval > 0 else { return "Replace" }
             // Under an hour the "0 T 0 h" readout is useless — switch to minutes.
             if interval < 3600 {
                 return "\(Int(interval / 60)) min"
@@ -148,12 +148,12 @@ extension Home {
         }
 
         /// Imminent pump/pod expiry warning for the pump tile's leading shield.
-        /// `show` once ≤ 4 h of life remain (or expired), `pulsing` once < 2 h
+        /// `show` once ≤ 8 h of life remain (or expired), `pulsing` once < 2 h
         /// remain (or expired). Returns nil when no expiry date is reported.
         private var pumpExpiryWarning: (show: Bool, pulsing: Bool) {
             guard let exp = state.pumpExpiresAtDate else { return (false, false) }
             let interval = exp.timeIntervalSinceNow
-            guard interval <= 4 * 3600 else { return (false, false) }
+            guard interval <= 8 * 3600 else { return (false, false) }
             return (true, interval < 2 * 3600)
         }
 
