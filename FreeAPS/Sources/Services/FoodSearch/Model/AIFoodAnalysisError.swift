@@ -12,6 +12,10 @@ enum AIFoodAnalysisError: Error, LocalizedError {
     case customError(String)
     case creditsExhausted(provider: String)
     case rateLimitExceeded(provider: String)
+    // Transiente Drossel (z. B. Gemini Free-Tier Anfragen/Minute) mit vom
+    // Provider vorgeschlagener Wartezeit — wird vom Client automatisch
+    // wiederholt, im Gegensatz zu rateLimitExceeded/quotaExceeded.
+    case rateLimited(provider: String, retryAfter: Double)
     case quotaExceeded(provider: String)
     case serviceUnavailable(provider: String)
     case timeout
@@ -66,6 +70,14 @@ enum AIFoodAnalysisError: Error, LocalizedError {
                 provider
             )
         case let .rateLimitExceeded(provider):
+            return String(
+                format: NSLocalizedString(
+                    "%@ rate limit exceeded. Please wait a moment before trying again.",
+                    comment: "Error when AI provider rate limit is exceeded"
+                ),
+                provider
+            )
+        case let .rateLimited(provider, _):
             return String(
                 format: NSLocalizedString(
                     "%@ rate limit exceeded. Please wait a moment before trying again.",

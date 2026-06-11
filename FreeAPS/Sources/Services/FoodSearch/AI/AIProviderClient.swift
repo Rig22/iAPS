@@ -98,8 +98,10 @@ struct AIProviderClient: Sendable {
     ) async throws -> (Data, HTTPURLResponse) {
         let maxTimeoutAttempts = proto.numberOfRetries
         let maxOverloadAttempts = 3
+        let maxRateLimitAttempts = 2
         var timeoutAttempts = 0
         var overloadAttempts = 0
+        var rateLimitAttempts = 0
 
         while true {
             do {
@@ -132,13 +134,30 @@ struct AIProviderClient: Sendable {
                 try await Task.sleep(nanoseconds: UInt64(backoffDelay * 1_000_000_000))
 
             } catch let error as AIFoodAnalysisError {
-                guard case .serviceUnavailable = error else { throw error }
-                overloadAttempts += 1
-                print("Service overloaded (attempt \(overloadAttempts)/\(maxOverloadAttempts))")
-                guard overloadAttempts < maxOverloadAttempts else { throw error }
-                let backoffDelay = Double(overloadAttempts) * 3.0
-                telemetryCallback?("⏳ Service overloaded — retrying in \(Int(backoffDelay))s …")
-                try await Task.sleep(nanoseconds: UInt64(backoffDelay * 1_000_000_000))
+                switch error {
+                case .serviceUnavailable:
+                    overloadAttempts += 1
+                    print("Service overloaded (attempt \(overloadAttempts)/\(maxOverloadAttempts))")
+                    guard overloadAttempts < maxOverloadAttempts else { throw error }
+                    let backoffDelay = Double(overloadAttempts) * 3.0
+                    telemetryCallback?("⏳ Service overloaded — retrying in \(Int(backoffDelay))s …")
+                    try await Task.sleep(nanoseconds: UInt64(backoffDelay * 1_000_000_000))
+
+                case let .rateLimited(provider, retryAfter):
+                    // Minuten-Drossel (z. B. Gemini Free-Tier): Wartezeit
+                    // kommt vom Provider. Nach Ausschöpfen der Versuche als
+                    // normales Rate-Limit melden, nicht als Quota-Problem.
+                    rateLimitAttempts += 1
+                    print("Rate limited (attempt \(rateLimitAttempts)/\(maxRateLimitAttempts)), retry in \(retryAfter)s")
+                    guard rateLimitAttempts <= maxRateLimitAttempts else {
+                        throw AIFoodAnalysisError.rateLimitExceeded(provider: provider)
+                    }
+                    telemetryCallback?("⏳ Rate limit — retrying in \(Int(retryAfter))s …")
+                    try await Task.sleep(nanoseconds: UInt64(retryAfter * 1_000_000_000))
+
+                default:
+                    throw error
+                }
             }
         }
     }

@@ -64,6 +64,36 @@ struct GeminiProtocol: AIProviderProtocol {
                 let status = apiError.error.status ?? ""
                 debug(.service, "Gemini API error \(httpResponse.statusCode): \(message) [status: \(status)]")
 
+                // Free-Tier-429 genauer einordnen: Googles Meldung enthält
+                // IMMER das Wort "quota" — auch bei der harmlosen
+                // Anfragen-pro-Minute-Drossel. Die quotaId in den Details
+                // unterscheidet Tageslimit (PerDay → harter Fehler) von
+                // Minuten-Drossel (PerMinute → automatisch wiederholen,
+                // Wartezeit aus RetryInfo).
+                if httpResponse.statusCode == 429 {
+                    let details = apiError.error.details ?? []
+                    let quotaIds = details
+                        .flatMap { $0.violations ?? [] }
+                        .compactMap(\.quotaId)
+                    let retryDelay = details
+                        .compactMap(\.retryDelay)
+                        .first
+                        .flatMap { Double($0.trimmingCharacters(in: CharacterSet(charactersIn: "s"))) }
+
+                    let isDailyLimit = quotaIds.contains { $0.localizedCaseInsensitiveContains("PerDay") }
+                    let isMinuteLimit = quotaIds.contains { $0.localizedCaseInsensitiveContains("PerMinute") }
+
+                    if isDailyLimit {
+                        throw AIFoodAnalysisError.quotaExceeded(provider: "Google Gemini")
+                    }
+                    if isMinuteLimit || (retryDelay ?? .infinity) <= 60 {
+                        throw AIFoodAnalysisError.rateLimited(
+                            provider: "Google Gemini",
+                            retryAfter: min(max(retryDelay ?? 15, 5), 60)
+                        )
+                    }
+                }
+
                 if message.localizedCaseInsensitiveContains("quota") ||
                     message.localizedCaseInsensitiveContains("QUOTA_EXCEEDED") ||
                     status.localizedCaseInsensitiveContains("QUOTA_EXCEEDED")
@@ -201,6 +231,20 @@ private struct GeminiErrorResponse: Decodable {
         let code: Int?
         let message: String
         let status: String?
+        let details: [Detail]?
+    }
+
+    // Aus error.details: QuotaFailure liefert violations[].quotaId
+    // (z. B. "…PerMinutePerProjectPerModel-FreeTier"), RetryInfo liefert
+    // retryDelay (z. B. "21s"). Felder, die der jeweilige Detail-Typ nicht
+    // hat, bleiben nil.
+    struct Detail: Decodable {
+        let retryDelay: String?
+        let violations: [Violation]?
+    }
+
+    struct Violation: Decodable {
+        let quotaId: String?
     }
 
     let error: APIError
