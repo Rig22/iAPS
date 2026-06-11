@@ -21,9 +21,10 @@ extension AIHub {
                         ForEach(Feature.allCases) { feature in
                             if feature == .foodSearch {
                                 // Springt ins bestehende AddCarbs-KI-Feature —
-                                // ersetzt das Hub-Modal durch das AddCarbs-Modal.
+                                // Suchfenster mit KI-Textsuche oben, Kamera
+                                // über die Suchleisten-Buttons.
                                 Button {
-                                    state.showModal(for: .addCarbs(editMode: false, override: false, mode: .image))
+                                    state.showModal(for: .addCarbs(editMode: false, override: false, mode: .aiSearch))
                                 } label: {
                                     FeatureCard(feature: feature)
                                 }
