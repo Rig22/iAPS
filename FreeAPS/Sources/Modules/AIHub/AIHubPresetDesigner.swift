@@ -188,7 +188,9 @@ enum AIHubPresetDesigner {
         let context = CoreDataStack.shared.persistentContainer.viewContext
         context.perform {
             let preset = OverridePresets(context: context)
-            preset.id = UUID().uuidString
+            // "ai-"-Präfix kennzeichnet KI-generierte Presets — die
+            // Override-Liste zeigt dafür ein Sparkles-Symbol.
+            preset.id = "ai-" + UUID().uuidString
             preset.date = Date()
             preset.name = proposal.name
             preset.emoji = proposal.emoji
