@@ -74,6 +74,7 @@ struct AIHubChatView: View {
     // als NavigationLink-Destination eager erzeugt und würde sonst beim
     // Wiederöffnen einen veralteten Key-Status zeigen.
     @State private var isConfigured = AIHubChatService.isConfigured
+    @FocusState private var inputFocused: Bool
 
     var body: some View {
         VStack(spacing: 0) {
@@ -128,6 +129,10 @@ struct AIHubChatView: View {
                 }
                 .padding(16)
             }
+            // Tastatur schließbar machen: Wisch nach unten im Verlauf
+            // (interaktiv, wie in Messages) oder Tipp auf den Verlauf.
+            .scrollDismissesKeyboard(.interactively)
+            .onTapGesture { inputFocused = false }
             .onChange(of: model.messages) { _ in
                 withAnimation {
                     proxy.scrollTo(model.messages.last?.id, anchor: .bottom)
@@ -218,6 +223,7 @@ struct AIHubChatView: View {
             TextField(hubT("chat.input.placeholder"), text: $model.input, axis: .vertical)
                 .lineLimit(1 ... 4)
                 .textFieldStyle(.plain)
+                .focused($inputFocused)
                 .padding(.horizontal, 14)
                 .padding(.vertical, 9)
                 .background(
