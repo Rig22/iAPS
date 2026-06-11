@@ -284,7 +284,11 @@ struct AIHubRecapView: View {
     // MARK: - Bausteine
 
     private var disclaimer: some View {
-        Text(hubT("recap.disclaimer"))
+        Text(hubT(
+            UserDefaults.standard.aiHubCarbsComplete
+                ? "recap.disclaimer.complete"
+                : "recap.disclaimer"
+        ))
             .font(.caption2)
             .foregroundStyle(.secondary)
             .multilineTextAlignment(.center)

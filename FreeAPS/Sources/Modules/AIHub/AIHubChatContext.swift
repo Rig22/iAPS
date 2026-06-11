@@ -220,8 +220,12 @@ enum AIHubChatContext {
     }
 
     private static func carbsSection(_ carbsByDay: [Date: Decimal]) -> String {
+        let complete = UserDefaults.standard.aiHubCarbsComplete
         guard !carbsByDay.isEmpty else {
-            return "Logged carbs last 7 days: none. Note: the user does not log every meal — "
+            return complete
+                ? "Logged carbs last 7 days: none. The user logs every meal, so this means "
+                + "(almost) no carbs were eaten."
+                : "Logged carbs last 7 days: none. Note: the user does not log every meal — "
                 + "absence of carb entries does not mean no food was eaten."
         }
         let formatter = DateFormatter()
@@ -230,8 +234,11 @@ enum AIHubChatContext {
         let lines = carbsByDay.keys.sorted().map { day in
             "\(formatter.string(from: day)): \(carbsByDay[day] ?? 0) g"
         }
+        let note = complete
+            ? "(complete — the user logs every meal, you may interpret meal patterns)"
+            : "(entries may be incomplete — the user does not log every meal)"
         return """
-        Logged carbs per day, last 7 days (entries may be incomplete — the user does not log every meal):
+        Logged carbs per day, last 7 days \(note):
         \(lines.joined(separator: ", "))
         """
     }

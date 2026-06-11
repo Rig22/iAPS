@@ -13,6 +13,7 @@ struct AIHubSettingsView: View {
 
     @State private var chatProvider = UserDefaults.standard.aiHubChatProvider
     @State private var aiLanguage = UserDefaults.standard.userPreferredLanguageForAI ?? ""
+    @State private var carbsComplete = UserDefaults.standard.aiHubCarbsComplete
     @State private var claudeKey = ""
     @State private var openAIKey = ""
     @State private var geminiKey = ""
@@ -86,6 +87,19 @@ struct AIHubSettingsView: View {
             }
 
             Section {
+                Toggle(hubT("settings.carbs.toggle"), isOn: $carbsComplete)
+                    // Sofort persistieren — gleicher onAppear-Effekt wie bei
+                    // den Pickern (siehe oben).
+                    .onChange(of: carbsComplete) { newValue in
+                        UserDefaults.standard.aiHubCarbsComplete = newValue
+                    }
+            } header: {
+                Text(hubT("settings.carbs.section"))
+            } footer: {
+                Text(hubT("settings.carbs.footer"))
+            }
+
+            Section {
                 keyRow(
                     title: "Claude API Key",
                     hint: hubT("settings.key.claude.hint"),
@@ -137,6 +151,7 @@ struct AIHubSettingsView: View {
     private func readPersistedValues() {
         chatProvider = UserDefaults.standard.aiHubChatProvider
         aiLanguage = UserDefaults.standard.userPreferredLanguageForAI ?? ""
+        carbsComplete = UserDefaults.standard.aiHubCarbsComplete
         claudeKey = UserDefaults.standard.claudeAPIKey
         openAIKey = UserDefaults.standard.openAIAPIKey
         geminiKey = UserDefaults.standard.googleGeminiAPIKey

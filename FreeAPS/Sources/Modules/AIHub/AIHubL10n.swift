@@ -126,6 +126,9 @@ enum AIHubL10n {
         "settings.note.section": "Note",
         "settings.note.text": "AI answers are estimates and can contain errors. Always verify therapy changes yourself and discuss them with your care team when in doubt.",
         "settings.save": "Save",
+        "settings.carbs.section": "Meal logging",
+        "settings.carbs.toggle": "I log all meals",
+        "settings.carbs.footer": "When enabled, the AI treats your carb entries as complete: chat and recap may interpret meal patterns, and the settings analysis also evaluates smaller meals. Leave it off if you skip smaller meals or snacks.",
 
         // Therapy Insights
         "ti.days.format": "%dd",
@@ -172,6 +175,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Create recap",
         "recap.ai.generating": "Writing recap …",
         "recap.nokey": "AI observations need an API key (AI Hub settings). The numbers above work without one.",
+        "recap.disclaimer.complete": "Meal entries are treated as complete — the recap may relate nutrition to glucose and loop data.",
         "recap.disclaimer": "Logged carbs are incomplete — the recap evaluates glucose and loop data, not nutrition."
     ]
 
@@ -229,6 +233,9 @@ enum AIHubL10n {
         "settings.note.section": "Hinweis",
         "settings.note.text": "KI-Antworten sind Schätzungen und können Fehler enthalten. Therapieänderungen immer selbst prüfen und im Zweifel mit dem Behandlungsteam besprechen.",
         "settings.save": "Speichern",
+        "settings.carbs.section": "Mahlzeiten-Erfassung",
+        "settings.carbs.toggle": "Ich erfasse alle Mahlzeiten",
+        "settings.carbs.footer": "Wenn aktiviert, behandelt die KI deine Kohlenhydrat-Einträge als vollständig: Chat und Rückblick dürfen Mahlzeiten-Muster interpretieren, die Einstellungs-Analyse wertet auch kleinere Mahlzeiten aus. Lass es aus, wenn du kleinere Mahlzeiten oder Snacks nicht einträgst.",
 
         "ti.days.format": "%dT",
         "time.range.format": "%02d–%02d Uhr",
@@ -273,6 +280,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Rückblick erstellen",
         "recap.ai.generating": "Formuliere Rückblick …",
         "recap.nokey": "Für KI-Beobachtungen wird ein API-Key benötigt (AI-Hub-Einstellungen). Der Zahlen-Vergleich oben funktioniert auch ohne.",
+        "recap.disclaimer.complete": "Mahlzeiten-Einträge gelten als vollständig — der Rückblick darf Ernährung und Glukose-/Loop-Daten in Beziehung setzen.",
         "recap.disclaimer": "Geloggte Kohlenhydrate sind unvollständig — der Rückblick bewertet Glukose- und Loop-Daten, keine Ernährung."
     ]
 
@@ -326,6 +334,9 @@ enum AIHubL10n {
         "settings.note.section": "Remarque",
         "settings.note.text": "Les réponses de l'IA sont des estimations et peuvent contenir des erreurs. Vérifie toujours les changements de thérapie toi-même et parles-en à ton équipe soignante en cas de doute.",
         "settings.save": "Enregistrer",
+        "settings.carbs.section": "Saisie des repas",
+        "settings.carbs.toggle": "Je saisis tous mes repas",
+        "settings.carbs.footer": "Si activé, l'IA considère tes saisies de glucides comme complètes : le chat et le récap peuvent interpréter les habitudes de repas, et l'analyse des réglages évalue aussi les petits repas. Laisse désactivé si tu ne saisis pas les petits repas ou les en-cas.",
         "ti.days.format": "%dj",
         "time.range.format": "%02dh–%02dh",
         "ti.score.title": "Score des réglages",
@@ -368,6 +379,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Créer le récap",
         "recap.ai.generating": "Rédaction du récap …",
         "recap.nokey": "Les observations IA nécessitent une clé API (réglages AI Hub). Les chiffres ci-dessus fonctionnent sans.",
+        "recap.disclaimer.complete": "Les repas saisis sont considérés comme complets — le récap peut relier l'alimentation aux données de glycémie et de boucle.",
         "recap.disclaimer": "Les glucides saisis sont incomplets — le récap évalue les données de glycémie et de boucle, pas l'alimentation."
     ]
 
@@ -421,6 +433,9 @@ enum AIHubL10n {
         "settings.note.section": "Nota",
         "settings.note.text": "Le risposte dell'IA sono stime e possono contenere errori. Verifica sempre le modifiche alla terapia e in caso di dubbi parlane con il tuo team diabetologico.",
         "settings.save": "Salva",
+        "settings.carbs.section": "Registrazione dei pasti",
+        "settings.carbs.toggle": "Registro tutti i pasti",
+        "settings.carbs.footer": "Se attivo, l'IA considera completi i tuoi carboidrati registrati: chat e recap possono interpretare le abitudini dei pasti e l'analisi delle impostazioni valuta anche i pasti più piccoli. Lascialo disattivato se non registri pasti piccoli o spuntini.",
         "ti.days.format": "%dg",
         "time.range.format": "%02d–%02d",
         "ti.score.title": "Punteggio impostazioni",
@@ -463,6 +478,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Crea recap",
         "recap.ai.generating": "Sto scrivendo il recap …",
         "recap.nokey": "Le osservazioni IA richiedono una chiave API (impostazioni AI Hub). I numeri sopra funzionano anche senza.",
+        "recap.disclaimer.complete": "I pasti registrati sono considerati completi — il recap può mettere in relazione l'alimentazione con i dati di glicemia e loop.",
         "recap.disclaimer": "I carboidrati registrati sono incompleti — il recap valuta i dati di glicemia e loop, non l'alimentazione."
     ]
 
@@ -516,6 +532,9 @@ enum AIHubL10n {
         "settings.note.section": "Nota",
         "settings.note.text": "Las respuestas de la IA son estimaciones y pueden contener errores. Verifica siempre los cambios de terapia y coméntalos con tu equipo médico en caso de duda.",
         "settings.save": "Guardar",
+        "settings.carbs.section": "Registro de comidas",
+        "settings.carbs.toggle": "Registro todas mis comidas",
+        "settings.carbs.footer": "Si está activado, la IA considera completas tus entradas de carbohidratos: el chat y el resumen pueden interpretar patrones de comidas, y el análisis de ajustes también evalúa comidas más pequeñas. Déjalo desactivado si no registras comidas pequeñas o snacks.",
         "ti.days.format": "%dd",
         "time.range.format": "%02d–%02d h",
         "ti.score.title": "Puntuación de ajustes",
@@ -558,6 +577,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Crear resumen",
         "recap.ai.generating": "Redactando el resumen …",
         "recap.nokey": "Las observaciones de IA necesitan una clave API (ajustes de AI Hub). Los números de arriba funcionan sin ella.",
+        "recap.disclaimer.complete": "Las comidas registradas se consideran completas — el resumen puede relacionar la alimentación con los datos de glucosa y loop.",
         "recap.disclaimer": "Los carbohidratos registrados están incompletos — el resumen evalúa datos de glucosa y loop, no la alimentación."
     ]
 
@@ -611,6 +631,9 @@ enum AIHubL10n {
         "settings.note.section": "Let op",
         "settings.note.text": "AI-antwoorden zijn schattingen en kunnen fouten bevatten. Controleer therapiewijzigingen altijd zelf en overleg bij twijfel met je behandelteam.",
         "settings.save": "Bewaar",
+        "settings.carbs.section": "Maaltijdregistratie",
+        "settings.carbs.toggle": "Ik registreer alle maaltijden",
+        "settings.carbs.footer": "Indien ingeschakeld behandelt de AI je koolhydraatinvoer als volledig: chat en recap mogen maaltijdpatronen interpreteren en de instellingen-analyse beoordeelt ook kleinere maaltijden. Laat het uit als je kleinere maaltijden of snacks niet invoert.",
         "ti.days.format": "%dd",
         "time.range.format": "%02d–%02d uur",
         "ti.score.title": "Instellingenscore",
@@ -653,6 +676,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Recap maken",
         "recap.ai.generating": "Recap wordt geschreven …",
         "recap.nokey": "Voor AI-observaties is een API-sleutel nodig (AI Hub-instellingen). De cijfers hierboven werken ook zonder.",
+        "recap.disclaimer.complete": "Maaltijdinvoer geldt als volledig — de recap mag voeding relateren aan glucose- en loopgegevens.",
         "recap.disclaimer": "Gelogde koolhydraten zijn onvolledig — de recap beoordeelt glucose- en loopgegevens, niet je voeding."
     ]
 
@@ -706,6 +730,9 @@ enum AIHubL10n {
         "settings.note.section": "Uwaga",
         "settings.note.text": "Odpowiedzi AI to szacunki i mogą zawierać błędy. Zawsze sam weryfikuj zmiany terapii, a w razie wątpliwości omów je z zespołem diabetologicznym.",
         "settings.save": "Zapisz",
+        "settings.carbs.section": "Rejestrowanie posiłków",
+        "settings.carbs.toggle": "Rejestruję wszystkie posiłki",
+        "settings.carbs.footer": "Po włączeniu AI traktuje twoje wpisy węglowodanów jako kompletne: czat i podsumowanie mogą interpretować wzorce posiłków, a analiza ustawień ocenia też mniejsze posiłki. Zostaw wyłączone, jeśli nie wpisujesz mniejszych posiłków lub przekąsek.",
         "ti.days.format": "%dd",
         "time.range.format": "%02d–%02d",
         "ti.score.title": "Ocena ustawień",
@@ -748,6 +775,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Utwórz podsumowanie",
         "recap.ai.generating": "Piszę podsumowanie …",
         "recap.nokey": "Obserwacje AI wymagają klucza API (ustawienia AI Hub). Liczby powyżej działają bez niego.",
+        "recap.disclaimer.complete": "Wpisy posiłków są traktowane jako kompletne — podsumowanie może powiązać odżywianie z danymi glukozy i pętli.",
         "recap.disclaimer": "Zapisane węglowodany są niekompletne — podsumowanie ocenia dane glukozy i pętli, nie odżywianie."
     ]
 
@@ -801,6 +829,9 @@ enum AIHubL10n {
         "settings.note.section": "Obs",
         "settings.note.text": "AI-svar är uppskattningar och kan innehålla fel. Kontrollera alltid behandlingsändringar själv och diskutera dem med ditt vårdteam vid tveksamhet.",
         "settings.save": "Spara",
+        "settings.carbs.section": "Måltidsregistrering",
+        "settings.carbs.toggle": "Jag registrerar alla måltider",
+        "settings.carbs.footer": "När detta är på behandlar AI:n dina kolhydratposter som kompletta: chatt och recap kan tolka måltidsmönster, och inställningsanalysen utvärderar även mindre måltider. Låt det vara av om du hoppar över mindre måltider eller mellanmål.",
         "ti.days.format": "%dd",
         "time.range.format": "%02d–%02d",
         "ti.score.title": "Inställningspoäng",
@@ -843,6 +874,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Skapa recap",
         "recap.ai.generating": "Skriver recap …",
         "recap.nokey": "AI-observationer kräver en API-nyckel (AI Hub-inställningar). Siffrorna ovan fungerar utan.",
+        "recap.disclaimer.complete": "Måltidsposterna behandlas som kompletta — recapen kan koppla kosten till glukos- och loopdata.",
         "recap.disclaimer": "Loggade kolhydrater är ofullständiga — recapen utvärderar glukos- och loopdata, inte kosten."
     ]
 
@@ -896,6 +928,9 @@ enum AIHubL10n {
         "settings.note.section": "Bemærk",
         "settings.note.text": "AI-svar er estimater og kan indeholde fejl. Kontroller altid behandlingsændringer selv, og drøft dem med dit behandlerteam ved tvivl.",
         "settings.save": "Gem",
+        "settings.carbs.section": "Måltidsregistrering",
+        "settings.carbs.toggle": "Jeg registrerer alle måltider",
+        "settings.carbs.footer": "Når slået til, behandler AI'en dine kulhydratindtastninger som komplette: chat og recap kan fortolke måltidsmønstre, og indstillingsanalysen vurderer også mindre måltider. Lad den være slået fra, hvis du ikke indtaster mindre måltider eller snacks.",
         "ti.days.format": "%dd",
         "time.range.format": "%02d–%02d",
         "ti.score.title": "Indstillingsscore",
@@ -938,6 +973,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Opret recap",
         "recap.ai.generating": "Skriver recap …",
         "recap.nokey": "AI-observationer kræver en API-nøgle (AI Hub-indstillinger). Tallene ovenfor virker uden.",
+        "recap.disclaimer.complete": "Måltidsindtastninger behandles som komplette — recappen kan relatere kosten til glukose- og loopdata.",
         "recap.disclaimer": "Loggede kulhydrater er ufuldstændige — recappen vurderer glukose- og loopdata, ikke kosten."
     ]
 
@@ -991,6 +1027,9 @@ enum AIHubL10n {
         "settings.note.section": "Merk",
         "settings.note.text": "AI-svar er estimater og kan inneholde feil. Kontroller alltid behandlingsendringer selv, og diskuter dem med behandlerteamet ditt ved tvil.",
         "settings.save": "Lagre",
+        "settings.carbs.section": "Måltidsregistrering",
+        "settings.carbs.toggle": "Jeg registrerer alle måltider",
+        "settings.carbs.footer": "Når dette er på, behandler AI-en karbohydratoppføringene dine som komplette: chat og recap kan tolke måltidsmønstre, og innstillingsanalysen vurderer også mindre måltider. La det være av hvis du ikke fører inn mindre måltider eller snacks.",
         "ti.days.format": "%dd",
         "time.range.format": "%02d–%02d",
         "ti.score.title": "Innstillingsscore",
@@ -1033,6 +1072,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Lag recap",
         "recap.ai.generating": "Skriver recap …",
         "recap.nokey": "AI-observasjoner krever en API-nøkkel (AI Hub-innstillinger). Tallene ovenfor fungerer uten.",
+        "recap.disclaimer.complete": "Måltidsoppføringene behandles som komplette — recapen kan knytte kostholdet til glukose- og loopdata.",
         "recap.disclaimer": "Loggførte karbohydrater er ufullstendige — recapen vurderer glukose- og loopdata, ikke kostholdet."
     ]
 
@@ -1086,6 +1126,9 @@ enum AIHubL10n {
         "settings.note.section": "Huomautus",
         "settings.note.text": "Tekoälyn vastaukset ovat arvioita ja voivat sisältää virheitä. Tarkista hoitomuutokset aina itse ja keskustele niistä hoitotiimisi kanssa epävarmoissa tilanteissa.",
         "settings.save": "Tallenna",
+        "settings.carbs.section": "Aterioiden kirjaus",
+        "settings.carbs.toggle": "Kirjaan kaikki ateriat",
+        "settings.carbs.footer": "Kun tämä on päällä, tekoäly pitää hiilihydraattikirjauksiasi täydellisinä: chat ja kooste voivat tulkita ateriarytmiä, ja asetusanalyysi arvioi myös pienemmät ateriat. Pidä pois päältä, jos et kirjaa pienempiä aterioita tai välipaloja.",
         "ti.days.format": "%dpv",
         "time.range.format": "klo %02d–%02d",
         "ti.score.title": "Asetuspisteet",
@@ -1128,6 +1171,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Luo kooste",
         "recap.ai.generating": "Kirjoitan koostetta …",
         "recap.nokey": "Tekoälyn havainnot vaativat API-avaimen (AI Hubin asetukset). Yllä olevat luvut toimivat ilmankin.",
+        "recap.disclaimer.complete": "Ateriakirjaukset katsotaan täydellisiksi — kooste voi yhdistää ruokavalion glukoosi- ja loop-dataan.",
         "recap.disclaimer": "Kirjatut hiilihydraatit ovat puutteellisia — kooste arvioi glukoosi- ja loop-dataa, ei ruokavaliota."
     ]
 
@@ -1181,6 +1225,9 @@ enum AIHubL10n {
         "settings.note.section": "Nota",
         "settings.note.text": "As respostas da IA são estimativas e podem conter erros. Verifica sempre as alterações terapêuticas e fala com a tua equipa de saúde em caso de dúvida.",
         "settings.save": "Guardar",
+        "settings.carbs.section": "Registo de refeições",
+        "settings.carbs.toggle": "Registo todas as refeições",
+        "settings.carbs.footer": "Quando ativado, a IA considera os teus registos de hidratos completos: o chat e o resumo podem interpretar padrões de refeições e a análise das definições avalia também refeições mais pequenas. Deixa desativado se não registas refeições pequenas ou snacks.",
         "ti.days.format": "%dd",
         "time.range.format": "%02dh–%02dh",
         "ti.score.title": "Pontuação das definições",
@@ -1223,6 +1270,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Criar resumo",
         "recap.ai.generating": "A redigir o resumo …",
         "recap.nokey": "As observações de IA precisam de uma chave API (definições do AI Hub). Os números acima funcionam sem ela.",
+        "recap.disclaimer.complete": "Os registos de refeições são considerados completos — o resumo pode relacionar a alimentação com os dados de glicose e loop.",
         "recap.disclaimer": "Os hidratos registados estão incompletos — o resumo avalia dados de glicose e loop, não a alimentação."
     ]
 
@@ -1276,6 +1324,9 @@ enum AIHubL10n {
         "settings.note.section": "Observação",
         "settings.note.text": "As respostas da IA são estimativas e podem conter erros. Sempre verifique você mesmo as mudanças de terapia e converse com sua equipe de saúde em caso de dúvida.",
         "settings.save": "Salvar",
+        "settings.carbs.section": "Registro de refeições",
+        "settings.carbs.toggle": "Registro todas as refeições",
+        "settings.carbs.footer": "Quando ativado, a IA considera seus registros de carboidratos completos: o chat e o resumo podem interpretar padrões de refeições, e a análise de ajustes também avalia refeições menores. Deixe desativado se você não registra refeições pequenas ou lanches.",
         "ti.days.format": "%dd",
         "time.range.format": "%02dh–%02dh",
         "ti.score.title": "Pontuação das configurações",
@@ -1318,6 +1369,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Criar resumo",
         "recap.ai.generating": "Escrevendo o resumo …",
         "recap.nokey": "As observações de IA precisam de uma chave de API (configurações do AI Hub). Os números acima funcionam sem ela.",
+        "recap.disclaimer.complete": "Os registros de refeições são considerados completos — o resumo pode relacionar a alimentação com os dados de glicose e loop.",
         "recap.disclaimer": "Os carboidratos registrados são incompletos — o resumo avalia dados de glicose e loop, não a alimentação."
     ]
 
@@ -1371,6 +1423,9 @@ enum AIHubL10n {
         "settings.note.section": "Примечание",
         "settings.note.text": "Ответы ИИ — это оценки, они могут содержать ошибки. Всегда проверяйте изменения терапии сами и при сомнениях обсуждайте их с лечащей командой.",
         "settings.save": "Сохранить",
+        "settings.carbs.section": "Учёт приёмов пищи",
+        "settings.carbs.toggle": "Я записываю все приёмы пищи",
+        "settings.carbs.footer": "Если включено, ИИ считает ваши записи углеводов полными: чат и обзор могут интерпретировать пищевые привычки, а анализ настроек учитывает и небольшие приёмы пищи. Оставьте выключенным, если не записываете небольшие приёмы пищи или перекусы.",
         "ti.days.format": "%dд",
         "time.range.format": "%02d–%02d ч",
         "ti.score.title": "Оценка настроек",
@@ -1413,6 +1468,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Создать обзор",
         "recap.ai.generating": "Пишу обзор …",
         "recap.nokey": "Для наблюдений ИИ нужен API-ключ (настройки AI Hub). Цифры выше работают и без него.",
+        "recap.disclaimer.complete": "Записи о еде считаются полными — обзор может связывать питание с данными глюкозы и петли.",
         "recap.disclaimer": "Записанные углеводы неполны — обзор оценивает данные глюкозы и петли, а не питание."
     ]
 
@@ -1466,6 +1522,9 @@ enum AIHubL10n {
         "settings.note.section": "Not",
         "settings.note.text": "Yapay zekâ yanıtları tahmindir ve hata içerebilir. Tedavi değişikliklerini daima kendin doğrula ve şüphe halinde tedavi ekibinle görüş.",
         "settings.save": "Kaydet",
+        "settings.carbs.section": "Öğün kaydı",
+        "settings.carbs.toggle": "Tüm öğünlerimi kaydediyorum",
+        "settings.carbs.footer": "Açıkken yapay zekâ karbonhidrat girişlerini eksiksiz kabul eder: sohbet ve özet öğün düzenini yorumlayabilir, ayar analizi küçük öğünleri de değerlendirir. Küçük öğünleri veya atıştırmalıkları kaydetmiyorsan kapalı bırak.",
         "ti.days.format": "%dg",
         "time.range.format": "%02d–%02d",
         "ti.score.title": "Ayar Puanı",
@@ -1508,6 +1567,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Özet oluştur",
         "recap.ai.generating": "Özet yazılıyor …",
         "recap.nokey": "Yapay zekâ gözlemleri için API anahtarı gerekir (AI Hub ayarları). Yukarıdaki sayılar onsuz da çalışır.",
+        "recap.disclaimer.complete": "Öğün kayıtları eksiksiz kabul edilir — özet, beslenmeyi glukoz ve loop verileriyle ilişkilendirebilir.",
         "recap.disclaimer": "Kaydedilen karbonhidratlar eksiktir — özet, glukoz ve loop verilerini değerlendirir, beslenmeyi değil."
     ]
 
@@ -1561,6 +1621,9 @@ enum AIHubL10n {
         "settings.note.section": "Примітка",
         "settings.note.text": "Відповіді ШІ — це оцінки, вони можуть містити помилки. Завжди перевіряйте зміни терапії самі та в разі сумнівів обговорюйте їх із лікувальною командою.",
         "settings.save": "Зберегти",
+        "settings.carbs.section": "Облік прийомів їжі",
+        "settings.carbs.toggle": "Я записую всі прийоми їжі",
+        "settings.carbs.footer": "Якщо ввімкнено, ШІ вважає ваші записи вуглеводів повними: чат і огляд можуть інтерпретувати харчові звички, а аналіз налаштувань враховує й невеликі прийоми їжі. Залиште вимкненим, якщо не записуєте невеликі прийоми їжі чи перекуси.",
         "ti.days.format": "%dд",
         "time.range.format": "%02d–%02d год",
         "ti.score.title": "Оцінка налаштувань",
@@ -1603,6 +1666,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Створити огляд",
         "recap.ai.generating": "Пишу огляд …",
         "recap.nokey": "Для спостережень ШІ потрібен API-ключ (налаштування AI Hub). Цифри вище працюють і без нього.",
+        "recap.disclaimer.complete": "Записи про їжу вважаються повними — огляд може пов'язувати харчування з даними глюкози та петлі.",
         "recap.disclaimer": "Записані вуглеводи неповні — огляд оцінює дані глюкози та петлі, а не харчування."
     ]
 
@@ -1656,6 +1720,9 @@ enum AIHubL10n {
         "settings.note.section": "Poznámka",
         "settings.note.text": "Odpovede AI sú odhady a môžu obsahovať chyby. Zmeny terapie si vždy over sám a pri pochybnostiach ich prekonzultuj s ošetrujúcim tímom.",
         "settings.save": "Uložiť",
+        "settings.carbs.section": "Zaznamenávanie jedál",
+        "settings.carbs.toggle": "Zaznamenávam všetky jedlá",
+        "settings.carbs.footer": "Ak je zapnuté, AI považuje tvoje sacharidové záznamy za úplné: chat a prehľad môžu interpretovať stravovacie vzorce a analýza nastavení hodnotí aj menšie jedlá. Nechaj vypnuté, ak menšie jedlá alebo snacky nezaznamenávaš.",
         "ti.days.format": "%dd",
         "time.range.format": "%02d–%02d h",
         "ti.score.title": "Skóre nastavení",
@@ -1698,6 +1765,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Vytvoriť prehľad",
         "recap.ai.generating": "Píšem prehľad …",
         "recap.nokey": "Pozorovania AI vyžadujú API kľúč (nastavenia AI Hubu). Čísla vyššie fungujú aj bez neho.",
+        "recap.disclaimer.complete": "Záznamy jedál sa považujú za úplné — prehľad môže dávať stravu do súvisu s údajmi o glukóze a loope.",
         "recap.disclaimer": "Zaznamenané sacharidy sú neúplné — prehľad hodnotí údaje o glukóze a loope, nie stravu."
     ]
 
@@ -1751,6 +1819,9 @@ enum AIHubL10n {
         "settings.note.section": "Megjegyzés",
         "settings.note.text": "Az MI válaszai becslések, és hibákat tartalmazhatnak. A terápiás módosításokat mindig ellenőrizd magad, és kétség esetén beszéld meg a kezelőcsapatoddal.",
         "settings.save": "Mentés",
+        "settings.carbs.section": "Étkezések naplózása",
+        "settings.carbs.toggle": "Minden étkezést naplózok",
+        "settings.carbs.footer": "Bekapcsolva az MI a szénhidrát-bejegyzéseidet teljesnek tekinti: a csevegés és az összefoglaló értelmezheti az étkezési mintákat, a beállítás-elemzés pedig a kisebb étkezéseket is értékeli. Hagyd kikapcsolva, ha a kisebb étkezéseket vagy nassolást nem rögzíted.",
         "ti.days.format": "%dn",
         "time.range.format": "%02d–%02d óra",
         "ti.score.title": "Beállítási pontszám",
@@ -1793,6 +1864,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Összefoglaló készítése",
         "recap.ai.generating": "Összefoglaló írása …",
         "recap.nokey": "Az MI-megfigyelésekhez API-kulcs szükséges (AI Hub beállítások). A fenti számok anélkül is működnek.",
+        "recap.disclaimer.complete": "Az étkezés-bejegyzések teljesnek számítanak — az összefoglaló összekapcsolhatja az étrendet a glükóz- és loop-adatokkal.",
         "recap.disclaimer": "A rögzített szénhidrátok hiányosak — az összefoglaló a glükóz- és loop-adatokat értékeli, nem az étkezést."
     ]
 
@@ -1846,6 +1918,9 @@ enum AIHubL10n {
         "settings.note.section": "ملاحظة",
         "settings.note.text": "إجابات الذكاء الاصطناعي تقديرات وقد تحتوي على أخطاء. تحقق دائماً من تغييرات العلاج بنفسك وناقشها مع فريقك العلاجي عند الشك.",
         "settings.save": "حفظ",
+        "settings.carbs.section": "تسجيل الوجبات",
+        "settings.carbs.toggle": "أسجّل كل وجباتي",
+        "settings.carbs.footer": "عند التفعيل يعتبر الذكاء الاصطناعي إدخالات الكربوهيدرات كاملة: يمكن للدردشة والملخّص تفسير أنماط الوجبات، ويقيّم تحليل الإعدادات الوجبات الصغيرة أيضاً. اتركه معطلاً إذا كنت لا تسجّل الوجبات الصغيرة أو الخفيفة.",
         "ti.days.format": "%dي",
         "time.range.format": "%02d–%02d",
         "ti.score.title": "تقييم الإعدادات",
@@ -1888,6 +1963,7 @@ enum AIHubL10n {
         "recap.ai.generate": "إنشاء الملخّص",
         "recap.ai.generating": "جارٍ كتابة الملخّص …",
         "recap.nokey": "تتطلب ملاحظات الذكاء الاصطناعي مفتاح API (إعدادات AI Hub). الأرقام أعلاه تعمل بدونه.",
+        "recap.disclaimer.complete": "تُعتبر إدخالات الوجبات كاملة — يمكن للملخّص ربط التغذية ببيانات الغلوكوز والحلقة.",
         "recap.disclaimer": "الكربوهيدرات المسجلة غير مكتملة — يقيّم الملخّص بيانات الغلوكوز والحلقة، لا التغذية."
     ]
 
@@ -1941,6 +2017,9 @@ enum AIHubL10n {
         "settings.note.section": "הערה",
         "settings.note.text": "תשובות AI הן הערכות ועלולות להכיל שגיאות. בדוק תמיד שינויי טיפול בעצמך והתייעץ עם הצוות המטפל בספק.",
         "settings.save": "שמור",
+        "settings.carbs.section": "תיעוד ארוחות",
+        "settings.carbs.toggle": "אני מתעד את כל הארוחות",
+        "settings.carbs.footer": "כשמופעל, ה-AI מתייחס לרישומי הפחמימות שלך כמלאים: הצ'אט והסיכום יכולים לפרש דפוסי ארוחות, וניתוח ההגדרות מעריך גם ארוחות קטנות. השאר כבוי אם אינך מתעד ארוחות קטנות או חטיפים.",
         "ti.days.format": "%dי",
         "time.range.format": "%02d–%02d",
         "ti.score.title": "ציון הגדרות",
@@ -1983,6 +2062,7 @@ enum AIHubL10n {
         "recap.ai.generate": "צור סיכום",
         "recap.ai.generating": "כותב סיכום …",
         "recap.nokey": "תצפיות AI דורשות מפתח API (הגדרות AI Hub). המספרים למעלה עובדים גם בלעדיו.",
+        "recap.disclaimer.complete": "רישומי הארוחות נחשבים מלאים — הסיכום יכול לקשר את התזונה לנתוני הגלוקוז והלולאה.",
         "recap.disclaimer": "הפחמימות שתועדו חלקיות — הסיכום מעריך נתוני גלוקוז ולולאה, לא תזונה."
     ]
 
@@ -2036,6 +2116,9 @@ enum AIHubL10n {
         "settings.note.section": "Σημείωση",
         "settings.note.text": "Οι απαντήσεις ΤΝ είναι εκτιμήσεις και μπορεί να περιέχουν λάθη. Έλεγχε πάντα ο ίδιος τις αλλαγές θεραπείας και συζήτησέ τες με την ιατρική σου ομάδα σε αμφιβολία.",
         "settings.save": "Αποθήκευση",
+        "settings.carbs.section": "Καταγραφή γευμάτων",
+        "settings.carbs.toggle": "Καταγράφω όλα τα γεύματα",
+        "settings.carbs.footer": "Όταν είναι ενεργό, η ΤΝ θεωρεί τις καταχωρίσεις υδατανθράκων πλήρεις: η συνομιλία και η ανασκόπηση μπορούν να ερμηνεύουν τα μοτίβα γευμάτων, και η ανάλυση ρυθμίσεων αξιολογεί και μικρότερα γεύματα. Άφησέ το ανενεργό αν δεν καταγράφεις μικρά γεύματα ή σνακ.",
         "ti.days.format": "%dημ",
         "time.range.format": "%02d–%02d",
         "ti.score.title": "Βαθμολογία ρυθμίσεων",
@@ -2078,6 +2161,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Δημιουργία ανασκόπησης",
         "recap.ai.generating": "Συντάσσω την ανασκόπηση …",
         "recap.nokey": "Οι παρατηρήσεις ΤΝ χρειάζονται κλειδί API (ρυθμίσεις AI Hub). Οι αριθμοί παραπάνω λειτουργούν και χωρίς αυτό.",
+        "recap.disclaimer.complete": "Οι καταχωρίσεις γευμάτων θεωρούνται πλήρεις — η ανασκόπηση μπορεί να συσχετίσει τη διατροφή με τα δεδομένα γλυκόζης και λούπας.",
         "recap.disclaimer": "Οι καταγεγραμμένοι υδατάνθρακες είναι ελλιπείς — η ανασκόπηση αξιολογεί δεδομένα γλυκόζης και λούπας, όχι τη διατροφή."
     ]
 
@@ -2131,6 +2215,9 @@ enum AIHubL10n {
         "settings.note.section": "Nota",
         "settings.note.text": "Les respostes de la IA són estimacions i poden contenir errors. Verifica sempre els canvis de teràpia tu mateix i parla'n amb el teu equip mèdic en cas de dubte.",
         "settings.save": "Desa",
+        "settings.carbs.section": "Registre d'àpats",
+        "settings.carbs.toggle": "Registro tots els àpats",
+        "settings.carbs.footer": "Si està activat, la IA considera completes les teves entrades de carbohidrats: el xat i el resum poden interpretar patrons d'àpats, i l'anàlisi d'ajustos també avalua àpats més petits. Deixa-ho desactivat si no registres àpats petits o snacks.",
         "ti.days.format": "%dd",
         "time.range.format": "%02d–%02d h",
         "ti.score.title": "Puntuació dels ajustos",
@@ -2173,6 +2260,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Crea el resum",
         "recap.ai.generating": "Redactant el resum …",
         "recap.nokey": "Les observacions d'IA necessiten una clau API (ajustos de l'AI Hub). Els números de dalt funcionen sense.",
+        "recap.disclaimer.complete": "Els àpats registrats es consideren complets — el resum pot relacionar l'alimentació amb les dades de glucosa i loop.",
         "recap.disclaimer": "Els carbohidrats registrats són incomplets — el resum avalua dades de glucosa i loop, no l'alimentació."
     ]
 
@@ -2226,6 +2314,9 @@ enum AIHubL10n {
         "settings.note.section": "Ghi chú",
         "settings.note.text": "Câu trả lời của AI là ước tính và có thể sai sót. Luôn tự kiểm tra các thay đổi điều trị và trao đổi với đội ngũ điều trị khi không chắc chắn.",
         "settings.save": "Lưu",
+        "settings.carbs.section": "Ghi nhật ký bữa ăn",
+        "settings.carbs.toggle": "Tôi ghi lại tất cả bữa ăn",
+        "settings.carbs.footer": "Khi bật, AI coi các mục carbohydrate của bạn là đầy đủ: trò chuyện và bản tổng kết có thể diễn giải thói quen ăn uống, và phân tích cài đặt cũng đánh giá các bữa ăn nhỏ. Hãy tắt nếu bạn không ghi các bữa nhỏ hoặc đồ ăn vặt.",
         "ti.days.format": "%dng",
         "time.range.format": "%02d–%02d giờ",
         "ti.score.title": "Điểm cài đặt",
@@ -2268,6 +2359,7 @@ enum AIHubL10n {
         "recap.ai.generate": "Tạo tổng kết",
         "recap.ai.generating": "Đang viết tổng kết …",
         "recap.nokey": "Quan sát của AI cần khóa API (cài đặt AI Hub). Các con số phía trên hoạt động mà không cần khóa.",
+        "recap.disclaimer.complete": "Các bữa ăn đã ghi được coi là đầy đủ — bản tổng kết có thể liên hệ dinh dưỡng với dữ liệu đường huyết và loop.",
         "recap.disclaimer": "Carbohydrate đã ghi không đầy đủ — bản tổng kết đánh giá dữ liệu đường huyết và loop, không phải chế độ ăn."
     ]
 
@@ -2321,6 +2413,9 @@ enum AIHubL10n {
         "settings.note.section": "提示",
         "settings.note.text": "AI 回答是估算，可能存在错误。请务必自行核实治疗方案的更改，如有疑问请与医疗团队讨论。",
         "settings.save": "保存",
+        "settings.carbs.section": "进餐记录",
+        "settings.carbs.toggle": "我记录所有进餐",
+        "settings.carbs.footer": "开启后，AI 会将你的碳水记录视为完整：聊天和回顾可以解读进餐规律，设置分析也会评估较小的进餐。如果你不记录小餐或零食，请保持关闭。",
         "ti.days.format": "%d天",
         "time.range.format": "%02d–%02d 点",
         "ti.score.title": "设置评分",
@@ -2363,6 +2458,7 @@ enum AIHubL10n {
         "recap.ai.generate": "生成回顾",
         "recap.ai.generating": "正在撰写回顾……",
         "recap.nokey": "AI 观察需要 API 密钥（AI Hub 设置）。上方数字无需密钥即可使用。",
+        "recap.disclaimer.complete": "进餐记录被视为完整——回顾可以将饮食与血糖和闭环数据关联起来。",
         "recap.disclaimer": "记录的碳水不完整——回顾评估的是血糖和闭环数据，而非饮食。"
     ]
 }

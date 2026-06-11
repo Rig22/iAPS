@@ -10,7 +10,10 @@ import Foundation
 /// basal-getrieben → Basal senken, nicht SMB/ISF anfassen. ISF wird nur aus
 /// carb-freien Korrektur-Episoden bewertet, CR nur aus geloggten Mahlzeiten
 /// (≥ 20 g — kleinere Mengen loggt der Nutzer erfahrungsgemäß nicht
-/// zuverlässig).
+/// zuverlässig; mit `aiHubCarbsComplete` ≥ 10 g, weil dann auch kleine
+/// Mahlzeiten verlässlich erfasst sind. Das Flag gibt ISF/CR-Vorschlägen
+/// außerdem einen Konfidenz-Bonus: „carb-frei" und „isolierte Mahlzeit"
+/// sind dann Fakten statt Vermutungen).
 enum AIHubTherapyAnalysis {
     // MARK: - Modelle
 
@@ -342,6 +345,10 @@ enum AIHubTherapyAnalysis {
             blockedUntil = windowEnd
         }
 
+        // Vollständiges Logging macht den Carb-frei-Filter zum Faktum
+        // statt zur Vermutung → Vorschläge dürfen höher gewichtet werden.
+        let carbBonus = UserDefaults.standard.aiHubCarbsComplete ? 10 : 0
+
         var suggestions: [Suggestion] = []
         for (index, entry) in profile.entries.enumerated() {
             let slotEpisodes = episodes.filter { $0.slot == index }
@@ -359,7 +366,7 @@ enum AIHubTherapyAnalysis {
                     timeText: timeText,
                     currentText: formatISF(entry.display, isMmol: profile.isMmol),
                     proposedText: formatISF(proposed, isMmol: profile.isMmol),
-                    confidence: min(90, 45 + hypoCount * 15),
+                    confidence: min(90, 45 + hypoCount * 15 + carbBonus),
                     rationale: hubT("ti.rationale.isf.raise", hypoCount, slotEpisodes.count)
                 ))
             } else if hypoCount == 0, weakCount * 5 >= slotEpisodes.count * 3 {
@@ -373,7 +380,7 @@ enum AIHubTherapyAnalysis {
                     timeText: timeText,
                     currentText: formatISF(entry.display, isMmol: profile.isMmol),
                     proposedText: formatISF(proposed, isMmol: profile.isMmol),
-                    confidence: Int(Double(weakCount) / Double(slotEpisodes.count) * 90),
+                    confidence: min(90, Int(Double(weakCount) / Double(slotEpisodes.count) * 90) + carbBonus),
                     rationale: hubT(
                         "ti.rationale.isf.lower",
                         weakCount,
@@ -388,7 +395,8 @@ enum AIHubTherapyAnalysis {
 
     // MARK: - CR-Engine
 
-    /// Mahlzeiten-Episoden: geloggte Mahlzeiten ≥ 20 g (Einträge < 90 min
+    /// Mahlzeiten-Episoden: geloggte Mahlzeiten ≥ 20 g bzw. ≥ 10 g bei
+    /// vollständigem Logging (Einträge < 90 min
     /// Abstand zusammengefasst), ohne weitere Mahlzeit im 4-h-Fenster.
     /// Bewertet wird der BG-Verlauf bis +4 h gegen den Vor-Mahlzeiten-Wert
     /// sowie Hypos bis +5 h.
@@ -412,10 +420,17 @@ enum AIHubTherapyAnalysis {
             }
         }
 
+        // Bei vollständigem Logging sind auch kleine Mahlzeiten verlässlich
+        // erfasst und die Fenster-Isolation ist ein Faktum → niedrigere
+        // Schwelle, Konfidenz-Bonus.
+        let carbsComplete = UserDefaults.standard.aiHubCarbsComplete
+        let minMealCarbs: Double = carbsComplete ? 10 : 20
+        let carbBonus = carbsComplete ? 10 : 0
+
         // (Slot-Index, Hypo bis +5 h, deutlich erhöht bei +4 h, Anstieg)
         var episodes: [(slot: Int, isHypo: Bool, isHigh: Bool, rise: Double)] = []
 
-        for (index, meal) in merged.enumerated() where meal.carbs >= 20 {
+        for (index, meal) in merged.enumerated() where meal.carbs >= minMealCarbs {
             // Überlappung mit Nachbar-Mahlzeit → Zuordnung unklar, auslassen
             if index > 0, meal.date.timeIntervalSince(merged[index - 1].date) < 4 * 3600 { continue }
             if index + 1 < merged.count, merged[index + 1].date.timeIntervalSince(meal.date) < 4 * 3600 { continue }
@@ -460,7 +475,7 @@ enum AIHubTherapyAnalysis {
                     timeText: timeText,
                     currentText: formatCR(entry.ratio),
                     proposedText: formatCR(proposed),
-                    confidence: min(90, 45 + hypoCount * 15),
+                    confidence: min(90, 45 + hypoCount * 15 + carbBonus),
                     rationale: hubT("ti.rationale.cr.raise", hypoCount, slotEpisodes.count)
                 ))
             } else if hypoCount == 0, highCount * 5 >= slotEpisodes.count * 3 {
@@ -474,7 +489,7 @@ enum AIHubTherapyAnalysis {
                     timeText: timeText,
                     currentText: formatCR(entry.ratio),
                     proposedText: formatCR(proposed),
-                    confidence: Int(Double(highCount) / Double(slotEpisodes.count) * 90),
+                    confidence: min(90, Int(Double(highCount) / Double(slotEpisodes.count) * 90) + carbBonus),
                     rationale: hubT(
                         "ti.rationale.cr.lower",
                         highCount,

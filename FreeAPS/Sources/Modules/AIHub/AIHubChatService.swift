@@ -4,6 +4,7 @@ import Foundation
 
 extension UserDefaults {
     private static let aiHubChatProviderKey = "iAPS.aiHubChatProvider"
+    private static let aiHubCarbsCompleteKey = "iAPS.aiHubCarbsComplete"
 
     /// Model used by the AI Hub chat. Independent from the FoodSearch
     /// provider choices, but reads the same per-provider API keys.
@@ -19,6 +20,15 @@ extension UserDefaults {
         set {
             set(newValue.rawValue, forKey: Self.aiHubChatProviderKey)
         }
+    }
+
+    /// Self-assessment by the user: "I log all meals". When true, chat,
+    /// recap and therapy analysis may treat carb entries as complete —
+    /// carb-free windows are real, meal patterns may be interpreted.
+    /// Default false: carb entries are assumed incomplete.
+    var aiHubCarbsComplete: Bool {
+        get { bool(forKey: Self.aiHubCarbsCompleteKey) }
+        set { set(newValue, forKey: Self.aiHubCarbsCompleteKey) }
     }
 }
 

@@ -189,6 +189,11 @@ enum AIHubRecap {
     // MARK: - KI-Beobachtungen
 
     static func narrativePrompt(for summary: Summary) -> String {
+        let carbRule = UserDefaults.standard.aiHubCarbsComplete
+            ? "- Logged carbs are complete (the user logs every meal) — you may relate meal " +
+            "amounts and timing to the glucose outcomes."
+            : "- Logged carbs are incomplete (the user does not log every meal) — never interpret " +
+            "low carb totals as fasting."
         var lines: [String] = []
         lines.append(
             """
@@ -203,8 +208,7 @@ enum AIHubRecap {
             what could be worth watching.
             - Glucose values in the data are mg/dL; present them in \(summary
                 .isMmol ? "mmol/L (divide by 18, one decimal)" : "mg/dL").
-            - Logged carbs are incomplete (the user does not log every meal) — never interpret \
-            low carb totals as fasting.
+            \(carbRule)
             - No greeting, no closing line, only the bullet points.
             """
         )
