@@ -9,6 +9,7 @@ enum AIHub {
         case chat
         case therapyInsights
         case recap
+        case presetDesigner
         case foodSearch
 
         var id: String { rawValue }

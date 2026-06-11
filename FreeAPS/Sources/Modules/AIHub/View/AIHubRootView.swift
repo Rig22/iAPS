@@ -65,6 +65,8 @@ extension AIHub {
                 AIHubTherapyInsightsView()
             case .recap:
                 AIHubRecapView()
+            case .presetDesigner:
+                AIHubPresetDesignerView()
             case .foodSearch:
                 // Nie erreicht — foodSearch ist ein Button (showModal), kein NavigationLink.
                 EmptyView()
@@ -161,6 +163,7 @@ private extension AIHub.Feature {
         case .chat: return "AI Chat"
         case .therapyInsights: return "Therapy Insights"
         case .recap: return "Recap"
+        case .presetDesigner: return "Preset Designer"
         case .foodSearch: return "FoodSearch"
         }
     }
@@ -170,6 +173,7 @@ private extension AIHub.Feature {
         case .chat: return hubT("root.card.chat.sub")
         case .therapyInsights: return hubT("root.card.insights.sub")
         case .recap: return hubT("root.card.recap.sub")
+        case .presetDesigner: return hubT("root.card.preset.sub")
         case .foodSearch: return hubT("root.card.food.sub")
         }
     }
@@ -179,6 +183,7 @@ private extension AIHub.Feature {
         case .chat: return "bubble.left.and.bubble.right.fill"
         case .therapyInsights: return "chart.line.uptrend.xyaxis"
         case .recap: return "calendar.badge.clock"
+        case .presetDesigner: return "slider.horizontal.3"
         case .foodSearch: return "fork.knife"
         }
     }
@@ -188,6 +193,7 @@ private extension AIHub.Feature {
         case .chat: return .purple
         case .therapyInsights: return .blue
         case .recap: return .indigo
+        case .presetDesigner: return .orange
         case .foodSearch: return .green
         }
     }

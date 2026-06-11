@@ -293,8 +293,9 @@ struct AIHubChatView: View {
 }
 
 /// Pulsierender Status-Punkt: Grün = Anfrage läuft noch. Das Pulsieren
-/// unterscheidet „lebt" von einem eingefrorenen UI.
-private struct PulsingDot: View {
+/// unterscheidet „lebt" von einem eingefrorenen UI. Auch vom
+/// Preset-Designer genutzt.
+struct PulsingDot: View {
     let color: Color
     @State private var dimmed = false
 

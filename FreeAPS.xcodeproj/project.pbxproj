@@ -426,6 +426,8 @@
 		A1AB000000000000A1AB0018 /* AIHubRecap.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0017 /* AIHubRecap.swift */; };
 		A1AB000000000000A1AB001A /* AIHubRecapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0019 /* AIHubRecapView.swift */; };
 		A1AB000000000000A1AB001C /* AIHubL10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB001B /* AIHubL10n.swift */; };
+		A1AB000000000000A1AB001E /* AIHubPresetDesigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB001D /* AIHubPresetDesigner.swift */; };
+		A1AB000000000000A1AB0020 /* AIHubPresetDesignerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB001F /* AIHubPresetDesignerView.swift */; };
 		BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */; };
 		BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */; };
 		BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0016 /* AutoBackupService.swift */; };
@@ -1197,6 +1199,8 @@
 		A1AB000000000000A1AB0017 /* AIHubRecap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubRecap.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0019 /* AIHubRecapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubRecapView.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB001B /* AIHubL10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubL10n.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB001D /* AIHubPresetDesigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubPresetDesigner.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB001F /* AIHubPresetDesignerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubPresetDesignerView.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunRestorePromptView.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarlyBackupRestore.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0016 /* AutoBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoBackupService.swift; sourceTree = "<group>"; };
@@ -2970,6 +2974,7 @@
 				A1AB000000000000A1AB0001 /* AIHubDataFlow.swift */,
 				A1AB000000000000A1AB0003 /* AIHubProvider.swift */,
 				A1AB000000000000A1AB001B /* AIHubL10n.swift */,
+				A1AB000000000000A1AB001D /* AIHubPresetDesigner.swift */,
 				A1AB000000000000A1AB0017 /* AIHubRecap.swift */,
 				A1AB000000000000A1AB0005 /* AIHubStateModel.swift */,
 				A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */,
@@ -2982,6 +2987,7 @@
 			isa = PBXGroup;
 			children = (
 				A1AB000000000000A1AB000F /* AIHubChatView.swift */,
+				A1AB000000000000A1AB001F /* AIHubPresetDesignerView.swift */,
 				A1AB000000000000A1AB0019 /* AIHubRecapView.swift */,
 				A1AB000000000000A1AB0007 /* AIHubRootView.swift */,
 				A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */,
@@ -4245,6 +4251,8 @@
 				A1AB000000000000A1AB0018 /* AIHubRecap.swift in Sources */,
 				A1AB000000000000A1AB001A /* AIHubRecapView.swift in Sources */,
 				A1AB000000000000A1AB001C /* AIHubL10n.swift in Sources */,
+				A1AB000000000000A1AB001E /* AIHubPresetDesigner.swift in Sources */,
+				A1AB000000000000A1AB0020 /* AIHubPresetDesignerView.swift in Sources */,
 				BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */,
 				BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */,
 				BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */,
