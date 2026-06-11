@@ -7,6 +7,9 @@ final class AIHubChatViewModel: ObservableObject {
     @Published var input = ""
     @Published var isSending = false
     @Published var errorText: String?
+    // Für die Laufzeit-Anzeige neben dem Aktiv-Indikator: Antworten können
+    // 30 s und länger dauern, der Zähler zeigt, dass noch etwas passiert.
+    @Published var requestStartedAt: Date?
     // Starter: datengetrieben (AIHubChatContext), bis geladen die Defaults.
     @Published var starters: [String] = AIHubChatContext.fallbackStarters
     // Follow-ups: vom Modell mitgelieferte Anschlussfragen zur letzten Antwort.
@@ -40,6 +43,7 @@ final class AIHubChatViewModel: ObservableObject {
         followUps = []
         messages.append(AIHubChat.Message(role: .user, text: text))
         isSending = true
+        requestStartedAt = Date()
 
         Task { @MainActor in
             do {
@@ -52,6 +56,7 @@ final class AIHubChatViewModel: ObservableObject {
                 errorText = error.localizedDescription
             }
             isSending = false
+            requestStartedAt = nil
         }
     }
 
@@ -110,21 +115,34 @@ struct AIHubChatView: View {
                             .id(message.id)
                     }
                     if model.isSending {
-                        HStack {
-                            ProgressView()
+                        HStack(spacing: 8) {
+                            PulsingDot(color: .green)
                             Text(hubT("chat.thinking"))
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
+                            if let started = model.requestStartedAt {
+                                TimelineView(.periodic(from: started, by: 1)) { timeline in
+                                    Text("\(max(0, Int(timeline.date.timeIntervalSince(started)))) s")
+                                        .font(.subheadline.monospacedDigit())
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .padding(.horizontal, 4)
                         .id("typing")
                     }
                     if let error = model.errorText {
-                        Text(error)
-                            .font(.footnote)
-                            .foregroundStyle(.red)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                            Circle()
+                                .fill(Color.red)
+                                .frame(width: 8, height: 8)
+                            Text(error)
+                                .font(.footnote)
+                                .foregroundStyle(.red)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 4)
                     }
                 }
                 .padding(16)
@@ -229,8 +247,14 @@ struct AIHubChatView: View {
                 .background(
                     Capsule().fill(Color(colorScheme == .dark ? .secondarySystemBackground : .systemBackground))
                 )
-                .onSubmit { model.send() }
+                .onSubmit {
+                    inputFocused = false
+                    model.send()
+                }
             Button {
+                // Tastatur einklappen, damit die Antwort Platz bekommt —
+                // erneutes Tippen ins Feld öffnet sie wieder.
+                inputFocused = false
                 model.send()
             } label: {
                 Image(systemName: "arrow.up.circle.fill")
@@ -265,5 +289,21 @@ struct AIHubChatView: View {
             .buttonStyle(.plain)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+}
+
+/// Pulsierender Status-Punkt: Grün = Anfrage läuft noch. Das Pulsieren
+/// unterscheidet „lebt" von einem eingefrorenen UI.
+private struct PulsingDot: View {
+    let color: Color
+    @State private var dimmed = false
+
+    var body: some View {
+        Circle()
+            .fill(color)
+            .frame(width: 8, height: 8)
+            .opacity(dimmed ? 0.3 : 1)
+            .animation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true), value: dimmed)
+            .onAppear { dimmed = true }
     }
 }
