@@ -199,13 +199,25 @@ struct AIHubTherapyInsightsView: View {
         }
     }
 
+    private func meta(for kind: AIHubTherapyAnalysis.Suggestion.Kind) -> (title: String, icon: String) {
+        switch kind {
+        case .basalDecrease,
+             .basalIncrease: return (hubT("ti.basal"), "chart.xyaxis.line")
+        case .isfLower,
+             .isfRaise: return (hubT("ti.isf"), "drop.fill")
+        case .crLower,
+             .crRaise: return (hubT("ti.cr"), "fork.knife")
+        }
+    }
+
     private func suggestionCard(_ suggestion: AIHubTherapyAnalysis.Suggestion) -> some View {
-        card {
+        let meta = meta(for: suggestion.kind)
+        return card {
             VStack(alignment: .leading, spacing: 10) {
                 HStack {
-                    Image(systemName: "chart.xyaxis.line")
+                    Image(systemName: meta.icon)
                         .foregroundStyle(.blue)
-                    Text(hubT("ti.basal"))
+                    Text(meta.title)
                         .font(.headline)
                     Spacer()
                     Text("\(suggestion.confidence)%")
@@ -215,18 +227,20 @@ struct AIHubTherapyInsightsView: View {
                         .background(Capsule().fill(Color.green.opacity(0.15)))
                         .foregroundStyle(.green)
                 }
-                HStack(spacing: 6) {
-                    Image(systemName: "clock")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    Text(String(format: "%02d:00 – %02d:00", suggestion.startHour, suggestion.endHour % 24))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                if let timeText = suggestion.timeText {
+                    HStack(spacing: 6) {
+                        Image(systemName: "clock")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        Text(timeText)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 HStack(spacing: 14) {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(hubT("ti.current")).font(.caption2).foregroundStyle(.secondary)
-                        Text(String(format: "%.2f U/h", suggestion.currentRate))
+                        Text(suggestion.currentText)
                             .font(.subheadline.bold())
                     }
                     Image(systemName: "arrow.right")
@@ -234,7 +248,7 @@ struct AIHubTherapyInsightsView: View {
                         .foregroundStyle(.secondary)
                     VStack(alignment: .leading, spacing: 2) {
                         Text(hubT("ti.proposed")).font(.caption2).foregroundStyle(.secondary)
-                        Text(String(format: "%.2f U/h", suggestion.proposedRate))
+                        Text(suggestion.proposedText)
                             .font(.subheadline.bold())
                             .foregroundStyle(.blue)
                     }

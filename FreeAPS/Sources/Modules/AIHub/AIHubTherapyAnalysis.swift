@@ -3,11 +3,14 @@ import Foundation
 
 /// Deterministische Therapie-Analyse für den AI Hub („Therapy Insights").
 ///
-/// Bewusst OHNE LLM: Score und Basal-Vorschläge werden lokal aus Readings,
-/// Reasons und dem aktiven Profil gerechnet — kostenlos, offline,
-/// reproduzierbar. Kernregel aus der wöchentlichen Analyse übernommen:
-/// Hypos ohne aktives Bolus-Insulin (IOB < 1) und ohne COB sind
-/// basal-getrieben → Basal senken, nicht SMB/ISF anfassen.
+/// Bewusst OHNE LLM: Score und Vorschläge (Basal, ISF, CR) werden lokal aus
+/// Readings, Reasons, Meals und dem aktiven Profil gerechnet — kostenlos,
+/// offline, reproduzierbar. Kernregel aus der wöchentlichen Analyse
+/// übernommen: Hypos ohne aktives Bolus-Insulin (IOB < 1) und ohne COB sind
+/// basal-getrieben → Basal senken, nicht SMB/ISF anfassen. ISF wird nur aus
+/// carb-freien Korrektur-Episoden bewertet, CR nur aus geloggten Mahlzeiten
+/// (≥ 20 g — kleinere Mengen loggt der Nutzer erfahrungsgemäß nicht
+/// zuverlässig).
 enum AIHubTherapyAnalysis {
     // MARK: - Modelle
 
@@ -27,14 +30,18 @@ enum AIHubTherapyAnalysis {
         enum Kind {
             case basalIncrease
             case basalDecrease
+            case isfRaise // ISF-Zahl anheben = schwächere Korrekturen
+            case isfLower // ISF-Zahl senken = stärkere Korrekturen
+            case crRaise // mehr g/U = weniger Mahlzeiten-Insulin
+            case crLower // weniger g/U = mehr Mahlzeiten-Insulin
         }
 
         let id = UUID()
         let kind: Kind
-        let startHour: Int
-        let endHour: Int
-        let currentRate: Double
-        let proposedRate: Double
+        /// "HH:mm – HH:mm" des Profil-Slots/Blocks; nil = ganztägig.
+        let timeText: String?
+        let currentText: String
+        let proposedText: String
         let confidence: Int // 0–100
         let rationale: String
     }
@@ -75,6 +82,7 @@ enum AIHubTherapyAnalysis {
 
         var readings: [(date: Date, glucose: Int)] = []
         var reasons: [(date: Date, iob: Double, cob: Double)] = []
+        var meals: [(date: Date, carbs: Double)] = []
 
         context.performAndWait {
             let readingsReq = NSFetchRequest<Readings>(entityName: "Readings")
@@ -90,6 +98,19 @@ enum AIHubTherapyAnalysis {
                 .compactMap { row in
                     row.date.map { ($0, row.iob?.doubleValue ?? 0, row.cob?.doubleValue ?? 0) }
                 }
+
+            // Meals: `date` ist beim Speichern nicht gesetzt — `actualDate`
+            // ist das zuverlässige Datum. Core Data enthält nur echte
+            // Einträge, keine FPU-Äquivalente.
+            let mealsReq = NSFetchRequest<Meals>(entityName: "Meals")
+            mealsReq.sortDescriptors = [NSSortDescriptor(key: "actualDate", ascending: true)]
+            meals = ((try? context.fetch(mealsReq)) ?? [])
+                .compactMap { row -> (Date, Double)? in
+                    guard let date = row.actualDate ?? row.createdAt, date >= cutoff else { return nil }
+                    let carbs = (row.value(forKey: "carbs") as? NSNumber)?.doubleValue ?? 0
+                    return carbs > 0 ? (date, carbs) : nil
+                }
+                .sorted { $0.0 < $1.0 }
         }
 
         let isMmol = (BaseFileStorage().retrieveRaw(OpenAPS.Settings.bgTargets) ?? "")
@@ -114,15 +135,29 @@ enum AIHubTherapyAnalysis {
             cv: mean > 0 ? sd / mean : 0
         )
 
-        let suggestions = basalSuggestions(
+        let basal = basalSuggestions(
             readings: readings,
             reasons: reasons,
             days: days,
             calendar: calendar,
             isMmol: isMmol
         )
+        let isf = isfSuggestions(
+            readings: readings,
+            reasons: reasons,
+            meals: meals,
+            calendar: calendar,
+            isMmol: isMmol
+        )
+        let cr = crSuggestions(
+            readings: readings,
+            meals: meals,
+            calendar: calendar,
+            isMmol: isMmol
+        )
 
-        return Result(stats: stats, suggestions: suggestions, isMmol: isMmol)
+        let combined = (basal + isf + cr).sorted { $0.confidence > $1.confidence }
+        return Result(stats: stats, suggestions: Array(combined.prefix(4)), isMmol: isMmol)
     }
 
     // MARK: - Basal-Engine
@@ -180,10 +215,9 @@ enum AIHubTherapyAnalysis {
                 let confidence = min(90, 45 + basalDrivenCount * 15)
                 suggestions.append(Suggestion(
                     kind: .basalDecrease,
-                    startHour: blockStart,
-                    endHour: blockEnd,
-                    currentRate: currentRate,
-                    proposedRate: proposed,
+                    timeText: timeRange(blockStart * 60, blockEnd * 60),
+                    currentText: String(format: "%.2f U/h", currentRate),
+                    proposedText: String(format: "%.2f U/h", proposed),
                     confidence: confidence,
                     rationale: hubT(
                         "ti.rationale.decrease",
@@ -219,10 +253,9 @@ enum AIHubTherapyAnalysis {
                 let pct = Int(((factor - 1) * 100).rounded())
                 suggestions.append(Suggestion(
                     kind: .basalIncrease,
-                    startHour: blockStart,
-                    endHour: blockEnd,
-                    currentRate: currentRate,
-                    proposedRate: proposed,
+                    timeText: timeRange(blockStart * 60, blockEnd * 60),
+                    currentText: String(format: "%.2f U/h", currentRate),
+                    proposedText: String(format: "%.2f U/h", proposed),
                     confidence: confidence,
                     rationale: hubT(
                         "ti.rationale.increase",
@@ -253,7 +286,208 @@ enum AIHubTherapyAnalysis {
         return reason.iob < 1.0 && reason.cob <= 0
     }
 
-    // MARK: - Basal-Profil
+    // MARK: - ISF-Engine
+
+    /// Korrektur-Episoden: Loop-Zyklus mit IOB ≥ 1, COB = 0 und BG ≥ 160,
+    /// die folgenden 3 h frei von COB und geloggten Carbs. Bewertet wird der
+    /// tatsächliche Abfall gegen die Profil-Erwartung (IOB × ISF) sowie
+    /// Hypos im 4-h-Fenster.
+    private static func isfSuggestions(
+        readings: [(date: Date, glucose: Int)],
+        reasons: [(date: Date, iob: Double, cob: Double)],
+        meals: [(date: Date, carbs: Double)],
+        calendar: Calendar,
+        isMmol _: Bool
+    ) -> [Suggestion] {
+        guard let profile = isfProfile(), !profile.entries.isEmpty else { return [] }
+
+        let readingDates = readings.map(\.date)
+        let cobDates = reasons.filter { $0.cob > 0 }.map(\.date)
+        let mealDates = meals.map(\.date)
+
+        // (Slot-Index, Hypo im Fenster, Korrektur deutlich zu schwach, End-BG)
+        var episodes: [(slot: Int, isHypo: Bool, isWeak: Bool, endBG: Double)] = []
+        var blockedUntil = Date.distantPast
+
+        for reason in reasons {
+            guard reason.date > blockedUntil, reason.iob >= 1.0, reason.cob <= 0 else { continue }
+            guard let startBG = nearestGlucose(to: reason.date, tolerance: 10 * 60, readings, readingDates),
+                  startBG >= 160 else { continue }
+            let windowEnd = reason.date.addingTimeInterval(3 * 3600)
+
+            // Kontamination: COB oder geloggte Carbs rund ums Fenster → Episode verwerfen
+            guard !containsDate(cobDates, after: reason.date, until: windowEnd),
+                  !containsDate(mealDates, after: reason.date.addingTimeInterval(-3600), until: windowEnd)
+            else { blockedUntil = windowEnd
+                continue }
+
+            guard let endBG = nearestGlucose(to: windowEnd, tolerance: 20 * 60, readings, readingDates)
+            else { blockedUntil = windowEnd
+                continue }
+
+            let minBG = minGlucose(
+                from: reason.date,
+                to: reason.date.addingTimeInterval(4 * 3600),
+                readings,
+                readingDates
+            ) ?? endBG
+            let slot = slotIndex(forMinute: minuteOfDay(reason.date, calendar), in: profile.entries.map(\.startMinute))
+            let expectedDrop = reason.iob * profile.entries[slot].mgdlPerU
+            episodes.append((
+                slot: slot,
+                isHypo: minBG < 70,
+                isWeak: (startBG - endBG) < 0.5 * expectedDrop && endBG > 160,
+                endBG: endBG
+            ))
+            blockedUntil = windowEnd
+        }
+
+        var suggestions: [Suggestion] = []
+        for (index, entry) in profile.entries.enumerated() {
+            let slotEpisodes = episodes.filter { $0.slot == index }
+            guard slotEpisodes.count >= 4 else { continue }
+            let hypoCount = slotEpisodes.filter(\.isHypo).count
+            let weakCount = slotEpisodes.filter(\.isWeak).count
+            let timeText = slotTimeText(profile.entries.map(\.startMinute), index)
+
+            if hypoCount >= 2, hypoCount * 2 >= slotEpisodes.count {
+                // Korrekturen enden zu oft im Unterzucker → ISF-Zahl anheben
+                let proposed = roundedISF(entry.display * 1.10, isMmol: profile.isMmol)
+                guard proposed > entry.display else { continue }
+                suggestions.append(Suggestion(
+                    kind: .isfRaise,
+                    timeText: timeText,
+                    currentText: formatISF(entry.display, isMmol: profile.isMmol),
+                    proposedText: formatISF(proposed, isMmol: profile.isMmol),
+                    confidence: min(90, 45 + hypoCount * 15),
+                    rationale: hubT("ti.rationale.isf.raise", hypoCount, slotEpisodes.count)
+                ))
+            } else if hypoCount == 0, weakCount * 5 >= slotEpisodes.count * 3 {
+                // Korrekturen bringen konsistent weniger als die Hälfte der
+                // erwarteten Senkung → ISF-Zahl senken
+                let proposed = roundedISF(entry.display * 0.90, isMmol: profile.isMmol)
+                guard proposed < entry.display else { continue }
+                let weakMeanEnd = slotEpisodes.filter(\.isWeak).map(\.endBG).reduce(0, +) / Double(weakCount)
+                suggestions.append(Suggestion(
+                    kind: .isfLower,
+                    timeText: timeText,
+                    currentText: formatISF(entry.display, isMmol: profile.isMmol),
+                    proposedText: formatISF(proposed, isMmol: profile.isMmol),
+                    confidence: Int(Double(weakCount) / Double(slotEpisodes.count) * 90),
+                    rationale: hubT(
+                        "ti.rationale.isf.lower",
+                        weakCount,
+                        slotEpisodes.count,
+                        formatGlucose(weakMeanEnd, isMmol: profile.isMmol)
+                    )
+                ))
+            }
+        }
+        return suggestions
+    }
+
+    // MARK: - CR-Engine
+
+    /// Mahlzeiten-Episoden: geloggte Mahlzeiten ≥ 20 g (Einträge < 90 min
+    /// Abstand zusammengefasst), ohne weitere Mahlzeit im 4-h-Fenster.
+    /// Bewertet wird der BG-Verlauf bis +4 h gegen den Vor-Mahlzeiten-Wert
+    /// sowie Hypos bis +5 h.
+    private static func crSuggestions(
+        readings: [(date: Date, glucose: Int)],
+        meals: [(date: Date, carbs: Double)],
+        calendar: Calendar,
+        isMmol: Bool
+    ) -> [Suggestion] {
+        guard let profile = crProfile(), !profile.isEmpty else { return [] }
+
+        let readingDates = readings.map(\.date)
+
+        // Einträge < 90 min Abstand zu einer Mahlzeit zusammenfassen
+        var merged: [(date: Date, carbs: Double)] = []
+        for meal in meals {
+            if let last = merged.last, meal.date.timeIntervalSince(last.date) < 90 * 60 {
+                merged[merged.count - 1].carbs += meal.carbs
+            } else {
+                merged.append(meal)
+            }
+        }
+
+        // (Slot-Index, Hypo bis +5 h, deutlich erhöht bei +4 h, Anstieg)
+        var episodes: [(slot: Int, isHypo: Bool, isHigh: Bool, rise: Double)] = []
+
+        for (index, meal) in merged.enumerated() where meal.carbs >= 20 {
+            // Überlappung mit Nachbar-Mahlzeit → Zuordnung unklar, auslassen
+            if index > 0, meal.date.timeIntervalSince(merged[index - 1].date) < 4 * 3600 { continue }
+            if index + 1 < merged.count, merged[index + 1].date.timeIntervalSince(meal.date) < 4 * 3600 { continue }
+
+            guard let preBG = nearestGlucose(to: meal.date, tolerance: 30 * 60, readings, readingDates),
+                  let endBG = nearestGlucose(
+                      to: meal.date.addingTimeInterval(4 * 3600),
+                      tolerance: 30 * 60,
+                      readings,
+                      readingDates
+                  )
+            else { continue }
+            let minBG = minGlucose(
+                from: meal.date,
+                to: meal.date.addingTimeInterval(5 * 3600),
+                readings,
+                readingDates
+            ) ?? endBG
+            let slot = slotIndex(forMinute: minuteOfDay(meal.date, calendar), in: profile.map(\.startMinute))
+            episodes.append((
+                slot: slot,
+                isHypo: minBG < 70,
+                isHigh: endBG - preBG > 50 && endBG > 180,
+                rise: endBG - preBG
+            ))
+        }
+
+        var suggestions: [Suggestion] = []
+        for (index, entry) in profile.enumerated() {
+            let slotEpisodes = episodes.filter { $0.slot == index }
+            guard slotEpisodes.count >= 4 else { continue }
+            let hypoCount = slotEpisodes.filter(\.isHypo).count
+            let highCount = slotEpisodes.filter(\.isHigh).count
+            let timeText = slotTimeText(profile.map(\.startMinute), index)
+
+            if hypoCount >= 2, hypoCount * 2 >= slotEpisodes.count {
+                // Nach Mahlzeiten zu oft Unterzucker → mehr Gramm pro Einheit
+                let proposed = roundedCR(entry.ratio * 1.10)
+                guard proposed > entry.ratio else { continue }
+                suggestions.append(Suggestion(
+                    kind: .crRaise,
+                    timeText: timeText,
+                    currentText: formatCR(entry.ratio),
+                    proposedText: formatCR(proposed),
+                    confidence: min(90, 45 + hypoCount * 15),
+                    rationale: hubT("ti.rationale.cr.raise", hypoCount, slotEpisodes.count)
+                ))
+            } else if hypoCount == 0, highCount * 5 >= slotEpisodes.count * 3 {
+                // Mahlzeiten enden konsistent deutlich über dem Ausgangswert
+                // → weniger Gramm pro Einheit
+                let proposed = roundedCR(entry.ratio * 0.90)
+                guard proposed < entry.ratio else { continue }
+                let highMeanRise = slotEpisodes.filter(\.isHigh).map(\.rise).reduce(0, +) / Double(highCount)
+                suggestions.append(Suggestion(
+                    kind: .crLower,
+                    timeText: timeText,
+                    currentText: formatCR(entry.ratio),
+                    proposedText: formatCR(proposed),
+                    confidence: Int(Double(highCount) / Double(slotEpisodes.count) * 90),
+                    rationale: hubT(
+                        "ti.rationale.cr.lower",
+                        highCount,
+                        slotEpisodes.count,
+                        formatGlucose(highMeanRise, isMmol: isMmol)
+                    )
+                ))
+            }
+        }
+        return suggestions
+    }
+
+    // MARK: - Profil-Dateien
 
     /// Liest basal_profile.json: `[{"start":"00:00:00","minutes":0,"rate":0.85}, …]`
     private static func basalSchedule() -> [(startMinute: Int, rate: Double)]? {
@@ -272,10 +506,130 @@ enum AIHubTherapyAnalysis {
         schedule.last(where: { $0.startMinute <= hour * 60 })?.rate ?? schedule.first?.rate ?? 0
     }
 
+    /// Liest insulin_sensitivities.json. `display` ist der Wert in
+    /// Profil-Einheiten (so wie in den Einstellungen sichtbar),
+    /// `mgdlPerU` der Rechenwert.
+    private static func isfProfile() -> (entries: [(startMinute: Int, mgdlPerU: Double, display: Double)], isMmol: Bool)? {
+        guard let raw = BaseFileStorage().retrieveRaw(OpenAPS.Settings.insulinSensitivities),
+              let data = raw.data(using: .utf8),
+              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let list = object["sensitivities"] as? [[String: Any]]
+        else { return nil }
+        let isMmol = ((object["units"] as? String) ?? "").lowercased().contains("mmol")
+        let entries = list.compactMap { entry -> (Int, Double, Double)? in
+            guard let value = (entry["sensitivity"] as? NSNumber)?.doubleValue, value > 0 else { return nil }
+            let offset = (entry["offset"] as? NSNumber)?.intValue ?? 0
+            return (offset, isMmol ? value * 18.0 : value, value)
+        }.sorted { $0.0 < $1.0 }
+        return (entries, isMmol)
+    }
+
+    /// Liest carb_ratios.json: `{"units":"grams","schedule":[{"offset":0,"ratio":10}, …]}`
+    private static func crProfile() -> [(startMinute: Int, ratio: Double)]? {
+        guard let raw = BaseFileStorage().retrieveRaw(OpenAPS.Settings.carbRatios),
+              let data = raw.data(using: .utf8),
+              let object = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+              let list = object["schedule"] as? [[String: Any]]
+        else { return nil }
+        return list.compactMap { entry -> (Int, Double)? in
+            guard let ratio = (entry["ratio"] as? NSNumber)?.doubleValue, ratio > 0 else { return nil }
+            let offset = (entry["offset"] as? NSNumber)?.intValue ?? 0
+            return (offset, ratio)
+        }.sorted { $0.startMinute < $1.startMinute }
+    }
+
+    private static func slotIndex(forMinute minute: Int, in startMinutes: [Int]) -> Int {
+        startMinutes.lastIndex(where: { $0 <= minute }) ?? 0
+    }
+
+    /// Zeitfenster eines Profil-Slots; nil bei nur einem Eintrag (ganztägig).
+    private static func slotTimeText(_ startMinutes: [Int], _ index: Int) -> String? {
+        guard startMinutes.count > 1 else { return nil }
+        let end = index + 1 < startMinutes.count ? startMinutes[index + 1] : 24 * 60
+        return timeRange(startMinutes[index], end)
+    }
+
+    // MARK: - Reading-Lookups (binäre Suche über sortierte Daten)
+
+    private static func lowerBound(_ dates: [Date], _ target: Date) -> Int {
+        var low = 0
+        var high = dates.count
+        while low < high {
+            let mid = (low + high) / 2
+            if dates[mid] < target { low = mid + 1 } else { high = mid }
+        }
+        return low
+    }
+
+    private static func containsDate(_ dates: [Date], after start: Date, until end: Date) -> Bool {
+        let index = lowerBound(dates, start)
+        return index < dates.count && dates[index] <= end
+    }
+
+    private static func nearestGlucose(
+        to target: Date,
+        tolerance: TimeInterval,
+        _ readings: [(date: Date, glucose: Int)],
+        _ dates: [Date]
+    ) -> Double? {
+        let index = lowerBound(dates, target)
+        var best: (interval: TimeInterval, glucose: Int)?
+        for candidate in [index - 1, index] where candidate >= 0 && candidate < readings.count {
+            let interval = abs(readings[candidate].date.timeIntervalSince(target))
+            if interval <= tolerance, interval < (best?.interval ?? .infinity) {
+                best = (interval, readings[candidate].glucose)
+            }
+        }
+        return best.map { Double($0.glucose) }
+    }
+
+    private static func minGlucose(
+        from start: Date,
+        to end: Date,
+        _ readings: [(date: Date, glucose: Int)],
+        _ dates: [Date]
+    ) -> Double? {
+        let lower = lowerBound(dates, start)
+        let upper = lowerBound(dates, end)
+        guard lower < upper else { return nil }
+        return readings[lower ..< upper].map { Double($0.glucose) }.min()
+    }
+
     // MARK: - Helpers
 
     private static func roundedRate(_ rate: Double) -> Double {
         max(0.05, (rate / 0.05).rounded() * 0.05)
+    }
+
+    private static func roundedISF(_ value: Double, isMmol: Bool) -> Double {
+        isMmol ? (value * 10).rounded() / 10 : value.rounded()
+    }
+
+    private static func roundedCR(_ value: Double) -> Double {
+        (value * 10).rounded() / 10
+    }
+
+    private static func formatISF(_ value: Double, isMmol: Bool) -> String {
+        isMmol ? String(format: "%.1f mmol/L/U", value) : String(format: "%.0f mg/dL/U", value)
+    }
+
+    private static func formatCR(_ value: Double) -> String {
+        String(format: "%.1f g/U", value)
+    }
+
+    private static func minuteOfDay(_ date: Date, _ calendar: Calendar) -> Int {
+        let components = calendar.dateComponents([.hour, .minute], from: date)
+        return (components.hour ?? 0) * 60 + (components.minute ?? 0)
+    }
+
+    private static func timeRange(_ startMinute: Int, _ endMinute: Int) -> String {
+        String(
+            format: "%02d:%02d – %02d:%02d",
+            startMinute / 60,
+            startMinute % 60,
+            (endMinute / 60) % 24,
+            endMinute % 60
+        )
     }
 
     private static func hh(_ hour: Int) -> String {
