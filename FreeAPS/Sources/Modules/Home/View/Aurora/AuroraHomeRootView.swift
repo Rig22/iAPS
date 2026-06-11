@@ -137,7 +137,7 @@ extension Home {
         private var pumpSub: String? {
             guard let exp = state.pumpExpiresAtDate else { return nil }
             let interval = exp.timeIntervalSinceNow
-            guard interval > 0 else { return "Replace" }
+            guard interval > 0 else { return hubT("aur.pump.replace") }
             // Under an hour the "0 T 0 h" readout is useless — switch to minutes.
             if interval < 3600 {
                 return "\(Int(interval / 60)) min"
