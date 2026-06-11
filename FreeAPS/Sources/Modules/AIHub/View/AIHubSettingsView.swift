@@ -14,6 +14,7 @@ struct AIHubSettingsView: View {
     @State private var chatProvider = UserDefaults.standard.aiHubChatProvider
     @State private var aiLanguage = UserDefaults.standard.userPreferredLanguageForAI ?? ""
     @State private var carbsComplete = UserDefaults.standard.aiHubCarbsComplete
+    @State private var showModelInfo = false
     @State private var claudeKey = ""
     @State private var openAIKey = ""
     @State private var geminiKey = ""
@@ -62,7 +63,18 @@ struct AIHubSettingsView: View {
                     UserDefaults.standard.aiHubChatProvider = newValue
                 }
             } header: {
-                Text(hubT("settings.model.section"))
+                HStack(spacing: 6) {
+                    Text(hubT("settings.model.section"))
+                    // Modell-/Preis-Überblick vor der Wahl
+                    Button {
+                        showModelInfo = true
+                    } label: {
+                        Image(systemName: "info.circle")
+                            .font(.footnote)
+                    }
+                    .buttonStyle(.plain)
+                    .foregroundStyle(.blue)
+                }
             } footer: {
                 Text(hubT("settings.model.footer"))
             }
@@ -141,6 +153,9 @@ struct AIHubSettingsView: View {
         .onAppear {
             readPersistedValues()
         }
+        .sheet(isPresented: $showModelInfo) {
+            AIHubModelInfoView()
+        }
     }
 
     /// Sprachname in der aktuellen UI-Sprache, z. B. "Niederländisch".
@@ -208,5 +223,115 @@ private struct AIHubSecureField: View {
             }
             .buttonStyle(.plain)
         }
+    }
+}
+
+// MARK: - Modell-Übersicht
+
+/// Kompakte Orientierung vor der Modellwahl: alle Picker-Modelle mit
+/// Preis-Richtwerten, Gratis-Kontingent- und Tempo-Kennzeichnung plus
+/// die Abo-≠-API-Hinweise pro Anbieter. Preise sind bewusst Richtwerte
+/// (Footer) — verbindlich sind die Preisseiten der Anbieter.
+struct AIHubModelInfoView: View {
+    @Environment(\.dismiss) private var dismiss
+
+    private struct ModelInfo {
+        let name: String
+        /// „in / out" in USD pro 1 Mio. Tokens; nil = Preis unbekannt/Preview.
+        let price: String?
+        var free = false
+        var fast = false
+    }
+
+    private struct ProviderInfo {
+        let name: String
+        let noteKey: String
+        let models: [ModelInfo]
+    }
+
+    private let providers: [ProviderInfo] = [
+        ProviderInfo(name: "Google Gemini", noteKey: "mi.note.gemini", models: [
+            ModelInfo(name: "Gemini 2.5 Flash", price: "0,30 / 2,50", free: true, fast: true),
+            ModelInfo(name: "Gemini 2.5 Pro", price: "1,25 / 10"),
+            ModelInfo(name: "Gemini 3 Flash Preview", price: nil, fast: true),
+            ModelInfo(name: "Gemini 3 Pro Preview", price: nil),
+            ModelInfo(name: "Gemini 3.1 Pro Preview", price: nil)
+        ]),
+        ProviderInfo(name: "Anthropic Claude", noteKey: "mi.note.claude", models: [
+            ModelInfo(name: "Haiku 4.5", price: "1 / 5", fast: true),
+            ModelInfo(name: "Sonnet 4.5", price: "3 / 15"),
+            ModelInfo(name: "Sonnet 4.6", price: "3 / 15"),
+            ModelInfo(name: "Opus 4.6", price: "5 / 25")
+        ]),
+        ProviderInfo(name: "OpenAI", noteKey: "mi.note.openai", models: [
+            ModelInfo(name: "GPT-4o mini", price: "0,15 / 0,60", fast: true),
+            ModelInfo(name: "GPT-4o", price: "2,50 / 10"),
+            ModelInfo(name: "GPT-5 mini", price: "0,25 / 2", fast: true),
+            ModelInfo(name: "GPT-5", price: "1,25 / 10"),
+            ModelInfo(name: "GPT-5.1", price: nil),
+            ModelInfo(name: "GPT-5.2", price: nil),
+            ModelInfo(name: "GPT-5.4", price: nil)
+        ])
+    ]
+
+    var body: some View {
+        NavigationView {
+            List {
+                Section {
+                    Text(hubT("mi.price.note"))
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                ForEach(providers, id: \.name) { provider in
+                    Section {
+                        ForEach(provider.models, id: \.name) { model in
+                            modelRow(model)
+                        }
+                    } header: {
+                        Text(provider.name)
+                    } footer: {
+                        Text(hubT(provider.noteKey))
+                    }
+                }
+                Section {
+                    Text(hubT("mi.footer"))
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .navigationTitle(hubT("mi.title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button(hubT("mi.done")) { dismiss() }
+                }
+            }
+        }
+    }
+
+    private func modelRow(_ model: ModelInfo) -> some View {
+        HStack(spacing: 8) {
+            Text(model.name)
+                .font(.subheadline)
+            if model.free {
+                badge(hubT("mi.free"), color: .green)
+            }
+            if model.fast {
+                badge(hubT("settings.fast"), color: .blue)
+            }
+            Spacer()
+            Text(model.price ?? "—")
+                .font(.subheadline.monospacedDigit())
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func badge(_ text: String, color: Color) -> some View {
+        Text(text)
+            .font(.caption2)
+            .padding(.horizontal, 6)
+            .padding(.vertical, 2)
+            .background(Capsule().fill(color.opacity(0.15)))
+            .foregroundStyle(color)
     }
 }

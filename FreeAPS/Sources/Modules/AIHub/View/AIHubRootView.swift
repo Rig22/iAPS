@@ -132,9 +132,18 @@ extension AIHub {
                             .fill(feature.tint.gradient)
                     )
                 VStack(alignment: .leading, spacing: 3) {
-                    Text(feature.title)
-                        .font(.headline)
-                        .foregroundStyle(.primary)
+                    HStack(spacing: 6) {
+                        Text(feature.title)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                        // Kennzeichnet Features, die ein KI-Modell aufrufen
+                        // (Therapy Insights rechnet rein deterministisch).
+                        if feature.usesAI {
+                            Image(systemName: "sparkles")
+                                .font(.caption)
+                                .foregroundStyle(.purple)
+                        }
+                    }
                     Text(feature.subtitle)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
@@ -192,6 +201,18 @@ private extension AIHub.Feature {
         case .recap: return .indigo
         case .presetDesigner: return .orange
         case .foodSearch: return .green
+        }
+    }
+
+    /// Features, die tatsächlich ein KI-Modell aufrufen — Therapy Insights
+    /// bleibt bewusst ohne Sparkles (rein deterministische Analyse).
+    var usesAI: Bool {
+        switch self {
+        case .chat,
+             .foodSearch,
+             .presetDesigner,
+             .recap: return true
+        case .therapyInsights: return false
         }
     }
 }
