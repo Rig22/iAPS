@@ -15,7 +15,7 @@ extension Home {
         @State private var showStatusPopup = false
         @State private var displayAutoHistory = false
         @State private var displayDynamicHistory = false
-        @State private var showCancelOverrideAlert = false
+        @State private var showOverrideDetail = false
         @State private var showCancelTempTargetAlert = false
         @State private var showExpirationAlert = false
 
@@ -333,16 +333,10 @@ extension Home {
                 }
                 Button("Abbrechen", role: .cancel) {}
             }
-            .confirmationDialog(
-                "Profil-Override beenden?",
-                isPresented: $showCancelOverrideAlert,
-                titleVisibility: .visible
-            ) {
-                Button("Override beenden", role: .destructive) {
-                    state.cancelProfile()
-                    toast = "Override beendet"
-                }
-                Button("Abbrechen", role: .cancel) {}
+            .sheet(isPresented: $showOverrideDetail) {
+                overrideDetailSheet
+                    .presentationDetents([.height(420), .medium])
+                    .presentationDragIndicator(.visible)
             }
             .confirmationDialog(
                 "Temporäres Ziel beenden?",
@@ -612,10 +606,10 @@ extension Home {
                 onStatistics: { state.showModal(for: .statistics) },
                 onProfile: {
                     // If an override is already running, tapping the icon
-                    // offers to end it (same dialog as the active badge).
-                    // Otherwise open the config modal as before.
+                    // shows what it actually does (same sheet as the active
+                    // badge). Otherwise open the config modal as before.
                     if profileActive {
-                        showCancelOverrideAlert = true
+                        showOverrideDetail = true
                     } else {
                         state.showModal(for: .overrideProfilesConfig)
                     }
@@ -660,9 +654,9 @@ extension Home {
                     activeBadge(
                         dotColor: AuroraPalette.pump,
                         text: profileBadgeText,
-                        accessibility: "Aktives Profil — antippen zum Beenden"
+                        accessibility: "Aktives Profil — antippen für Details"
                     ) {
-                        showCancelOverrideAlert = true
+                        showOverrideDetail = true
                     }
                     .transition(.opacity.combined(with: .scale(scale: 0.9, anchor: .top)))
                 }
@@ -708,6 +702,106 @@ extension Home {
             }
             .buttonStyle(.plain)
             .accessibilityLabel(Text(accessibility))
+        }
+
+        // MARK: - Override-Detail-Sheet
+
+        /// Zeigt, was der aktive Override tatsächlich tut — Antwort auf
+        /// „was ist gerade eingeschaltet?", ohne in Settings oder Loop-Status
+        /// suchen zu müssen. Beenden ist von hier aus möglich.
+        @ViewBuilder private var overrideDetailSheet: some View {
+            if let override = fetchedPercent.first, override.enabled {
+                let preset = fetchedProfiles.first(where: { $0.id == override.id })
+                let isAI = (override.id ?? "").hasPrefix("ai-")
+                let targetRaw = ((override.target ?? 0) as NSDecimalNumber) as Decimal
+                let aisf = fetchedAISF.first(where: { $0.id == override.id })
+
+                VStack(alignment: .leading, spacing: 18) {
+                    HStack(spacing: 8) {
+                        if let emoji = preset?.emoji, !emoji.isEmpty {
+                            Text(emoji).font(.title2)
+                        }
+                        Text(
+                            (preset?.name).flatMap { $0.isEmpty ? nil : $0 }
+                                ?? (override.percentage != 100 ? "\(Int(override.percentage)) %" : "Override")
+                        )
+                        .font(.title3.bold())
+                        if isAI {
+                            Image(systemName: "sparkles")
+                                .font(.subheadline)
+                                .foregroundStyle(.purple)
+                        }
+                        Spacer()
+                    }
+
+                    VStack(spacing: 12) {
+                        overrideDetailRow("Insulin (Basal/ISF/CR)", "\(Int(override.percentage)) %")
+                        overrideDetailRow(
+                            "Temporäres Ziel",
+                            targetRaw > 6 ? overrideTargetText(targetRaw) : "Profil-Ziel"
+                        )
+                        overrideDetailRow("Restdauer", overrideRemainingText(override))
+                        overrideDetailRow("SMB", override.smbIsOff ? "Aus" : "An")
+                        if override.overrideAutoISF, let aisf {
+                            overrideDetailRow("AutoISF", aisf.autoisf ? "Erzwungen an" : "Erzwungen aus")
+                        }
+                        if let started = override.date {
+                            overrideDetailRow(
+                                "Aktiv seit",
+                                started.formatted(date: .omitted, time: .shortened)
+                            )
+                        }
+                    }
+
+                    Button {
+                        state.cancelProfile()
+                        showOverrideDetail = false
+                        toast = "Override beendet"
+                    } label: {
+                        Text("Override beenden")
+                            .font(.headline)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                    .fill(Color.red.opacity(0.85))
+                            )
+                            .foregroundStyle(.white)
+                    }
+                    .buttonStyle(.plain)
+
+                    Spacer(minLength: 0)
+                }
+                .padding(20)
+            }
+        }
+
+        private func overrideDetailRow(_ label: String, _ value: String) -> some View {
+            HStack {
+                Text(label)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                Spacer()
+                Text(value)
+                    .font(.subheadline.weight(.semibold))
+            }
+        }
+
+        private func overrideTargetText(_ mgdl: Decimal) -> String {
+            state.data.units == .mmolL
+                ? "\(mgdl.asMmolL) mmol/L"
+                : "\(mgdl) mg/dl"
+        }
+
+        private func overrideRemainingText(_ override: Override) -> String {
+            if override.indefinite { return "Unbegrenzt" }
+            let minutes = Double(truncating: (override.duration ?? 0) as NSNumber)
+            guard minutes > 0, let start = override.date else { return "—" }
+            let remaining = start.addingTimeInterval(minutes * 60).timeIntervalSinceNow
+            guard remaining > 0 else { return "Läuft aus" }
+            let hours = Int(remaining) / 3600
+            let mins = (Int(remaining) % 3600) / 60
+            return hours > 0 ? "\(hours) h \(mins) min" : "\(mins) min"
         }
     }
 }
