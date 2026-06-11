@@ -763,12 +763,17 @@ extension AddCarbs {
             case .presets:
                 foodSearchState.showingFoodSearch = true
                 foodSearchState.showSavedFoods = true
-            case .aiSearch:
+            case let .aiSearch(query):
                 // AI-Hub-Einstieg: Suchfenster mit KI-Textsuche statt der
                 // konfigurierten Datenbank-Suche (USDA/OpenFoodFacts).
+                // Eine aus dem Hub mitgebrachte Query startet sofort.
                 if state.ai {
                     foodSearchState.aiTextAnalysis = true
                     foodSearchState.showingFoodSearch = true
+                    if let query, !query.isEmpty {
+                        foodSearchState.foodSearchText = query
+                        foodSearchState.searchByText(query: query, useAI: state.ai)
+                    }
                 }
             default:
                 break

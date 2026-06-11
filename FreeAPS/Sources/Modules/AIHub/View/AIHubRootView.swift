@@ -19,22 +19,10 @@ extension AIHub {
                     header
                     VStack(spacing: 12) {
                         ForEach(Feature.allCases) { feature in
-                            if feature == .foodSearch {
-                                // Springt ins bestehende AddCarbs-KI-Feature —
-                                // Suchfenster mit KI-Textsuche oben, Kamera
-                                // über die Suchleisten-Buttons.
-                                Button {
-                                    state.showModal(for: .addCarbs(editMode: false, override: false, mode: .aiSearch))
-                                } label: {
-                                    FeatureCard(feature: feature)
-                                }
-                                .buttonStyle(.plain)
-                            } else {
-                                NavigationLink(destination: destination(for: feature)) {
-                                    FeatureCard(feature: feature)
-                                }
-                                .buttonStyle(.plain)
+                            NavigationLink(destination: destination(for: feature)) {
+                                FeatureCard(feature: feature)
                             }
+                            .buttonStyle(.plain)
                         }
                     }
                     medicalDisclaimer
@@ -69,8 +57,16 @@ extension AIHub {
             case .presetDesigner:
                 AIHubPresetDesignerView()
             case .foodSearch:
-                // Nie erreicht — foodSearch ist ein Button (showModal), kein NavigationLink.
-                EmptyView()
+                // Weiche: Texteingabe oben (KI-Suche), Kamera darunter —
+                // beide Wege springen ins bestehende AddCarbs-Modal.
+                AIHubFoodSearchView(
+                    onSearch: { query in
+                        state.showModal(for: .addCarbs(editMode: false, override: false, mode: .aiSearch(query: query)))
+                    },
+                    onCamera: {
+                        state.showModal(for: .addCarbs(editMode: false, override: false, mode: .image))
+                    }
+                )
             }
         }
 
