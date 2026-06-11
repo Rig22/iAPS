@@ -48,16 +48,16 @@ struct AuroraTabBar: View {
 
     private var leftPill: some View {
         HStack(spacing: 0) {
-            actionButton(icon: "fork.knife", accessibility: "Kohlenhydrate") {
+            actionButton(icon: "fork.knife", accessibility: NSLocalizedString("Carbs", comment: "")) {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onCarbs()
             }
-            actionButton(icon: "syringe.fill", accessibility: "Bolus") {
+            actionButton(icon: "syringe.fill", accessibility: NSLocalizedString("Bolus", comment: "")) {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onBolus()
             }
             if !moveDataTableRight {
-                actionButton(icon: "list.bullet.rectangle", accessibility: "Behandlungen") {
+                actionButton(icon: "list.bullet.rectangle", accessibility: NSLocalizedString("Treatments", comment: "")) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     onDataTable()
                 }
@@ -73,19 +73,19 @@ struct AuroraTabBar: View {
     private var rightPill: some View {
         HStack(spacing: 0) {
             if moveDataTableRight {
-                actionButton(icon: "list.bullet.rectangle", accessibility: "Behandlungen") {
+                actionButton(icon: "list.bullet.rectangle", accessibility: NSLocalizedString("Treatments", comment: "")) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     onDataTable()
                 }
             }
-            actionButton(icon: "chart.pie.fill", accessibility: "Statistik") {
+            actionButton(icon: "chart.pie.fill", accessibility: NSLocalizedString("Statistics", comment: "")) {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onStatistics()
             }
             if showOverride {
                 actionButton(
                     icon: "person.fill",
-                    accessibility: "Profil",
+                    accessibility: hubT("aur.profile"),
                     tint: profileActive ? status.main : nil
                 ) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -95,14 +95,14 @@ struct AuroraTabBar: View {
             if showTempTarget {
                 actionButton(
                     icon: "target",
-                    accessibility: "Temporäres Ziel",
+                    accessibility: hubT("aur.tt"),
                     tint: targetActive ? status.main : nil
                 ) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     onTarget()
                 }
             }
-            actionButton(icon: "gearshape.fill", accessibility: "Einstellungen") {
+            actionButton(icon: "gearshape.fill", accessibility: NSLocalizedString("Settings", comment: "")) {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onSettings()
             }

@@ -72,10 +72,10 @@ extension Home {
             let age = Date().timeIntervalSince(state.lastLoopDate)
             if state.lastLoopDate == .distantPast { return "Loop · —" }
             let mins = Int(age / 60)
-            if mins < 1 { return "Loop · jetzt" }
-            if mins < 60 { return "Loop · vor \(mins) Min" }
+            if mins < 1 { return hubT("aur.loop.now") }
+            if mins < 60 { return hubT("aur.loop.minago", mins) }
             let hours = mins / 60
-            return "Loop · vor \(hours) h"
+            return hubT("aur.loop.hago", hours)
         }
 
         private var sensorCaption: String? {
@@ -229,7 +229,7 @@ extension Home {
         /// Compact label for the active-profile badge (mirrors breath's logic).
         private var profileBadgeText: String {
             guard let override = fetchedPercent.first, override.enabled else {
-                return "Profil"
+                return hubT("aur.profile")
             }
             if override.isPreset {
                 if let profile = fetchedProfiles.first(where: { $0.id == override.id }),
@@ -237,7 +237,7 @@ extension Home {
                 {
                     return name.count > 14 ? String(name.prefix(14)) : name
                 }
-                return "Profil"
+                return hubT("aur.profile")
             }
             if override.percentage != 100 {
                 return "\(Int(override.percentage)) %"
@@ -323,15 +323,15 @@ extension Home {
             .navigationBarHidden(true)
             .ignoresSafeArea(.keyboard)
             .confirmationDialog(
-                "Loop manuell ausführen?",
+                hubT("aur.loop.confirm"),
                 isPresented: $showRunLoopConfirm,
                 titleVisibility: .visible
             ) {
-                Button("Loop jetzt ausführen") {
+                Button(hubT("aur.loop.run")) {
                     state.runLoop()
-                    toast = "Loop gestartet"
+                    toast = hubT("aur.loop.started")
                 }
-                Button("Abbrechen", role: .cancel) {}
+                Button(NSLocalizedString("Cancel", comment: ""), role: .cancel) {}
             }
             .sheet(isPresented: $showOverrideDetail) {
                 overrideDetailSheet
@@ -339,15 +339,15 @@ extension Home {
                     .presentationDragIndicator(.visible)
             }
             .confirmationDialog(
-                "Temporäres Ziel beenden?",
+                hubT("aur.tt.confirm"),
                 isPresented: $showCancelTempTargetAlert,
                 titleVisibility: .visible
             ) {
-                Button("Ziel beenden", role: .destructive) {
+                Button(hubT("aur.tt.end"), role: .destructive) {
                     state.cancelTempTarget()
-                    toast = "Temp-Ziel beendet"
+                    toast = hubT("aur.tt.ended")
                 }
-                Button("Abbrechen", role: .cancel) {}
+                Button(NSLocalizedString("Cancel", comment: ""), role: .cancel) {}
             }
             .sheet(isPresented: $showStatusPopup) {
                 AuroraStatusSheet(state: state)
@@ -378,7 +378,7 @@ extension Home {
                 isPresented: $showExpirationAlert
             ) {
                 Button("OK", role: .cancel) {}
-                Button("Mehr Infos") {
+                Button(hubT("aur.moreinfo")) {
                     if let url = URL(string: "https://github.com/Artificial-Pancreas/iAPS/releases") {
                         UIApplication.shared.open(url)
                     }
@@ -656,7 +656,7 @@ extension Home {
                     activeBadge(
                         dotColor: AuroraPalette.pump,
                         text: profileBadgeText,
-                        accessibility: "Aktives Profil — antippen für Details"
+                        accessibility: hubT("aur.profile.a11y")
                     ) {
                         showOverrideDetail = true
                     }
@@ -666,7 +666,7 @@ extension Home {
                     activeBadge(
                         dotColor: AuroraPalette.Status.inMain,
                         text: tt,
-                        accessibility: "Temporäres Ziel — antippen zum Beenden"
+                        accessibility: hubT("aur.tt.a11y")
                     ) {
                         showCancelTempTargetAlert = true
                     }
@@ -737,19 +737,19 @@ extension Home {
                     }
 
                     VStack(spacing: 12) {
-                        overrideDetailRow("Insulin (Basal/ISF/CR)", "\(Int(override.percentage)) %")
+                        overrideDetailRow(hubT("aur.or.insulin"), "\(Int(override.percentage)) %")
                         overrideDetailRow(
-                            "Temporäres Ziel",
-                            targetRaw > 6 ? overrideTargetText(targetRaw) : "Profil-Ziel"
+                            hubT("aur.tt"),
+                            targetRaw > 6 ? overrideTargetText(targetRaw) : hubT("aur.or.profiletarget")
                         )
-                        overrideDetailRow("Restdauer", overrideRemainingText(override))
-                        overrideDetailRow("SMB", override.smbIsOff ? "Aus" : "An")
+                        overrideDetailRow(hubT("aur.or.remaining"), overrideRemainingText(override))
+                        overrideDetailRow("SMB", override.smbIsOff ? hubT("pd.off") : hubT("pd.on"))
                         if override.overrideAutoISF, let aisf {
-                            overrideDetailRow("AutoISF", aisf.autoisf ? "Erzwungen an" : "Erzwungen aus")
+                            overrideDetailRow("AutoISF", aisf.autoisf ? hubT("aur.or.forcedon") : hubT("aur.or.forcedoff"))
                         }
                         if let started = override.date {
                             overrideDetailRow(
-                                "Aktiv seit",
+                                hubT("aur.or.since"),
                                 started.formatted(date: .omitted, time: .shortened)
                             )
                         }
@@ -758,9 +758,9 @@ extension Home {
                     Button {
                         state.cancelProfile()
                         showOverrideDetail = false
-                        toast = "Override beendet"
+                        toast = hubT("aur.or.ended")
                     } label: {
-                        Text("Override beenden")
+                        Text(hubT("aur.or.end"))
                             .font(.headline)
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 12)
@@ -796,11 +796,11 @@ extension Home {
         }
 
         private func overrideRemainingText(_ override: Override) -> String {
-            if override.indefinite { return "Unbegrenzt" }
+            if override.indefinite { return hubT("pd.duration.indefinite") }
             let minutes = Double(truncating: (override.duration ?? 0) as NSNumber)
             guard minutes > 0, let start = override.date else { return "—" }
             let remaining = start.addingTimeInterval(minutes * 60).timeIntervalSinceNow
-            guard remaining > 0 else { return "Läuft aus" }
+            guard remaining > 0 else { return hubT("aur.or.expiring") }
             let hours = Int(remaining) / 3600
             let mins = (Int(remaining) % 3600) / 60
             return hours > 0 ? "\(hours) h \(mins) min" : "\(mins) min"
@@ -853,7 +853,7 @@ struct AuroraBolusOverlay: View {
                     )
 
                 VStack(alignment: .leading, spacing: 1) {
-                    Text("Bolus läuft")
+                    Text(hubT("aur.bolus.running"))
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundStyle(AuroraPalette.textPrimary(scheme))
                     Text(deliveredString)
@@ -876,7 +876,7 @@ struct AuroraBolusOverlay: View {
                     HStack(spacing: 5) {
                         Image(systemName: "stop.fill")
                             .font(.system(size: 10, weight: .semibold))
-                        Text("Stoppen")
+                        Text(hubT("aur.stop"))
                             .font(.system(size: 12, weight: .semibold))
                     }
                     .foregroundStyle(Color.white)
@@ -894,7 +894,7 @@ struct AuroraBolusOverlay: View {
                     .scaleEffect(cancelPressed ? 0.96 : 1.0)
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(Text("Bolus stoppen"))
+                .accessibilityLabel(Text(hubT("aur.bolus.stop")))
             }
 
             GeometryReader { geo in
@@ -948,9 +948,9 @@ struct AuroraStatusSheet: View {
     private var lastLoopText: String {
         guard state.lastLoopDate != .distantPast else { return "—" }
         let mins = Int(-state.lastLoopDate.timeIntervalSinceNow / 60)
-        if mins < 1 { return "gerade eben" }
-        if mins < 60 { return "vor \(mins) Min" }
-        return "vor \(mins / 60) h"
+        if mins < 1 { return hubT("aur.justnow") }
+        if mins < 60 { return hubT("aur.ago.min", mins) }
+        return hubT("aur.ago.h", mins / 60)
     }
 
     var body: some View {
@@ -966,7 +966,7 @@ struct AuroraStatusSheet: View {
                 reasoningCard
 
                 AuroraPrimaryButton(
-                    title: state.isLooping ? "Loop läuft …" : "Loop jetzt ausführen",
+                    title: state.isLooping ? hubT("aur.loop.running") : hubT("aur.loop.run"),
                     accent: loopAccent
                 ) {
                     state.runLoop()
@@ -984,11 +984,11 @@ struct AuroraStatusSheet: View {
 
     private var header: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Loop-Status")
+            Text(hubT("aur.loop.status"))
                 .font(.system(size: 28, weight: .heavy))
                 .kerning(-0.5)
                 .foregroundStyle(AuroraPalette.textPrimary(scheme))
-            Text("Letzter Lauf \(lastLoopText)")
+            Text(hubT("aur.loop.last", lastLoopText))
                 .font(.system(size: 13, weight: .semibold))
                 .foregroundStyle(AuroraPalette.textMuted(scheme))
         }
@@ -1001,7 +1001,7 @@ struct AuroraStatusSheet: View {
                 .fill(loopAccent)
                 .frame(width: 12, height: 12)
                 .shadow(color: loopAccent.opacity(0.5), radius: 6)
-            Text(state.statusTitle.isEmpty ? "Bereit" : state.statusTitle)
+            Text(state.statusTitle.isEmpty ? hubT("aur.ready") : state.statusTitle)
                 .font(.system(size: 15.5, weight: .semibold))
                 .foregroundStyle(AuroraPalette.textPrimary(scheme))
             Spacer()
@@ -1014,7 +1014,7 @@ struct AuroraStatusSheet: View {
 
     @ViewBuilder private func errorCard(_ message: String) -> some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Letzter Loop fehlgeschlagen")
+            Text(hubT("aur.loop.failed"))
                 .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(AuroraLoopStatus.error.color)
             Text(message)
@@ -1030,7 +1030,7 @@ struct AuroraStatusSheet: View {
     @ViewBuilder private var reasoningCard: some View {
         if let suggestion = state.data.suggestion {
             VStack(alignment: .leading, spacing: 8) {
-                Text("Algorithmus-Begründung")
+                Text(hubT("aur.reason"))
                     .font(.system(size: 12.5, weight: .semibold))
                     .kerning(0.4)
                     .foregroundStyle(AuroraPalette.textMuted(scheme))

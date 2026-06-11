@@ -14,13 +14,13 @@ struct AuroraProfileScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                Text("Profil")
+                Text(hubT("aur.profile"))
                     .font(.system(size: 32, weight: .heavy))
                     .kerning(-0.5)
                     .foregroundStyle(AuroraPalette.textPrimary(scheme))
                     .padding(.leading, 6)
 
-                AuroraListSection(title: "Aktives Profil") {
+                AuroraListSection(title: hubT("aur.profile.active")) {
                     AuroraListRow(
                         icon: "person.fill",
                         iconColor: AuroraPalette.pump,
@@ -30,11 +30,11 @@ struct AuroraProfileScreen: View {
                     )
                 }
 
-                AuroraListSection(title: "Dosierung") {
+                AuroraListSection(title: hubT("aur.dosing")) {
                     AuroraListRow(
                         icon: "drop.fill",
                         iconColor: AuroraPalette.drop(scheme),
-                        title: "Basalrate",
+                        title: hubT("aur.basal"),
                         value: basalRate,
                         showsChevron: false
                     )
@@ -42,7 +42,7 @@ struct AuroraProfileScreen: View {
                     AuroraListRow(
                         icon: "fork.knife",
                         iconColor: AuroraPalette.carbs(scheme),
-                        title: "KH-Verhältnis (IC)",
+                        title: hubT("aur.cr"),
                         value: carbRatio,
                         showsChevron: false
                     )
@@ -50,7 +50,7 @@ struct AuroraProfileScreen: View {
                     AuroraListRow(
                         icon: "arrow.down.right",
                         iconColor: AuroraPalette.pump,
-                        title: "Korrekturfaktor (ISF)",
+                        title: hubT("aur.isf"),
                         value: isf,
                         showsChevron: false
                     )
@@ -58,13 +58,13 @@ struct AuroraProfileScreen: View {
                     AuroraListRow(
                         icon: "clock.fill",
                         iconColor: AuroraPalette.sensor,
-                        title: "Wirkdauer (DIA)",
+                        title: hubT("aur.dia"),
                         value: dia,
                         showsChevron: false
                     )
                 }
 
-                AuroraListSection(title: "Automatik") {
+                AuroraListSection(title: hubT("aur.automation")) {
                     AuroraListRow(
                         icon: "waveform.path.ecg",
                         iconColor: AuroraPalette.pump,
@@ -76,7 +76,7 @@ struct AuroraProfileScreen: View {
                     AuroraListRow(
                         icon: "bolt.fill",
                         iconColor: AuroraPalette.drop(scheme),
-                        title: "SMB aktiviert",
+                        title: hubT("aur.smb.enabled"),
                         value: smbEnabled ? "Ein" : "Aus",
                         showsChevron: false
                     )

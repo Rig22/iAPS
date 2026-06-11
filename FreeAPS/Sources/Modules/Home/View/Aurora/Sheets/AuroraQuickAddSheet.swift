@@ -9,17 +9,17 @@ struct AuroraQuickAddSheet: View {
 
     var body: some View {
         VStack(spacing: 14) {
-            sheetTitle("Hinzufügen")
+            sheetTitle(NSLocalizedString("Add", comment: ""))
 
             tile(
                 icon: "fork.knife",
-                title: "Kohlenhydrate",
+                title: NSLocalizedString("Carbs", comment: ""),
                 accent: AuroraPalette.carbs(scheme),
                 action: onCarbs
             )
             tile(
                 icon: "syringe.fill",
-                title: "Bolus",
+                title: NSLocalizedString("Bolus", comment: ""),
                 accent: AuroraPalette.drop(scheme),
                 action: onBolus
             )

@@ -14,7 +14,7 @@ struct AuroraCarbSheet: View {
 
     var body: some View {
         VStack(spacing: 18) {
-            sheetTitle("Kohlenhydrate")
+            sheetTitle(NSLocalizedString("Carbs", comment: ""))
 
             AuroraStepper(
                 value: $grams,

@@ -583,7 +583,7 @@ struct AuroraMainChart: View {
                         )
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(Text("Behandlungen"))
+                .accessibilityLabel(Text(NSLocalizedString("Treatments", comment: "")))
             }
 
             chartLegend
@@ -617,10 +617,10 @@ struct AuroraMainChart: View {
         if displayCarbs || displayBoluses {
             HStack(spacing: 10) {
                 if displayBoluses {
-                    legendItem(label: "Boli", color: bolusDotColor)
+                    legendItem(label: hubT("aur.boluses"), color: bolusDotColor)
                 }
                 if displayCarbs {
-                    legendItem(label: "Carbs", color: carbDotColor)
+                    legendItem(label: NSLocalizedString("Carbs", comment: ""), color: carbDotColor)
                 }
             }
             .padding(.leading, 8)
