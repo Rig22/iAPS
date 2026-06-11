@@ -461,7 +461,9 @@ enum AITextProvider {
         .aiModel(.claude(.haiku_4_5))
     ]
 
-    static let defaultProvider: AITextProvider = .aiModel(.gemini(.gemini_2_5_pro))
+    // 2.5 Flash statt 2.5 Pro: das einzige Gemini-Modell mit Free-Tier —
+    // Pro und die 3.x-Previews liefern ohne Billing nur Quota-Fehler.
+    static let defaultProvider: AITextProvider = .aiModel(.gemini(.gemini_2_5_flash))
 }
 
 enum TextSearchProvider {
