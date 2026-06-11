@@ -66,6 +66,9 @@ struct AuroraStatBadge: View {
                 .kerning(-0.2)
                 .foregroundStyle(AuroraPalette.textMuted(scheme))
                 .lineLimit(1)
+                // Längere Übersetzungen (z. B. „Aktives Insulin (IOB)")
+                // schrumpfen statt abzuschneiden.
+                .minimumScaleFactor(0.7)
 
             if let sub = sub {
                 Text(sub)

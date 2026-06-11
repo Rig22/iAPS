@@ -556,21 +556,23 @@ extension Home {
                     iconColor: AuroraPalette.textMuted(scheme),
                     value: iobString,
                     unit: "E",
-                    label: "Aktiv. Insulin"
+                    label: NSLocalizedString("Insulin on Board", comment: "Aurora stat badge label")
                 )
                 AuroraStatBadge(
                     icon: "leaf.fill",
                     iconColor: AuroraPalette.textMuted(scheme),
                     value: cobString,
                     unit: "g",
-                    label: "Kohlenhydrate"
+                    label: NSLocalizedString("Carbs", comment: "Aurora stat badge label")
                 )
                 AuroraStatBadge(
                     icon: "cylinder.fill",
                     iconColor: AuroraPalette.textMuted(scheme),
                     value: reservoirString,
                     unit: "E",
-                    label: pumpSub.map { "Pumpe \($0)" } ?? "Pumpe",
+                    label: pumpSub
+                        .map { "\(NSLocalizedString("Pump", comment: "Aurora stat badge label")) \($0)" }
+                        ?? NSLocalizedString("Pump", comment: "Aurora stat badge label"),
                     sub: nil,
                     badge: reservoirBadge,
                     badgeColor: AuroraGlucoseStatus(mgdl: glucoseValue).main,
