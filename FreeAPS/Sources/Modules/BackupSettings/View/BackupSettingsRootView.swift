@@ -31,7 +31,7 @@ extension BackupSettings {
                 credentialsSection
                 infoSection
             }
-            .navigationTitle("Backup")
+            .navigationTitle(BackupL10n.t("title"))
             .navigationBarTitleDisplayMode(.inline)
             .sheet(item: $state.exportURL) { url in
                 ShareSheet(activityItems: [url])
@@ -55,29 +55,27 @@ extension BackupSettings {
                 }
             }
             .alert(
-                "Restore Backup?",
+                BackupL10n.t("alert.restore.title"),
                 isPresented: Binding(
                     get: { state.pendingRestoreURL != nil },
                     set: { if !$0 { state.cancelRestore() } }
                 ),
                 presenting: state.pendingRestoreURL
             ) { _ in
-                Button("Restore", role: .destructive, action: state.confirmRestore)
+                Button(BackupL10n.t("alert.restore.action"), role: .destructive, action: state.confirmRestore)
                 Button("Cancel", role: .cancel, action: state.cancelRestore)
             } message: { url in
-                Text(
-                    "This will overwrite all current settings with the contents of \(url.lastPathComponent). The app may need to be restarted."
-                )
+                Text(BackupL10n.t("alert.restore.message", url.lastPathComponent))
             }
             .alert(
-                "Restore Complete",
+                BackupL10n.t("alert.complete.title"),
                 isPresented: Binding(
                     get: { state.restoreSummary != nil },
                     set: { _ in /* swallowed — the user must use the Close button */ }
                 ),
                 presenting: state.restoreSummary
             ) { _ in
-                Button("Close iAPS", role: .destructive) {
+                Button(BackupL10n.t("alert.close"), role: .destructive) {
                     // Quit immediately so the in-memory caches in the various
                     // state models don't overwrite the freshly restored files
                     // with their default values. The user reopens iAPS and all
@@ -88,7 +86,7 @@ extension BackupSettings {
                 Text(restoreSummaryMessage(summary))
             }
             .alert(
-                "Restore Failed",
+                BackupL10n.t("alert.failed.title"),
                 isPresented: Binding(
                     get: { state.restoreErrorMessage != nil },
                     set: { if !$0 { state.dismissRestoreError() } }
@@ -100,7 +98,7 @@ extension BackupSettings {
                 Text(message)
             }
             .alert(
-                "Folder Not Usable",
+                BackupL10n.t("alert.folder.title"),
                 isPresented: Binding(
                     get: { state.folderPickError != nil },
                     set: { if !$0 { state.dismissFolderPickError() } }
@@ -109,7 +107,7 @@ extension BackupSettings {
             ) { _ in
                 Button("OK", action: state.dismissFolderPickError)
             } message: { message in
-                Text("\(message)\n\nThis often happens on the iOS Simulator. Try a different folder, or test on a real device.")
+                Text(BackupL10n.t("alert.folder.message", message))
             }
         }
 
@@ -118,13 +116,13 @@ extension BackupSettings {
         private var statusSection: some View {
             Section {
                 HStack {
-                    Text("Last backup")
+                    Text(BackupL10n.t("status.last"))
                     Spacer()
                     Text(lastBackupText).foregroundColor(.secondary)
                 }
                 if let path = state.selectedFolderDisplayPath {
                     HStack {
-                        Text("Folder")
+                        Text(BackupL10n.t("status.folder"))
                         Spacer()
                         Text(path).foregroundColor(.secondary).multilineTextAlignment(.trailing)
                     }
@@ -137,65 +135,58 @@ extension BackupSettings {
                 Button {
                     state.exportNow()
                 } label: {
-                    Label("Export Backup Now", systemImage: "square.and.arrow.up")
+                    Label(BackupL10n.t("manual.export"), systemImage: "square.and.arrow.up")
                 }
                 Button {
                     pickerMode = .restore
                     showPicker = true
                 } label: {
-                    Label("Restore from Backup", systemImage: "square.and.arrow.down")
+                    Label(BackupL10n.t("manual.restore"), systemImage: "square.and.arrow.down")
                 }
             } header: { Text("Manual") } footer: {
-                Text(
-                    "Export creates a JSON file you can share to iCloud Drive, Files, AirDrop or email. Restore replaces your current settings with the contents of a backup file."
-                )
+                Text(BackupL10n.t("manual.footer"))
             }
         }
 
         private var automaticSection: some View {
             Section {
-                Toggle("Automatic Backup", isOn: $state.autoBackupEnabled)
+                Toggle(BackupL10n.t("auto.toggle"), isOn: $state.autoBackupEnabled)
                 if state.autoBackupEnabled {
                     Button {
                         pickerMode = .folder
                         showPicker = true
                     } label: {
                         Label(
-                            state.selectedFolderDisplayPath == nil ? "Choose Backup Folder" : "Change Backup Folder",
+                            state.selectedFolderDisplayPath == nil ? BackupL10n.t("auto.choose") : BackupL10n
+                                .t("auto.change"),
                             systemImage: "folder.badge.plus"
                         )
                     }
                 }
             } header: { Text("Automatic") } footer: {
-                Text(
-                    "When enabled, iAPS writes a backup daily and after settings changes into the folder you choose. Pick a folder in iCloud Drive so backups survive a reinstall. Keeps the most recent \(state.rollingBackupCount) backups."
-                )
+                Text(BackupL10n.t("auto.footer", state.rollingBackupCount))
             }
         }
 
         private var credentialsSection: some View {
             Section {
-                Toggle("Include Nightscout Credentials", isOn: $state.includeNightscoutCredentials)
-            } header: { Text("Security") } footer: {
-                Text(
-                    "When on, your Nightscout URL and API secret are stored inside the backup file. Turn off if you plan to share the backup with someone else."
-                )
+                Toggle(BackupL10n.t("security.toggle"), isOn: $state.includeNightscoutCredentials)
+            } header: { Text(BackupL10n.t("security.header")) } footer: {
+                Text(BackupL10n.t("security.footer"))
             }
         }
 
         private var infoSection: some View {
             Section {} footer: {
-                Text(
-                    "Backup files contain all settings including Auto ISF, pump, basal, ISF, carb ratios, targets and UI preferences. Glucose history and pump events are not included."
-                )
-                .font(.footnote)
+                Text(BackupL10n.t("info.footer"))
+                    .font(.footnote)
             }
         }
 
         // MARK: - Formatting helpers
 
         private var lastBackupText: String {
-            guard let date = state.lastBackupAt else { return "never" }
+            guard let date = state.lastBackupAt else { return BackupL10n.t("status.never") }
             let formatter = RelativeDateTimeFormatter()
             formatter.unitsStyle = .short
             return formatter.localizedString(for: date, relativeTo: Date())
@@ -203,18 +194,15 @@ extension BackupSettings {
 
         private func restoreSummaryMessage(_ summary: RestoreSummary) -> String {
             var parts: [String] = []
-            parts.append("\(summary.filesRestored.count) settings files will be restored on next launch.")
+            parts.append(BackupL10n.t("summary.restored", summary.filesRestored.count))
             if !summary.filesSkipped.isEmpty {
-                parts.append("\(summary.filesSkipped.count) files were not present in the backup.")
+                parts.append(BackupL10n.t("summary.skipped", summary.filesSkipped.count))
             }
             if summary.nightscoutRestored {
-                parts.append("Nightscout credentials will be restored.")
+                parts.append(BackupL10n.t("summary.nightscout"))
             }
             parts.append("")
-            parts
-                .append(
-                    "iAPS will now close so the restored settings can load cleanly on the next launch. Reopen iAPS from the home screen."
-                )
+            parts.append(BackupL10n.t("summary.relaunch"))
             return parts.joined(separator: "\n")
         }
     }
