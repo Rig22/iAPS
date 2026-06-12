@@ -11,6 +11,13 @@ struct AIHubTherapyInsightsView: View {
     @State private var showSuggestions = false
     @State private var isAnalyzing = false
 
+    // Direkte Übernahme (Opt-in über Hub-Settings)
+    @State private var applyAllowed = UserDefaults.standard.aiHubAllowApply
+    @State private var pendingApply: AIHubTherapyAnalysis.Suggestion?
+    @State private var applyingID: UUID?
+    @State private var appliedIDs: Set<UUID> = []
+    @State private var applyErrorText: String?
+
     private var intervals: [(label: String, days: Int)] {
         [3, 7, 14, 30].map { (hubT("ti.days.format", $0), $0) }
     }
@@ -34,14 +41,66 @@ struct AIHubTherapyInsightsView: View {
         )
         .navigationTitle("Therapy Insights")
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear { reload() }
+        .onAppear {
+            applyAllowed = UserDefaults.standard.aiHubAllowApply
+            reload()
+        }
         .onChange(of: intervalDays) { _ in reload() }
+        // Disclaimer-Bestätigung vor jeder Übernahme — bewusst als Alert
+        // mit destruktivem Button: Das ändert die aktive Therapie.
+        .alert(
+            hubT("ti.apply.title"),
+            isPresented: Binding(
+                get: { pendingApply != nil },
+                set: { if !$0 { pendingApply = nil } }
+            ),
+            presenting: pendingApply
+        ) { suggestion in
+            Button(hubT("ti.apply"), role: .destructive) { runApply(suggestion) }
+            Button(NSLocalizedString("Cancel", comment: ""), role: .cancel) {}
+        } message: { suggestion in
+            Text(applyMessage(for: suggestion))
+        }
+        .alert(
+            hubT("ti.apply.failed"),
+            isPresented: Binding(
+                get: { applyErrorText != nil },
+                set: { if !$0 { applyErrorText = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(applyErrorText ?? "")
+        }
+    }
+
+    // MARK: - Übernahme
+
+    private func applyMessage(for suggestion: AIHubTherapyAnalysis.Suggestion) -> String {
+        var message = hubT("ti.apply.message", suggestion.currentText, suggestion.proposedText)
+        if case .basal = suggestion.apply {
+            message += "\n\n" + hubT("ti.apply.message.basal")
+        }
+        return message
+    }
+
+    private func runApply(_ suggestion: AIHubTherapyAnalysis.Suggestion) {
+        applyingID = suggestion.id
+        AIHubTherapyApply.apply(suggestion) { error in
+            applyingID = nil
+            if let error = error {
+                applyErrorText = error.localizedDescription
+            } else {
+                _ = appliedIDs.insert(suggestion.id)
+            }
+        }
     }
 
     // MARK: - Laden
 
     private func reload() {
         showSuggestions = false
+        appliedIDs = []
         let days = intervalDays
         Task { @MainActor in
             result = await Task.detached(priority: .userInitiated) {
@@ -54,6 +113,7 @@ struct AIHubTherapyInsightsView: View {
         // Analyse liegt bereits im Result — der Button steuert nur die
         // Sichtbarkeit, mit kurzer Verzögerung als Feedback.
         isAnalyzing = true
+        appliedIDs = []
         Task { @MainActor in
             let days = intervalDays
             result = await Task.detached(priority: .userInitiated) {
@@ -195,6 +255,12 @@ struct AIHubTherapyInsightsView: View {
                 ForEach(suggestions) { suggestion in
                     suggestionCard(suggestion)
                 }
+                if !applyAllowed {
+                    Text(hubT("ti.apply.hint"))
+                        .font(.caption2)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 4)
+                }
             }
         }
     }
@@ -258,7 +324,45 @@ struct AIHubTherapyInsightsView: View {
                     .font(.footnote)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
+                if applyAllowed {
+                    applyControl(for: suggestion)
+                }
             }
+        }
+    }
+
+    /// Übernehmen-Button bzw. Übernommen-Status unter der Begründung.
+    /// Nur sichtbar, wenn der Opt-in-Toggle in den Hub-Settings aktiv ist.
+    @ViewBuilder private func applyControl(for suggestion: AIHubTherapyAnalysis.Suggestion) -> some View {
+        if appliedIDs.contains(suggestion.id) {
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.seal.fill")
+                    .foregroundStyle(.green)
+                Text(hubT("ti.applied"))
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.green)
+            }
+        } else {
+            Button {
+                pendingApply = suggestion
+            } label: {
+                HStack(spacing: 6) {
+                    if applyingID == suggestion.id {
+                        ProgressView().controlSize(.small)
+                    } else {
+                        Image(systemName: "square.and.arrow.down")
+                            .font(.subheadline)
+                    }
+                    Text(hubT("ti.apply"))
+                        .font(.subheadline.bold())
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 7)
+                .background(Capsule().fill(Color.blue.opacity(0.15)))
+                .foregroundStyle(.blue)
+            }
+            .buttonStyle(.plain)
+            .disabled(applyingID != nil)
         }
     }
 

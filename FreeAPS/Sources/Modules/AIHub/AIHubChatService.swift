@@ -5,6 +5,7 @@ import Foundation
 extension UserDefaults {
     private static let aiHubChatProviderKey = "iAPS.aiHubChatProvider"
     private static let aiHubCarbsCompleteKey = "iAPS.aiHubCarbsComplete"
+    private static let aiHubAllowApplyKey = "iAPS.aiHubAllowApply"
 
     /// Model used by the AI Hub chat. Independent from the FoodSearch
     /// provider choices, but reads the same per-provider API keys.
@@ -29,6 +30,14 @@ extension UserDefaults {
     var aiHubCarbsComplete: Bool {
         get { bool(forKey: Self.aiHubCarbsCompleteKey) }
         set { set(newValue, forKey: Self.aiHubCarbsCompleteKey) }
+    }
+
+    /// Opt-in: Therapy-Insights-Vorschläge dürfen nach Bestätigung direkt
+    /// ins aktive Profil übernommen werden. Default false — ohne den
+    /// Toggle zeigt die View keine Übernehmen-Buttons.
+    var aiHubAllowApply: Bool {
+        get { bool(forKey: Self.aiHubAllowApplyKey) }
+        set { set(newValue, forKey: Self.aiHubAllowApplyKey) }
     }
 }
 

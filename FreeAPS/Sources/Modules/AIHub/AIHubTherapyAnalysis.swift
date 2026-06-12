@@ -39,6 +39,18 @@ enum AIHubTherapyAnalysis {
             case crLower // weniger g/U = mehr Mahlzeiten-Insulin
         }
 
+        /// Maschinenlesbare Form des Vorschlags für die direkte Übernahme
+        /// ins aktive Profil (AIHubTherapyApply). Werte in Profil-Einheiten,
+        /// identisch gerundet zu den angezeigten Texten.
+        enum ApplyPayload {
+            /// Basal-Block [startMinute, endMinute) mit Faktor skalieren.
+            case basal(startMinute: Int, endMinute: Int, factor: Double)
+            /// ISF des Slots mit diesem Offset auf den Wert setzen.
+            case isf(slotStartMinute: Int, proposed: Double)
+            /// CR des Slots mit diesem Offset auf den Wert setzen.
+            case cr(slotStartMinute: Int, proposed: Double)
+        }
+
         let id = UUID()
         let kind: Kind
         /// "HH:mm – HH:mm" des Profil-Slots/Blocks; nil = ganztägig.
@@ -47,6 +59,7 @@ enum AIHubTherapyAnalysis {
         let proposedText: String
         let confidence: Int // 0–100
         let rationale: String
+        let apply: ApplyPayload
     }
 
     struct Result {
@@ -228,7 +241,8 @@ enum AIHubTherapyAnalysis {
                         hh(blockEnd),
                         blockEpisodes.count,
                         basalDrivenCount
-                    )
+                    ),
+                    apply: .basal(startMinute: blockStart * 60, endMinute: blockEnd * 60, factor: 0.90)
                 ))
                 continue
             }
@@ -269,7 +283,8 @@ enum AIHubTherapyAnalysis {
                         dayMeans.count,
                         String(format: "%.1f", blockLowShare * 100),
                         pct
-                    )
+                    ),
+                    apply: .basal(startMinute: blockStart * 60, endMinute: blockEnd * 60, factor: factor)
                 ))
             }
         }
@@ -367,7 +382,8 @@ enum AIHubTherapyAnalysis {
                     currentText: formatISF(entry.display, isMmol: profile.isMmol),
                     proposedText: formatISF(proposed, isMmol: profile.isMmol),
                     confidence: min(90, 45 + hypoCount * 15 + carbBonus),
-                    rationale: hubT("ti.rationale.isf.raise", hypoCount, slotEpisodes.count)
+                    rationale: hubT("ti.rationale.isf.raise", hypoCount, slotEpisodes.count),
+                    apply: .isf(slotStartMinute: entry.startMinute, proposed: proposed)
                 ))
             } else if hypoCount == 0, weakCount * 5 >= slotEpisodes.count * 3 {
                 // Korrekturen bringen konsistent weniger als die Hälfte der
@@ -386,7 +402,8 @@ enum AIHubTherapyAnalysis {
                         weakCount,
                         slotEpisodes.count,
                         formatGlucose(weakMeanEnd, isMmol: profile.isMmol)
-                    )
+                    ),
+                    apply: .isf(slotStartMinute: entry.startMinute, proposed: proposed)
                 ))
             }
         }
@@ -476,7 +493,8 @@ enum AIHubTherapyAnalysis {
                     currentText: formatCR(entry.ratio),
                     proposedText: formatCR(proposed),
                     confidence: min(90, 45 + hypoCount * 15 + carbBonus),
-                    rationale: hubT("ti.rationale.cr.raise", hypoCount, slotEpisodes.count)
+                    rationale: hubT("ti.rationale.cr.raise", hypoCount, slotEpisodes.count),
+                    apply: .cr(slotStartMinute: entry.startMinute, proposed: proposed)
                 ))
             } else if hypoCount == 0, highCount * 5 >= slotEpisodes.count * 3 {
                 // Mahlzeiten enden konsistent deutlich über dem Ausgangswert
@@ -495,7 +513,8 @@ enum AIHubTherapyAnalysis {
                         highCount,
                         slotEpisodes.count,
                         formatGlucose(highMeanRise, isMmol: isMmol)
-                    )
+                    ),
+                    apply: .cr(slotStartMinute: entry.startMinute, proposed: proposed)
                 ))
             }
         }

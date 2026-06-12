@@ -14,6 +14,7 @@ struct AIHubSettingsView: View {
     @State private var chatProvider = UserDefaults.standard.aiHubChatProvider
     @State private var aiLanguage = UserDefaults.standard.userPreferredLanguageForAI ?? ""
     @State private var carbsComplete = UserDefaults.standard.aiHubCarbsComplete
+    @State private var allowApply = UserDefaults.standard.aiHubAllowApply
     @State private var showModelInfo = false
     @State private var claudeKey = ""
     @State private var openAIKey = ""
@@ -112,6 +113,19 @@ struct AIHubSettingsView: View {
             }
 
             Section {
+                Toggle(hubT("settings.apply.toggle"), isOn: $allowApply)
+                    // Sofort persistieren — gleicher onAppear-Effekt wie bei
+                    // den Pickern (siehe oben).
+                    .onChange(of: allowApply) { newValue in
+                        UserDefaults.standard.aiHubAllowApply = newValue
+                    }
+            } header: {
+                Text(hubT("settings.apply.section"))
+            } footer: {
+                Text(hubT("settings.apply.footer"))
+            }
+
+            Section {
                 keyRow(
                     title: "Claude API Key",
                     hint: hubT("settings.key.claude.hint"),
@@ -167,6 +181,7 @@ struct AIHubSettingsView: View {
         chatProvider = UserDefaults.standard.aiHubChatProvider
         aiLanguage = UserDefaults.standard.userPreferredLanguageForAI ?? ""
         carbsComplete = UserDefaults.standard.aiHubCarbsComplete
+        allowApply = UserDefaults.standard.aiHubAllowApply
         claudeKey = UserDefaults.standard.claudeAPIKey
         openAIKey = UserDefaults.standard.openAIAPIKey
         geminiKey = UserDefaults.standard.googleGeminiAPIKey

@@ -425,6 +425,7 @@
 		A1AB000000000000A1AB0010 /* AIHubChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB000F /* AIHubChatView.swift */; };
 		A1AB000000000000A1AB0012 /* AIHubSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */; };
 		A1AB000000000000A1AB0014 /* AIHubTherapyAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */; };
+		A1AB000000000000A1AB0024 /* AIHubTherapyApply.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0023 /* AIHubTherapyApply.swift */; };
 		A1AB000000000000A1AB0016 /* AIHubTherapyInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0015 /* AIHubTherapyInsightsView.swift */; };
 		A1AB000000000000A1AB0018 /* AIHubRecap.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0017 /* AIHubRecap.swift */; };
 		A1AB000000000000A1AB001A /* AIHubRecapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0019 /* AIHubRecapView.swift */; };
@@ -1202,6 +1203,7 @@
 		A1AB000000000000A1AB000F /* AIHubChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubChatView.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubSettingsView.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyAnalysis.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0023 /* AIHubTherapyApply.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyApply.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0015 /* AIHubTherapyInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyInsightsView.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0017 /* AIHubRecap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubRecap.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0019 /* AIHubRecapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubRecapView.swift; sourceTree = "<group>"; };
@@ -2988,6 +2990,7 @@
 				A1AB000000000000A1AB0017 /* AIHubRecap.swift */,
 				A1AB000000000000A1AB0005 /* AIHubStateModel.swift */,
 				A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */,
+				A1AB000000000000A1AB0023 /* AIHubTherapyApply.swift */,
 				A1AB000000000000A1AB000A /* View */,
 			);
 			path = AIHub;
@@ -4261,6 +4264,7 @@
 				A1AB000000000000A1AB0010 /* AIHubChatView.swift in Sources */,
 				A1AB000000000000A1AB0012 /* AIHubSettingsView.swift in Sources */,
 				A1AB000000000000A1AB0014 /* AIHubTherapyAnalysis.swift in Sources */,
+				A1AB000000000000A1AB0024 /* AIHubTherapyApply.swift in Sources */,
 				A1AB000000000000A1AB0016 /* AIHubTherapyInsightsView.swift in Sources */,
 				A1AB000000000000A1AB0018 /* AIHubRecap.swift in Sources */,
 				A1AB000000000000A1AB001A /* AIHubRecapView.swift in Sources */,
