@@ -14,37 +14,32 @@ extension TidepoolConfig {
 
         var body: some View {
             Form {
-                Section(header: Text("Tidepool Integration")) {
+                Section(header: Text(TidepoolL10n.t("section.header"))) {
                     if state.serviceUIType != nil {
                         Button {
                             state.setupTidepool = true
                         } label: {
                             if state.isConnected {
                                 HStack {
-                                    Text("Connected to Tidepool")
+                                    Text(TidepoolL10n.t("connected"))
                                     Spacer()
                                     Image(systemName: "checkmark.circle.fill")
                                         .foregroundColor(.green)
                                 }
                             } else {
-                                Text("Connect to Tidepool")
+                                Text(TidepoolL10n.t("connect"))
                             }
                         }
                     } else {
-                        Text("Tidepool service unavailable")
+                        Text(TidepoolL10n.t("unavailable"))
                             .foregroundColor(.secondary)
                     }
                 }
 
                 Section {
-                    Text(
-                        "You can connect iAPS to Tidepool to upload and manage your diabetes data. " +
-                            "Log in with your Tidepool credentials, or sign up on the login page.\n\n" +
-                            "When connected, iAPS uploads glucose, carb entries, insulin (bolus and basal), " +
-                            "and therapy settings (basal schedules, carb ratios, insulin sensitivities, glucose targets)."
-                    )
-                    .font(.footnote)
-                    .foregroundColor(.secondary)
+                    Text(TidepoolL10n.t("footer"))
+                        .font(.footnote)
+                        .foregroundColor(.secondary)
                 }
             }
             .sheet(isPresented: $state.setupTidepool, onDismiss: { state.refreshConnectionState() }) {
