@@ -65,6 +65,23 @@ struct AIHubPresetDesignerView: View {
     @State private var isConfigured = AIHubChatService.isConfigured
     @State private var isMmol = false
 
+    // Preset-Review (deterministisch, braucht keinen API-Key — deshalb
+    // auch im Kein-Key-Zweig sichtbar)
+    @State private var reviewResult: AIHubPresetReview.Result?
+    @State private var applyAllowed = UserDefaults.standard.aiHubAllowApply
+    @State private var pendingApply: PendingPresetApply?
+    @State private var appliedRecIDs: Set<UUID> = []
+    @State private var applyErrorText: String?
+    @State private var undoRecord: AIHubTherapyApply.UndoRecord?
+    @State private var showUndoConfirm = false
+
+    private struct PendingPresetApply: Identifiable {
+        let id = UUID()
+        let presetID: String
+        let presetName: String
+        let recommendation: AIHubPresetReview.Recommendation
+    }
+
     private let chipKeys = ["pd.chip.sport", "pd.chip.illness", "pd.chip.travel", "pd.chip.stress"]
 
     var body: some View {
@@ -78,10 +95,11 @@ struct AIHubPresetDesignerView: View {
                     if let error = model.errorText { errorRow(error) }
                     if let text = model.resultText, !model.isGenerating { explanationCard(text) }
                     if let proposal = model.proposal, !model.isGenerating { proposalCard(proposal) }
-                    disclaimer
                 } else {
                     missingKeyNotice
                 }
+                reviewSection
+                if isConfigured { disclaimer }
             }
             .padding(16)
         }
@@ -95,7 +113,291 @@ struct AIHubPresetDesignerView: View {
         .onAppear {
             isConfigured = AIHubChatService.isConfigured
             isMmol = AIHubPresetDesigner.isMmol
+            applyAllowed = UserDefaults.standard.aiHubAllowApply
+            undoRecord = AIHubTherapyApply.lastUndoRecord
+            reloadReview()
         }
+        // Gleiche Disclaimer-Bestätigung wie bei Therapy Insights
+        .alert(
+            hubT("ti.apply.title"),
+            isPresented: Binding(
+                get: { pendingApply != nil },
+                set: { if !$0 { pendingApply = nil } }
+            ),
+            presenting: pendingApply
+        ) { pending in
+            Button(hubT("ti.apply"), role: .destructive) { runApply(pending) }
+            Button(NSLocalizedString("Cancel", comment: ""), role: .cancel) {}
+        } message: { pending in
+            Text(hubT(
+                "ti.apply.message",
+                pending.recommendation.currentText,
+                pending.recommendation.proposedText
+            ))
+        }
+        .alert(
+            hubT("ti.apply.failed"),
+            isPresented: Binding(
+                get: { applyErrorText != nil },
+                set: { if !$0 { applyErrorText = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(applyErrorText ?? "")
+        }
+        .alert(hubT("ti.undo.title"), isPresented: $showUndoConfirm) {
+            Button(hubT("ti.undo"), role: .destructive) { runUndo() }
+            Button(NSLocalizedString("Cancel", comment: ""), role: .cancel) {}
+        } message: {
+            Text(hubT("ti.undo.message", undoRecord?.summary ?? ""))
+        }
+    }
+
+    // MARK: - Preset-Review
+
+    private func reloadReview() {
+        Task { @MainActor in
+            reviewResult = await Task.detached(priority: .userInitiated) {
+                AIHubPresetReview.analyze()
+            }.value
+        }
+    }
+
+    private func runApply(_ pending: PendingPresetApply) {
+        let recommendation = pending.recommendation
+        var newPercentage: Double?
+        var newDuration: Int?
+        switch recommendation.adjustment {
+        case let .percentage(value): newPercentage = Double(value)
+        case let .durationMinutes(minutes): newDuration = minutes
+        }
+        let summary = "\(pending.presetName): \(recommendation.currentText) → \(recommendation.proposedText)"
+        if let error = AIHubTherapyApply.applyPresetAdjustment(
+            presetID: pending.presetID,
+            newPercentage: newPercentage,
+            newDurationMinutes: newDuration,
+            summary: summary
+        ) {
+            applyErrorText = error.localizedDescription
+        } else {
+            _ = appliedRecIDs.insert(recommendation.id)
+            undoRecord = AIHubTherapyApply.lastUndoRecord
+        }
+    }
+
+    private func runUndo() {
+        AIHubTherapyApply.undoLast { error in
+            if let error = error {
+                applyErrorText = error.localizedDescription
+            } else {
+                undoRecord = AIHubTherapyApply.lastUndoRecord
+                reloadReview()
+            }
+        }
+    }
+
+    private var reviewSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(hubT("pr.section"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding(.leading, 4)
+            if let result = reviewResult {
+                if result.qualifyingCount == 0 {
+                    reviewInfoCard(
+                        icon: "tray",
+                        color: .secondary,
+                        text: hubT("pr.toofew", AIHubPresetReview.minActivations)
+                    )
+                } else {
+                    if result.reviews.isEmpty, result.suppressedCount == 0 {
+                        reviewInfoCard(icon: "checkmark.seal.fill", color: .green, text: hubT("pr.none"))
+                    }
+                    ForEach(result.reviews) { review in
+                        reviewCard(review)
+                    }
+                    if result.suppressedCount > 0 {
+                        reviewInfoCard(
+                            icon: "hourglass",
+                            color: .orange,
+                            text: hubT(
+                                "ti.cooldown.info",
+                                result.suppressedCount,
+                                AIHubTherapyApply.cooldownDays
+                            )
+                        )
+                    }
+                    if !applyAllowed, !result.reviews.isEmpty {
+                        Text(hubT("ti.apply.hint"))
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, 4)
+                    }
+                }
+            } else {
+                HStack(spacing: 8) {
+                    ProgressView()
+                    Text(hubT("ti.computing"))
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.horizontal, 4)
+            }
+            if applyAllowed, let record = undoRecord, record.target == .preset {
+                undoRow(record)
+            }
+            Text(hubT("pr.minnote", AIHubPresetReview.analysisDays, AIHubPresetReview.minActivations))
+                .font(.caption2)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 4)
+        }
+    }
+
+    private func reviewInfoCard(icon: String, color: Color, text: String) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.title3)
+                .foregroundStyle(color)
+            Text(text)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color(colorScheme == .dark ? .secondarySystemBackground : .systemBackground))
+        )
+    }
+
+    private func reviewCard(_ review: AIHubPresetReview.Review) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                if !review.emoji.isEmpty {
+                    Text(review.emoji).font(.title3)
+                }
+                Text(review.name)
+                    .font(.headline)
+                Spacer()
+                Text(hubT("pr.activations.format", review.activationCount, AIHubPresetReview.analysisDays))
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            VStack(alignment: .leading, spacing: 3) {
+                statLine("TIR: \(Int((review.tirDuring * 100).rounded())) %")
+                statLine(hubT("pr.hypos.during", review.hypoDuring, review.activationCount))
+                statLine(hubT("pr.hypos.after", review.hypoAfter, review.activationCount))
+                statLine(hubT("pr.early", review.earlyEndCount, review.activationCount))
+            }
+            ForEach(review.recommendations) { recommendation in
+                recommendationView(recommendation, review: review)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Color(colorScheme == .dark ? .secondarySystemBackground : .systemBackground))
+        )
+    }
+
+    private func statLine(_ text: String) -> some View {
+        Text(text)
+            .font(.caption)
+            .foregroundStyle(.secondary)
+    }
+
+    private func recommendationView(
+        _ recommendation: AIHubPresetReview.Recommendation,
+        review: AIHubPresetReview.Review
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("\(recommendation.currentText) → \(recommendation.proposedText)")
+                    .font(.subheadline.bold())
+                    .foregroundStyle(.blue)
+                Spacer()
+                Text("\(recommendation.confidence)%")
+                    .font(.caption.bold())
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(Capsule().fill(Color.green.opacity(0.15)))
+                    .foregroundStyle(.green)
+            }
+            Text(recommendation.text)
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            if applyAllowed {
+                if appliedRecIDs.contains(recommendation.id) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "checkmark.seal.fill")
+                            .foregroundStyle(.green)
+                        Text(hubT("ti.applied"))
+                            .font(.subheadline.bold())
+                            .foregroundStyle(.green)
+                    }
+                } else {
+                    Button {
+                        pendingApply = PendingPresetApply(
+                            presetID: review.id,
+                            presetName: review.name,
+                            recommendation: recommendation
+                        )
+                    } label: {
+                        HStack(spacing: 6) {
+                            Image(systemName: "square.and.arrow.down")
+                                .font(.subheadline)
+                            Text(hubT("ti.apply"))
+                                .font(.subheadline.bold())
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 7)
+                        .background(Capsule().fill(Color.blue.opacity(0.15)))
+                        .foregroundStyle(.blue)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .padding(10)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(Color.blue.opacity(colorScheme == .dark ? 0.10 : 0.05))
+        )
+    }
+
+    private func undoRow(_ record: AIHubTherapyApply.UndoRecord) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "arrow.uturn.backward.circle")
+                .foregroundStyle(.orange)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(hubT("ti.undo.row"))
+                    .font(.caption.bold())
+                Text(record.summary)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button {
+                showUndoConfirm = true
+            } label: {
+                Text(hubT("ti.undo"))
+                    .font(.caption.bold())
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Capsule().fill(Color.orange.opacity(0.15)))
+                    .foregroundStyle(.orange)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color(colorScheme == .dark ? .secondarySystemBackground : .systemBackground))
+        )
     }
 
     // MARK: - Bausteine

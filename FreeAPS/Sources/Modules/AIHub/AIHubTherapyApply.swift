@@ -31,6 +31,17 @@ enum AIHubTherapyApply {
         case basal
         case isf
         case cr
+        case preset
+    }
+
+    /// Stabiler Slot für Preset-Cooldowns (SipHash von String ist pro
+    /// App-Start randomisiert — deshalb djb2 über die UTF8-Bytes).
+    static func presetSlot(_ id: String) -> Int {
+        var hash: UInt64 = 5381
+        for byte in id.utf8 {
+            hash = hash &* 33 &+ UInt64(byte)
+        }
+        return Int(truncatingIfNeeded: hash)
     }
 
     // MARK: - Apply
@@ -99,6 +110,64 @@ enum AIHubTherapyApply {
         }
         storage.save(CarbRatios(units: profile.units, schedule: schedule), as: OpenAPS.Settings.carbRatios)
         didApply(target: .cr, slot: slotStartMinute, snapshot: snapshot, summary: summary)
+        return nil
+    }
+
+    // MARK: - Preset-Review (OverridePresets-Row anpassen)
+
+    /// Snapshot-Format für Preset-Undo: alte Werte + Preset-ID als JSON.
+    private struct PresetSnapshot: Codable {
+        let id: String
+        let percentage: Double
+        let duration: Double
+    }
+
+    /// Passt Prozent und/oder Dauer eines Override-Presets an (synchron,
+    /// Core-Data-viewContext wie OverrideStorage). Ein laufender Override
+    /// bleibt unberührt — die Aktivierung kopiert die Preset-Werte.
+    static func applyPresetAdjustment(
+        presetID: String,
+        newPercentage: Double?,
+        newDurationMinutes: Int?,
+        summary: String
+    ) -> Error? {
+        guard let preset = OverrideStorage().fetchPreset(id: presetID) else { return ApplyError.profileMissing }
+
+        let context = CoreDataStack.shared.persistentContainer.viewContext
+        let snapshot = PresetSnapshot(
+            id: presetID,
+            percentage: preset.percentage,
+            duration: Double(truncating: preset.duration ?? 0)
+        )
+        guard let snapshotData = try? JSONEncoder().encode(snapshot),
+              let snapshotString = String(data: snapshotData, encoding: .utf8)
+        else { return ApplyError.profileMissing }
+
+        context.performAndWait {
+            if let newPercentage = newPercentage {
+                preset.percentage = newPercentage
+            }
+            if let newDurationMinutes = newDurationMinutes {
+                preset.duration = NSDecimalNumber(value: newDurationMinutes)
+            }
+            try? context.save()
+        }
+        didApply(target: .preset, slot: presetSlot(presetID), snapshot: snapshotString, summary: summary)
+        return nil
+    }
+
+    private static func undoPreset(_ record: UndoRecord) -> Error? {
+        guard let data = record.snapshot.data(using: .utf8),
+              let snapshot = try? JSONDecoder().decode(PresetSnapshot.self, from: data),
+              let preset = OverrideStorage().fetchPreset(id: snapshot.id)
+        else { return ApplyError.profileMissing }
+
+        let context = CoreDataStack.shared.persistentContainer.viewContext
+        context.performAndWait {
+            preset.percentage = snapshot.percentage
+            preset.duration = NSDecimalNumber(value: snapshot.duration)
+            try? context.save()
+        }
         return nil
     }
 
@@ -302,6 +371,8 @@ enum AIHubTherapyApply {
         case .cr:
             BaseFileStorage().save(record.snapshot, as: OpenAPS.Settings.carbRatios)
             finish(nil, done)
+        case .preset:
+            finish(undoPreset(record), done)
         }
     }
 
