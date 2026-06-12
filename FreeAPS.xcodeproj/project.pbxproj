@@ -362,6 +362,7 @@
 		74EFB04A06E146AA34BB6BC1 /* AuroraStatBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77EB182D48EEAC3A419C2195 /* AuroraStatBadge.swift */; };
 		786ADCD9A35FD8B3B1117E75 /* TidepoolServiceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5856ED3FC5A31C9E7F86FDE5 /* TidepoolServiceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7940BF502F83D7EE00E56268 /* StatTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF4F2F83D7EE00E56268 /* StatTypes.swift */; };
+		CE51B8782F4BF986A9CD9659 /* StatL10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95C86309B09605ED568274C /* StatL10n.swift */; };
 		7940BF522F83D80100E56268 /* StatChartUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF512F83D80100E56268 /* StatChartUtils.swift */; };
 		7940BF662F83D87D00E56268 /* LoopStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF612F83D87D00E56268 /* LoopStatsView.swift */; };
 		7940BF672F83D87D00E56268 /* GlucoseSectorChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF5A2F83D87D00E56268 /* GlucoseSectorChart.swift */; };
@@ -1139,6 +1140,7 @@
 		77EB182D48EEAC3A419C2195 /* AuroraStatBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuroraStatBadge.swift; sourceTree = "<group>"; };
 		790B2C092FCC24B70064CC50 /* HomeRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRootView.swift; sourceTree = "<group>"; };
 		7940BF4F2F83D7EE00E56268 /* StatTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatTypes.swift; sourceTree = "<group>"; };
+		D95C86309B09605ED568274C /* StatL10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StatL10n.swift; path = StatL10n.swift; sourceTree = "<group>"; };
 		7940BF512F83D80100E56268 /* StatChartUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatChartUtils.swift; sourceTree = "<group>"; };
 		7940BF592F83D87D00E56268 /* GlucoseMetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseMetricsView.swift; sourceTree = "<group>"; };
 		7940BF5A2F83D87D00E56268 /* GlucoseSectorChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseSectorChart.swift; sourceTree = "<group>"; };
@@ -1830,6 +1832,7 @@
 			isa = PBXGroup;
 			children = (
 				7940BF4F2F83D7EE00E56268 /* StatTypes.swift */,
+				D95C86309B09605ED568274C /* StatL10n.swift */,
 				19F95FF229F10FBC00314DDC /* StatDataFlow.swift */,
 				19F95FF429F10FCF00314DDC /* StatProvider.swift */,
 				19F95FF629F10FEE00314DDC /* StatStateModel.swift */,
@@ -4030,6 +4033,7 @@
 				19A910362A24D6D700C8951B /* Configs.swift in Sources */,
 				A0B8EC8CC5CD1DD237D1BCD2 /* PumpSettingsEditorRootView.swift in Sources */,
 				7940BF502F83D7EE00E56268 /* StatTypes.swift in Sources */,
+				CE51B8782F4BF986A9CD9659 /* StatL10n.swift in Sources */,
 				E06B911A275B5EEA003C04B6 /* Array+Extension.swift in Sources */,
 				38EA0600262091870064E39B /* BolusProgressViewStyle.swift in Sources */,
 				19DC678329CA677D00FD9EC4 /* OverrideProfilesStateModel.swift in Sources */,

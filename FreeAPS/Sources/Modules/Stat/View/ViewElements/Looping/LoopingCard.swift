@@ -25,7 +25,7 @@ struct LoopingCard: View {
     var body: some View {
         let statsData = computeLoopStats()
         let nonCompleted = computeNonCompleted()
-        let errorInfo = computeMostFrequentError()
+        let errorBreakdown = computeErrorBreakdown()
 
         if fetchLoopStats.isEmpty {
             StatCard {
@@ -45,7 +45,7 @@ struct LoopingCard: View {
                             .foregroundStyle(.secondary)
                             .textCase(.uppercase)
                         Spacer()
-                        if nonCompleted > 0, errorInfo != nil {
+                        if nonCompleted > 0, !errorBreakdown.isEmpty {
                             Button {
                                 showErrorDetails.toggle()
                             } label: {
@@ -66,8 +66,7 @@ struct LoopingCard: View {
                             .popover(isPresented: $showErrorDetails, arrowEdge: .top) {
                                 ErrorDetailsPopover(
                                     nonCompleted: nonCompleted,
-                                    mostFrequent: errorInfo?.message ?? "",
-                                    mostFrequentCount: errorInfo?.count ?? 0
+                                    errors: errorBreakdown
                                 )
                                 .presentationCompactAdaptation(.popover)
                             }
@@ -96,12 +95,12 @@ struct LoopingCard: View {
         return max(loopStatuses.count - success, 0)
     }
 
-    private func computeMostFrequentError() -> (message: String, count: Int)? {
+    private func computeErrorBreakdown() -> [LoopErrorEntry] {
         let errors = fetchLoopStats.compactMap(\.error).filter { !$0.isEmpty }
-        guard !errors.isEmpty else { return nil }
-        guard let mostFrequent = errors.mostFrequent()?.description else { return nil }
-        let count = errors.filter { $0 == mostFrequent }.count
-        return (mostFrequent, count)
+        guard !errors.isEmpty else { return [] }
+        return Dictionary(grouping: errors) { $0 }
+            .map { LoopErrorEntry(message: $0.key, count: $0.value.count) }
+            .sorted { $0.count > $1.count }
     }
 
     private func computeLoopStats() -> [LoopStatsProcessedData] {
@@ -161,30 +160,53 @@ struct LoopingCard: View {
 
 // MARK: - Error Details Popover
 
+private struct LoopErrorEntry: Identifiable {
+    let message: String
+    let count: Int
+    var id: String { message }
+}
+
 private struct ErrorDetailsPopover: View {
     let nonCompleted: Int
-    let mostFrequent: String
-    let mostFrequentCount: Int
+    let errors: [LoopErrorEntry]
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 6) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundStyle(BreathePalette.kamille)
-                Text(NSLocalizedString("Most Frequent Error", comment: "Loop Statistics pop-up"))
+                Text(StatL10n.t("loop.errors"))
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
+                Spacer()
+                Text("\(nonCompleted)")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .monospacedDigit()
+                    .foregroundStyle(.secondary)
             }
-
-            Text("\(mostFrequentCount) " + NSLocalizedString("of", comment: "") + " \(nonCompleted)")
-                .font(.system(size: 12, weight: .medium, design: .rounded))
-                .foregroundStyle(.secondary)
 
             Divider()
 
-            Text(mostFrequent)
-                .font(.system(size: 13, design: .rounded))
-                .foregroundStyle(.primary)
-                .fixedSize(horizontal: false, vertical: true)
+            ScrollView {
+                VStack(alignment: .leading, spacing: 8) {
+                    ForEach(errors) { error in
+                        HStack(alignment: .firstTextBaseline, spacing: 8) {
+                            Text("\(error.count)×")
+                                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                                .monospacedDigit()
+                                .foregroundStyle(BreathePalette.kamille)
+                                .frame(minWidth: 28, alignment: .trailing)
+                            Text(error.message)
+                                .font(.system(size: 13, design: .rounded))
+                                .foregroundStyle(.primary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        if error.id != errors.last?.id {
+                            Divider()
+                        }
+                    }
+                }
+            }
+            .frame(maxHeight: 300)
         }
         .padding(14)
         .frame(maxWidth: 320)
