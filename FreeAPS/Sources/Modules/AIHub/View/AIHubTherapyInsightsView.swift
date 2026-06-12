@@ -18,6 +18,11 @@ struct AIHubTherapyInsightsView: View {
     @State private var appliedIDs: Set<UUID> = []
     @State private var applyErrorText: String?
 
+    // Rückgängig (letzte Übernahme, Snapshot-basiert)
+    @State private var undoRecord: AIHubTherapyApply.UndoRecord?
+    @State private var showUndoConfirm = false
+    @State private var isUndoing = false
+
     private var intervals: [(label: String, days: Int)] {
         [3, 7, 14, 30].map { (hubT("ti.days.format", $0), $0) }
     }
@@ -31,6 +36,9 @@ struct AIHubTherapyInsightsView: View {
                 if showSuggestions {
                     suggestionsSection
                 }
+                if applyAllowed, undoRecord != nil {
+                    undoCard
+                }
                 disclaimer
             }
             .padding(16)
@@ -43,6 +51,7 @@ struct AIHubTherapyInsightsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             applyAllowed = UserDefaults.standard.aiHubAllowApply
+            undoRecord = AIHubTherapyApply.lastUndoRecord
             reload()
         }
         .onChange(of: intervalDays) { _ in reload() }
@@ -72,26 +81,115 @@ struct AIHubTherapyInsightsView: View {
         } message: {
             Text(applyErrorText ?? "")
         }
+        .alert(hubT("ti.undo.title"), isPresented: $showUndoConfirm) {
+            Button(hubT("ti.undo"), role: .destructive) { runUndo() }
+            Button(NSLocalizedString("Cancel", comment: ""), role: .cancel) {}
+        } message: {
+            Text(undoMessage)
+        }
     }
 
     // MARK: - Übernahme
 
     private func applyMessage(for suggestion: AIHubTherapyAnalysis.Suggestion) -> String {
         var message = hubT("ti.apply.message", suggestion.currentText, suggestion.proposedText)
-        if case .basal = suggestion.apply {
+        // Bei Basal betrifft die Übernahme den GANZEN Block — alle
+        // Segmente einzeln auflisten, damit das unmissverständlich ist.
+        if case let .basal(startMinute, endMinute, factor) = suggestion.apply {
+            let lines = AIHubTherapyApply.basalPreviewLines(
+                startMinute: startMinute,
+                endMinute: endMinute,
+                factor: factor
+            )
+            if !lines.isEmpty {
+                message += "\n\n" + hubT("ti.apply.block.note") + "\n" + lines.joined(separator: "\n")
+            }
             message += "\n\n" + hubT("ti.apply.message.basal")
         }
         return message
     }
 
+    /// Kurzbeschreibung für die Undo-Zeile, z. B.
+    /// „Basalrate 18:00 – 21:00: 0.60 U/h → 0.55 U/h".
+    private func summary(for suggestion: AIHubTherapyAnalysis.Suggestion) -> String {
+        let title = meta(for: suggestion.kind).title
+        let time = suggestion.timeText.map { " \($0)" } ?? ""
+        return "\(title)\(time): \(suggestion.currentText) → \(suggestion.proposedText)"
+    }
+
     private func runApply(_ suggestion: AIHubTherapyAnalysis.Suggestion) {
         applyingID = suggestion.id
-        AIHubTherapyApply.apply(suggestion) { error in
+        AIHubTherapyApply.apply(suggestion, summary: summary(for: suggestion)) { error in
             applyingID = nil
             if let error = error {
                 applyErrorText = error.localizedDescription
             } else {
                 _ = appliedIDs.insert(suggestion.id)
+                undoRecord = AIHubTherapyApply.lastUndoRecord
+            }
+        }
+    }
+
+    // MARK: - Rückgängig
+
+    private var undoMessage: String {
+        hubT("ti.undo.message", undoRecord?.summary ?? "")
+            + (undoRecord?.target == .basal ? "\n\n" + hubT("ti.apply.message.basal") : "")
+    }
+
+    private func runUndo() {
+        isUndoing = true
+        AIHubTherapyApply.undoLast { error in
+            isUndoing = false
+            if let error = error {
+                applyErrorText = error.localizedDescription
+            } else {
+                undoRecord = AIHubTherapyApply.lastUndoRecord
+                // Profil hat sich geändert → Analyse neu rechnen
+                reload()
+            }
+        }
+    }
+
+    private var undoCard: some View {
+        card {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.uturn.backward.circle")
+                        .foregroundStyle(.orange)
+                    Text(hubT("ti.undo.row"))
+                        .font(.headline)
+                    Spacer()
+                    if let date = undoRecord?.date {
+                        Text(date, style: .relative)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                Text(undoRecord?.summary ?? "")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button {
+                    showUndoConfirm = true
+                } label: {
+                    HStack(spacing: 6) {
+                        if isUndoing {
+                            ProgressView().controlSize(.small)
+                        } else {
+                            Image(systemName: "arrow.uturn.backward")
+                                .font(.subheadline)
+                        }
+                        Text(hubT("ti.undo"))
+                            .font(.subheadline.bold())
+                    }
+                    .padding(.horizontal, 14)
+                    .padding(.vertical, 7)
+                    .background(Capsule().fill(Color.orange.opacity(0.15)))
+                    .foregroundStyle(.orange)
+                }
+                .buttonStyle(.plain)
+                .disabled(isUndoing || applyingID != nil)
             }
         }
     }
@@ -236,12 +334,13 @@ struct AIHubTherapyInsightsView: View {
 
     @ViewBuilder private var suggestionsSection: some View {
         let suggestions = result?.suggestions ?? []
+        let suppressedCount = result?.suppressedCount ?? 0
         VStack(alignment: .leading, spacing: 12) {
             Text(hubT("ti.suggestions"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .padding(.leading, 4)
-            if suggestions.isEmpty {
+            if suggestions.isEmpty, suppressedCount == 0 {
                 card {
                     HStack(spacing: 12) {
                         Image(systemName: "checkmark.seal.fill")
@@ -255,7 +354,24 @@ struct AIHubTherapyInsightsView: View {
                 ForEach(suggestions) { suggestion in
                     suggestionCard(suggestion)
                 }
-                if !applyAllowed {
+                if suppressedCount > 0 {
+                    card {
+                        HStack(spacing: 12) {
+                            Image(systemName: "hourglass")
+                                .font(.title3)
+                                .foregroundStyle(.orange)
+                            Text(hubT(
+                                "ti.cooldown.info",
+                                suppressedCount,
+                                AIHubTherapyApply.cooldownDays
+                            ))
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
+                }
+                if !applyAllowed, !suggestions.isEmpty {
                     Text(hubT("ti.apply.hint"))
                         .font(.caption2)
                         .foregroundStyle(.secondary)

@@ -66,6 +66,9 @@ enum AIHubTherapyAnalysis {
         let stats: Stats?
         let suggestions: [Suggestion]
         let isMmol: Bool
+        /// Vorschläge, die wegen einer kürzlichen Übernahme (Cooldown)
+        /// zurückgehalten wurden — die View zeigt dann einen Hinweis.
+        let suppressedCount: Int
     }
 
     // MARK: - Score
@@ -133,7 +136,7 @@ enum AIHubTherapyAnalysis {
             .lowercased().contains("mmol")
 
         guard readings.count >= 50 else {
-            return Result(stats: nil, suggestions: [], isMmol: isMmol)
+            return Result(stats: nil, suggestions: [], isMmol: isMmol, suppressedCount: 0)
         }
 
         // Gesamt-Statistik
@@ -172,8 +175,32 @@ enum AIHubTherapyAnalysis {
             isMmol: isMmol
         )
 
-        let combined = (basal + isf + cr).sorted { $0.confidence > $1.confidence }
-        return Result(stats: stats, suggestions: Array(combined.prefix(4)), isMmol: isMmol)
+        // Cooldown: Slots, die in den letzten Tagen per Übernahme geändert
+        // wurden, nicht erneut vorschlagen — die Analyse rechnet sonst auf
+        // Daten der ALTEN Einstellung und würde dieselbe Änderung gleich
+        // nochmal stapeln.
+        var suppressed = 0
+        let available = (basal + isf + cr).filter { suggestion in
+            let coolingDown: Bool
+            switch suggestion.apply {
+            case let .basal(startMinute, _, _):
+                coolingDown = AIHubTherapyApply.isCoolingDown(target: .basal, slot: startMinute)
+            case let .isf(slotStartMinute, _):
+                coolingDown = AIHubTherapyApply.isCoolingDown(target: .isf, slot: slotStartMinute)
+            case let .cr(slotStartMinute, _):
+                coolingDown = AIHubTherapyApply.isCoolingDown(target: .cr, slot: slotStartMinute)
+            }
+            if coolingDown { suppressed += 1 }
+            return !coolingDown
+        }
+
+        let combined = available.sorted { $0.confidence > $1.confidence }
+        return Result(
+            stats: stats,
+            suggestions: Array(combined.prefix(4)),
+            isMmol: isMmol,
+            suppressedCount: suppressed
+        )
     }
 
     // MARK: - Basal-Engine
