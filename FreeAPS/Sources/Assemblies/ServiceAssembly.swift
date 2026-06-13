@@ -29,5 +29,6 @@ final class ServiceAssembly: Assembly {
         container.register(LiveActivityBridge.self) { r in LiveActivityBridge(resolver: r) }
         container.register(CoreDataStorageGlucoseSaver.self) { r in CoreDataStorageGlucoseSaver(resolver: r) }
         container.register(AutoBackupService.self) { r in BaseAutoBackupService(resolver: r) }
+        container.register(AutoPresetsService.self) { r in BaseAutoPresetsService(resolver: r) }
     }
 }

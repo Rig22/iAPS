@@ -56,6 +56,8 @@ extension AIHub {
                 AIHubRecapView()
             case .presetDesigner:
                 AIHubPresetDesignerView()
+            case .autoPresets:
+                AIHubAutoPresetsView()
             case .foodSearch:
                 // Weiche: Texteingabe oben (KI-Suche), Kamera darunter —
                 // beide Wege springen ins bestehende AddCarbs-Modal.
@@ -170,6 +172,7 @@ private extension AIHub.Feature {
         case .therapyInsights: return "Therapy Insights"
         case .recap: return "Recap"
         case .presetDesigner: return "Preset Designer"
+        case .autoPresets: return "AutoPresets"
         case .foodSearch: return "FoodSearch"
         }
     }
@@ -180,6 +183,7 @@ private extension AIHub.Feature {
         case .therapyInsights: return hubT("root.card.insights.sub")
         case .recap: return hubT("root.card.recap.sub")
         case .presetDesigner: return hubT("root.card.preset.sub")
+        case .autoPresets: return hubT("root.card.auto.sub")
         case .foodSearch: return hubT("root.card.food.sub")
         }
     }
@@ -190,6 +194,7 @@ private extension AIHub.Feature {
         case .therapyInsights: return "chart.line.uptrend.xyaxis"
         case .recap: return "calendar.badge.clock"
         case .presetDesigner: return "slider.horizontal.3"
+        case .autoPresets: return "figure.walk.motion"
         case .foodSearch: return "fork.knife"
         }
     }
@@ -200,19 +205,22 @@ private extension AIHub.Feature {
         case .therapyInsights: return .blue
         case .recap: return .indigo
         case .presetDesigner: return .orange
+        case .autoPresets: return .teal
         case .foodSearch: return .green
         }
     }
 
     /// Features, die tatsächlich ein KI-Modell aufrufen — Therapy Insights
-    /// bleibt bewusst ohne Sparkles (rein deterministische Analyse).
+    /// und AutoPresets bleiben bewusst ohne Sparkles (deterministisch bzw.
+    /// rein sensorgesteuert).
     var usesAI: Bool {
         switch self {
         case .chat,
              .foodSearch,
              .presetDesigner,
              .recap: return true
-        case .therapyInsights: return false
+        case .autoPresets,
+             .therapyInsights: return false
         }
     }
 }

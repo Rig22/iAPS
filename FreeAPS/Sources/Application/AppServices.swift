@@ -33,5 +33,8 @@ class AppServices: ObservableObject {
         // Eagerly instantiate so the Tidepool manager registers its storage observers
         // at launch and uploads in the background even before the settings screen opens.
         _ = FreeAPSApp.resolver.resolve(TidepoolManager.self)!
+        // Eagerly start AutoPresets so motion monitoring resumes at launch when
+        // the user has it enabled (no need to open the settings screen first).
+        _ = FreeAPSApp.resolver.resolve(AutoPresetsService.self)!
     }
 }

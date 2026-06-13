@@ -425,6 +425,9 @@
 		A1AB000000000000A1AB0010 /* AIHubChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB000F /* AIHubChatView.swift */; };
 		A1AB000000000000A1AB0012 /* AIHubSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */; };
 		A1AB000000000000A1AB0014 /* AIHubTherapyAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */; };
+		A1AB000000000000A1AB0028 /* AIHubAutoPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0027 /* AIHubAutoPresets.swift */; };
+		A1AB000000000000A1AB002A /* AIHubAutoPresetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0029 /* AIHubAutoPresetsView.swift */; };
+		A1AB000000000000A1AB002C /* AutoPresetsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB002B /* AutoPresetsService.swift */; };
 		A1AB000000000000A1AB0026 /* AIHubPresetReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0025 /* AIHubPresetReview.swift */; };
 		A1AB000000000000A1AB0024 /* AIHubTherapyApply.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0023 /* AIHubTherapyApply.swift */; };
 		A1AB000000000000A1AB0016 /* AIHubTherapyInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0015 /* AIHubTherapyInsightsView.swift */; };
@@ -1204,6 +1207,9 @@
 		A1AB000000000000A1AB000F /* AIHubChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubChatView.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubSettingsView.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyAnalysis.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0027 /* AIHubAutoPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubAutoPresets.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0029 /* AIHubAutoPresetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubAutoPresetsView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB002B /* AutoPresetsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoPresetsService.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0025 /* AIHubPresetReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubPresetReview.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0023 /* AIHubTherapyApply.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyApply.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0015 /* AIHubTherapyInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyInsightsView.swift; sourceTree = "<group>"; };
@@ -2992,6 +2998,8 @@
 				A1AB000000000000A1AB0017 /* AIHubRecap.swift */,
 				A1AB000000000000A1AB0005 /* AIHubStateModel.swift */,
 				A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */,
+				A1AB000000000000A1AB0027 /* AIHubAutoPresets.swift */,
+				A1AB000000000000A1AB002B /* AutoPresetsService.swift */,
 				A1AB000000000000A1AB0025 /* AIHubPresetReview.swift */,
 				A1AB000000000000A1AB0023 /* AIHubTherapyApply.swift */,
 				A1AB000000000000A1AB000A /* View */,
@@ -3009,6 +3017,7 @@
 				A1AB000000000000A1AB0007 /* AIHubRootView.swift */,
 				A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */,
 				A1AB000000000000A1AB0015 /* AIHubTherapyInsightsView.swift */,
+				A1AB000000000000A1AB0029 /* AIHubAutoPresetsView.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -4267,6 +4276,9 @@
 				A1AB000000000000A1AB0010 /* AIHubChatView.swift in Sources */,
 				A1AB000000000000A1AB0012 /* AIHubSettingsView.swift in Sources */,
 				A1AB000000000000A1AB0014 /* AIHubTherapyAnalysis.swift in Sources */,
+				A1AB000000000000A1AB0028 /* AIHubAutoPresets.swift in Sources */,
+				A1AB000000000000A1AB002A /* AIHubAutoPresetsView.swift in Sources */,
+				A1AB000000000000A1AB002C /* AutoPresetsService.swift in Sources */,
 				A1AB000000000000A1AB0026 /* AIHubPresetReview.swift in Sources */,
 				A1AB000000000000A1AB0024 /* AIHubTherapyApply.swift in Sources */,
 				A1AB000000000000A1AB0016 /* AIHubTherapyInsightsView.swift in Sources */,
