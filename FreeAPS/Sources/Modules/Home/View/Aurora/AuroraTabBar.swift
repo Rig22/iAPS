@@ -6,10 +6,11 @@ import SwiftUI
 /// wires to `state.showModal(for:)` or similar.
 ///
 /// - Left pill:  always Carbs + Bolus.
-/// - FAB:        Settings.
+/// - FAB:        AI Hub.
 /// - Right pill: Profil (override) and/or Ziel (temp target), each individually
 ///   hideable via the `showOverride` / `showTempTarget` flags (driven from
-///   `UIUXStateModel.profileButton` / `.useTargetButton`).
+///   `UIUXStateModel.profileButton` / `.useTargetButton`), plus Settings as
+///   the fixed last button.
 struct AuroraTabBar: View {
     let glucose: Double // drives FAB color
     var showOverride: Bool = true
@@ -24,6 +25,7 @@ struct AuroraTabBar: View {
     let onStatistics: () -> Void
     let onProfile: () -> Void
     let onTarget: () -> Void
+    let onAIHub: () -> Void
     let onSettings: () -> Void
 
     @Environment(\.colorScheme) private var scheme
@@ -46,16 +48,16 @@ struct AuroraTabBar: View {
 
     private var leftPill: some View {
         HStack(spacing: 0) {
-            actionButton(icon: "fork.knife", accessibility: "Kohlenhydrate") {
+            actionButton(icon: "fork.knife", accessibility: NSLocalizedString("Carbs", comment: "")) {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onCarbs()
             }
-            actionButton(icon: "syringe.fill", accessibility: "Bolus") {
+            actionButton(icon: "syringe.fill", accessibility: NSLocalizedString("Bolus", comment: "")) {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onBolus()
             }
             if !moveDataTableRight {
-                actionButton(icon: "list.bullet.rectangle", accessibility: "Behandlungen") {
+                actionButton(icon: "list.bullet.rectangle", accessibility: NSLocalizedString("Treatments", comment: "")) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     onDataTable()
                 }
@@ -71,19 +73,19 @@ struct AuroraTabBar: View {
     private var rightPill: some View {
         HStack(spacing: 0) {
             if moveDataTableRight {
-                actionButton(icon: "list.bullet.rectangle", accessibility: "Behandlungen") {
+                actionButton(icon: "list.bullet.rectangle", accessibility: NSLocalizedString("Treatments", comment: "")) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     onDataTable()
                 }
             }
-            actionButton(icon: "chart.pie.fill", accessibility: "Statistik") {
+            actionButton(icon: "chart.pie.fill", accessibility: NSLocalizedString("Statistics", comment: "")) {
                 UIImpactFeedbackGenerator(style: .light).impactOccurred()
                 onStatistics()
             }
             if showOverride {
                 actionButton(
                     icon: "person.fill",
-                    accessibility: "Profil",
+                    accessibility: hubT("aur.profile"),
                     tint: profileActive ? status.main : nil
                 ) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
@@ -93,12 +95,16 @@ struct AuroraTabBar: View {
             if showTempTarget {
                 actionButton(
                     icon: "target",
-                    accessibility: "Temporäres Ziel",
+                    accessibility: hubT("aur.tt"),
                     tint: targetActive ? status.main : nil
                 ) {
                     UIImpactFeedbackGenerator(style: .light).impactOccurred()
                     onTarget()
                 }
+            }
+            actionButton(icon: "gearshape.fill", accessibility: NSLocalizedString("Settings", comment: "")) {
+                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                onSettings()
             }
         }
         .frame(height: 58)
@@ -106,14 +112,14 @@ struct AuroraTabBar: View {
         .auroraGlass(radius: 30)
     }
 
-    // MARK: - FAB (Settings)
+    // MARK: - FAB (AI Hub)
 
     private var fab: some View {
         Button(action: {
             UIImpactFeedbackGenerator(style: .medium).impactOccurred()
-            onSettings()
+            onAIHub()
         }, label: {
-            Image(systemName: "gearshape.fill")
+            Image(systemName: "sparkles")
                 .font(.system(size: 24, weight: .semibold))
                 .foregroundStyle(Color.white)
                 .frame(width: 62, height: 62)
@@ -128,7 +134,7 @@ struct AuroraTabBar: View {
                 )
         })
             .buttonStyle(.plain)
-            .accessibilityLabel(Text("Einstellungen"))
+            .accessibilityLabel(Text("AI Hub"))
     }
 
     // MARK: - Helpers

@@ -100,6 +100,8 @@
 	<string>Health App is used to store blood glucose, carbs and insulin</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Health App is used to store blood glucose, carbs and insulin</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Motion &amp; Fitness data is used by AutoPresets to detect walking, running or cycling and automatically activate the override preset you configured</string>
 	<key>NSHumanReadableCopyright</key>
 	<string>$(COPYRIGHT_NOTICE)</string>
 	<key>NSSupportsLiveActivities</key>

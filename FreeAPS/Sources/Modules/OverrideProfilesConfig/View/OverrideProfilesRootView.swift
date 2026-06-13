@@ -718,7 +718,18 @@ extension OverrideProfilesConfig {
             if name != "" {
                 VStack(alignment: .leading, spacing: 1) {
                     HStack {
+                        // Das Emoji-Feld wird beim Speichern befüllt (Editor
+                        // und AI Hub), wurde hier aber nie angezeigt.
+                        if let emoji = preset.emoji, !emoji.isEmpty {
+                            Text(emoji)
+                        }
                         Text(name).padding(.vertical, 4)
+                        // KI-generierte Presets (AI Hub Preset Designer)
+                        if preset.id?.hasPrefix("ai-") == true {
+                            Image(systemName: "sparkles")
+                                .font(.caption)
+                                .foregroundStyle(.purple)
+                        }
                         if preset.advancedSettings, preset.endWIthNewCarbs {
                             Image("PreMealOverride").foregroundStyle(.green)
                         }

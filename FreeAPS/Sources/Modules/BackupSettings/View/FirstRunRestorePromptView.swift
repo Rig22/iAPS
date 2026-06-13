@@ -26,21 +26,19 @@ struct FirstRunRestorePromptView: View {
                     .font(.system(size: 64))
                     .foregroundColor(.accentColor)
 
-                Text("Welcome to iAPS")
+                Text(BackupL10n.t("firstrun.welcome"))
                     .font(.largeTitle).bold()
                     .multilineTextAlignment(.center)
 
-                Text("Do you have a backup of your settings from a previous install?")
+                Text(BackupL10n.t("firstrun.question"))
                     .multilineTextAlignment(.center)
                     .font(.body)
 
-                Text(
-                    "Restoring brings back all your preferences including Auto ISF, pump settings, basal profile, ISF, carb ratios, targets and UI."
-                )
-                .multilineTextAlignment(.center)
-                .font(.footnote)
-                .foregroundColor(.secondary)
-                .padding(.horizontal)
+                Text(BackupL10n.t("firstrun.detail"))
+                    .multilineTextAlignment(.center)
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                    .padding(.horizontal)
             }
             .padding(.horizontal, 32)
 
@@ -50,14 +48,14 @@ struct FirstRunRestorePromptView: View {
                 Button {
                     showFilePicker = true
                 } label: {
-                    Label("Restore from Backup File", systemImage: "square.and.arrow.down")
+                    Label(BackupL10n.t("firstrun.restore"), systemImage: "square.and.arrow.down")
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 10)
                 }
                 .buttonStyle(.borderedProminent)
 
                 Button(action: onDone) {
-                    Text("Start Fresh")
+                    Text(BackupL10n.t("firstrun.fresh"))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 8)
                 }
@@ -75,27 +73,27 @@ struct FirstRunRestorePromptView: View {
             }
         }
         .alert(
-            "Restore Backup?",
+            BackupL10n.t("alert.restore.title"),
             isPresented: Binding(
                 get: { pendingURL != nil },
                 set: { if !$0 { pendingURL = nil } }
             ),
             presenting: pendingURL
         ) { _ in
-            Button("Restore", role: .destructive, action: performRestore)
+            Button(BackupL10n.t("alert.restore.action"), role: .destructive, action: performRestore)
             Button("Cancel", role: .cancel) { pendingURL = nil }
         } message: { url in
-            Text("This will write the settings from \(url.lastPathComponent) into iAPS. Continue?")
+            Text(BackupL10n.t("firstrun.confirm", url.lastPathComponent))
         }
         .alert(
-            "Restore Complete",
+            BackupL10n.t("alert.complete.title"),
             isPresented: Binding(
                 get: { summary != nil },
                 set: { _ in /* swallowed — user must use the Close button */ }
             ),
             presenting: summary
         ) { _ in
-            Button("Close iAPS", role: .destructive) {
+            Button(BackupL10n.t("alert.close"), role: .destructive) {
                 // Mark onboarding done first so the prompt doesn't reappear
                 // after the relaunch, then quit so the in-memory state models
                 // can't overwrite the restored files with their defaults.
@@ -106,7 +104,7 @@ struct FirstRunRestorePromptView: View {
             Text(summaryMessage(result))
         }
         .alert(
-            "Restore Failed",
+            BackupL10n.t("alert.failed.title"),
             isPresented: Binding(
                 get: { errorMessage != nil },
                 set: { if !$0 { errorMessage = nil } }
@@ -159,15 +157,12 @@ struct FirstRunRestorePromptView: View {
 
     private func summaryMessage(_ summary: RestoreSummary) -> String {
         var parts: [String] = []
-        parts.append("\(summary.filesRestored.count) settings files will be restored on next launch.")
+        parts.append(BackupL10n.t("summary.restored", summary.filesRestored.count))
         if summary.nightscoutRestored {
-            parts.append("Nightscout credentials will be restored.")
+            parts.append(BackupL10n.t("summary.nightscout"))
         }
         parts.append("")
-        parts
-            .append(
-                "iAPS will now close. Reopen it from the home screen — your settings load cleanly before anything else runs."
-            )
+        parts.append(BackupL10n.t("firstrun.relaunch"))
         return parts.joined(separator: "\n")
     }
 }

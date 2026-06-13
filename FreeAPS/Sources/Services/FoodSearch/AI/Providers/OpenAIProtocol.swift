@@ -60,6 +60,11 @@ struct OpenAIProtocol: AIProviderProtocol {
         telemetryCallback _: ((String) -> Void)?
     ) throws {
         if httpResponse.statusCode != 200 {
+            // 503 = engine overloaded — transient, retried by AIProviderClient.
+            if httpResponse.statusCode == 503 {
+                debug(.service, "OpenAI API \(httpResponse.statusCode): service overloaded")
+                throw AIFoodAnalysisError.serviceUnavailable(provider: "OpenAI")
+            }
             if let apiError = try? JSONDecoder().decode(OpenAIErrorResponse.self, from: data) {
                 let message = apiError.error.message ?? "Unknown error"
                 let code = apiError.error.code ?? apiError.error.type ?? ""

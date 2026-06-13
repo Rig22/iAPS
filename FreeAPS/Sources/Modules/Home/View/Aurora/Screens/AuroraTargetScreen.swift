@@ -36,13 +36,13 @@ struct AuroraTargetScreen: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
-                Text("Ziel")
+                Text(NSLocalizedString("Target", comment: ""))
                     .font(.system(size: 32, weight: .heavy))
                     .kerning(-0.5)
                     .foregroundStyle(AuroraPalette.textPrimary(scheme))
                     .padding(.leading, 6)
 
-                AuroraListSection(title: "Temporäres Ziel") {
+                AuroraListSection(title: hubT("aur.tt")) {
                     ForEach(Array(options.enumerated()), id: \.element) { index, opt in
                         row(opt)
                         if index < options.count - 1 {

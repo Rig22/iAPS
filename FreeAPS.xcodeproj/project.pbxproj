@@ -144,7 +144,7 @@
 		320D030F724170A637F06D50 /* CalibrationsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 212E8BFE6D66EE65AA26A114 /* CalibrationsProvider.swift */; };
 		33E198D3039045D98C3DC5D4 /* AddCarbsStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 39E7C997E56DAF8D28D09014 /* AddCarbsStateModel.swift */; };
 		3587052B9C5D18B21D583ED4 /* TidepoolConfigDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 652114B4B7218C6D940B1A61 /* TidepoolConfigDataFlow.swift */; };
-		599D283FC29E4CFBF4E258C8 /* TidepoolL10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = 167FBA3942489481B776F74B /* TidepoolL10n.swift */; };
+		A631DEEB3FE8383D4EDEE6EC /* TidepoolL10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BF66A62F7FA6E1D512E0F98 /* TidepoolL10n.swift */; };
 		37A1E50092CA8C9789CDA982 /* AuroraBackground.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACFB0749D1992E87C36D782D /* AuroraBackground.swift */; };
 		3811DE0B25C9D32F00A708ED /* BaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3811DE0725C9D32E00A708ED /* BaseView.swift */; };
 		3811DE0C25C9D32F00A708ED /* BaseProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3811DE0825C9D32F00A708ED /* BaseProvider.swift */; };
@@ -363,7 +363,7 @@
 		74EFB04A06E146AA34BB6BC1 /* AuroraStatBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 77EB182D48EEAC3A419C2195 /* AuroraStatBadge.swift */; };
 		786ADCD9A35FD8B3B1117E75 /* TidepoolServiceKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 5856ED3FC5A31C9E7F86FDE5 /* TidepoolServiceKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		7940BF502F83D7EE00E56268 /* StatTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF4F2F83D7EE00E56268 /* StatTypes.swift */; };
-		2EC467629A86760F0B8A509E /* StatL10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73875D8943BE211F96657BC6 /* StatL10n.swift */; };
+		CE51B8782F4BF986A9CD9659 /* StatL10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = D95C86309B09605ED568274C /* StatL10n.swift */; };
 		7940BF522F83D80100E56268 /* StatChartUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF512F83D80100E56268 /* StatChartUtils.swift */; };
 		7940BF662F83D87D00E56268 /* LoopStatsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF612F83D87D00E56268 /* LoopStatsView.swift */; };
 		7940BF672F83D87D00E56268 /* GlucoseSectorChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7940BF5A2F83D87D00E56268 /* GlucoseSectorChart.swift */; };
@@ -412,9 +412,31 @@
 		BACCAFE0000000000BAC0004 /* JSONValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0003 /* JSONValue.swift */; };
 		BACCAFE0000000000BAC0006 /* BackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0005 /* BackupService.swift */; };
 		BACCAFE0000000000BAC0009 /* BackupSettingsDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0008 /* BackupSettingsDataFlow.swift */; };
+		3C659212E68EBD358CEEEA10 /* BackupL10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6E2349E5C3873A87F9972E4 /* BackupL10n.swift */; };
 		BACCAFE0000000000BAC000B /* BackupSettingsProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC000A /* BackupSettingsProvider.swift */; };
 		BACCAFE0000000000BAC000D /* BackupSettingsStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC000C /* BackupSettingsStateModel.swift */; };
 		BACCAFE0000000000BAC000F /* BackupSettingsRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC000E /* BackupSettingsRootView.swift */; };
+		A1AB000000000000A1AB0002 /* AIHubDataFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0001 /* AIHubDataFlow.swift */; };
+		A1AB000000000000A1AB0004 /* AIHubProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0003 /* AIHubProvider.swift */; };
+		A1AB000000000000A1AB0006 /* AIHubStateModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0005 /* AIHubStateModel.swift */; };
+		A1AB000000000000A1AB0008 /* AIHubRootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0007 /* AIHubRootView.swift */; };
+		A1AB000000000000A1AB000C /* AIHubChatService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB000B /* AIHubChatService.swift */; };
+		A1AB000000000000A1AB000E /* AIHubChatContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB000D /* AIHubChatContext.swift */; };
+		A1AB000000000000A1AB0010 /* AIHubChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB000F /* AIHubChatView.swift */; };
+		A1AB000000000000A1AB0012 /* AIHubSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */; };
+		A1AB000000000000A1AB0014 /* AIHubTherapyAnalysis.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */; };
+		A1AB000000000000A1AB0028 /* AIHubAutoPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0027 /* AIHubAutoPresets.swift */; };
+		A1AB000000000000A1AB002A /* AIHubAutoPresetsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0029 /* AIHubAutoPresetsView.swift */; };
+		A1AB000000000000A1AB002C /* AutoPresetsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB002B /* AutoPresetsService.swift */; };
+		A1AB000000000000A1AB0026 /* AIHubPresetReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0025 /* AIHubPresetReview.swift */; };
+		A1AB000000000000A1AB0024 /* AIHubTherapyApply.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0023 /* AIHubTherapyApply.swift */; };
+		A1AB000000000000A1AB0016 /* AIHubTherapyInsightsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0015 /* AIHubTherapyInsightsView.swift */; };
+		A1AB000000000000A1AB0018 /* AIHubRecap.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0017 /* AIHubRecap.swift */; };
+		A1AB000000000000A1AB001A /* AIHubRecapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0019 /* AIHubRecapView.swift */; };
+		A1AB000000000000A1AB001C /* AIHubL10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB001B /* AIHubL10n.swift */; };
+		A1AB000000000000A1AB001E /* AIHubPresetDesigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB001D /* AIHubPresetDesigner.swift */; };
+		A1AB000000000000A1AB0020 /* AIHubPresetDesignerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB001F /* AIHubPresetDesignerView.swift */; };
+		A1AB000000000000A1AB0022 /* AIHubFoodSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0021 /* AIHubFoodSearchView.swift */; };
 		BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */; };
 		BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */; };
 		BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */ = {isa = PBXBuildFile; fileRef = BACCAFE0000000000BAC0016 /* AutoBackupService.swift */; };
@@ -1104,7 +1126,7 @@
 		626D56EDD3670C39B0AA93A8 /* TidepoolManager.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TidepoolManager.swift; sourceTree = "<group>"; };
 		64AA5E04A2761F6EEA6568E1 /* CREditorStateModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CREditorStateModel.swift; sourceTree = "<group>"; };
 		652114B4B7218C6D940B1A61 /* TidepoolConfigDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TidepoolConfigDataFlow.swift; sourceTree = "<group>"; };
-		167FBA3942489481B776F74B /* TidepoolL10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TidepoolL10n.swift; path = TidepoolL10n.swift; sourceTree = "<group>"; };
+		3BF66A62F7FA6E1D512E0F98 /* TidepoolL10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TidepoolL10n.swift; path = TidepoolL10n.swift; sourceTree = "<group>"; };
 		67F94DD2853CF42BA4E30616 /* BasalProfileEditorDataFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BasalProfileEditorDataFlow.swift; sourceTree = "<group>"; };
 		680C4420C9A345D46D90D06C /* ManualTempBasalProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ManualTempBasalProvider.swift; sourceTree = "<group>"; };
 		6B1A8D012B14D88B00E76752 /* UniformTypeIdentifiers.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UniformTypeIdentifiers.framework; path = System/Library/Frameworks/UniformTypeIdentifiers.framework; sourceTree = SDKROOT; };
@@ -1126,7 +1148,7 @@
 		77EB182D48EEAC3A419C2195 /* AuroraStatBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AuroraStatBadge.swift; sourceTree = "<group>"; };
 		790B2C092FCC24B70064CC50 /* HomeRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeRootView.swift; sourceTree = "<group>"; };
 		7940BF4F2F83D7EE00E56268 /* StatTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatTypes.swift; sourceTree = "<group>"; };
-		73875D8943BE211F96657BC6 /* StatL10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StatL10n.swift; path = StatL10n.swift; sourceTree = "<group>"; };
+		D95C86309B09605ED568274C /* StatL10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StatL10n.swift; path = StatL10n.swift; sourceTree = "<group>"; };
 		7940BF512F83D80100E56268 /* StatChartUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatChartUtils.swift; sourceTree = "<group>"; };
 		7940BF592F83D87D00E56268 /* GlucoseMetricsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseMetricsView.swift; sourceTree = "<group>"; };
 		7940BF5A2F83D87D00E56268 /* GlucoseSectorChart.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseSectorChart.swift; sourceTree = "<group>"; };
@@ -1172,9 +1194,31 @@
 		BACCAFE0000000000BAC0003 /* JSONValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONValue.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0005 /* BackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupService.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0008 /* BackupSettingsDataFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsDataFlow.swift; sourceTree = "<group>"; };
+		F6E2349E5C3873A87F9972E4 /* BackupL10n.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BackupL10n.swift; path = BackupL10n.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC000A /* BackupSettingsProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsProvider.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC000C /* BackupSettingsStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsStateModel.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC000E /* BackupSettingsRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackupSettingsRootView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0001 /* AIHubDataFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubDataFlow.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0003 /* AIHubProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubProvider.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0005 /* AIHubStateModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubStateModel.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0007 /* AIHubRootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubRootView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB000B /* AIHubChatService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubChatService.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB000D /* AIHubChatContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubChatContext.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB000F /* AIHubChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubChatView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubSettingsView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyAnalysis.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0027 /* AIHubAutoPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubAutoPresets.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0029 /* AIHubAutoPresetsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubAutoPresetsView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB002B /* AutoPresetsService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoPresetsService.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0025 /* AIHubPresetReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubPresetReview.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0023 /* AIHubTherapyApply.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyApply.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0015 /* AIHubTherapyInsightsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyInsightsView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0017 /* AIHubRecap.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubRecap.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0019 /* AIHubRecapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubRecapView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB001B /* AIHubL10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubL10n.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB001D /* AIHubPresetDesigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubPresetDesigner.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB001F /* AIHubPresetDesignerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubPresetDesignerView.swift; sourceTree = "<group>"; };
+		A1AB000000000000A1AB0021 /* AIHubFoodSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubFoodSearchView.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0012 /* FirstRunRestorePromptView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirstRunRestorePromptView.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0014 /* EarlyBackupRestore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EarlyBackupRestore.swift; sourceTree = "<group>"; };
 		BACCAFE0000000000BAC0016 /* AutoBackupService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AutoBackupService.swift; sourceTree = "<group>"; };
@@ -1802,7 +1846,7 @@
 			isa = PBXGroup;
 			children = (
 				7940BF4F2F83D7EE00E56268 /* StatTypes.swift */,
-				73875D8943BE211F96657BC6 /* StatL10n.swift */,
+				D95C86309B09605ED568274C /* StatL10n.swift */,
 				19F95FF229F10FBC00314DDC /* StatDataFlow.swift */,
 				19F95FF429F10FCF00314DDC /* StatProvider.swift */,
 				19F95FF629F10FEE00314DDC /* StatStateModel.swift */,
@@ -1845,6 +1889,7 @@
 		3811DE0325C9D31700A708ED /* Modules */ = {
 			isa = PBXGroup;
 			children = (
+				A1AB000000000000A1AB0009 /* AIHub */,
 				6DC5D590658EF8B8DF94F9F5 /* AddCarbs */,
 				A9A4C88374496B3C89058A89 /* AddTempTarget */,
 				198F67B42CFCBD5D00E538CB /* AutoISF */,
@@ -2846,7 +2891,7 @@
 			children = (
 				E660984B0D9C1CC978536863 /* View */,
 				652114B4B7218C6D940B1A61 /* TidepoolConfigDataFlow.swift */,
-				167FBA3942489481B776F74B /* TidepoolL10n.swift */,
+				3BF66A62F7FA6E1D512E0F98 /* TidepoolL10n.swift */,
 				2408776D13078EC404D98BB3 /* TidepoolConfigProvider.swift */,
 				74270BE27155B89F53DD80A0 /* TidepoolConfigStateModel.swift */,
 			);
@@ -2941,10 +2986,47 @@
 			path = Backup;
 			sourceTree = "<group>";
 		};
+		A1AB000000000000A1AB0009 /* AIHub */ = {
+			isa = PBXGroup;
+			children = (
+				A1AB000000000000A1AB000D /* AIHubChatContext.swift */,
+				A1AB000000000000A1AB000B /* AIHubChatService.swift */,
+				A1AB000000000000A1AB0001 /* AIHubDataFlow.swift */,
+				A1AB000000000000A1AB0003 /* AIHubProvider.swift */,
+				A1AB000000000000A1AB001B /* AIHubL10n.swift */,
+				A1AB000000000000A1AB001D /* AIHubPresetDesigner.swift */,
+				A1AB000000000000A1AB0017 /* AIHubRecap.swift */,
+				A1AB000000000000A1AB0005 /* AIHubStateModel.swift */,
+				A1AB000000000000A1AB0013 /* AIHubTherapyAnalysis.swift */,
+				A1AB000000000000A1AB0027 /* AIHubAutoPresets.swift */,
+				A1AB000000000000A1AB002B /* AutoPresetsService.swift */,
+				A1AB000000000000A1AB0025 /* AIHubPresetReview.swift */,
+				A1AB000000000000A1AB0023 /* AIHubTherapyApply.swift */,
+				A1AB000000000000A1AB000A /* View */,
+			);
+			path = AIHub;
+			sourceTree = "<group>";
+		};
+		A1AB000000000000A1AB000A /* View */ = {
+			isa = PBXGroup;
+			children = (
+				A1AB000000000000A1AB000F /* AIHubChatView.swift */,
+				A1AB000000000000A1AB0021 /* AIHubFoodSearchView.swift */,
+				A1AB000000000000A1AB001F /* AIHubPresetDesignerView.swift */,
+				A1AB000000000000A1AB0019 /* AIHubRecapView.swift */,
+				A1AB000000000000A1AB0007 /* AIHubRootView.swift */,
+				A1AB000000000000A1AB0011 /* AIHubSettingsView.swift */,
+				A1AB000000000000A1AB0015 /* AIHubTherapyInsightsView.swift */,
+				A1AB000000000000A1AB0029 /* AIHubAutoPresetsView.swift */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
 		BACCAFE0000000000BAC0010 /* BackupSettings */ = {
 			isa = PBXGroup;
 			children = (
 				BACCAFE0000000000BAC0008 /* BackupSettingsDataFlow.swift */,
+				F6E2349E5C3873A87F9972E4 /* BackupL10n.swift */,
 				BACCAFE0000000000BAC000A /* BackupSettingsProvider.swift */,
 				BACCAFE0000000000BAC000C /* BackupSettingsStateModel.swift */,
 				BACCAFE0000000000BAC0011 /* View */,
@@ -3972,7 +4054,7 @@
 				19A910362A24D6D700C8951B /* Configs.swift in Sources */,
 				A0B8EC8CC5CD1DD237D1BCD2 /* PumpSettingsEditorRootView.swift in Sources */,
 				7940BF502F83D7EE00E56268 /* StatTypes.swift in Sources */,
-				2EC467629A86760F0B8A509E /* StatL10n.swift in Sources */,
+				CE51B8782F4BF986A9CD9659 /* StatL10n.swift in Sources */,
 				E06B911A275B5EEA003C04B6 /* Array+Extension.swift in Sources */,
 				38EA0600262091870064E39B /* BolusProgressViewStyle.swift in Sources */,
 				19DC678329CA677D00FD9EC4 /* OverrideProfilesStateModel.swift in Sources */,
@@ -4181,9 +4263,31 @@
 				BACCAFE0000000000BAC0004 /* JSONValue.swift in Sources */,
 				BACCAFE0000000000BAC0006 /* BackupService.swift in Sources */,
 				BACCAFE0000000000BAC0009 /* BackupSettingsDataFlow.swift in Sources */,
+				3C659212E68EBD358CEEEA10 /* BackupL10n.swift in Sources */,
 				BACCAFE0000000000BAC000B /* BackupSettingsProvider.swift in Sources */,
 				BACCAFE0000000000BAC000D /* BackupSettingsStateModel.swift in Sources */,
 				BACCAFE0000000000BAC000F /* BackupSettingsRootView.swift in Sources */,
+				A1AB000000000000A1AB0002 /* AIHubDataFlow.swift in Sources */,
+				A1AB000000000000A1AB0004 /* AIHubProvider.swift in Sources */,
+				A1AB000000000000A1AB0006 /* AIHubStateModel.swift in Sources */,
+				A1AB000000000000A1AB0008 /* AIHubRootView.swift in Sources */,
+				A1AB000000000000A1AB000C /* AIHubChatService.swift in Sources */,
+				A1AB000000000000A1AB000E /* AIHubChatContext.swift in Sources */,
+				A1AB000000000000A1AB0010 /* AIHubChatView.swift in Sources */,
+				A1AB000000000000A1AB0012 /* AIHubSettingsView.swift in Sources */,
+				A1AB000000000000A1AB0014 /* AIHubTherapyAnalysis.swift in Sources */,
+				A1AB000000000000A1AB0028 /* AIHubAutoPresets.swift in Sources */,
+				A1AB000000000000A1AB002A /* AIHubAutoPresetsView.swift in Sources */,
+				A1AB000000000000A1AB002C /* AutoPresetsService.swift in Sources */,
+				A1AB000000000000A1AB0026 /* AIHubPresetReview.swift in Sources */,
+				A1AB000000000000A1AB0024 /* AIHubTherapyApply.swift in Sources */,
+				A1AB000000000000A1AB0016 /* AIHubTherapyInsightsView.swift in Sources */,
+				A1AB000000000000A1AB0018 /* AIHubRecap.swift in Sources */,
+				A1AB000000000000A1AB001A /* AIHubRecapView.swift in Sources */,
+				A1AB000000000000A1AB001C /* AIHubL10n.swift in Sources */,
+				A1AB000000000000A1AB001E /* AIHubPresetDesigner.swift in Sources */,
+				A1AB000000000000A1AB0020 /* AIHubPresetDesignerView.swift in Sources */,
+				A1AB000000000000A1AB0022 /* AIHubFoodSearchView.swift in Sources */,
 				BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */,
 				BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */,
 				BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */,
@@ -4196,7 +4300,7 @@
 				40C1CB6EFADE9BCEA37E09F0 /* PumpHistoryEvent+Tidepool.swift in Sources */,
 				2C29831344C29CEE964BDB29 /* TherapySettings+Tidepool.swift in Sources */,
 				3587052B9C5D18B21D583ED4 /* TidepoolConfigDataFlow.swift in Sources */,
-				599D283FC29E4CFBF4E258C8 /* TidepoolL10n.swift in Sources */,
+				A631DEEB3FE8383D4EDEE6EC /* TidepoolL10n.swift in Sources */,
 				6F014C92C94761D66C358AB0 /* TidepoolConfigProvider.swift in Sources */,
 				DFAB937A968F02CF9915CE99 /* TidepoolConfigStateModel.swift in Sources */,
 				4EF97E898F427B0CC47F2817 /* TidepoolConfigRootView.swift in Sources */,

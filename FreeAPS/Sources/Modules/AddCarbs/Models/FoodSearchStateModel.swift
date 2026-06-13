@@ -28,6 +28,13 @@ import SwiftUI
 
     @Published var forceShowCommentForNextImage = false
 
+    /// Query aus dem AI Hub, die nach dem Erscheinen des Suchfensters
+    /// automatisch per KI gesucht wird. Erst dort starten — ein Start aus
+    /// AddCarbs' onAppear läuft, bevor die FoodSearchView (und damit der
+    /// aiProgress-Cover) montiert ist, und mehrfaches onAppear cancelt
+    /// den laufenden Task (→ sofortiger „Network error").
+    @Published var pendingAIQuery: String?
+
     var searchResultsState = SearchResultsState.empty
 
     // analysis progress
@@ -305,12 +312,27 @@ import SwiftUI
             } catch is CancellationError {
                 // cancelled, already reset by cancelSearchTask()
             } catch {
+                // Abbrüche, die als URLError.cancelled (ggf. in networkError
+                // verpackt) ankommen, sind immer Folge eines bewussten
+                // Cancel/Neustarts — der abgebrochene Task darf den Zustand
+                // eines bereits laufenden Nachfolgers nicht überschreiben
+                // („Network error: Abgebrochen" mit totem Retry).
+                guard !Self.isCancellation(error) else { return }
                 try? await Task.sleep(for: .seconds(1))
                 self.analysisStart = nil
                 self.analysisEnd = nil
                 self.analysisError = error.localizedDescription
             }
         }
+    }
+
+    private static func isCancellation(_ error: Error) -> Bool {
+        if error is CancellationError { return true }
+        if let urlError = error as? URLError, urlError.code == .cancelled { return true }
+        if case let AIFoodAnalysisError.networkError(inner) = error {
+            return isCancellation(inner)
+        }
+        return false
     }
 
     private func handleTelemetry(_ message: String) {

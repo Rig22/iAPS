@@ -45,9 +45,9 @@ enum AuroraGlucoseStatus {
 
     var caption: String {
         switch self {
-        case .low: return "mg/dL · unter Zielbereich"
-        case .inRange: return "mg/dL · im Zielbereich"
-        case .high: return "mg/dL · über Zielbereich"
+        case .low: return "mg/dL · " + hubT("aur.range.below")
+        case .inRange: return "mg/dL · " + hubT("aur.range.in")
+        case .high: return "mg/dL · " + hubT("aur.range.above")
         }
     }
 }

@@ -57,6 +57,12 @@ struct ClaudeProtocol: AIProviderProtocol {
         telemetryCallback _: ((String) -> Void)?
     ) throws {
         guard httpResponse.statusCode == 200 else {
+            // 529 = Anthropic "overloaded_error", 503 = generic unavailability —
+            // transient, retried by AIProviderClient.
+            if httpResponse.statusCode == 529 || httpResponse.statusCode == 503 {
+                debug(.service, "Claude API \(httpResponse.statusCode): service overloaded")
+                throw AIFoodAnalysisError.serviceUnavailable(provider: "Claude")
+            }
             if let apiError = try? JSONDecoder().decode(ClaudeErrorResponse.self, from: data) {
                 let message = apiError.error.message
                 let type = apiError.error.type ?? ""
