@@ -50,7 +50,6 @@ enum AIHubAutoPresets {
     /// Gesamtkonfiguration (eine JSON-Blob in UserDefaults).
     struct Config: Codable {
         var masterEnabled: Bool
-        var useHealthKitWorkouts: Bool
         var activities: [String: ActivityConfig]
 
         static var defaultConfig: Config {
@@ -62,7 +61,7 @@ enum AIHubAutoPresets {
                     sustainedSeconds: activity.defaultSustainedSeconds
                 )
             }
-            return Config(masterEnabled: false, useHealthKitWorkouts: false, activities: activities)
+            return Config(masterEnabled: false, activities: activities)
         }
 
         func config(for activity: Activity) -> ActivityConfig {

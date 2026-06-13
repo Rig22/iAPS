@@ -7,6 +7,7 @@ extension AIHub {
         @StateObject var state: StateModel
 
         @Environment(\.colorScheme) private var colorScheme
+        @Environment(\.dismiss) private var dismiss
 
         init(resolver: Resolver) {
             self.resolver = resolver
@@ -38,6 +39,13 @@ extension AIHub {
             .navigationTitle("AI Hub")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                    }
+                }
                 ToolbarItem(placement: .topBarTrailing) {
                     NavigationLink(destination: AIHubSettingsView()) {
                         Image(systemName: "gearshape")

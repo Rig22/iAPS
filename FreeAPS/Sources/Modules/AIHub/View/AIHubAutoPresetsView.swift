@@ -15,7 +15,6 @@ struct AIHubAutoPresetsView: View {
             masterSection
             if config.masterEnabled {
                 activitiesSection
-                healthKitSection
             }
         }
         .navigationTitle("AutoPresets")
@@ -82,19 +81,6 @@ struct AIHubAutoPresetsView: View {
                     Text(sustainedLabel(seconds)).tag(seconds)
                 }
             }
-        }
-    }
-
-    // MARK: - HealthKit (Folge-Schritt)
-
-    private var healthKitSection: some View {
-        Section {
-            Toggle(hubT("ap.healthkit"), isOn: .constant(false))
-                .disabled(true)
-        } header: {
-            Text(hubT("ap.section.healthkit"))
-        } footer: {
-            Text(hubT("ap.healthkit.soon"))
         }
     }
 
