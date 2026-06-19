@@ -7,6 +7,7 @@ import SwiftUI
 struct AuroraRing: View {
     let glucose: Double // mg/dL
     let delta: Int? // mg/dL
+    let units: GlucoseUnits
     let trendCaption: String? // e.g. "Leicht steigend"
 
     var direction: BloodGlucose.Direction? = nil
@@ -157,11 +158,17 @@ struct AuroraRing: View {
     }
 
     private var formattedGlucose: String {
-        String(format: "%.0f", glucose)
+        if units == .mmolL {
+            return String(format: "%.1f", glucose * 0.0555)
+        }
+        return String(format: "%.0f", glucose)
     }
 
     private func formattedDelta(_ d: Int) -> String {
         let sign = d > 0 ? "+" : ""
+        if units == .mmolL {
+            return "\(sign)\(String(format: "%.1f", Double(d) * 0.0555)) mmol/L"
+        }
         return "\(sign)\(d) mg/dL"
     }
 }

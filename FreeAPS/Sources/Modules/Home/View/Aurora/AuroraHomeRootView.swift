@@ -429,6 +429,7 @@ extension Home {
                 AuroraRing(
                     glucose: glucoseValue,
                     delta: glucoseDelta,
+                    units: state.data.units,
                     trendCaption: nil,
                     direction: state.recentGlucose?.direction,
                     bolusProgress: state.bolusProgress.map { NSDecimalNumber(decimal: $0).doubleValue },
