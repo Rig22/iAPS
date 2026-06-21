@@ -40,18 +40,18 @@ struct MealStatsView: View {
             // Stats row
             HStack {
                 StatChartUtils.statView(
-                    title: prefix + "Carbs" + suffix,
+                    title: prefix + NSLocalizedString("Carbs", comment: "") + suffix,
                     value: carbsValue.formatted(.number.grouping(.never).rounded().precision(.fractionLength(0))) + " g"
                 )
                 Spacer()
                 if hasFatProtein {
                     StatChartUtils.statView(
-                        title: prefix + "Fat" + suffix,
+                        title: prefix + NSLocalizedString("Fat", comment: "") + suffix,
                         value: fatValue.formatted(.number.grouping(.never).rounded().precision(.fractionLength(0))) + " g"
                     )
                     Spacer()
                     StatChartUtils.statView(
-                        title: prefix + "Protein" + suffix,
+                        title: prefix + NSLocalizedString("Protein", comment: "") + suffix,
                         value: proteinValue.formatted(.number.grouping(.never).rounded().precision(.fractionLength(0))) + " g"
                     )
                 }
@@ -239,7 +239,7 @@ struct MacroDistributionDonut: View {
                 )
                 if showAverage {
                     caloriesTile(
-                        label: "Ø / Day",
+                        label: statT("stat.avgPerDay"),
                         value: avgKcalPerDay
                     )
                 }
@@ -303,7 +303,7 @@ struct MacroNutrientStatsView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(spacing: 8) {
-                Text(verbatim: "Macronutrients")
+                Text(statT("stat.macronutrients"))
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                 Spacer()
                 Button(action: onEditProfile) {
@@ -328,8 +328,8 @@ struct MacroNutrientStatsView: View {
 
             Text(
                 profile.hasBodyData
-                    ? "% of your daily macro target"
-                    : "% of EFSA reference daily intake"
+                    ? statT("stat.macroTargetPct")
+                    : statT("stat.efsaRefPct")
             )
             .font(.system(size: 10, weight: .medium, design: .rounded))
             .foregroundStyle(.secondary)
@@ -346,7 +346,7 @@ struct MacroNutrientStatsView: View {
                 Image(systemName: "flame.fill")
                     .font(.system(size: 12))
                     .foregroundStyle(color)
-                Text(verbatim: "Energy")
+                Text(statT("stat.energy"))
                     .font(.system(size: 13, weight: .semibold, design: .rounded))
                     .foregroundStyle(.primary)
                 Spacer(minLength: 8)
@@ -424,7 +424,7 @@ struct MicronutrientStatsView: View {
 
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text(NSLocalizedString("Micronutrients", comment: ""))
+                Text(statT("stat.micronutrients"))
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                 Spacer()
                 Text(prefix + "\(nutrients.count)" + suffix)
@@ -434,16 +434,16 @@ struct MicronutrientStatsView: View {
             }
 
             if !vitamins.isEmpty {
-                sectionHeader("Vitamins")
+                sectionHeader(statT("stat.vitamins"))
                 ForEach(vitamins, id: \.nutrient) { row(for: $0) }
             }
 
             if !minerals.isEmpty {
-                sectionHeader("Minerals")
+                sectionHeader(statT("stat.minerals"))
                 ForEach(minerals, id: \.nutrient) { row(for: $0) }
             }
 
-            Text(verbatim: "% of EFSA reference daily intake")
+            Text(statT("stat.efsaRefPct"))
                 .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(.secondary)
                 .padding(.top, 2)

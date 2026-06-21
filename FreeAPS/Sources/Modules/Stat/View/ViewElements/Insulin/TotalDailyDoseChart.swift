@@ -33,13 +33,13 @@ struct TotalDailyDoseChart: View {
                 if isHourly {
                     StatChartUtils.statView(
                         title: selectedInterval == .today
-                            ? NSLocalizedString("TDD Today", comment: "Total Daily Dose for today")
-                            : NSLocalizedString("TDD 24h", comment: "Total Daily Dose last 24 hours"),
+                            ? statT("stat.tddToday")
+                            : statT("stat.tdd24h"),
                         value: total.formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) + " U"
                     )
                 } else {
                     StatChartUtils.statView(
-                        title: "Ø / Day",
+                        title: statT("stat.avgPerDay"),
                         value: average.formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) + " U"
                     )
                     Spacer()

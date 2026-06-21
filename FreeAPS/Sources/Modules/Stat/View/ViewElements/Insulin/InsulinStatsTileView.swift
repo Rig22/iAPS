@@ -46,7 +46,7 @@ struct InsulinStatsTileView: View {
                         .font(.system(size: 13, weight: .medium, design: .rounded))
                         .foregroundStyle(.secondary)
                 }
-                Text(NSLocalizedString("Ø 10 days", comment: ""))
+                Text(statT("stat.avg10days"))
                     .font(.system(size: 11, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
                     .textCase(.uppercase)
@@ -66,7 +66,7 @@ struct InsulinStatsTileView: View {
                 .font(.system(size: 15, weight: .bold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(BreathePalette.daemmer)
-            Text(NSLocalizedString("neg min", comment: "Negative insulin minutes"))
+            Text(statT("stat.negMin"))
                 .font(.system(size: 9, weight: .medium, design: .rounded))
                 .foregroundStyle(.secondary)
                 .textCase(.uppercase)
@@ -93,21 +93,21 @@ struct InsulinStatsTileView: View {
                 color: BreathePalette.salbei,
                 value: formatTDD(tddYesterday),
                 unit: NSLocalizedString("U", comment: "Unit"),
-                label: NSLocalizedString("Yesterday", comment: "")
+                label: statT("stat.yesterday")
             )
             metricTile(
                 icon: "2.circle.fill",
                 color: BreathePalette.flieder,
                 value: formatTDD(tdd2DaysAgo),
                 unit: NSLocalizedString("U", comment: "Unit"),
-                label: NSLocalizedString("2 Days", comment: "")
+                label: statT("stat.twoDays")
             )
             metricTile(
                 icon: "3.circle.fill",
                 color: BreathePalette.kamille,
                 value: formatTDD(tdd3DaysAgo),
                 unit: NSLocalizedString("U", comment: "Unit"),
-                label: NSLocalizedString("3 Days", comment: "")
+                label: statT("stat.threeDays")
             )
         }
     }
@@ -122,11 +122,11 @@ struct InsulinStatsTileView: View {
         return LazyVGrid(columns: columns, spacing: 8) {
             deltaTile(
                 value: tddChange,
-                label: NSLocalizedString("vs Yesterday", comment: "")
+                label: statT("stat.vsYesterday")
             )
             deltaTile(
                 value: tddAverage,
-                label: NSLocalizedString("vs Ø 10 days", comment: "")
+                label: statT("stat.vsAvg10days")
             )
         }
     }

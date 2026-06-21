@@ -33,12 +33,12 @@ struct BolusStatsView: View {
             HStack {
                 if isHourly {
                     StatChartUtils.statView(
-                        title: NSLocalizedString("Bolus Today", comment: "Bolus delivered today"),
+                        title: statT("stat.bolusToday"),
                         value: totalBolus.formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) + " U"
                     )
                     Spacer()
                     StatChartUtils.statView(
-                        title: NSLocalizedString("Basal Today", comment: "Basal delivered today"),
+                        title: statT("stat.basalToday"),
                         value: totalBasal.formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) + " U"
                     )
                     Spacer()
@@ -49,12 +49,12 @@ struct BolusStatsView: View {
                     )
                 } else {
                     StatChartUtils.statView(
-                        title: NSLocalizedString("Ø Bolus/d", comment: "Average bolus per day"),
+                        title: statT("stat.avgBolusPerDay"),
                         value: avgBolus.formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) + " U"
                     )
                     Spacer()
                     StatChartUtils.statView(
-                        title: NSLocalizedString("Ø Basal/d", comment: "Average basal per day"),
+                        title: statT("stat.avgBasalPerDay"),
                         value: avgBasal.formatted(.number.grouping(.never).rounded().precision(.fractionLength(1))) + " U"
                     )
                     Spacer()

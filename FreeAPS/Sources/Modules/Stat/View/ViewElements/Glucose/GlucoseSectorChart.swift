@@ -24,7 +24,7 @@ struct GlucoseSectorChart: View {
 
     var body: some View {
         if glucose.count < 1 {
-            Text("No glucose readings found.")
+            Text(statT("stat.empty.noReadings"))
         } else {
             let total = Decimal(glucose.count)
             let high = glucose.filter { $0.glucose > Int(highLimit) }.count
@@ -113,7 +113,7 @@ struct GlucoseSectorChart: View {
                     .font(.system(size: 22, weight: .bold, design: .rounded))
                     .monospacedDigit()
                     .foregroundStyle(BreathePalette.salbei)
-                Text(NSLocalizedString("Time in Range", comment: ""))
+                Text(statT("stat.timeInRange"))
                     .font(.system(size: 12, weight: .medium, design: .rounded))
                     .foregroundStyle(.secondary)
                     .textCase(.uppercase)
@@ -207,7 +207,7 @@ struct GlucoseSectorChart: View {
                 icon: "target",
                 color: BreathePalette.salbei.opacity(0.7),
                 value: formatPercentage(tightPercentage),
-                label: NSLocalizedString("Tight Range", comment: ""),
+                label: statT("stat.tightRange"),
                 sublabel: "\(tightLowFormatted)–\(tightHighFormatted)"
             )
         }
@@ -291,7 +291,7 @@ struct GlucoseSectorChart: View {
             let (average, median, sd) = calculateDetailedStats(for: values)
 
             return RangeDetail(
-                title: NSLocalizedString("High Glucose", comment: ""),
+                title: statT("stat.highGlucose"),
                 color: BreathePalette.kamille,
                 items: [
                     (
@@ -322,7 +322,7 @@ struct GlucoseSectorChart: View {
                         formatPercentage(Decimal(values.count) / total * 100)
                     ),
                     (
-                        NSLocalizedString("Tight", comment: "") + " (70–140)",
+                        statT("stat.tight") + " (70–140)",
                         formatPercentage(Decimal(tight) / total * 100)
                     ),
                     (NSLocalizedString("Average", comment: ""), formatGlucoseValue(average)),
@@ -338,7 +338,7 @@ struct GlucoseSectorChart: View {
             let (average, median, sd) = calculateDetailedStats(for: values)
 
             return RangeDetail(
-                title: NSLocalizedString("Low Glucose", comment: ""),
+                title: statT("stat.lowGlucose"),
                 color: BreathePalette.daemmer,
                 items: [
                     (

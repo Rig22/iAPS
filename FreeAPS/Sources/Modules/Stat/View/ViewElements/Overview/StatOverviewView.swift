@@ -95,7 +95,7 @@ struct StatOverviewView: View {
 
                 HStack {
                     Image(systemName: "hand.draw.fill").foregroundStyle(.primary)
-                    Text("Tap a ring for details. Tap a card to open the full view.")
+                    Text(statT("stat.hint.overview"))
                         .foregroundStyle(.secondary)
                 }
                 .font(.footnote)
@@ -238,7 +238,7 @@ private struct MiniNoData: View {
             Image(systemName: icon)
                 .font(.system(size: 28, weight: .light))
                 .foregroundStyle(color.opacity(0.3))
-            Text(NSLocalizedString("No Data", comment: ""))
+            Text(statT("stat.empty.noData"))
                 .font(.system(size: 13, weight: .medium, design: .rounded))
                 .foregroundStyle(.tertiary)
         }
@@ -326,7 +326,7 @@ private struct OverviewGlucoseCard: View {
                         .font(.system(size: 20, weight: .bold, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(.primary)
-                    Text(NSLocalizedString("Time in Range", comment: ""))
+                    Text(statT("stat.timeInRange"))
                         .font(.system(size: 10, weight: .medium, design: .rounded))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)
@@ -353,7 +353,7 @@ private struct OverviewGlucoseCard: View {
         let median = StatChartUtils.medianCalculation(array: values)
 
         return PopoverData(
-            title: NSLocalizedString("Glucose Details", comment: ""),
+            title: statT("stat.details.glucose"),
             color: BreathePalette.salbei,
             items: [
                 (
@@ -369,7 +369,7 @@ private struct OverviewGlucoseCard: View {
                     fmtPct(Double(inRangeCount) / totalD * 100)
                 ),
                 (
-                    NSLocalizedString("Tight", comment: "") + " (70–140)",
+                    statT("stat.tight") + " (70–140)",
                     fmtPct(Double(tight) / totalD * 100)
                 ),
                 (
@@ -426,15 +426,15 @@ private struct OverviewInsulinCard: View {
             if hasData {
                 InteractiveDonut(showPopover: {
                     showPopover(PopoverData(
-                        title: NSLocalizedString("Insulin Details", comment: ""),
+                        title: statT("stat.details.insulin"),
                         color: BreathePalette.daemmer,
                         items: [
                             (NSLocalizedString("Bolus", comment: ""), fmtU(todayBolus)),
                             (NSLocalizedString("Basal", comment: ""), fmtU(todayBasal)),
-                            (NSLocalizedString("Yesterday", comment: ""), fmtUDec(tddYesterday)),
-                            (NSLocalizedString("2 Days Ago", comment: ""), fmtUDec(tdd2DaysAgo)),
-                            (NSLocalizedString("3 Days Ago", comment: ""), fmtUDec(tdd3DaysAgo)),
-                            (NSLocalizedString("Ø 10 Days", comment: ""), fmtUDec(averageTDD))
+                            (statT("stat.yesterday"), fmtUDec(tddYesterday)),
+                            (statT("stat.twoDaysAgo"), fmtUDec(tdd2DaysAgo)),
+                            (statT("stat.threeDaysAgo"), fmtUDec(tdd3DaysAgo)),
+                            (statT("stat.avg10days"), fmtUDec(averageTDD))
                         ],
                         origin: .bottomLeft
                     ))
@@ -525,7 +525,7 @@ private struct OverviewLoopingCard: View {
         let medianInterval = StatChartUtils.medianCalculationDouble(array: intervalArray) * 60
 
         MiniCard(
-            title: NSLocalizedString("Looping", comment: ""),
+            title: statT("stat.tab.looping"),
             icon: "arrow.triangle.2.circlepath",
             color: BreathePalette.flieder,
             navigate: navigate
@@ -533,11 +533,11 @@ private struct OverviewLoopingCard: View {
             if total > 0 {
                 InteractiveDonut(showPopover: {
                     showPopover(PopoverData(
-                        title: NSLocalizedString("Loop Details", comment: ""),
+                        title: statT("stat.details.loop"),
                         color: BreathePalette.flieder,
                         items: [
-                            (NSLocalizedString("Successful", comment: ""), "\(successful)"),
-                            (NSLocalizedString("Failed", comment: ""), "\(failed)"),
+                            (statT("stat.successful"), "\(successful)"),
+                            (statT("stat.failed"), "\(failed)"),
                             (
                                 NSLocalizedString("Interval", comment: ""),
                                 (medianInterval / 60).formatted(.number.precision(.fractionLength(1))) + " min"
@@ -614,7 +614,7 @@ private struct OverviewMealCard: View {
 
                 InteractiveDonut(showPopover: {
                     showPopover(PopoverData(
-                        title: NSLocalizedString("Meal Details", comment: ""),
+                        title: statT("stat.details.meal"),
                         color: BreathePalette.kamille,
                         items: mealPopoverItems(stats: stats, total: total, kcal: kcal),
                         origin: .bottomRight

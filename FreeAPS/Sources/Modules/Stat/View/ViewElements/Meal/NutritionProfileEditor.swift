@@ -32,18 +32,18 @@ struct NutritionProfileEditor: View {
                 Section {
                     Stepper(value: decimalProxy(\.weightKg), in: 0 ... 250, step: 1) {
                         labeledValue(
-                            "Body weight",
-                            profile.weightKg > 0 ? "\(Int(profile.doubleWeight)) kg" : "Not set"
+                            statT("stat.np.bodyWeight"),
+                            profile.weightKg > 0 ? "\(Int(profile.doubleWeight)) kg" : statT("stat.np.notSet")
                         )
                     }
                     Stepper(value: decimalProxy(\.heightCm), in: 0 ... 230, step: 1) {
                         labeledValue(
-                            "Height",
-                            profile.heightCm > 0 ? "\(Int(profile.doubleHeight)) cm" : "Not set"
+                            statT("stat.np.height"),
+                            profile.heightCm > 0 ? "\(Int(profile.doubleHeight)) cm" : statT("stat.np.notSet")
                         )
                     }
                     Stepper(value: $profile.age, in: 1 ... 120) {
-                        labeledValue("Age", "\(profile.age)")
+                        labeledValue(statT("stat.np.age"), "\(profile.age)")
                     }
                     Picker("Sex", selection: sexProxy) {
                         ForEach(selectableSexes) { sex in
@@ -51,9 +51,9 @@ struct NutritionProfileEditor: View {
                         }
                     }
                 } header: {
-                    Text(verbatim: "Body Data")
+                    Text(statT("stat.np.bodyData"))
                 } footer: {
-                    Text(verbatim: "Used only for the nutrient targets in the Meal statistics. Independent from Share & Backup.")
+                    Text(statT("stat.np.bodyData.footer"))
                 }
 
                 Section {
@@ -62,17 +62,17 @@ struct NutritionProfileEditor: View {
                             Text(verbatim: "\(level.title) · \(level.detail)").tag(level)
                         }
                     } label: {
-                        Text(verbatim: "Activity")
+                        Text(statT("stat.np.activity"))
                     }
 
                     if profile.hasBodyData {
-                        labeledValue("Daily energy", kcal(profile.tdee), valueColor: .primary)
-                        labeledValue("Basal (BMR)", kcal(profile.bmr))
+                        labeledValue(statT("stat.np.dailyEnergy"), kcal(profile.tdee), valueColor: .primary)
+                        labeledValue(statT("stat.np.bmr"), kcal(profile.bmr))
                     }
                 } header: {
-                    Text(verbatim: "Activity & Energy")
+                    Text(statT("stat.np.activityEnergy"))
                 } footer: {
-                    Text(verbatim: "Estimated daily calorie need (Mifflin-St Jeor × activity factor).")
+                    Text(statT("stat.np.activityEnergy.footer"))
                 }
 
                 Section {
@@ -88,14 +88,12 @@ struct NutritionProfileEditor: View {
                     }
                     macroLabel("Carbs", macro: .carbs, trailing: carbsPercentText)
                 } header: {
-                    Text(verbatim: "Macro Targets")
+                    Text(statT("stat.np.macroTargets"))
                 } footer: {
-                    Text(
-                        verbatim: "Protein from body weight, fat as a share of daily energy, carbs fill the rest. Without body weight & height the fixed EFSA / EU reference values are used."
-                    )
+                    Text(statT("stat.np.macroTargets.footer"))
                 }
             }
-            .navigationTitle(Text(verbatim: "Nutrition Profile"))
+            .navigationTitle(Text(statT("stat.np.title")))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
@@ -109,7 +107,7 @@ struct NutritionProfileEditor: View {
     }
 
     private var carbsPercentText: String {
-        guard profile.hasBodyData, profile.tdee > 0 else { return "rest" }
+        guard profile.hasBodyData, profile.tdee > 0 else { return statT("stat.np.rest") }
         let pct = profile.targetGrams(for: .carbs) * 4 / profile.tdee * 100
         return "\(Int(pct.rounded())) %"
     }

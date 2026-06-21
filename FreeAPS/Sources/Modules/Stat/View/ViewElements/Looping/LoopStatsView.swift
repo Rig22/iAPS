@@ -142,18 +142,15 @@ struct LoopStatsView: View {
     private func daysSubtitle(days: Int) -> String {
         switch selectedInterval {
         case .today:
-            return NSLocalizedString("today", comment: "")
+            return statT("stat.today")
         case .day:
-            return NSLocalizedString("over the last day", comment: "")
+            return statT("stat.overLastDay")
         case .week:
-            let format = NSLocalizedString("Ø / day — over the last %d days", comment: "")
-            return String(format: format, max(days, 7))
+            return statT("stat.avgPerDayOverDays", max(days, 7))
         case .month:
-            let format = NSLocalizedString("Ø / day — over the last %d days", comment: "")
-            return String(format: format, max(days, 30))
+            return statT("stat.avgPerDayOverDays", max(days, 30))
         case .total:
-            let format = NSLocalizedString("Ø / day — over the last %d days", comment: "")
-            return String(format: format, max(days, 90))
+            return statT("stat.avgPerDayOverDays", max(days, 90))
         }
     }
 }

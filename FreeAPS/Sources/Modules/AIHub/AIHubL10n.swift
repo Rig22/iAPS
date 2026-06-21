@@ -70,6 +70,18 @@ enum AIHubL10n {
     // MARK: English (Basis/Fallback)
 
     private static let en: [String: String] = [
+        // UIUX settings (own keys, not covered by Crowdin)
+        "uiux.chart.basalRate": "Display Basal Rate in Chart",
+        "uiux.chart.carbs": "Display Carbs in Chart",
+        "uiux.chart.boluses": "Display Boluses in Chart",
+        "uiux.chart.prediction": "Display Prediction Line",
+        "uiux.header.eventualGlucose": "Display Eventual Glucose",
+        "uiux.header.tempBasal": "Display Temp Basal",
+        "uiux.header.isfView": "Display ISF",
+        "uiux.tabbar.header": "Aurora Tab Bar",
+        "uiux.tabbar.profile": "Show Profile tab (Override)",
+        "uiux.tabbar.target": "Show Target tab (Temp Target)",
+        "uiux.tabbar.footer": "Controls which buttons appear next to the FAB in the Aurora tab bar.",
         // Root
         "root.subtitle": "How can I help you today?",
         "root.card.chat.sub": "Ask questions about your data and settings.",
@@ -319,6 +331,18 @@ enum AIHubL10n {
     // MARK: Deutsch
 
     private static let de: [String: String] = [
+        // UIUX-Einstellungen (eigene Keys, nicht in Crowdin)
+        "uiux.chart.basalRate": "Basalrate im Diagramm anzeigen",
+        "uiux.chart.carbs": "Kohlenhydrate im Diagramm anzeigen",
+        "uiux.chart.boluses": "Bolusgaben im Diagramm anzeigen",
+        "uiux.chart.prediction": "Vorhersagelinie anzeigen",
+        "uiux.header.eventualGlucose": "Voraussichtlichen Glukosewert anzeigen",
+        "uiux.header.tempBasal": "Temporäre Basalrate anzeigen",
+        "uiux.header.isfView": "ISF anzeigen",
+        "uiux.tabbar.header": "Aurora-Tab-Leiste",
+        "uiux.tabbar.profile": "Profil-Tab (Override) anzeigen",
+        "uiux.tabbar.target": "Ziel-Tab (Temp Target) anzeigen",
+        "uiux.tabbar.footer": "Steuert, welche Buttons rechts und links neben dem FAB in der Aurora-Tab-Leiste erscheinen.",
         "root.subtitle": "Wie kann ich dir heute helfen?",
         "root.card.chat.sub": "Fragen zu deinen Daten und Einstellungen stellen.",
         "root.card.insights.sub": "Automatische Analyse von Basal, ISF und CR.",
@@ -561,6 +585,19 @@ enum AIHubL10n {
     // MARK: Français
 
     private static let fr: [String: String] = [
+        "aur.pump.grace": "Tolérance %@",
+        // Réglages UIUX (clés propres, absentes de Crowdin)
+        "uiux.chart.basalRate": "Afficher le débit de base dans le graphique",
+        "uiux.chart.carbs": "Afficher les glucides dans le graphique",
+        "uiux.chart.boluses": "Afficher les bolus dans le graphique",
+        "uiux.chart.prediction": "Afficher la ligne de prévision",
+        "uiux.header.eventualGlucose": "Afficher la glycémie prévue",
+        "uiux.header.tempBasal": "Afficher le débit de base temporaire",
+        "uiux.header.isfView": "Afficher l'ISF",
+        "uiux.tabbar.header": "Barre d'onglets Aurora",
+        "uiux.tabbar.profile": "Afficher l'onglet Profil (Override)",
+        "uiux.tabbar.target": "Afficher l'onglet Cible (Temp Target)",
+        "uiux.tabbar.footer": "Détermine quels boutons apparaissent à côté du FAB dans la barre d'onglets Aurora.",
         "root.subtitle": "Comment puis-je t'aider aujourd'hui ?",
         "root.card.chat.sub": "Pose des questions sur tes données et réglages.",
         "root.card.insights.sub": "Analyse automatique du basal, de l'ISF et du ratio glucides.",
@@ -796,6 +833,19 @@ enum AIHubL10n {
     // MARK: Italiano
 
     private static let it: [String: String] = [
+        "aur.pump.grace": "Tolleranza %@",
+        // Impostazioni UIUX (chiavi proprie, non presenti in Crowdin)
+        "uiux.chart.basalRate": "Mostra la velocità basale nel grafico",
+        "uiux.chart.carbs": "Mostra i carboidrati nel grafico",
+        "uiux.chart.boluses": "Mostra i boli nel grafico",
+        "uiux.chart.prediction": "Mostra la linea di previsione",
+        "uiux.header.eventualGlucose": "Mostra la glicemia prevista",
+        "uiux.header.tempBasal": "Mostra la basale temporanea",
+        "uiux.header.isfView": "Mostra ISF",
+        "uiux.tabbar.header": "Barra schede Aurora",
+        "uiux.tabbar.profile": "Mostra scheda Profilo (Override)",
+        "uiux.tabbar.target": "Mostra scheda Obiettivo (Temp Target)",
+        "uiux.tabbar.footer": "Controlla quali pulsanti appaiono accanto al FAB nella barra schede Aurora.",
         "root.subtitle": "Come posso aiutarti oggi?",
         "root.card.chat.sub": "Fai domande sui tuoi dati e sulle impostazioni.",
         "root.card.insights.sub": "Analisi automatica di basale, ISF e rapporto carboidrati.",
@@ -1031,6 +1081,19 @@ enum AIHubL10n {
     // MARK: Español
 
     private static let es: [String: String] = [
+        "aur.pump.grace": "Margen %@",
+        // Ajustes UIUX (claves propias, no presentes en Crowdin)
+        "uiux.chart.basalRate": "Mostrar tasa basal en el gráfico",
+        "uiux.chart.carbs": "Mostrar carbohidratos en el gráfico",
+        "uiux.chart.boluses": "Mostrar bolos en el gráfico",
+        "uiux.chart.prediction": "Mostrar línea de predicción",
+        "uiux.header.eventualGlucose": "Mostrar glucosa prevista",
+        "uiux.header.tempBasal": "Mostrar basal temporal",
+        "uiux.header.isfView": "Mostrar ISF",
+        "uiux.tabbar.header": "Barra de pestañas Aurora",
+        "uiux.tabbar.profile": "Mostrar pestaña Perfil (Override)",
+        "uiux.tabbar.target": "Mostrar pestaña Objetivo (Temp Target)",
+        "uiux.tabbar.footer": "Controla qué botones aparecen junto al FAB en la barra de pestañas Aurora.",
         "root.subtitle": "¿Cómo puedo ayudarte hoy?",
         "root.card.chat.sub": "Haz preguntas sobre tus datos y ajustes.",
         "root.card.insights.sub": "Análisis automático de basal, ISF y ratio de carbohidratos.",
@@ -1266,6 +1329,19 @@ enum AIHubL10n {
     // MARK: Nederlands
 
     private static let nl: [String: String] = [
+        "aur.pump.grace": "Marge %@",
+        // UIUX-instellingen (eigen sleutels, niet in Crowdin)
+        "uiux.chart.basalRate": "Basaalsnelheid in grafiek weergeven",
+        "uiux.chart.carbs": "Koolhydraten in grafiek weergeven",
+        "uiux.chart.boluses": "Bolussen in grafiek weergeven",
+        "uiux.chart.prediction": "Voorspellingslijn weergeven",
+        "uiux.header.eventualGlucose": "Verwachte glucose weergeven",
+        "uiux.header.tempBasal": "Tijdelijke basaal weergeven",
+        "uiux.header.isfView": "ISF weergeven",
+        "uiux.tabbar.header": "Aurora-tabbalk",
+        "uiux.tabbar.profile": "Profiel-tabblad (Override) weergeven",
+        "uiux.tabbar.target": "Doel-tabblad (Temp Target) weergeven",
+        "uiux.tabbar.footer": "Bepaalt welke knoppen naast de FAB in de Aurora-tabbalk verschijnen.",
         "root.subtitle": "Hoe kan ik je vandaag helpen?",
         "root.card.chat.sub": "Stel vragen over je gegevens en instellingen.",
         "root.card.insights.sub": "Automatische analyse van basaal, ISF en koolhydraatratio.",
@@ -1501,6 +1577,19 @@ enum AIHubL10n {
     // MARK: Polski
 
     private static let pl: [String: String] = [
+        "aur.pump.grace": "Karencja %@",
+        // Ustawienia UIUX (własne klucze, nieobjęte Crowdin)
+        "uiux.chart.basalRate": "Pokaż dawkę bazową na wykresie",
+        "uiux.chart.carbs": "Pokaż węglowodany na wykresie",
+        "uiux.chart.boluses": "Pokaż bolusy na wykresie",
+        "uiux.chart.prediction": "Pokaż linię prognozy",
+        "uiux.header.eventualGlucose": "Pokaż przewidywaną glikemię",
+        "uiux.header.tempBasal": "Pokaż tymczasową bazę",
+        "uiux.header.isfView": "Pokaż ISF",
+        "uiux.tabbar.header": "Pasek kart Aurora",
+        "uiux.tabbar.profile": "Pokaż kartę Profil (Override)",
+        "uiux.tabbar.target": "Pokaż kartę Cel (Temp Target)",
+        "uiux.tabbar.footer": "Określa, które przyciski pojawiają się obok przycisku FAB na pasku kart Aurora.",
         "root.subtitle": "Jak mogę ci dziś pomóc?",
         "root.card.chat.sub": "Zadawaj pytania o swoje dane i ustawienia.",
         "root.card.insights.sub": "Automatyczna analiza bazy, ISF i przelicznika węglowodanów.",
@@ -1736,6 +1825,19 @@ enum AIHubL10n {
     // MARK: Svenska
 
     private static let sv: [String: String] = [
+        "aur.pump.grace": "Respit %@",
+        // UIUX-inställningar (egna nycklar, ej i Crowdin)
+        "uiux.chart.basalRate": "Visa basaldos i diagrammet",
+        "uiux.chart.carbs": "Visa kolhydrater i diagrammet",
+        "uiux.chart.boluses": "Visa bolusdoser i diagrammet",
+        "uiux.chart.prediction": "Visa prognoslinje",
+        "uiux.header.eventualGlucose": "Visa förväntat glukosvärde",
+        "uiux.header.tempBasal": "Visa tillfällig basaldos",
+        "uiux.header.isfView": "Visa ISF",
+        "uiux.tabbar.header": "Aurora-flikfält",
+        "uiux.tabbar.profile": "Visa fliken Profil (Override)",
+        "uiux.tabbar.target": "Visa fliken Mål (Temp Target)",
+        "uiux.tabbar.footer": "Styr vilka knappar som visas bredvid FAB i Aurora-flikfältet.",
         "root.subtitle": "Hur kan jag hjälpa dig i dag?",
         "root.card.chat.sub": "Ställ frågor om dina data och inställningar.",
         "root.card.insights.sub": "Automatisk analys av basal, ISF och kolhydratkvot.",
@@ -1971,6 +2073,19 @@ enum AIHubL10n {
     // MARK: Dansk
 
     private static let da: [String: String] = [
+        "aur.pump.grace": "Frist %@",
+        // UIUX-indstillinger (egne nøgler, ikke i Crowdin)
+        "uiux.chart.basalRate": "Vis basalrate i diagrammet",
+        "uiux.chart.carbs": "Vis kulhydrater i diagrammet",
+        "uiux.chart.boluses": "Vis bolusser i diagrammet",
+        "uiux.chart.prediction": "Vis forudsigelseslinje",
+        "uiux.header.eventualGlucose": "Vis forventet glukose",
+        "uiux.header.tempBasal": "Vis midlertidig basal",
+        "uiux.header.isfView": "Vis ISF",
+        "uiux.tabbar.header": "Aurora-fanelinje",
+        "uiux.tabbar.profile": "Vis fanen Profil (Override)",
+        "uiux.tabbar.target": "Vis fanen Mål (Temp Target)",
+        "uiux.tabbar.footer": "Styrer hvilke knapper der vises ved siden af FAB i Aurora-fanelinjen.",
         "root.subtitle": "Hvordan kan jeg hjælpe dig i dag?",
         "root.card.chat.sub": "Stil spørgsmål om dine data og indstillinger.",
         "root.card.insights.sub": "Automatisk analyse af basal, ISF og kulhydratratio.",
@@ -2206,6 +2321,19 @@ enum AIHubL10n {
     // MARK: Norsk (bokmål)
 
     private static let nb: [String: String] = [
+        "aur.pump.grace": "Frist %@",
+        // UIUX-innstillinger (egne nøkler, ikke i Crowdin)
+        "uiux.chart.basalRate": "Vis basaldose i diagrammet",
+        "uiux.chart.carbs": "Vis karbohydrater i diagrammet",
+        "uiux.chart.boluses": "Vis boluser i diagrammet",
+        "uiux.chart.prediction": "Vis prediksjonslinje",
+        "uiux.header.eventualGlucose": "Vis forventet glukose",
+        "uiux.header.tempBasal": "Vis midlertidig basal",
+        "uiux.header.isfView": "Vis ISF",
+        "uiux.tabbar.header": "Aurora-fanelinje",
+        "uiux.tabbar.profile": "Vis fanen Profil (Override)",
+        "uiux.tabbar.target": "Vis fanen Mål (Temp Target)",
+        "uiux.tabbar.footer": "Styrer hvilke knapper som vises ved siden av FAB i Aurora-fanelinjen.",
         "root.subtitle": "Hvordan kan jeg hjelpe deg i dag?",
         "root.card.chat.sub": "Still spørsmål om dataene og innstillingene dine.",
         "root.card.insights.sub": "Automatisk analyse av basal, ISF og karbohydratforhold.",
@@ -2441,6 +2569,19 @@ enum AIHubL10n {
     // MARK: Suomi
 
     private static let fi: [String: String] = [
+        "aur.pump.grace": "Lisäaika %@",
+        // UIUX-asetukset (omat avaimet, ei Crowdinissa)
+        "uiux.chart.basalRate": "Näytä basaaliannos kaaviossa",
+        "uiux.chart.carbs": "Näytä hiilihydraatit kaaviossa",
+        "uiux.chart.boluses": "Näytä bolukset kaaviossa",
+        "uiux.chart.prediction": "Näytä ennusteviiva",
+        "uiux.header.eventualGlucose": "Näytä ennustettu glukoosi",
+        "uiux.header.tempBasal": "Näytä väliaikainen basaali",
+        "uiux.header.isfView": "Näytä ISF",
+        "uiux.tabbar.header": "Aurora-välilehtipalkki",
+        "uiux.tabbar.profile": "Näytä Profiili-välilehti (Override)",
+        "uiux.tabbar.target": "Näytä Tavoite-välilehti (Temp Target)",
+        "uiux.tabbar.footer": "Määrittää, mitkä painikkeet näkyvät FAB-painikkeen vieressä Aurora-välilehtipalkissa.",
         "root.subtitle": "Kuinka voin auttaa sinua tänään?",
         "root.card.chat.sub": "Kysy tiedoistasi ja asetuksistasi.",
         "root.card.insights.sub": "Basaalin, ISF:n ja hiilihydraattisuhteen automaattinen analyysi.",
@@ -2676,6 +2817,19 @@ enum AIHubL10n {
     // MARK: Português (Portugal)
 
     private static let pt: [String: String] = [
+        "aur.pump.grace": "Tolerância %@",
+        // Definições UIUX (chaves próprias, fora do Crowdin)
+        "uiux.chart.basalRate": "Mostrar taxa basal no gráfico",
+        "uiux.chart.carbs": "Mostrar hidratos de carbono no gráfico",
+        "uiux.chart.boluses": "Mostrar bólus no gráfico",
+        "uiux.chart.prediction": "Mostrar linha de previsão",
+        "uiux.header.eventualGlucose": "Mostrar glicose prevista",
+        "uiux.header.tempBasal": "Mostrar basal temporária",
+        "uiux.header.isfView": "Mostrar ISF",
+        "uiux.tabbar.header": "Barra de separadores Aurora",
+        "uiux.tabbar.profile": "Mostrar separador Perfil (Override)",
+        "uiux.tabbar.target": "Mostrar separador Objetivo (Temp Target)",
+        "uiux.tabbar.footer": "Controla que botões aparecem ao lado do FAB na barra de separadores Aurora.",
         "root.subtitle": "Como posso ajudar-te hoje?",
         "root.card.chat.sub": "Faz perguntas sobre os teus dados e definições.",
         "root.card.insights.sub": "Análise automática de basal, ISF e rácio de hidratos.",
@@ -2911,6 +3065,19 @@ enum AIHubL10n {
     // MARK: Português (Brasil)
 
     private static let ptBR: [String: String] = [
+        "aur.pump.grace": "Tolerância %@",
+        // Configurações UIUX (chaves próprias, fora do Crowdin)
+        "uiux.chart.basalRate": "Mostrar taxa basal no gráfico",
+        "uiux.chart.carbs": "Mostrar carboidratos no gráfico",
+        "uiux.chart.boluses": "Mostrar bólus no gráfico",
+        "uiux.chart.prediction": "Mostrar linha de previsão",
+        "uiux.header.eventualGlucose": "Mostrar glicose prevista",
+        "uiux.header.tempBasal": "Mostrar basal temporária",
+        "uiux.header.isfView": "Mostrar ISF",
+        "uiux.tabbar.header": "Barra de abas Aurora",
+        "uiux.tabbar.profile": "Mostrar aba Perfil (Override)",
+        "uiux.tabbar.target": "Mostrar aba Alvo (Temp Target)",
+        "uiux.tabbar.footer": "Controla quais botões aparecem ao lado do FAB na barra de abas Aurora.",
         "root.subtitle": "Como posso ajudar você hoje?",
         "root.card.chat.sub": "Faça perguntas sobre seus dados e configurações.",
         "root.card.insights.sub": "Análise automática de basal, ISF e razão de carboidratos.",
@@ -3146,6 +3313,19 @@ enum AIHubL10n {
     // MARK: Русский
 
     private static let ru: [String: String] = [
+        "aur.pump.grace": "Отсрочка %@",
+        // Настройки UIUX (собственные ключи, нет в Crowdin)
+        "uiux.chart.basalRate": "Показывать базальную скорость на графике",
+        "uiux.chart.carbs": "Показывать углеводы на графике",
+        "uiux.chart.boluses": "Показывать болюсы на графике",
+        "uiux.chart.prediction": "Показывать линию прогноза",
+        "uiux.header.eventualGlucose": "Показывать прогнозируемую глюкозу",
+        "uiux.header.tempBasal": "Показывать временный базал",
+        "uiux.header.isfView": "Показывать ISF",
+        "uiux.tabbar.header": "Панель вкладок Aurora",
+        "uiux.tabbar.profile": "Показывать вкладку «Профиль» (Override)",
+        "uiux.tabbar.target": "Показывать вкладку «Цель» (Temp Target)",
+        "uiux.tabbar.footer": "Определяет, какие кнопки отображаются рядом с FAB на панели вкладок Aurora.",
         "root.subtitle": "Чем я могу помочь сегодня?",
         "root.card.chat.sub": "Задавайте вопросы о своих данных и настройках.",
         "root.card.insights.sub": "Автоматический анализ базала, ISF и углеводного коэффициента.",
@@ -3381,6 +3561,19 @@ enum AIHubL10n {
     // MARK: Türkçe
 
     private static let tr: [String: String] = [
+        "aur.pump.grace": "Tolerans %@",
+        // UIUX ayarları (kendi anahtarlar, Crowdin'de yok)
+        "uiux.chart.basalRate": "Bazal hızı grafikte göster",
+        "uiux.chart.carbs": "Karbonhidratları grafikte göster",
+        "uiux.chart.boluses": "Bolusları grafikte göster",
+        "uiux.chart.prediction": "Tahmin çizgisini göster",
+        "uiux.header.eventualGlucose": "Tahmini glukozu göster",
+        "uiux.header.tempBasal": "Geçici bazalı göster",
+        "uiux.header.isfView": "ISF göster",
+        "uiux.tabbar.header": "Aurora Sekme Çubuğu",
+        "uiux.tabbar.profile": "Profil sekmesini göster (Override)",
+        "uiux.tabbar.target": "Hedef sekmesini göster (Temp Target)",
+        "uiux.tabbar.footer": "Aurora sekme çubuğunda FAB'ın yanında hangi düğmelerin görüneceğini belirler.",
         "root.subtitle": "Bugün sana nasıl yardımcı olabilirim?",
         "root.card.chat.sub": "Verilerin ve ayarların hakkında sorular sor.",
         "root.card.insights.sub": "Bazal, ISF ve karbonhidrat oranının otomatik analizi.",
@@ -3616,6 +3809,19 @@ enum AIHubL10n {
     // MARK: Українська
 
     private static let uk: [String: String] = [
+        "aur.pump.grace": "Відстрочка %@",
+        // Налаштування UIUX (власні ключі, немає в Crowdin)
+        "uiux.chart.basalRate": "Показувати базальну швидкість на графіку",
+        "uiux.chart.carbs": "Показувати вуглеводи на графіку",
+        "uiux.chart.boluses": "Показувати болюси на графіку",
+        "uiux.chart.prediction": "Показувати лінію прогнозу",
+        "uiux.header.eventualGlucose": "Показувати прогнозовану глюкозу",
+        "uiux.header.tempBasal": "Показувати тимчасовий базал",
+        "uiux.header.isfView": "Показувати ISF",
+        "uiux.tabbar.header": "Панель вкладок Aurora",
+        "uiux.tabbar.profile": "Показувати вкладку «Профіль» (Override)",
+        "uiux.tabbar.target": "Показувати вкладку «Ціль» (Temp Target)",
+        "uiux.tabbar.footer": "Визначає, які кнопки відображаються поряд із FAB на панелі вкладок Aurora.",
         "root.subtitle": "Чим я можу допомогти сьогодні?",
         "root.card.chat.sub": "Запитуйте про свої дані та налаштування.",
         "root.card.insights.sub": "Автоматичний аналіз базалу, ISF і вуглеводного коефіцієнта.",
@@ -3851,6 +4057,19 @@ enum AIHubL10n {
     // MARK: Slovenčina
 
     private static let sk: [String: String] = [
+        "aur.pump.grace": "Tolerancia %@",
+        // Nastavenia UIUX (vlastné kľúče, nie sú v Crowdin)
+        "uiux.chart.basalRate": "Zobraziť bazálnu dávku v grafe",
+        "uiux.chart.carbs": "Zobraziť sacharidy v grafe",
+        "uiux.chart.boluses": "Zobraziť bolusy v grafe",
+        "uiux.chart.prediction": "Zobraziť líniu predikcie",
+        "uiux.header.eventualGlucose": "Zobraziť predpokladanú glukózu",
+        "uiux.header.tempBasal": "Zobraziť dočasnú bazálu",
+        "uiux.header.isfView": "Zobraziť ISF",
+        "uiux.tabbar.header": "Panel kariet Aurora",
+        "uiux.tabbar.profile": "Zobraziť kartu Profil (Override)",
+        "uiux.tabbar.target": "Zobraziť kartu Cieľ (Temp Target)",
+        "uiux.tabbar.footer": "Určuje, ktoré tlačidlá sa zobrazia vedľa FAB v paneli kariet Aurora.",
         "root.subtitle": "Ako ti dnes môžem pomôcť?",
         "root.card.chat.sub": "Pýtaj sa na svoje údaje a nastavenia.",
         "root.card.insights.sub": "Automatická analýza bazálu, ISF a sacharidového pomeru.",
@@ -4086,6 +4305,19 @@ enum AIHubL10n {
     // MARK: Magyar
 
     private static let hu: [String: String] = [
+        "aur.pump.grace": "Türelem %@",
+        // UIUX beállítások (saját kulcsok, nincsenek Crowdinban)
+        "uiux.chart.basalRate": "Bazális ráta megjelenítése a grafikonon",
+        "uiux.chart.carbs": "Szénhidrátok megjelenítése a grafikonon",
+        "uiux.chart.boluses": "Bólusok megjelenítése a grafikonon",
+        "uiux.chart.prediction": "Előrejelzési vonal megjelenítése",
+        "uiux.header.eventualGlucose": "Várható glükóz megjelenítése",
+        "uiux.header.tempBasal": "Ideiglenes bazális megjelenítése",
+        "uiux.header.isfView": "ISF megjelenítése",
+        "uiux.tabbar.header": "Aurora lapsáv",
+        "uiux.tabbar.profile": "Profil lap megjelenítése (Override)",
+        "uiux.tabbar.target": "Cél lap megjelenítése (Temp Target)",
+        "uiux.tabbar.footer": "Meghatározza, mely gombok jelennek meg a FAB mellett az Aurora lapsávban.",
         "root.subtitle": "Miben segíthetek ma?",
         "root.card.chat.sub": "Tegyél fel kérdéseket az adataidról és beállításaidról.",
         "root.card.insights.sub": "A bazál, az ISF és a szénhidrát-arány automatikus elemzése.",
@@ -4321,6 +4553,19 @@ enum AIHubL10n {
     // MARK: العربية
 
     private static let ar: [String: String] = [
+        "aur.pump.grace": "مهلة %@",
+        // إعدادات UIUX (مفاتيح خاصة، غير موجودة في Crowdin)
+        "uiux.chart.basalRate": "عرض المعدل القاعدي في الرسم البياني",
+        "uiux.chart.carbs": "عرض الكربوهيدرات في الرسم البياني",
+        "uiux.chart.boluses": "عرض الجرعات في الرسم البياني",
+        "uiux.chart.prediction": "عرض خط التوقع",
+        "uiux.header.eventualGlucose": "عرض الجلوكوز المتوقع",
+        "uiux.header.tempBasal": "عرض القاعدي المؤقت",
+        "uiux.header.isfView": "عرض ISF",
+        "uiux.tabbar.header": "شريط تبويب Aurora",
+        "uiux.tabbar.profile": "إظهار تبويب الملف الشخصي (Override)",
+        "uiux.tabbar.target": "إظهار تبويب الهدف (Temp Target)",
+        "uiux.tabbar.footer": "يتحكم في الأزرار التي تظهر بجوار زر FAB في شريط تبويب Aurora.",
         "root.subtitle": "كيف يمكنني مساعدتك اليوم؟",
         "root.card.chat.sub": "اطرح أسئلة حول بياناتك وإعداداتك.",
         "root.card.insights.sub": "تحليل تلقائي للبازال وعامل حساسية الإنسولين ونسبة الكربوهيدرات.",
@@ -4556,6 +4801,19 @@ enum AIHubL10n {
     // MARK: עברית
 
     private static let he: [String: String] = [
+        "aur.pump.grace": "ארכה %@",
+        // הגדרות UIUX (מפתחות משלנו, לא ב-Crowdin)
+        "uiux.chart.basalRate": "הצגת קצב בזאלי בגרף",
+        "uiux.chart.carbs": "הצגת פחמימות בגרף",
+        "uiux.chart.boluses": "הצגת בולוסים בגרף",
+        "uiux.chart.prediction": "הצגת קו התחזית",
+        "uiux.header.eventualGlucose": "הצגת הגלוקוז הצפוי",
+        "uiux.header.tempBasal": "הצגת בזאלי זמני",
+        "uiux.header.isfView": "הצגת ISF",
+        "uiux.tabbar.header": "סרגל הכרטיסיות של Aurora",
+        "uiux.tabbar.profile": "הצגת כרטיסיית פרופיל (Override)",
+        "uiux.tabbar.target": "הצגת כרטיסיית יעד (Temp Target)",
+        "uiux.tabbar.footer": "קובע אילו כפתורים מופיעים ליד ה-FAB בסרגל הכרטיסיות של Aurora.",
         "root.subtitle": "איך אפשר לעזור לך היום?",
         "root.card.chat.sub": "שאל שאלות על הנתונים וההגדרות שלך.",
         "root.card.insights.sub": "ניתוח אוטומטי של בזאלי, ISF ויחס פחמימות.",
@@ -4791,6 +5049,19 @@ enum AIHubL10n {
     // MARK: Ελληνικά
 
     private static let el: [String: String] = [
+        "aur.pump.grace": "Ανοχή %@",
+        // Ρυθμίσεις UIUX (δικά μας κλειδιά, εκτός Crowdin)
+        "uiux.chart.basalRate": "Εμφάνιση βασικού ρυθμού στο γράφημα",
+        "uiux.chart.carbs": "Εμφάνιση υδατανθράκων στο γράφημα",
+        "uiux.chart.boluses": "Εμφάνιση δόσεων (bolus) στο γράφημα",
+        "uiux.chart.prediction": "Εμφάνιση γραμμής πρόβλεψης",
+        "uiux.header.eventualGlucose": "Εμφάνιση αναμενόμενης γλυκόζης",
+        "uiux.header.tempBasal": "Εμφάνιση προσωρινού βασικού ρυθμού",
+        "uiux.header.isfView": "Εμφάνιση ISF",
+        "uiux.tabbar.header": "Γραμμή καρτελών Aurora",
+        "uiux.tabbar.profile": "Εμφάνιση καρτέλας Προφίλ (Override)",
+        "uiux.tabbar.target": "Εμφάνιση καρτέλας Στόχου (Temp Target)",
+        "uiux.tabbar.footer": "Καθορίζει ποια κουμπιά εμφανίζονται δίπλα στο FAB στη γραμμή καρτελών Aurora.",
         "root.subtitle": "Πώς μπορώ να σε βοηθήσω σήμερα;",
         "root.card.chat.sub": "Κάνε ερωτήσεις για τα δεδομένα και τις ρυθμίσεις σου.",
         "root.card.insights.sub": "Αυτόματη ανάλυση βασικού ρυθμού, ISF και αναλογίας υδατανθράκων.",
@@ -5026,6 +5297,19 @@ enum AIHubL10n {
     // MARK: Català
 
     private static let ca: [String: String] = [
+        "aur.pump.grace": "Marge %@",
+        // Configuració UIUX (claus pròpies, fora de Crowdin)
+        "uiux.chart.basalRate": "Mostra la taxa basal al gràfic",
+        "uiux.chart.carbs": "Mostra els carbohidrats al gràfic",
+        "uiux.chart.boluses": "Mostra els bols al gràfic",
+        "uiux.chart.prediction": "Mostra la línia de predicció",
+        "uiux.header.eventualGlucose": "Mostra la glucosa prevista",
+        "uiux.header.tempBasal": "Mostra la basal temporal",
+        "uiux.header.isfView": "Mostra l'ISF",
+        "uiux.tabbar.header": "Barra de pestanyes Aurora",
+        "uiux.tabbar.profile": "Mostra la pestanya Perfil (Override)",
+        "uiux.tabbar.target": "Mostra la pestanya Objectiu (Temp Target)",
+        "uiux.tabbar.footer": "Controla quins botons apareixen al costat del FAB a la barra de pestanyes Aurora.",
         "root.subtitle": "Com et puc ajudar avui?",
         "root.card.chat.sub": "Fes preguntes sobre les teves dades i configuracions.",
         "root.card.insights.sub": "Anàlisi automàtica de basal, ISF i ràtio de carbohidrats.",
@@ -5261,6 +5545,19 @@ enum AIHubL10n {
     // MARK: Tiếng Việt
 
     private static let vi: [String: String] = [
+        "aur.pump.grace": "Gia hạn %@",
+        // Cài đặt UIUX (khóa riêng, không có trong Crowdin)
+        "uiux.chart.basalRate": "Hiển thị tốc độ nền trên biểu đồ",
+        "uiux.chart.carbs": "Hiển thị carb trên biểu đồ",
+        "uiux.chart.boluses": "Hiển thị liều bolus trên biểu đồ",
+        "uiux.chart.prediction": "Hiển thị đường dự đoán",
+        "uiux.header.eventualGlucose": "Hiển thị đường huyết dự kiến",
+        "uiux.header.tempBasal": "Hiển thị nền tạm thời",
+        "uiux.header.isfView": "Hiển thị ISF",
+        "uiux.tabbar.header": "Thanh thẻ Aurora",
+        "uiux.tabbar.profile": "Hiển thị thẻ Hồ sơ (Override)",
+        "uiux.tabbar.target": "Hiển thị thẻ Mục tiêu (Temp Target)",
+        "uiux.tabbar.footer": "Kiểm soát những nút nào xuất hiện bên cạnh FAB trên thanh thẻ Aurora.",
         "root.subtitle": "Hôm nay tôi có thể giúp gì cho bạn?",
         "root.card.chat.sub": "Đặt câu hỏi về dữ liệu và cài đặt của bạn.",
         "root.card.insights.sub": "Phân tích tự động basal, ISF và tỷ lệ carbohydrate.",
@@ -5496,6 +5793,19 @@ enum AIHubL10n {
     // MARK: 简体中文
 
     private static let zhHans: [String: String] = [
+        "aur.pump.grace": "宽限 %@",
+        // UIUX 设置（自有键，Crowdin 未覆盖）
+        "uiux.chart.basalRate": "在图表中显示基础率",
+        "uiux.chart.carbs": "在图表中显示碳水",
+        "uiux.chart.boluses": "在图表中显示大剂量",
+        "uiux.chart.prediction": "显示预测线",
+        "uiux.header.eventualGlucose": "显示最终血糖",
+        "uiux.header.tempBasal": "显示临时基础率",
+        "uiux.header.isfView": "显示 ISF",
+        "uiux.tabbar.header": "Aurora 标签栏",
+        "uiux.tabbar.profile": "显示配置文件标签 (Override)",
+        "uiux.tabbar.target": "显示目标标签 (Temp Target)",
+        "uiux.tabbar.footer": "控制 Aurora 标签栏中 FAB 两侧显示哪些按钮。",
         "root.subtitle": "今天我能帮你什么？",
         "root.card.chat.sub": "询问你的数据和设置相关问题。",
         "root.card.insights.sub": "自动分析基础率、ISF 和碳水比例。",

@@ -57,7 +57,7 @@ struct LoopBarChartView: View {
             case .month,
                  .total,
                  .week:
-                return "\(data.count) " + NSLocalizedString("Loops per Day", comment: "")
+                return "\(data.count) " + statT("stat.loopsPerDay")
             }
         } else {
             switch selectedInterval {
@@ -67,7 +67,7 @@ struct LoopBarChartView: View {
             case .month,
                  .total,
                  .week:
-                return "\(data.count) " + NSLocalizedString("Readings per Day", comment: "")
+                return "\(data.count) " + statT("stat.readingsPerDay")
             }
         }
     }

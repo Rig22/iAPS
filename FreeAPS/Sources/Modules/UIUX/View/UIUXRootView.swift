@@ -45,16 +45,16 @@ extension UIUX {
                         Spacer()
                         DecimalTextField("6", value: $state.hours, formatter: carbsFormatter)
                     }
-                    Toggle("Display Basal Rate in Chart", isOn: $state.displayMainChartBasalRate)
-                    Toggle("Display Carbs in Chart", isOn: $state.displayChartCarbs)
-                    Toggle("Display Boluses in Chart", isOn: $state.displayChartBoluses)
+                    Toggle(hubT("uiux.chart.basalRate"), isOn: $state.displayMainChartBasalRate)
+                    Toggle(hubT("uiux.chart.carbs"), isOn: $state.displayChartCarbs)
+                    Toggle(hubT("uiux.chart.boluses"), isOn: $state.displayChartBoluses)
                     HStack {
                         Text("Hide the bolus amount strings when amount is under")
                         Spacer()
                         DecimalTextField("0.2", value: $state.minimumSMB, formatter: insulinFormatter)
                         Text("U").foregroundColor(.secondary)
                     }
-                    Toggle("Display Prediction Line", isOn: Binding(
+                    Toggle(hubT("uiux.chart.prediction"), isOn: Binding(
                         get: { !state.hidePredictions },
                         set: { state.hidePredictions = !$0 }
                     ))
@@ -62,12 +62,12 @@ extension UIUX {
 
                 Section {
                     /*   Toggle("Display Glucose Delta", isOn: $state.displayDelta)*/
-                    Toggle("Display Eventual Glucose", isOn: $state.displayeventualBG)
-                    Toggle("Display Temp Basal", isOn: $state.displayTBR)
+                    Toggle(hubT("uiux.header.eventualGlucose"), isOn: $state.displayeventualBG)
+                    Toggle(hubT("uiux.header.tempBasal"), isOn: $state.displayTBR)
                     Toggle("Hide Concentration Badge", isOn: $state.hideInsulinBadge)
                     Toggle("Display Sensor Age", isOn: $state.displaySAGE)
                     Toggle("Display Sensor Time Remaining", isOn: $state.displayExpiration)
-                    Toggle("Display isfView", isOn: $state.isfView)
+                    Toggle(hubT("uiux.header.isfView"), isOn: $state.isfView)
 
                 } header: { Text("Header settings") }
                     ._onBindingChange($state.displaySAGE) { enabled in
@@ -78,10 +78,10 @@ extension UIUX {
                     }
 
                 Section {
-                    Toggle("Profil-Tab (Override) anzeigen", isOn: $state.profileButton)
-                    Toggle("Ziel-Tab (Temp Target) anzeigen", isOn: $state.useTargetButton)
-                } header: { Text("Aurora Tab Bar") } footer: {
-                    Text("Steuert, welche Buttons rechts und links neben dem FAB in der Aurora-Tab-Leiste erscheinen.")
+                    Toggle(hubT("uiux.tabbar.profile"), isOn: $state.profileButton)
+                    Toggle(hubT("uiux.tabbar.target"), isOn: $state.useTargetButton)
+                } header: { Text(hubT("uiux.tabbar.header")) } footer: {
+                    Text(hubT("uiux.tabbar.footer"))
                 }
 
                 Section {

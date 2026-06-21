@@ -106,7 +106,7 @@ extension Stat {
 
             // Chart type picker
             HStack {
-                Text("Chart Type")
+                Text(statT("stat.chartType"))
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
                     .foregroundStyle(.secondary)
                     .textCase(.uppercase)
@@ -184,7 +184,7 @@ extension Stat {
 
         @ViewBuilder var insulinView: some View {
             HStack {
-                Text("Chart Type")
+                Text(statT("stat.chartType"))
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
                     .foregroundStyle(.secondary)
                     .textCase(.uppercase)
@@ -232,9 +232,9 @@ extension Stat {
                     }()
                     if tddData.isEmpty {
                         ContentUnavailableView(
-                            NSLocalizedString("No TDD Data", comment: ""),
+                            statT("stat.empty.tdd.title"),
                             systemImage: "chart.bar.xaxis",
-                            description: Text("Total Daily Doses will appear here once data is available.")
+                            description: Text(statT("stat.empty.tdd.msg"))
                         )
                     } else {
                         TotalDailyDoseChart(
@@ -254,9 +254,9 @@ extension Stat {
                     let hasData = bolusData.contains { $0.manualBolus > 0 || $0.external > 0 }
                     if bolusData.isEmpty || !hasData {
                         ContentUnavailableView(
-                            NSLocalizedString("No Bolus Data", comment: ""),
+                            statT("stat.empty.bolus.title"),
                             systemImage: "cross.vial",
-                            description: Text("Bolus statistics will appear here once data is available.")
+                            description: Text(statT("stat.empty.bolus.msg"))
                         )
                     } else {
                         BolusStatsView(
@@ -286,9 +286,9 @@ extension Stat {
             StatCard {
                 if mealData.isEmpty || !hasData {
                     ContentUnavailableView(
-                        NSLocalizedString("No Meal Data", comment: ""),
+                        statT("stat.empty.meal.title"),
                         systemImage: "fork.knife",
-                        description: Text("Meal statistics will appear here once data is available.")
+                        description: Text(statT("stat.empty.meal.msg"))
                     )
                 } else {
                     MealStatsView(
@@ -398,9 +398,9 @@ private struct GlucoseOverviewCard: View {
         if fetchRequest.isEmpty {
             StatCard {
                 ContentUnavailableView(
-                    NSLocalizedString("No Glucose Data", comment: ""),
+                    statT("stat.empty.glucose.title"),
                     systemImage: "chart.bar.fill",
-                    description: Text("Glucose statistics will appear here once data is available.")
+                    description: Text(statT("stat.empty.glucose.msg"))
                 )
             }
         } else {
@@ -427,7 +427,7 @@ private struct GlucoseOverviewCard: View {
             // Hint
             HStack {
                 Image(systemName: "hand.draw.fill").foregroundStyle(.primary)
-                Text("Tap and hold the ring chart to reveal more details.")
+                Text(statT("stat.hint.ringHold"))
                     .foregroundStyle(.secondary)
             }.font(.footnote)
         }
@@ -545,7 +545,7 @@ private struct GlucoseScatterCard: View {
                 if selectedInterval == .total {
                     HStack {
                         Image(systemName: "hand.draw.fill").foregroundStyle(.primary)
-                        Text("Swipe to scroll through time.")
+                        Text(statT("stat.hint.swipe"))
                             .foregroundStyle(.secondary)
                     }.font(.footnote)
                 }
@@ -606,9 +606,9 @@ struct GlucoseAGPCard: View {
         if agpData.isEmpty || agpData.allSatisfy({ $0.p50 == 0 }) {
             StatCard {
                 ContentUnavailableView(
-                    NSLocalizedString("No Glucose Data", comment: ""),
+                    statT("stat.empty.glucose.title"),
                     systemImage: "chart.bar.fill",
-                    description: Text("Glucose statistics will appear here once data is available.")
+                    description: Text(statT("stat.empty.glucose.msg"))
                 )
             }
         } else {
@@ -622,7 +622,7 @@ struct GlucoseAGPCard: View {
 
                     Text(
                         showBands
-                            ? NSLocalizedString("Ambulatory Glucose Profile", comment: "AGP chart title")
+                            ? statT("stat.title.agp")
                             : NSLocalizedString("Glucose", comment: "Glucose chart title")
                     )
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
@@ -669,7 +669,7 @@ struct GlucoseAGPCard: View {
                             RoundedRectangle(cornerRadius: 1)
                                 .fill(BreathePalette.daemmer)
                                 .frame(width: 14, height: 2.5)
-                            Text(showBands ? "Median" : NSLocalizedString("Glucose (Median/h)", comment: ""))
+                            Text(showBands ? NSLocalizedString("Median", comment: "") : statT("stat.glucoseMedianPerH"))
                         }
                         if showBands {
                             HStack(spacing: 4) {
@@ -768,15 +768,15 @@ struct GlucoseDistributionCard: View {
         if distributionData.isEmpty || distributionData.allSatisfy({ $0.inRange == 0 && $0.high == 0 && $0.low == 0 }) {
             StatCard {
                 ContentUnavailableView(
-                    NSLocalizedString("No Glucose Data", comment: ""),
+                    statT("stat.empty.glucose.title"),
                     systemImage: "chart.bar.fill",
-                    description: Text("Glucose statistics will appear here once data is available.")
+                    description: Text(statT("stat.empty.glucose.msg"))
                 )
             }
         } else {
             StatCard {
                 VStack(spacing: 12) {
-                    Text(NSLocalizedString("Glucose Distribution", comment: "Distribution chart title"))
+                    Text(statT("stat.title.glucoseDistribution"))
                         .font(.system(size: 14, weight: .semibold, design: .rounded))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)

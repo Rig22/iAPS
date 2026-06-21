@@ -30,9 +30,9 @@ struct LoopingCard: View {
         if fetchLoopStats.isEmpty {
             StatCard {
                 ContentUnavailableView(
-                    NSLocalizedString("No Loop Data", comment: ""),
+                    statT("stat.empty.loop.title"),
                     systemImage: "clock.arrow.2.circlepath",
-                    description: Text("Loop statistics will appear here once data is available.")
+                    description: Text(statT("stat.empty.loop.msg"))
                 )
             }
         } else {
@@ -40,7 +40,7 @@ struct LoopingCard: View {
                 VStack(spacing: 12) {
                     // Header with optional error info button
                     HStack {
-                        Text(NSLocalizedString("Loop Performance", comment: "Loop card header"))
+                        Text(statT("stat.loop.performance"))
                             .font(.system(size: 14, weight: .semibold, design: .rounded))
                             .foregroundStyle(.secondary)
                             .textCase(.uppercase)

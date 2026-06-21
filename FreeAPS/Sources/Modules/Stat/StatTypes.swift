@@ -14,10 +14,10 @@ enum StatisticViewType: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .overview: return NSLocalizedString("Overview", comment: "")
+        case .overview: return StatL10n.t("stat.tab.overview")
         case .glucose: return NSLocalizedString("Glucose", comment: "")
         case .insulin: return NSLocalizedString("Insulin", comment: "")
-        case .looping: return NSLocalizedString("Looping", comment: "")
+        case .looping: return StatL10n.t("stat.tab.looping")
         case .meals: return NSLocalizedString("Meals", comment: "")
         }
     }
@@ -37,10 +37,10 @@ enum StatsTimeIntervalWithToday: String, CaseIterable, Identifiable {
     var displayName: String {
         switch self {
         case .today: return NSLocalizedString("Today", comment: "")
-        case .day: return NSLocalizedString("D", comment: "Abbreviation for day")
-        case .week: return NSLocalizedString("W", comment: "Abbreviation for week")
-        case .month: return NSLocalizedString("M", comment: "Abbreviation for month")
-        case .total: return NSLocalizedString("3 M", comment: "Abbreviation for three months")
+        case .day: return StatL10n.t("stat.interval.d")
+        case .week: return StatL10n.t("stat.interval.w")
+        case .month: return StatL10n.t("stat.interval.m")
+        case .total: return StatL10n.t("stat.interval.3m")
         }
     }
 }
@@ -70,10 +70,10 @@ enum StatsTimeInterval: String, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .day: return NSLocalizedString("D", comment: "Abbreviation for day")
-        case .week: return NSLocalizedString("W", comment: "Abbreviation for week")
-        case .month: return NSLocalizedString("M", comment: "Abbreviation for month")
-        case .total: return NSLocalizedString("3 M", comment: "Abbreviation for three months")
+        case .day: return StatL10n.t("stat.interval.d")
+        case .week: return StatL10n.t("stat.interval.w")
+        case .month: return StatL10n.t("stat.interval.m")
+        case .total: return StatL10n.t("stat.interval.3m")
         }
     }
 }
@@ -87,9 +87,9 @@ enum GlucoseChartType: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .sectorAndMetrics: return NSLocalizedString("Overview", comment: "")
-        case .percentileByTime: return NSLocalizedString("Percentile", comment: "")
-        case .distribution: return NSLocalizedString("Distribution", comment: "")
+        case .sectorAndMetrics: return StatL10n.t("stat.tab.overview")
+        case .percentileByTime: return StatL10n.t("stat.glucoseChart.percentile")
+        case .distribution: return StatL10n.t("stat.glucoseChart.distribution")
         }
     }
 }
@@ -100,8 +100,8 @@ enum InsulinChartType: String, CaseIterable {
 
     var displayName: String {
         switch self {
-        case .totalDailyDose: return NSLocalizedString("Total Daily Dose", comment: "")
-        case .bolusDistribution: return NSLocalizedString("Bolus Distribution", comment: "")
+        case .totalDailyDose: return StatL10n.t("stat.insulinChart.tdd")
+        case .bolusDistribution: return StatL10n.t("stat.insulinChart.bolusDist")
         }
     }
 }
@@ -110,7 +110,7 @@ enum LoopingChartType: String, CaseIterable {
     case loopingPerformance = "Looping Performance"
 
     var displayName: String {
-        NSLocalizedString("Looping Performance", comment: "")
+        StatL10n.t("stat.loopChart.performance")
     }
 }
 
@@ -118,7 +118,7 @@ enum MealChartType: String, CaseIterable {
     case totalMeals = "Total Meals"
 
     var displayName: String {
-        NSLocalizedString("Total Meals", comment: "")
+        StatL10n.t("stat.mealChart.totalMeals")
     }
 }
 
@@ -189,8 +189,8 @@ enum LoopStatsDataType: String {
 
     var displayName: String {
         switch self {
-        case .successfulLoop: return NSLocalizedString("Successful Loops", comment: "")
-        case .glucoseCount: return NSLocalizedString("Glucose Count", comment: "")
+        case .successfulLoop: return StatL10n.t("stat.loopType.successfulLoops")
+        case .glucoseCount: return StatL10n.t("stat.loopType.glucoseCount")
         }
     }
 }

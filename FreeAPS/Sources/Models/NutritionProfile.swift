@@ -24,21 +24,21 @@ enum ActivityLevel: String, Codable, CaseIterable, Identifiable, Sendable {
 
     var title: String {
         switch self {
-        case .sedentary: return "Sedentary"
-        case .light: return "Light"
-        case .moderate: return "Moderate"
-        case .active: return "Active"
-        case .veryActive: return "Very active"
+        case .sedentary: return statT("stat.activity.sedentary")
+        case .light: return statT("stat.activity.light")
+        case .moderate: return statT("stat.activity.moderate")
+        case .active: return statT("stat.activity.active")
+        case .veryActive: return statT("stat.activity.veryActive")
         }
     }
 
     var detail: String {
         switch self {
-        case .sedentary: return "Little or no exercise"
-        case .light: return "1–3 days/week"
-        case .moderate: return "3–5 days/week"
-        case .active: return "6–7 days/week"
-        case .veryActive: return "Hard exercise / physical job"
+        case .sedentary: return statT("stat.activity.sedentary.detail")
+        case .light: return statT("stat.activity.light.detail")
+        case .moderate: return statT("stat.activity.moderate.detail")
+        case .active: return statT("stat.activity.active.detail")
+        case .veryActive: return statT("stat.activity.veryActive.detail")
         }
     }
 }
