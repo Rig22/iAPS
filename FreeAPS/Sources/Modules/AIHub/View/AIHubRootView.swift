@@ -58,6 +58,19 @@ extension AIHub {
             switch feature {
             case .chat:
                 AIHubChatView()
+            case .mealSim:
+                AIHubMealSimView(onApplyMeal: { carbs, fat, protein, note in
+                    // Mahlzeit in den offiziellen AddCarbs-/Bolus-Flow übergeben:
+                    // Werte vorbelegen, dann das Modal öffnen. Der offizielle
+                    // Bolus-Screen rechnet & bestätigt die Abgabe selbst.
+                    AddCarbs.pendingPrefill = AddCarbs.Prefill(
+                        carbs: carbs,
+                        fat: fat,
+                        protein: protein,
+                        note: note
+                    )
+                    state.showModal(for: .addCarbs(editMode: false, override: false, mode: .meal))
+                })
             case .therapyInsights:
                 AIHubTherapyInsightsView()
             case .recap:
@@ -177,6 +190,7 @@ private extension AIHub.Feature {
     var title: String {
         switch self {
         case .chat: return "AI Chat"
+        case .mealSim: return hubT("sim.title")
         case .therapyInsights: return "Therapy Insights"
         case .recap: return "Recap"
         case .presetDesigner: return "Preset Designer"
@@ -188,6 +202,7 @@ private extension AIHub.Feature {
     var subtitle: String {
         switch self {
         case .chat: return hubT("root.card.chat.sub")
+        case .mealSim: return hubT("root.card.sim.sub")
         case .therapyInsights: return hubT("root.card.insights.sub")
         case .recap: return hubT("root.card.recap.sub")
         case .presetDesigner: return hubT("root.card.preset.sub")
@@ -199,6 +214,7 @@ private extension AIHub.Feature {
     var icon: String {
         switch self {
         case .chat: return "bubble.left.and.bubble.right.fill"
+        case .mealSim: return "wand.and.stars"
         case .therapyInsights: return "chart.line.uptrend.xyaxis"
         case .recap: return "calendar.badge.clock"
         case .presetDesigner: return "slider.horizontal.3"
@@ -210,6 +226,7 @@ private extension AIHub.Feature {
     var tint: Color {
         switch self {
         case .chat: return .purple
+        case .mealSim: return .pink
         case .therapyInsights: return .blue
         case .recap: return .indigo
         case .presetDesigner: return .orange
@@ -225,6 +242,7 @@ private extension AIHub.Feature {
         switch self {
         case .chat,
              .foodSearch,
+             .mealSim,
              .presetDesigner,
              .recap: return true
         case .autoPresets,

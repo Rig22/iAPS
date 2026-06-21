@@ -754,6 +754,15 @@ extension AddCarbs {
             addMissingFoodIDs()
             updateSavedFoods()
 
+            // Vorbelegung aus dem AI-Hub-Simulator (einmalig konsumieren).
+            if let prefill = AddCarbs.pendingPrefill {
+                AddCarbs.pendingPrefill = nil
+                state.carbs = prefill.carbs
+                state.fat = prefill.fat
+                state.protein = prefill.protein
+                if !prefill.note.isEmpty { state.note = prefill.note }
+            }
+
             guard !meal else { return }
 
             switch mode {

@@ -7,6 +7,7 @@ enum AIHub {
     /// bestehenden KI-Teil von AddCarbs (mode: .image) — kein Nachbau nötig.
     enum Feature: String, CaseIterable, Identifiable {
         case chat
+        case mealSim
         case therapyInsights
         case recap
         case presetDesigner
