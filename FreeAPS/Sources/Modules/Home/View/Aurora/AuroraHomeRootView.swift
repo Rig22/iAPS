@@ -134,10 +134,23 @@ extension Home {
             return "U" + (f.string(from: insulinConcentration * 100 as NSNumber) ?? "")
         }
 
+        /// Pods/patches keep delivering for a grace period after their nominal
+        /// expiry. `pumpExpiresAtDate` is that *nominal* expiry: Omnipod reports
+        /// `podState.expiresAt` (activatedAt + nominalPodLife, 72 h) and Medtrum is
+        /// normalised to its grace-period start in `KnownPlugins`. Both pumps then
+        /// have an 8 h grace window afterwards, so surface a "Grace" countdown
+        /// instead of jumping straight to "Replace".
+        private static let pumpGracePeriod: TimeInterval = 8 * 3600
+
         private var pumpSub: String? {
             guard let exp = state.pumpExpiresAtDate else { return nil }
             let interval = exp.timeIntervalSinceNow
-            guard interval > 0 else { return hubT("aur.pump.replace") }
+            guard interval > 0 else {
+                let graceLeft = Self.pumpGracePeriod + interval
+                guard graceLeft > 0 else { return hubT("aur.pump.replace") }
+                if graceLeft < 3600 { return hubT("aur.pump.grace", "\(Int(graceLeft / 60)) min") }
+                return hubT("aur.pump.grace", "\(Int(graceLeft / 3600)) h")
+            }
             // Under an hour the "0 T 0 h" readout is useless — switch to minutes.
             if interval < 3600 {
                 return "\(Int(interval / 60)) min"

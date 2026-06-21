@@ -292,6 +292,7 @@ enum AIHubL10n {
         "aur.cgm": "CGM sensor",
         "aur.boluses": "Boluses",
         "aur.pump.replace": "Replace",
+        "aur.pump.grace": "Grace %@",
 
         // Recap
         "recap.week": "Week",
@@ -534,6 +535,7 @@ enum AIHubL10n {
         "aur.cgm": "CGM-Sensor",
         "aur.boluses": "Boli",
         "aur.pump.replace": "Wechseln",
+        "aur.pump.grace": "Kulanz %@",
 
         "recap.week": "Woche",
         "recap.month": "Monat",

@@ -119,7 +119,12 @@ enum KnownPlugins {
     static func pumpExpirationDate(_ pumpManager: PumpManager) -> Date? {
         switch pumpManager.pluginIdentifier {
         case MedtrumPumpManager.pluginIdentifier:
-            return (pumpManager as? MedtrumPumpManager)?.state.patchExpiresAt
+            // Report the grace-period start (nominal expiry) rather than
+            // patchExpiresAt (= lifespan + grace, the hard end), keeping Medtrum
+            // in line with Omnipod's podState.expiresAt. Both pumps then expose a
+            // nominal expiry with an 8 h grace window after it, which the Aurora
+            // pump badge surfaces as a "Grace" countdown.
+            return (pumpManager as? MedtrumPumpManager)?.state.patchGracePeriodFrom
         case OmniPumpManager.pluginIdentifier:
             return (pumpManager as? OmniPumpManager)?.state.podState?.expiresAt
         default: return nil
