@@ -944,13 +944,11 @@ struct AuroraBolusOverlay: View {
 
 /// Aurora-style sheet shown when the user taps the loop pill in the top row.
 /// Surfaces the current loop status, last loop time, optional error message,
-/// the suggestion's reasoning conclusion, and a primary "Loop jetzt ausführen"
-/// action.
+/// and the suggestion's reasoning conclusion.
 struct AuroraStatusSheet: View {
     @ObservedObject var state: Home.StateModel
 
     @Environment(\.colorScheme) private var scheme
-    @Environment(\.dismiss) private var dismiss
 
     private var loopAccent: Color {
         if state.errorMessage != nil { return AuroraLoopStatus.error.color }
@@ -978,16 +976,6 @@ struct AuroraStatusSheet: View {
 
                 statusCard
                 reasoningCard
-
-                AuroraPrimaryButton(
-                    title: state.isLooping ? hubT("aur.loop.running") : hubT("aur.loop.run"),
-                    accent: loopAccent
-                ) {
-                    state.runLoop()
-                    dismiss()
-                }
-                .disabled(state.isLooping)
-                .opacity(state.isLooping ? 0.6 : 1.0)
             }
             .padding(.horizontal, 18)
             .padding(.top, 12)
@@ -1049,7 +1037,8 @@ struct AuroraStatusSheet: View {
                     .kerning(0.4)
                     .foregroundStyle(AuroraPalette.textMuted(scheme))
                 Text(suggestion.reasonConclusion.capitalizingFirstLetter())
-                    .font(.system(size: 14, weight: .regular))
+                    .font(.system(size: 18, weight: .regular))
+                    .lineSpacing(4)
                     .foregroundStyle(AuroraPalette.textPrimary(scheme))
                     .fixedSize(horizontal: false, vertical: true)
             }
