@@ -685,7 +685,7 @@ extension BaseDeviceDataManager: PumpManagerDelegate {
     }
 
     func pumpManager(
-        _: PumpManager,
+        _ pumpManager: PumpManager,
         didReadReservoirValue units: Double,
         at date: Date,
         completion: @escaping (Result<
@@ -695,9 +695,18 @@ extension BaseDeviceDataManager: PumpManagerDelegate {
     ) {
         dispatchPrecondition(condition: .onQueue(processQueue))
         debug(.deviceManager, "Reservoir Value \(units), at: \(date)")
-        storage.save(Decimal(units), as: OpenAPS.Monitor.reservoir)
+        // Omnipod-only safeguard: when the live pod reports "> 50 U" (sentinel),
+        // use that instead of this raw reading, so a stale low value from a
+        // just-replaced pod can't overwrite the live one and stick — e.g. the old
+        // pod's last 4 U on a fresh > 50 U pod (doubled to "8" under U200).
+        // Every other pump — Medtrum, Minimed, Dana — and every real Omnipod
+        // reading (≤ 50 U) keep the unchanged raw-units behavior.
+        let reservoir: Decimal = KnownPlugins.pumpReservoir(pumpManager) == Decimal(0xDEAD_BEEF)
+            ? Decimal(0xDEAD_BEEF)
+            : Decimal(units)
+        storage.save(reservoir, as: OpenAPS.Monitor.reservoir)
         broadcaster.notify(PumpReservoirObserver.self, on: processQueue) {
-            $0.pumpReservoirDidChange(Decimal(units))
+            $0.pumpReservoirDidChange(reservoir)
         }
 
         completion(.success((
