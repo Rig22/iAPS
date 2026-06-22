@@ -83,6 +83,9 @@ extension Bolus {
 
         private var cleanBolusView: some View {
             Form {
+                if let rec = state.simRecommendation {
+                    Section { BolusSimRecommendationBanner(recommendation: rec) }
+                }
                 if fetch {
                     Section {
                         mealEntries
@@ -189,6 +192,49 @@ extension Bolus {
                     }.foregroundColor(.secondary)
                 }
             }
+        }
+    }
+}
+
+/// Banner im Bolus-Screen, das die Empfehlung aus dem AI-Hub-Mahlzeiten-
+/// Simulator anzeigt (Gesamt/Split) — das Bolus-Feld ist bereits mit dem
+/// „jetzt"-Anteil vorbefüllt, hier steht die Begründung dazu.
+struct BolusSimRecommendationBanner: View {
+    let recommendation: Bolus.SimRecommendation
+
+    private static let formatter: NumberFormatter = {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        formatter.minimumFractionDigits = 0
+        formatter.maximumFractionDigits = 2
+        return formatter
+    }()
+
+    private func fmt(_ value: Double) -> String {
+        (Self.formatter.string(from: value as NSNumber) ?? "\(value)") + " U"
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 6) {
+                Image(systemName: "sparkles")
+                    .foregroundStyle(.purple)
+                Text(hubT("sim.bolus.banner.title"))
+                    .font(.subheadline.bold())
+            }
+            if recommendation.isSplit {
+                Text(hubT(
+                    "sim.treat.split",
+                    fmt(recommendation.now),
+                    fmt(recommendation.later),
+                    "\(recommendation.afterMinutes)"
+                ))
+                    .font(.caption)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Text(hubT("sim.bolus.banner.prefilled", fmt(recommendation.now)))
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
     }
 }

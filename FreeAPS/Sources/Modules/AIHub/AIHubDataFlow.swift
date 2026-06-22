@@ -12,7 +12,6 @@ enum AIHub {
         case recap
         case presetDesigner
         case autoPresets
-        case foodSearch
 
         var id: String { rawValue }
     }

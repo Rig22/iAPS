@@ -79,17 +79,6 @@ extension AIHub {
                 AIHubPresetDesignerView()
             case .autoPresets:
                 AIHubAutoPresetsView()
-            case .foodSearch:
-                // Weiche: Texteingabe oben (KI-Suche), Kamera darunter —
-                // beide Wege springen ins bestehende AddCarbs-Modal.
-                AIHubFoodSearchView(
-                    onSearch: { query in
-                        state.showModal(for: .addCarbs(editMode: false, override: false, mode: .aiSearch(query: query)))
-                    },
-                    onCamera: {
-                        state.showModal(for: .addCarbs(editMode: false, override: false, mode: .image))
-                    }
-                )
             }
         }
 
@@ -195,7 +184,6 @@ private extension AIHub.Feature {
         case .recap: return "Recap"
         case .presetDesigner: return "Preset Designer"
         case .autoPresets: return "AutoPresets"
-        case .foodSearch: return "FoodSearch"
         }
     }
 
@@ -207,7 +195,6 @@ private extension AIHub.Feature {
         case .recap: return hubT("root.card.recap.sub")
         case .presetDesigner: return hubT("root.card.preset.sub")
         case .autoPresets: return hubT("root.card.auto.sub")
-        case .foodSearch: return hubT("root.card.food.sub")
         }
     }
 
@@ -219,19 +206,17 @@ private extension AIHub.Feature {
         case .recap: return "calendar.badge.clock"
         case .presetDesigner: return "slider.horizontal.3"
         case .autoPresets: return "figure.walk.motion"
-        case .foodSearch: return "fork.knife"
         }
     }
 
     var tint: Color {
         switch self {
         case .chat: return .purple
-        case .mealSim: return .pink
+        case .mealSim: return .orange
         case .therapyInsights: return .blue
         case .recap: return .indigo
-        case .presetDesigner: return .orange
+        case .presetDesigner: return .pink
         case .autoPresets: return .teal
-        case .foodSearch: return .green
         }
     }
 
@@ -241,7 +226,6 @@ private extension AIHub.Feature {
     var usesAI: Bool {
         switch self {
         case .chat,
-             .foodSearch,
              .mealSim,
              .presetDesigner,
              .recap: return true

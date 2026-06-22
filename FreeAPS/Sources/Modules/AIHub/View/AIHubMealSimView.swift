@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 /// Meal Simulator: Eingabemaske für eine geplante Mahlzeit, deterministischer
 /// Bolus-Anker (rechnet sofort lokal) und optionale KI-Strategie auf Knopfdruck.
@@ -19,10 +20,13 @@ struct AIHubMealSimView: View {
     @State private var mealName = ""
     /// Mehrfachauswahl im Picker: Anzahl pro Speise (id → Portionen).
     @State private var pickCounts: [UUID: Int] = [:]
+    /// Geladene Thumbnails (id → Bild), asynchron pro Zeile nachgeladen.
+    @State private var foodImages: [UUID: UIImage] = [:]
 
     // Bolus-Plan aus der KI (now/later/afterMin)
     @State private var bolusPlan: AIHubMealSim.BolusPlan?
     @State private var reminderScheduled = false
+    @State private var showApplyConfirm = false
 
     // Eingaben
     @State private var bgText = ""
@@ -30,11 +34,7 @@ struct AIHubMealSimView: View {
     @State private var fatText = ""
     @State private var proteinText = ""
     @State private var iobText = ""
-    @State private var time = Date()
-    @State private var useCustomTime = false
     @State private var activity: AIHubMealSim.Activity = .none
-    @State private var usePlannedBolus = false
-    @State private var plannedBolusText = ""
 
     // Ausgaben
     @State private var calc: AIHubMealSim.Calc?
@@ -68,8 +68,6 @@ struct AIHubMealSimView: View {
         .onChange(of: bgText) { _ in recompute() }
         .onChange(of: carbsText) { _ in recompute() }
         .onChange(of: iobText) { _ in recompute() }
-        .onChange(of: useCustomTime) { _ in reloadProfile() }
-        .onChange(of: time) { _ in if useCustomTime { reloadProfile() } }
     }
 
     // MARK: - Laden / Rechnen
@@ -77,8 +75,7 @@ struct AIHubMealSimView: View {
     private func load() {
         isMmol = (BaseFileStorage().retrieveRaw(OpenAPS.Settings.bgTargets) ?? "")
             .lowercased().contains("mmol")
-        let effectiveTime = useCustomTime ? time : Date()
-        profile = AIHubMealSim.profileContext(at: effectiveTime)
+        profile = AIHubMealSim.profileContext(at: Date())
 
         Task { @MainActor in
             let prefill = await Task.detached(priority: .userInitiated) {
@@ -131,14 +128,6 @@ struct AIHubMealSimView: View {
         recompute()
     }
 
-    private func reloadProfile() {
-        let effectiveTime = useCustomTime ? time : Date()
-        profile = AIHubMealSim.profileContext(at: effectiveTime)
-        // Tageszeit ändert ISF/CR/Ziel → Strategie passt nicht mehr.
-        strategy = nil
-        recompute()
-    }
-
     private func recompute() {
         guard let profile = profile, let inputs = currentInputs() else {
             calc = nil
@@ -164,9 +153,8 @@ struct AIHubMealSimView: View {
             fat: parse(fatText) ?? 0,
             protein: parse(proteinText) ?? 0,
             iob: parse(iobText) ?? 0,
-            timeOfDay: useCustomTime ? time : Date(),
-            activity: activity,
-            plannedBolus: usePlannedBolus ? parse(plannedBolusText) : nil
+            timeOfDay: Date(),
+            activity: activity
         )
     }
 
@@ -189,6 +177,38 @@ struct AIHubMealSimView: View {
         }
     }
 
+    /// Übergibt die aktuelle Mahlzeit an den offiziellen AddCarbs-/Bolus-Flow
+    /// und reicht die Empfehlung an den Bolus-Screen weiter (Banner + Vorfüllung
+    /// des „jetzt"-Anteils).
+    private func performApply() {
+        let carbs = parse(carbsText) ?? 0
+        let total = calc?.recommendedBolus ?? 0
+        let now: Double
+        let later: Double
+        let afterMin: Int
+        if let plan = bolusPlan {
+            now = plan.now
+            later = plan.later
+            afterMin = plan.afterMinutes
+        } else {
+            now = total
+            later = 0
+            afterMin = 0
+        }
+        Bolus.pendingSimRecommendation = Bolus.SimRecommendation(
+            total: total,
+            now: now,
+            later: later,
+            afterMinutes: afterMin
+        )
+        onApplyMeal?(
+            Decimal(carbs),
+            Decimal(parse(fatText) ?? 0),
+            Decimal(parse(proteinText) ?? 0),
+            mealName
+        )
+    }
+
     // MARK: - Eingabe-Card
 
     private var inputCard: some View {
@@ -200,20 +220,22 @@ struct AIHubMealSimView: View {
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "bookmark.fill")
+                                .foregroundStyle(.secondary)
                             Text(mealName.isEmpty ? hubT("sim.savedfoods.button") : mealName)
+                                .foregroundStyle(.primary)
                                 .lineLimit(1)
                             Spacer()
                             Image(systemName: "chevron.up.chevron.down")
                                 .font(.caption)
+                                .foregroundStyle(.secondary)
                         }
                         .font(.subheadline.weight(.medium))
-                        .foregroundStyle(accent)
-                        .padding(.vertical, 8)
+                        .padding(.vertical, 10)
                         .padding(.horizontal, 12)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .background(
                             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(accent.opacity(colorScheme == .dark ? 0.18 : 0.10))
+                                .fill(Color(.secondarySystemFill))
                         )
                     }
                     .buttonStyle(.plain)
@@ -257,10 +279,7 @@ struct AIHubMealSimView: View {
                     suffix: insulinUnit
                 )
                 Divider()
-                timeRow
                 activityRow
-                Divider()
-                plannedBolusRow
             }
         }
     }
@@ -292,26 +311,6 @@ struct AIHubMealSimView: View {
         }
     }
 
-    private var timeRow: some View {
-        VStack(spacing: 8) {
-            Toggle(isOn: $useCustomTime) {
-                HStack(spacing: 12) {
-                    Image(systemName: "clock")
-                        .font(.subheadline)
-                        .foregroundStyle(.indigo)
-                        .frame(width: 22)
-                    Text(hubT("sim.field.time"))
-                        .font(.subheadline)
-                }
-            }
-            if useCustomTime {
-                DatePicker("", selection: $time, displayedComponents: .hourAndMinute)
-                    .labelsHidden()
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-            }
-        }
-    }
-
     private var activityRow: some View {
         HStack(spacing: 12) {
             Image(systemName: "figure.walk")
@@ -328,35 +327,6 @@ struct AIHubMealSimView: View {
             }
             .pickerStyle(.menu)
             .labelsHidden()
-        }
-    }
-
-    private var plannedBolusRow: some View {
-        VStack(spacing: 8) {
-            Toggle(isOn: $usePlannedBolus) {
-                HStack(spacing: 12) {
-                    Image(systemName: "pencil")
-                        .font(.subheadline)
-                        .foregroundStyle(.purple)
-                        .frame(width: 22)
-                    Text(hubT("sim.field.planned"))
-                        .font(.subheadline)
-                }
-            }
-            if usePlannedBolus {
-                HStack {
-                    Spacer()
-                    TextField("0", text: $plannedBolusText)
-                        .keyboardType(.decimalPad)
-                        .multilineTextAlignment(.trailing)
-                        .font(.subheadline.bold())
-                        .frame(maxWidth: 80)
-                    Text(insulinUnit)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .frame(width: 50, alignment: .leading)
-                }
-            }
         }
     }
 
@@ -484,13 +454,15 @@ struct AIHubMealSimView: View {
                     }
 
                     // 1) Mahlzeit (+ Bolus) in den offiziellen Flow übergeben.
+                    //    Bei empfohlenem Split ohne gesetzte Erinnerung erst
+                    //    nachfragen — sonst ist man weg, bevor man die
+                    //    Erinnerung setzen konnte.
                     Button {
-                        onApplyMeal?(
-                            Decimal(carbs),
-                            Decimal(parse(fatText) ?? 0),
-                            Decimal(parse(proteinText) ?? 0),
-                            mealName
-                        )
+                        if let plan = bolusPlan, plan.isSplit, !reminderScheduled {
+                            showApplyConfirm = true
+                        } else {
+                            performApply()
+                        }
                     } label: {
                         Label(hubT("sim.treat.apply"), systemImage: "arrow.right.circle.fill")
                             .font(.subheadline.bold())
@@ -501,6 +473,33 @@ struct AIHubMealSimView: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(onApplyMeal == nil || carbs <= 0)
+                    .confirmationDialog(
+                        hubT("sim.treat.confirm.title"),
+                        isPresented: $showApplyConfirm,
+                        titleVisibility: .visible
+                    ) {
+                        if let plan = bolusPlan {
+                            Button(hubT("sim.treat.confirm.remind")) {
+                                AIHubMealSim.scheduleLaterBolusReminder(
+                                    units: plan.later,
+                                    afterMinutes: plan.afterMinutes,
+                                    isMmol: isMmol
+                                )
+                                reminderScheduled = true
+                                performApply()
+                            }
+                        }
+                        Button(hubT("sim.treat.confirm.noremind")) { performApply() }
+                        Button(hubT("sim.savedfoods.cancel"), role: .cancel) {}
+                    } message: {
+                        if let plan = bolusPlan {
+                            Text(hubT(
+                                "sim.treat.confirm.msg",
+                                "\(formatInsulin(plan.later)) \(insulinUnit)",
+                                "\(plan.afterMinutes)"
+                            ))
+                        }
+                    }
 
                     Text(hubT("sim.treat.applyhint"))
                         .font(.caption2)
@@ -580,16 +579,17 @@ struct AIHubMealSimView: View {
         let count = pickCounts[food.id] ?? 0
         let selected = count > 0
         return HStack(spacing: 12) {
+            thumbnail(for: food)
             VStack(alignment: .leading, spacing: 3) {
                 Text(food.name)
                     .font(.subheadline.weight(.medium))
+                    .foregroundStyle(.primary)
                 Text(
                     "\(formatGram(food.carbs)) g · \(hubT("sim.field.fat")) \(formatGram(food.fat)) g · \(hubT("sim.field.protein")) \(formatGram(food.protein)) g"
                 )
                 .font(.caption)
+                .foregroundStyle(.secondary)
             }
-            // Ausgegraut, bis per Plus hinzugefügt.
-            .foregroundStyle(selected ? AnyShapeStyle(.primary) : AnyShapeStyle(.tertiary))
             Spacer()
             if selected {
                 Button {
@@ -607,9 +607,38 @@ struct AIHubMealSimView: View {
             } label: {
                 Image(systemName: "plus.circle.fill")
                     .font(.title3)
-                    .foregroundStyle(accent)
+                    .foregroundStyle(.blue)
             }
             .buttonStyle(.plain)
+        }
+        // Ausgewählte Zeilen dezent farblich hinterlegen — Auswahl wird nicht
+        // nur über das Plus-Zeichen signalisiert.
+        .listRowBackground(selected ? Color.blue.opacity(colorScheme == .dark ? 0.22 : 0.10) : nil)
+    }
+
+    /// Thumbnail aus dem Preset-Bild (lokal oder per URL), sonst Platzhalter.
+    @ViewBuilder private func thumbnail(for food: AIHubMealSim.SavedFood) -> some View {
+        Group {
+            if let image = foodImages[food.id] {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                ZStack {
+                    Color(.tertiarySystemFill)
+                    Image(systemName: "fork.knife")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+        }
+        .frame(width: 44, height: 44)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .task {
+            guard foodImages[food.id] == nil, let url = food.imageURL, !url.isEmpty else { return }
+            if let image = await FoodImageStorageManager.shared.loadImage(from: url) {
+                foodImages[food.id] = image
+            }
         }
     }
 

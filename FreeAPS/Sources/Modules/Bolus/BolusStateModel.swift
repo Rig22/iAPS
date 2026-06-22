@@ -77,6 +77,11 @@ extension Bolus {
         @Published var disable15MinTrend: Bool = false
         @Published var minBolus: Decimal = 0.05
 
+        // AI-Hub-Mahlzeiten-Simulator: übergebene Empfehlung (Banner + einmalige
+        // Vorfüllung des Bolus-Felds mit dem „jetzt"-Anteil).
+        @Published var simRecommendation: Bolus.SimRecommendation?
+        private var didApplySimRecommendation = false
+
         var concentration: (concentration: Double, increment: Double) {
             CoreDataStorage().insulinConcentration()
         }
@@ -112,6 +117,10 @@ extension Bolus {
             disable15MinTrend = settings.settings.disable15MinTrend
             minBolus = Decimal(deviceManager.pumpManager?.supportedBolusVolumes.first ?? Double(bolusIncrement)) *
                 Decimal(concentration.concentration)
+
+            // Empfehlung aus dem Mahlzeiten-Simulator übernehmen (einmalig).
+            simRecommendation = Bolus.pendingSimRecommendation
+            Bolus.pendingSimRecommendation = nil
         }
 
         func start() {
@@ -331,6 +340,14 @@ extension Bolus {
                     self.getDeltaBG()
                     self.insulinCalculated = self.roundBolus(max(self.calculateInsulin(), 0))
                     self.prepareData()
+                }
+
+                // Simulator-Empfehlung einmalig ins Bolus-Feld vorfüllen — der
+                // „jetzt"-Anteil. Danach gehört das Feld dem Nutzer (ein
+                // späteres Suggestion-Update überschreibt es nicht mehr).
+                if let recommendation = self.simRecommendation, !self.didApplySimRecommendation {
+                    self.didApplySimRecommendation = true
+                    self.amount = self.roundBolus(max(Decimal(recommendation.now), 0))
                 }
             }
         }

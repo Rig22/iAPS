@@ -43,6 +43,7 @@ enum AIHubMealSim {
         let carbs: Double
         let fat: Double
         let protein: Double
+        let imageURL: String?
     }
 
     /// Maschinenlesbarer Bolus-Plan, den die KI am Ende der Strategie ausgibt.
@@ -84,7 +85,6 @@ enum AIHubMealSim {
         var iob: Double
         var timeOfDay: Date
         var activity: Activity
-        var plannedBolus: Double? // nil = „schlag du etwas vor"
     }
 
     /// Deterministisches Ergebnis der Bolus-Rechnung.
@@ -130,7 +130,8 @@ enum AIHubMealSim {
                     name: dish,
                     carbs: preset.carbs?.doubleValue ?? 0,
                     fat: preset.fat?.doubleValue ?? 0,
-                    protein: preset.protein?.doubleValue ?? 0
+                    protein: preset.protein?.doubleValue ?? 0,
+                    imageURL: preset.imageURL
                 ))
             }
         }
@@ -237,11 +238,6 @@ enum AIHubMealSim {
             ? "The user reliably logs meals."
             : "The user does not always log meals precisely."
 
-        let plannedLine = inputs.plannedBolus.map {
-            "User's own planned bolus: \(fmt($0)) U. Compare it with the calculated " +
-                "recommendation and comment if they differ meaningfully."
-        } ?? "The user did not enter their own bolus plan — recommend one."
-
         let fpu = inputs.fat > 0 || inputs.protein > 0
             ? "Fat: \(fmt(inputs.fat)) g, protein: \(fmt(inputs.protein)) g — a fat/protein-rich " +
             "meal causes a delayed, prolonged glucose rise; consider an extended/split bolus."
@@ -285,7 +281,6 @@ enum AIHubMealSim {
         Correction ((glucose − target) ÷ ISF): \(fmt(calc.correctionInsulin)) U
         Minus IOB: −\(fmt(calc.iob)) U
         Recommended total bolus: \(fmt(calc.recommendedBolus)) U
-        \(plannedLine)
 
         Write your answer as:
         - One short forecast sentence: where glucose is likely to head over the next few hours \

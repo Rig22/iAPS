@@ -408,7 +408,6 @@
 		A1AB000000000000A1AB001C /* AIHubL10n.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB001B /* AIHubL10n.swift */; };
 		A1AB000000000000A1AB001E /* AIHubPresetDesigner.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB001D /* AIHubPresetDesigner.swift */; };
 		A1AB000000000000A1AB0020 /* AIHubPresetDesignerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB001F /* AIHubPresetDesignerView.swift */; };
-		A1AB000000000000A1AB0022 /* AIHubFoodSearchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0021 /* AIHubFoodSearchView.swift */; };
 		A1AB000000000000A1AB0024 /* AIHubTherapyApply.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0023 /* AIHubTherapyApply.swift */; };
 		A1AB000000000000A1AB0026 /* AIHubPresetReview.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0025 /* AIHubPresetReview.swift */; };
 		A1AB000000000000A1AB0028 /* AIHubAutoPresets.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1AB000000000000A1AB0027 /* AIHubAutoPresets.swift */; };
@@ -1193,7 +1192,6 @@
 		A1AB000000000000A1AB001B /* AIHubL10n.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubL10n.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB001D /* AIHubPresetDesigner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubPresetDesigner.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB001F /* AIHubPresetDesignerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubPresetDesignerView.swift; sourceTree = "<group>"; };
-		A1AB000000000000A1AB0021 /* AIHubFoodSearchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubFoodSearchView.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0023 /* AIHubTherapyApply.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubTherapyApply.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0025 /* AIHubPresetReview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubPresetReview.swift; sourceTree = "<group>"; };
 		A1AB000000000000A1AB0027 /* AIHubAutoPresets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIHubAutoPresets.swift; sourceTree = "<group>"; };
@@ -2962,7 +2960,6 @@
 			isa = PBXGroup;
 			children = (
 				A1AB000000000000A1AB000F /* AIHubChatView.swift */,
-				A1AB000000000000A1AB0021 /* AIHubFoodSearchView.swift */,
 				A1AB000000000000A1AB001F /* AIHubPresetDesignerView.swift */,
 				A1AB000000000000A1AB0019 /* AIHubRecapView.swift */,
 				A1AB000000000000A1AB0032 /* AIHubMealSimView.swift */,
@@ -4295,7 +4292,6 @@
 				A1AB000000000000A1AB001C /* AIHubL10n.swift in Sources */,
 				A1AB000000000000A1AB001E /* AIHubPresetDesigner.swift in Sources */,
 				A1AB000000000000A1AB0020 /* AIHubPresetDesignerView.swift in Sources */,
-				A1AB000000000000A1AB0022 /* AIHubFoodSearchView.swift in Sources */,
 				BACCAFE0000000000BAC0013 /* FirstRunRestorePromptView.swift in Sources */,
 				BACCAFE0000000000BAC0015 /* EarlyBackupRestore.swift in Sources */,
 				BACCAFE0000000000BAC0017 /* AutoBackupService.swift in Sources */,

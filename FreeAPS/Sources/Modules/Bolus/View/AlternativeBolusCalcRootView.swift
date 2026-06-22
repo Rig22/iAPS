@@ -74,6 +74,9 @@ extension Bolus {
 
         var body: some View {
             Form {
+                if let rec = state.simRecommendation {
+                    Section { BolusSimRecommendationBanner(recommendation: rec) }
+                }
                 Section {
                     if state.waitForSuggestion {
                         Text("Please wait")
