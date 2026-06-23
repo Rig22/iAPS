@@ -28,9 +28,20 @@ enum AIHubAutoPresets {
             }
         }
 
-        /// Voreingestellte Haltezeit: Radfahren höher, um kurze
-        /// Pendel-/Ampelphasen herauszufiltern.
+        /// Voreingestellte Haltezeit. Radfahren etwas höher als Gehen/Laufen,
+        /// um kurze Pendel-/Ampelphasen herauszufiltern — aber nicht zu hoch,
+        /// da CoreMotion das Rad-Signal ohnehin schwächer/flackeriger liefert.
         var defaultSustainedSeconds: Int {
+            switch self {
+            case .running,
+                 .walking: return 120
+            case .cycling: return 60
+            }
+        }
+
+        /// Alter Default (vor der Sensitivitäts-Anpassung) — für die einmalige
+        /// Migration, die noch unveränderte Werte auf den neuen Default hebt.
+        var legacyDefaultSustainedSeconds: Int {
             switch self {
             case .running,
                  .walking: return 30
@@ -85,6 +96,12 @@ enum AIHubAutoPresets {
     /// wird — filtert kurze Pausen (Ampel, Verschnaufen). Richards Wahl: ~5 min.
     static let autoEndGraceSeconds: TimeInterval = 300
 
+    /// Flacker-Toleranz: Ein einzelnes Ereignis OHNE Ziel-Aktivität (kurze
+    /// Fehlklassifikation während der Fahrt, z. B. „automotive"/„stationary")
+    /// setzt den laufenden Countdown nicht sofort zurück — erst wenn so lange
+    /// keine Ziel-Aktivität mehr gemeldet wird, gilt sie als beendet.
+    static let dropGraceSeconds: TimeInterval = 30
+
     private static let configKey = "iAPS.aiHubAutoPresets"
 
     /// Geändert-Notification: Settings-View postet nach jedem Schreiben,
@@ -101,5 +118,31 @@ enum AIHubAutoPresets {
     static func saveConfig(_ config: Config) {
         UserDefaults.standard.set(try? JSONEncoder().encode(config), forKey: configKey)
         Foundation.NotificationCenter.default.post(name: configChangedNotification, object: nil)
+    }
+
+    private static let sustainMigrationKey = "iAPS.aiHubAutoPresetsSustainMigratedV2"
+
+    /// Einmalige Migration: Aktivitäten, die noch auf dem ALTEN Default stehen,
+    /// werden auf den neuen Default gehoben (Gehen/Laufen 30→120, Rad 120→60).
+    /// Bewusst abweichend gewählte Haltezeiten bleiben unangetastet. Läuft nur
+    /// einmal und nur, wenn überhaupt schon eine Konfiguration gespeichert ist.
+    static func migrateSustainDefaultsIfNeeded() {
+        guard !UserDefaults.standard.bool(forKey: sustainMigrationKey) else { return }
+        UserDefaults.standard.set(true, forKey: sustainMigrationKey)
+
+        guard let data = UserDefaults.standard.data(forKey: configKey),
+              var config = try? JSONDecoder().decode(Config.self, from: data)
+        else { return }
+
+        var changed = false
+        for activity in Activity.allCases {
+            guard var activityConfig = config.activities[activity.rawValue],
+                  activityConfig.sustainedSeconds == activity.legacyDefaultSustainedSeconds
+            else { continue }
+            activityConfig.sustainedSeconds = activity.defaultSustainedSeconds
+            config.activities[activity.rawValue] = activityConfig
+            changed = true
+        }
+        if changed { saveConfig(config) }
     }
 }

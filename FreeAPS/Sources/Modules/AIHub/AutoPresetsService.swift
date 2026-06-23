@@ -36,6 +36,7 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
     private var detectedActivity: AIHubAutoPresets.Activity?
     private var startWorkItem: DispatchWorkItem?
     private var endWorkItem: DispatchWorkItem?
+    private var dropWorkItem: DispatchWorkItem?
 
     // Herkunfts-Markierung des zuletzt selbst aktivierten Overrides
     private static let activeAutoIDKey = "iAPS.aiHubAutoPresetsActiveID"
@@ -63,6 +64,7 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
     // MARK: - Monitoring-Steuerung
 
     func reload() {
+        AIHubAutoPresets.migrateSustainDefaultsIfNeeded()
         config = AIHubAutoPresets.loadConfig()
         let shouldMonitor = config.masterEnabled
             && AIHubAutoPresets.Activity.allCases.contains { config.isLive($0) }
@@ -80,8 +82,10 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
         guard !isMonitoring, CMMotionActivityManager.isActivityAvailable() else { return }
         isMonitoring = true
         motionManager.startActivityUpdates(to: motionQueue) { [weak self] activity in
-            guard let self = self, let activity = activity else { return }
-            self.handle(activity)
+            guard let activity = activity else { return }
+            // Auf Main auswerten: Timer-/Status-Mutationen passieren sonst aus
+            // zwei Queues (Motion-Callback + Timer-Callbacks) → Data Race.
+            DispatchQueue.main.async { self?.handle(activity) }
         }
     }
 
@@ -98,36 +102,70 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
     /// CMMotionActivity ist ereignisbasiert (feuert bei Zustandswechsel).
     /// Wir bilden auf eine *live* Ziel-Aktivität ab; alles andere
     /// (stationary/automotive/unknown oder nicht konfiguriert) zählt als
-    /// „keine Aktivität".
+    /// „keine Aktivität". Läuft auf Main (siehe startMonitoring).
     private func handle(_ activity: CMMotionActivity) {
-        // Niedrige Konfidenz ignorieren — zu wackelig für Therapie-Eingriffe.
-        guard activity.confidence != .low else { return }
+        if let mapped = acceptedActivity(activity) {
+            // Ziel-Aktivität mit ausreichender Konfidenz erkannt → ein evtl.
+            // laufendes Drop-Fenster war nur ein kurzer Aussetzer.
+            dropWorkItem?.cancel()
+            dropWorkItem = nil
 
-        let mapped = mappedActivity(activity)
-        guard mapped != detectedActivity else { return }
-        detectedActivity = mapped
+            guard mapped != detectedActivity else { return }
+            detectedActivity = mapped
+            startWorkItem?.cancel()
+            startWorkItem = nil
+            endWorkItem?.cancel()
+            endWorkItem = nil
 
-        cancelTimers()
-
-        if let activity = mapped {
-            // Aktivität erkannt → nach Haltezeit aktivieren
-            let delay = TimeInterval(config.config(for: activity).sustainedSeconds)
-            let work = DispatchWorkItem { [weak self] in self?.activate(activity) }
+            let delay = TimeInterval(config.config(for: mapped).sustainedSeconds)
+            let work = DispatchWorkItem { [weak self] in self?.activate(mapped) }
             startWorkItem = work
             DispatchQueue.main.asyncAfter(deadline: .now() + max(0, delay), execute: work)
         } else {
-            // Keine Aktivität mehr → nach Grace-Period eigenes Override beenden
-            let work = DispatchWorkItem { [weak self] in self?.endAutoOverrideIfOurs() }
-            endWorkItem = work
-            DispatchQueue.main.asyncAfter(
-                deadline: .now() + AIHubAutoPresets.autoEndGraceSeconds,
-                execute: work
-            )
+            guard let current = detectedActivity else { return }
+            if current == .cycling {
+                // Radfahren: schwaches/flackeriges Signal → kurze
+                // Fehlklassifikationen nicht sofort als Ende werten.
+                guard dropWorkItem == nil else { return }
+                let drop = DispatchWorkItem { [weak self] in self?.activityDidStop() }
+                dropWorkItem = drop
+                DispatchQueue.main.asyncAfter(deadline: .now() + AIHubAutoPresets.dropGraceSeconds, execute: drop)
+            } else {
+                // Gehen/Laufen: zuverlässige Erkennung → sofort als beendet
+                // werten (bricht einen noch nicht ausgelösten Start ab, sonst
+                // würde ein kurzer Gang nachträglich noch aktivieren).
+                activityDidStop()
+            }
         }
     }
 
-    /// Höchste relevante Bewegungsart, sofern live konfiguriert. Reihenfolge
-    /// Running vor Walking, da CoreMotion bei schnellem Gehen beide melden kann.
+    /// Drop-Grace abgelaufen, ohne dass die Ziel-Aktivität zurückkam → wirklich
+    /// beendet: Start-Countdown abbrechen, eigenes Override nach Grace beenden.
+    private func activityDidStop() {
+        dropWorkItem = nil
+        detectedActivity = nil
+        startWorkItem?.cancel()
+        startWorkItem = nil
+        endWorkItem?.cancel()
+        let work = DispatchWorkItem { [weak self] in self?.endAutoOverrideIfOurs() }
+        endWorkItem = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + AIHubAutoPresets.autoEndGraceSeconds, execute: work)
+    }
+
+    /// Höchste relevante Bewegungsart mit *akzeptabler* Konfidenz, sofern live.
+    /// Reihenfolge Cycling > Running > Walking. **Radfahren akzeptiert auch
+    /// niedrige Konfidenz**, weil CoreMotion das Rad-Signal auf dem iPhone
+    /// (ohne Apple Watch) meist nur mit `.low` meldet; Gehen/Laufen bleiben bei
+    /// ≥ medium, damit sie so präzise wie bisher bleiben. Die Haltezeit filtert
+    /// das verbleibende Rauschen.
+    private func acceptedActivity(_ activity: CMMotionActivity) -> AIHubAutoPresets.Activity? {
+        guard let mapped = mappedActivity(activity) else { return nil }
+        if mapped == .cycling { return .cycling }
+        return activity.confidence != .low ? mapped : nil
+    }
+
+    /// Höchste relevante Bewegungsart, sofern live konfiguriert (ohne
+    /// Konfidenz-Filter — den macht `acceptedActivity`).
     private func mappedActivity(_ activity: CMMotionActivity) -> AIHubAutoPresets.Activity? {
         if activity.cycling, config.isLive(.cycling) { return .cycling }
         if activity.running, config.isLive(.running) { return .running }
@@ -140,6 +178,8 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
         startWorkItem = nil
         endWorkItem?.cancel()
         endWorkItem = nil
+        dropWorkItem?.cancel()
+        dropWorkItem = nil
     }
 
     // MARK: - Aktivieren / Beenden (auf Main, Core Data = viewContext)
