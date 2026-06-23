@@ -108,6 +108,39 @@ extension Home {
         /// layer substitutes this sentinel (see KnownPlugins.pumpReservoir).
         private static let reservoirSentinel = Decimal(0xDEAD_BEEF)
 
+        /// Omnipod and Medtrum show the reservoir level as a filled silhouette in
+        /// the icon slot (pod / nano asset); the numeric amount stays as the
+        /// value to its right. Dana and Medtronic keep the cylinder icon.
+        private var isOmnipod: Bool {
+            state.pumpName.contains("Omni")
+        }
+
+        private var isMedtrum: Bool {
+            state.pumpName.contains("Medtrum")
+        }
+
+        /// Filled pod/nano silhouette for the pump tile's icon slot, tinted with
+        /// the glucose status color. `nil` for Dana/Medtronic (cylinder icon) or
+        /// when no reservoir is known.
+        private var pumpIconGraphic: AnyView? {
+            guard let r = state.reservoir else { return nil }
+            let color = AuroraGlucoseStatus(mgdl: glucoseValue).main
+            if isOmnipod {
+                return AnyView(AuroraReservoirGraphic(
+                    reservoir: r, fillColor: color, assetBase: "pod", aspect: 0.72, yOffset: 2.5
+                ))
+            }
+            if isMedtrum {
+                // Nano PNG is a square (900×900) canvas with transparent padding,
+                // so keep a 1:1 aspect — forcing the silhouette ratio would squash
+                // the square horizontally (too narrow).
+                return AnyView(AuroraReservoirGraphic(
+                    reservoir: r, fillColor: color, assetBase: "nano", aspect: 1.0, yOffset: 2.5
+                ))
+            }
+            return nil
+        }
+
         private var reservoirString: String {
             guard let r = state.reservoir else { return "—" }
             let conc = insulinConcentration
@@ -593,6 +626,10 @@ extension Home {
                     warning: pumpExpiryWarning.show,
                     warningPulsing: pumpExpiryWarning.pulsing,
                     warningColor: AuroraGlucoseStatus(mgdl: glucoseValue).main,
+                    // Omnipod/Medtrum: filled pod/nano silhouette in the icon slot
+                    // (fill level, tinted with the glucose status color); the
+                    // amount stays as the value to its right. Dana/Medtronic nil.
+                    iconOverride: pumpIconGraphic,
                     onTap: {
                         // Mirror breath: only open settings when a pump is
                         // actually connected — otherwise the modal has nothing

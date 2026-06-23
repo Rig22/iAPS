@@ -22,6 +22,12 @@ struct AuroraStatBadge: View {
     var warningPulsing: Bool = false
     /// Tint for the warning shield — bound to glucose status, same as `badgeColor`.
     var warningColor: Color = .red
+    /// Replaces the leading SF-Symbol icon with a custom view — used by the
+    /// Omnipod pump tile to put the original reservoir graphic in the icon slot
+    /// (pods can't report an exact level above 50 U, so the level is shown
+    /// graphically with the remaining amount drawn inside the pod). `value`/
+    /// `unit` are then passed empty; label, badge and warning still apply.
+    var iconOverride: AnyView? = nil
     var onTap: (() -> Void)? = nil
 
     @Environment(\.colorScheme) private var scheme
@@ -45,20 +51,28 @@ struct AuroraStatBadge: View {
     private var content: some View {
         VStack(alignment: .center, spacing: 4) {
             HStack(alignment: .firstTextBaseline, spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(iconColor)
+                if let iconOverride = iconOverride {
+                    iconOverride
+                } else {
+                    Image(systemName: icon)
+                        .font(.system(size: 18, weight: .semibold))
+                        .foregroundStyle(iconColor)
+                }
 
-                Text(value)
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
-                    .foregroundStyle(AuroraPalette.textPrimary(scheme))
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                if !value.isEmpty {
+                    Text(value)
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .foregroundStyle(AuroraPalette.textPrimary(scheme))
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
 
-                Text(unit)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(AuroraPalette.textMuted(scheme))
+                if !unit.isEmpty {
+                    Text(unit)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(AuroraPalette.textMuted(scheme))
+                }
             }
 
             Text(label)
@@ -128,5 +142,46 @@ struct PulsingWarningShield: View {
             .onChange(of: pulsing, initial: true) { _, isPulsing in
                 animate = isPulsing
             }
+    }
+}
+
+/// Pump reservoir rendered as a filled silhouette in the tile's icon slot —
+/// pods can't report an exact level above 50 U, so the standard iAPS view
+/// (PumpView) shows the level graphically too. Mirrors `PumpView`'s
+/// pod/nano fill: the fill represents the (sinking) insulin level. The numeric
+/// amount is shown as the tile's value to the right, not inside.
+/// Used for both Omnipod (`pod` asset) and Medtrum nano (`nano` asset).
+struct AuroraReservoirGraphic: View {
+    /// U100-equivalent reservoir; the `0xDEADBEEF` sentinel means "> 50 U".
+    let reservoir: Decimal
+    /// Fill tint — the glucose status color, to match the rest of the tile
+    /// (U200 pill, warning shield) and the app's color concept.
+    let fillColor: Color
+    /// Asset base name: "pod" → pod_light/pod_dark, "nano" → nano_light/nano_dark.
+    var assetBase: String = "pod"
+    /// Intrinsic width/height ratio of the silhouette.
+    var aspect: CGFloat = 0.72
+    /// Fine vertical nudge so the silhouette lines up with the value text.
+    var yOffset: CGFloat = 0
+
+    @Environment(\.colorScheme) private var scheme
+
+    /// Empty fraction (higher = emptier). The "> 50 U" sentinel overfills and
+    /// clamps to a full silhouette inside `fillImageUpToPortion`. Mirrors PumpView.
+    private var emptyPortion: Double {
+        1.0 - (NSDecimalNumber(decimal: reservoir + 10).doubleValue * 1.2 / 200)
+    }
+
+    var body: some View {
+        let asset = scheme == .dark ? "\(assetBase)_dark" : "\(assetBase)_light"
+        UIImage(imageLiteralResourceName: asset)
+            .fillImageUpToPortion(color: fillColor.opacity(0.85), portion: emptyPortion)
+            .resizable()
+            .aspectRatio(aspect, contentMode: .fit)
+            .frame(width: 26, height: 26)
+            .symbolRenderingMode(.palette)
+            .shadow(radius: 1, x: 1, y: 1)
+            .foregroundStyle(.white)
+            .offset(y: yOffset)
     }
 }
