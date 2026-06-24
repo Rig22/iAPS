@@ -9,12 +9,17 @@ import SwiftUI
 struct AIHubAutoPresetsView: View {
     @State private var config = AIHubAutoPresets.loadConfig()
     @State private var presets: [OverridePresets] = []
+    /// Diagnose: zuletzt von CoreMotion gemeldete Roh-Bewegung.
+    @State private var lastDetection = ""
+
+    private let diagnosticTimer = Timer.publish(every: 2, on: .main, in: .common).autoconnect()
 
     var body: some View {
         Form {
             masterSection
             if config.masterEnabled {
                 activitiesSection
+                diagnosticSection
             }
         }
         .navigationTitle("AutoPresets")
@@ -22,6 +27,29 @@ struct AIHubAutoPresetsView: View {
         .onAppear {
             config = AIHubAutoPresets.loadConfig()
             presets = OverrideStorage().fetchProfiles()
+            lastDetection = UserDefaults.standard.string(forKey: BaseAutoPresetsService.lastDetectionKey) ?? ""
+        }
+        .onReceive(diagnosticTimer) { _ in
+            lastDetection = UserDefaults.standard.string(forKey: BaseAutoPresetsService.lastDetectionKey) ?? ""
+        }
+    }
+
+    // MARK: - Diagnose
+
+    private var diagnosticSection: some View {
+        Section {
+            HStack(alignment: .firstTextBaseline) {
+                Text(hubT("ap.diag.detected"))
+                Spacer()
+                Text(lastDetection.isEmpty ? "—" : lastDetection)
+                    .font(.caption.monospaced())
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.trailing)
+            }
+        } header: {
+            Text(hubT("ap.diag.title"))
+        } footer: {
+            Text(hubT("ap.diag.footer"))
         }
     }
 

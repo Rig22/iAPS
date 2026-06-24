@@ -42,6 +42,11 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
     private static let activeAutoIDKey = "iAPS.aiHubAutoPresetsActiveID"
     private static let activeAutoDateKey = "iAPS.aiHubAutoPresetsActiveDate"
 
+    /// Diagnose: zuletzt von CoreMotion gemeldete Roh-Bewegung (Flags +
+    /// Konfidenz + Uhrzeit). Wird bei JEDEM Ereignis geschrieben, damit die
+    /// Settings-Zeile zeigt, was das iPhone beim Radfahren wirklich erkennt.
+    static let lastDetectionKey = "iAPS.aiHubAutoPresetsLastDetection"
+
     init(resolver: Resolver) {
         motionQueue.maxConcurrentOperationCount = 1
         motionQueue.qualityOfService = .utility
@@ -104,6 +109,7 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
     /// (stationary/automotive/unknown oder nicht konfiguriert) zählt als
     /// „keine Aktivität". Läuft auf Main (siehe startMonitoring).
     private func handle(_ activity: CMMotionActivity) {
+        recordDiagnostic(activity)
         if let mapped = acceptedActivity(activity) {
             // Ziel-Aktivität mit ausreichender Konfidenz erkannt → ein evtl.
             // laufendes Drop-Fenster war nur ein kurzer Aussetzer.
@@ -158,6 +164,30 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
     /// (ohne Apple Watch) meist nur mit `.low` meldet; Gehen/Laufen bleiben bei
     /// ≥ medium, damit sie so präzise wie bisher bleiben. Die Haltezeit filtert
     /// das verbleibende Rauschen.
+    /// Diagnose: rohe CoreMotion-Flags + Konfidenz + Uhrzeit persistieren —
+    /// zeigt in den Settings, was das iPhone beim Radfahren wirklich erkennt.
+    private func recordDiagnostic(_ activity: CMMotionActivity) {
+        var flags: [String] = []
+        if activity.cycling { flags.append("cycling") }
+        if activity.automotive { flags.append("automotive") }
+        if activity.running { flags.append("running") }
+        if activity.walking { flags.append("walking") }
+        if activity.stationary { flags.append("stationary") }
+        if activity.unknown { flags.append("unknown") }
+        let confidence: String
+        switch activity.confidence {
+        case .low: confidence = "low"
+        case .medium: confidence = "medium"
+        case .high: confidence = "high"
+        @unknown default: confidence = "?"
+        }
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.dateFormat = "HH:mm:ss"
+        let text = "\(flags.isEmpty ? "—" : flags.joined(separator: ", ")) · \(confidence) · \(formatter.string(from: Date()))"
+        UserDefaults.standard.set(text, forKey: Self.lastDetectionKey)
+    }
+
     private func acceptedActivity(_ activity: CMMotionActivity) -> AIHubAutoPresets.Activity? {
         guard let mapped = mappedActivity(activity) else { return nil }
         if mapped == .cycling { return .cycling }
