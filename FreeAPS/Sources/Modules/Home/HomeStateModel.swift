@@ -33,6 +33,7 @@ extension Home {
         @Published var tempRate: Decimal?
         @Published var battery: Battery?
         @Published var reservoir: Decimal?
+        @Published var reservoirCapacity: Decimal = 200
         @Published var pumpName = ""
         @Published var pumpExpiresAtDate: Date?
         @Published var isExtendedLifespan = false
@@ -640,6 +641,7 @@ extension Home {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }
                 self.reservoir = self.provider.pumpReservoir()
+                self.reservoirCapacity = self.provider.pumpReservoirCapacity() ?? 200
             }
         }
 

@@ -18,6 +18,7 @@ protocol HomeProvider: Provider {
     func carbs(hours: Int) -> [CarbsEntry]
     func pumpBattery() -> Battery?
     func pumpReservoir() -> Decimal?
+    func pumpReservoirCapacity() -> Decimal?
     func tempTarget() -> TempTarget?
     func announcement(_ hours: Int) -> [Announcement]
     func overrides() -> [Override]

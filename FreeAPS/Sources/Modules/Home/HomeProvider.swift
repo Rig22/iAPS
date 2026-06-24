@@ -136,6 +136,14 @@ extension Home {
             storage.retrieve(OpenAPS.Monitor.reservoir, as: Decimal.self)
         }
 
+        // Read live from the pump manager (the reservoir number itself is stored,
+        // but the model-dependent capacity isn't): Medtrum Nano comes in 200 U and
+        // 300 U variants, so the Aurora silhouette fill needs the real capacity.
+        func pumpReservoirCapacity() -> Decimal? {
+            guard let pumpManager = deviceManager.pumpManager else { return nil }
+            return KnownPlugins.pumpReservoirCapacity(pumpManager)
+        }
+
         func autotunedBasalProfile() -> [BasalProfileEntry] {
             storage.retrieve(OpenAPS.Settings.profile, as: Autotune.self)?.basalProfile
                 ?? storage.retrieve(OpenAPS.Settings.pumpProfile, as: Autotune.self)?.basalProfile

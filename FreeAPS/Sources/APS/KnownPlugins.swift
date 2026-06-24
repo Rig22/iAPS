@@ -145,6 +145,22 @@ enum KnownPlugins {
         }
     }
 
+    /// Full reservoir capacity (U100-equivalent) for pumps whose level is drawn
+    /// as a filled silhouette in the Aurora pump tile. The Medtrum Nano ships as
+    /// a 200 U and a 300 U variant (model MD8301); mirroring the driver's own
+    /// `pumpReservoirCapacity` here keeps the logic on the app side so MedtrumKit
+    /// upstream updates don't clobber it. Omnipod holds 200 U; `nil` for pumps
+    /// that keep the plain cylinder icon (Dana, Medtronic).
+    static func pumpReservoirCapacity(_ pumpManager: PumpManager) -> Decimal? {
+        switch pumpManager.pluginIdentifier {
+        case OmniPumpManager.pluginIdentifier:
+            return 200
+        case MedtrumPumpManager.pluginIdentifier:
+            return (pumpManager as? MedtrumPumpManager)?.state.model == "MD8301" ? 300 : 200
+        default: return nil
+        }
+    }
+
     static func cgmInfo(for cgmManager: CGMManager) -> GlucoseSourceInfo? {
         switch cgmManager.pluginIdentifier {
         case G5CGMManager.pluginIdentifier:

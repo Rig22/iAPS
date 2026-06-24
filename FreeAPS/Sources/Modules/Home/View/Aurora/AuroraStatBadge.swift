@@ -159,6 +159,8 @@ struct AuroraReservoirGraphic: View {
     let fillColor: Color
     /// Asset base name: "pod" → pod_light/pod_dark, "nano" → nano_light/nano_dark.
     var assetBase: String = "pod"
+    /// Full reservoir capacity in U100-equivalent units (pods/nano hold 200 U).
+    var capacity: Double = 200
     /// Intrinsic width/height ratio of the silhouette.
     var aspect: CGFloat = 0.72
     /// Fine vertical nudge so the silhouette lines up with the value text.
@@ -166,10 +168,12 @@ struct AuroraReservoirGraphic: View {
 
     @Environment(\.colorScheme) private var scheme
 
-    /// Empty fraction (higher = emptier). The "> 50 U" sentinel overfills and
-    /// clamps to a full silhouette inside `fillImageUpToPortion`. Mirrors PumpView.
+    /// Empty fraction (higher = emptier) — linear in the actual reservoir level,
+    /// so e.g. 108 U of a 200 U cartridge reads as a little over half full. The
+    /// "> 50 U" sentinel (0xDEADBEEF) overfills and clamps to a full silhouette
+    /// inside `fillImageUpToPortion`.
     private var emptyPortion: Double {
-        1.0 - (NSDecimalNumber(decimal: reservoir + 10).doubleValue * 1.2 / 200)
+        1.0 - NSDecimalNumber(decimal: reservoir).doubleValue / capacity
     }
 
     var body: some View {

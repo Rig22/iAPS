@@ -125,9 +125,13 @@ extension Home {
         private var pumpIconGraphic: AnyView? {
             guard let r = state.reservoir else { return nil }
             let color = AuroraGlucoseStatus(mgdl: glucoseValue).main
+            // Real capacity so the fill is linear: Medtrum Nano is 200 U or 300 U,
+            // Omnipod 200 U. Falls back to 200 if the pump didn't report one.
+            let capacity = NSDecimalNumber(decimal: state.reservoirCapacity).doubleValue
             if isOmnipod {
                 return AnyView(AuroraReservoirGraphic(
-                    reservoir: r, fillColor: color, assetBase: "pod", aspect: 0.72, yOffset: 2.5
+                    reservoir: r, fillColor: color, assetBase: "pod",
+                    capacity: capacity, aspect: 0.72, yOffset: 2.5
                 ))
             }
             if isMedtrum {
@@ -135,7 +139,8 @@ extension Home {
                 // so keep a 1:1 aspect — forcing the silhouette ratio would squash
                 // the square horizontally (too narrow).
                 return AnyView(AuroraReservoirGraphic(
-                    reservoir: r, fillColor: color, assetBase: "nano", aspect: 1.0, yOffset: 2.5
+                    reservoir: r, fillColor: color, assetBase: "nano",
+                    capacity: capacity, aspect: 1.0, yOffset: 2.5
                 ))
             }
             return nil
