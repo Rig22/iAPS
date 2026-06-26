@@ -119,26 +119,11 @@ extension Home {
             state.pumpName.contains("Medtrum")
         }
 
-        /// Omnipod only carries a valid reservoir while a pod is actually active —
-        /// iAPS signals that via `pumpExpiresAtDate`. Without it the stored
-        /// reservoir is stale (e.g. the previous pod's last few units, doubled
-        /// under U200 → a misleading "8" on a fresh > 50 U pod). The original
-        /// PumpView gates its whole pod readout on `expiresAtDate` and shows
-        /// "No Pod" otherwise; mirror that so we don't surface the leftover
-        /// number/graphic. Medtrum reports real values continuously (works fine)
-        /// and tethered pumps (Dana, Medtronic) never report an expiry, so both
-        /// are exempt and keep showing their reservoir directly.
-        private var podPumpWithoutActivePod: Bool {
-            isOmnipod && state.pumpExpiresAtDate == nil
-        }
-
         /// Filled pod/nano silhouette for the pump tile's icon slot, tinted with
         /// the glucose status color. `nil` for Dana/Medtronic (cylinder icon) or
         /// when no reservoir is known.
         private var pumpIconGraphic: AnyView? {
-            // No active pod → don't draw a (stale, near-empty) silhouette; fall
-            // back to the cylinder icon, matching PumpView's "No Pod" state.
-            guard !podPumpWithoutActivePod, let r = state.reservoir else { return nil }
+            guard let r = state.reservoir else { return nil }
             let color = AuroraGlucoseStatus(mgdl: glucoseValue).main
             // Real capacity so the fill is linear: Medtrum Nano is 200 U or 300 U,
             // Omnipod 200 U. Falls back to 200 if the pump didn't report one.
@@ -162,9 +147,6 @@ extension Home {
         }
 
         private var reservoirString: String {
-            // No active pod → the stored reservoir is the previous pod's stale
-            // value; show a placeholder instead (PumpView shows "No Pod" here).
-            if podPumpWithoutActivePod { return "—" }
             guard let r = state.reservoir else { return "—" }
             let conc = insulinConcentration
             // Pod sentinel: show a capped "50+" (scaled for concentration),
