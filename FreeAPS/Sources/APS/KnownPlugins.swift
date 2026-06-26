@@ -95,12 +95,23 @@ enum KnownPlugins {
         return !(dose.automatic ?? true)
     }
 
+    /// Omnipod's `podState` as a raw dictionary, read via the base `PumpManager`
+    /// protocol's `rawState` instead of `pumpManager as? OmniPumpManager`.
+    /// The Omnipod driver is loaded from a plugin bundle, so a typed cast to the
+    /// statically-linked `OmniPumpManager` fails at runtime (two distinct type
+    /// identities) — every reservoir/expiry read silently returned nil and the
+    /// pump tile fell back to a stale stored reservoir with no remaining time.
+    /// `rawState` works regardless of where the type was loaded from.
+    private static func omnipodPodState(_ pumpManager: PumpManager) -> [String: Any]? {
+        pumpManager.rawState["podState"] as? [String: Any]
+    }
+
     static func pumpActivationDate(_ pumpManager: PumpManager) -> Date? {
         switch pumpManager.pluginIdentifier {
         case MedtrumPumpManager.pluginIdentifier:
             return (pumpManager as? MedtrumPumpManager)?.state.patchActivatedAt
         case OmniPumpManager.pluginIdentifier:
-            return (pumpManager as? OmniPumpManager)?.state.podState?.activatedAt
+            return omnipodPodState(pumpManager)?["activatedAt"] as? Date
         default: return nil
         }
     }
@@ -115,7 +126,7 @@ enum KnownPlugins {
             // pump badge surfaces as a "Grace" countdown.
             return (pumpManager as? MedtrumPumpManager)?.state.patchGracePeriodFrom
         case OmniPumpManager.pluginIdentifier:
-            return (pumpManager as? OmniPumpManager)?.state.podState?.expiresAt
+            return omnipodPodState(pumpManager)?["expiresAt"] as? Date
         default: return nil
         }
     }
@@ -123,10 +134,15 @@ enum KnownPlugins {
     static func pumpReservoir(_ pumpManager: PumpManager) -> Decimal? {
         switch pumpManager.pluginIdentifier {
         case OmniPumpManager.pluginIdentifier:
-            let reservoirVal = (pumpManager as? OmniPumpManager)?.state.podState?.lastInsulinMeasurements?
-                .reservoirLevel ?? 0xDEAD_BEEF
-            let reservoir = Decimal(reservoirVal) > 50.0 ? 0xDEAD_BEEF : reservoirVal
-            return Decimal(reservoir)
+            // Pods can't report an exact level above 50 U: reservoirLevel is then
+            // nil or the "above threshold" magic number — both mean "> 50 U", for
+            // which we substitute the sentinel (rendered as a full pod). At/below
+            // 50 U the pod reports the real remaining units.
+            let measurements = omnipodPodState(pumpManager)?["lastInsulinMeasurements"] as? [String: Any]
+            guard let level = measurements?["reservoirLevel"] as? Double, level <= 50.0 else {
+                return Decimal(0xDEAD_BEEF)
+            }
+            return Decimal(level)
         case MedtrumPumpManager.pluginIdentifier:
             guard let reservoir = (pumpManager as? MedtrumPumpManager)?.state.reservoir else { return nil }
             return Decimal(reservoir)
