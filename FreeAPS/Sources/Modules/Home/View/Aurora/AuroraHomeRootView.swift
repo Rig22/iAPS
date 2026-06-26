@@ -629,7 +629,7 @@ extension Home {
                     label: pumpSub
                         .map { "\(NSLocalizedString("Pump", comment: "Aurora stat badge label")) \($0)" }
                         ?? NSLocalizedString("Pump", comment: "Aurora stat badge label"),
-                    sub: nil,
+                    sub: state.debugPumpInfo, // TEMP DIAGNOSTIC — remove afterwards
                     badge: reservoirBadge,
                     badgeColor: AuroraGlucoseStatus(mgdl: glucoseValue).main,
                     warning: pumpExpiryWarning.show,
