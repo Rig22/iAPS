@@ -38,7 +38,12 @@ struct AuroraMainChart: View {
 
     private var isMmolL: Bool { data.units == .mmolL }
     private var yLow: Double { isMmolL ? 2.0 : 45 }
-    private var yHigh: Double { isMmolL ? 16.0 : 235 }
+    private var yHigh: Double {
+        let fixedHigh: Double = isMmolL ? 16.0 : 235.0
+        let maxDataValue = gluPoints.map(\.value).max() ?? 0
+        let buffer: Double = isMmolL ? 2.0 : 40.0
+        return max(fixedHigh, maxDataValue + buffer)
+    }
 
     private func display(_ mgdl: Int) -> Double {
         isMmolL ? Double(mgdl) * 0.0555 : Double(mgdl)
