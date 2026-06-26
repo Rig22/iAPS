@@ -133,7 +133,19 @@ extension Home {
         }
 
         func pumpReservoir() -> Decimal? {
-            storage.retrieve(OpenAPS.Monitor.reservoir, as: Decimal.self)
+            // Read live from the pump manager first (same as pumpReservoirCapacity).
+            // The persisted reservoir is only overwritten when a pump callback
+            // fires, so right after a pod change it still holds the *old* pod's
+            // last value — e.g. 4 U, doubled to a misleading "8" under U200 on a
+            // fresh > 50 U pod. The live pod reports the > 50 U sentinel instead,
+            // which renders as a full pod. KnownPlugins.pumpReservoir returns nil
+            // for tethered pumps (Dana, Medtronic), so they keep the stored value.
+            if let pumpManager = deviceManager.pumpManager,
+               let live = KnownPlugins.pumpReservoir(pumpManager)
+            {
+                return live
+            }
+            return storage.retrieve(OpenAPS.Monitor.reservoir, as: Decimal.self)
         }
 
         // Read live from the pump manager (the reservoir number itself is stored,
