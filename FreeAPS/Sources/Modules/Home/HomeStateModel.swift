@@ -642,7 +642,24 @@ extension Home {
                 guard let self = self else { return }
                 self.reservoir = self.provider.pumpReservoir()
                 self.reservoirCapacity = self.provider.pumpReservoirCapacity() ?? 200
+                // Refresh the pod expiry live alongside the reservoir. The
+                // pumpExpiresAtDate publisher only emits on a pump status update,
+                // which may not fire while the home screen is on top — so a freshly
+                // changed pod can keep a stale (nil) expiry until the next loop.
+                // Reading it live here keeps the badge's remaining-time in sync
+                // with the pump's own settings screen.
+                if let pumpManager = self.provider.deviceManager.pumpManager {
+                    self.pumpExpiresAtDate = KnownPlugins.pumpExpirationDate(pumpManager)
+                }
             }
+        }
+
+        /// Pull pump reservoir, capacity, expiry and battery live from the pump
+        /// manager. Used by the home view on appear so the pump badge reflects the
+        /// current pod instead of a stale snapshot from the last pump callback.
+        func refreshPumpStatus() {
+            setupBattery()
+            setupReservoir()
         }
 
         private func setupBattery() {

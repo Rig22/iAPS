@@ -417,13 +417,17 @@ extension Home {
                 switch phase {
                 case .active:
                     state.startTimer()
+                    state.refreshPumpStatus()
                     checkBuildExpiration()
                 case .background,
                      .inactive: state.stopTimer()
                 default: break
                 }
             }
-            .onAppear { checkBuildExpiration() }
+            .onAppear {
+                state.refreshPumpStatus()
+                checkBuildExpiration()
+            }
             .alert(
                 BuildExpirationManager.shared.alertTitle,
                 isPresented: $showExpirationAlert
