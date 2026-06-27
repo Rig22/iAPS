@@ -662,22 +662,6 @@ extension Home {
             setupReservoir()
         }
 
-        /// TEMPORARY DIAGNOSTIC — remove after the Omnipod DASH reservoir issue is
-        /// understood. Surfaces the raw values the pump badge derives from, so a
-        /// single screenshot tells us where the stale "4" comes from.
-        var debugPumpInfo: String {
-            let pm = provider.deviceManager.pumpManager
-            let res = reservoir.map { NSDecimalNumber(decimal: $0).stringValue } ?? "nil"
-            let pmFlag = pm != nil ? "p1" : "p0"
-            var raw = "ps0"
-            if let podState = pm?.rawState["podState"] as? [String: Any] {
-                let m = podState["lastInsulinMeasurements"] as? [String: Any]
-                let rl = m?["reservoirLevel"] as? Double
-                raw = "L\(rl.map { String(format: "%.1f", $0) } ?? "nil") x\(podState["expiresAt"] is Date ? "1" : "0")"
-            }
-            return "R\(res) e\(pumpExpiresAtDate != nil ? "1" : "0") \(pmFlag) \(raw)"
-        }
-
         private func setupBattery() {
             DispatchQueue.main.async { [weak self] in
                 guard let self = self else { return }

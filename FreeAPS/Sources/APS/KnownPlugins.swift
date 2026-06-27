@@ -95,45 +95,53 @@ enum KnownPlugins {
         return !(dose.automatic ?? true)
     }
 
+    /// All three Omnipod variants (Eros, DASH, Omnipod 5) share the "Omni"
+    /// plugin-identifier prefix. We match on the prefix — not on
+    /// `OmniPumpManager.pluginIdentifier` exactly — because the driver is loaded
+    /// from a plugin bundle whose runtime identifier doesn't always equal the
+    /// statically-linked constant (DASH was falling through to `default`, so
+    /// reservoir/expiry silently returned nil and the pump tile showed a stale
+    /// reservoir with no remaining time). `DeviceDataManager` matches the same
+    /// way (`OmniStr`).
+    private static func isOmnipod(_ pumpManager: PumpManager) -> Bool {
+        pumpManager.pluginIdentifier.hasPrefix("Omni")
+    }
+
     /// Omnipod's `podState` as a raw dictionary, read via the base `PumpManager`
-    /// protocol's `rawState` instead of `pumpManager as? OmniPumpManager`.
-    /// The Omnipod driver is loaded from a plugin bundle, so a typed cast to the
-    /// statically-linked `OmniPumpManager` fails at runtime (two distinct type
-    /// identities) — every reservoir/expiry read silently returned nil and the
-    /// pump tile fell back to a stale stored reservoir with no remaining time.
-    /// `rawState` works regardless of where the type was loaded from.
+    /// protocol's `rawState` instead of `pumpManager as? OmniPumpManager` — a
+    /// typed cast fails at runtime because the plugin's type identity differs
+    /// from the statically-linked one. `rawState` works regardless.
     private static func omnipodPodState(_ pumpManager: PumpManager) -> [String: Any]? {
         pumpManager.rawState["podState"] as? [String: Any]
     }
 
     static func pumpActivationDate(_ pumpManager: PumpManager) -> Date? {
-        switch pumpManager.pluginIdentifier {
-        case MedtrumPumpManager.pluginIdentifier:
+        if pumpManager.pluginIdentifier == MedtrumPumpManager.pluginIdentifier {
             return (pumpManager as? MedtrumPumpManager)?.state.patchActivatedAt
-        case OmniPumpManager.pluginIdentifier:
-            return omnipodPodState(pumpManager)?["activatedAt"] as? Date
-        default: return nil
         }
+        if isOmnipod(pumpManager) {
+            return omnipodPodState(pumpManager)?["activatedAt"] as? Date
+        }
+        return nil
     }
 
     static func pumpExpirationDate(_ pumpManager: PumpManager) -> Date? {
-        switch pumpManager.pluginIdentifier {
-        case MedtrumPumpManager.pluginIdentifier:
+        if pumpManager.pluginIdentifier == MedtrumPumpManager.pluginIdentifier {
             // Report the grace-period start (nominal expiry) rather than
             // patchExpiresAt (= lifespan + grace, the hard end), keeping Medtrum
             // in line with Omnipod's podState.expiresAt. Both pumps then expose a
             // nominal expiry with an 8 h grace window after it, which the Aurora
             // pump badge surfaces as a "Grace" countdown.
             return (pumpManager as? MedtrumPumpManager)?.state.patchGracePeriodFrom
-        case OmniPumpManager.pluginIdentifier:
-            return omnipodPodState(pumpManager)?["expiresAt"] as? Date
-        default: return nil
         }
+        if isOmnipod(pumpManager) {
+            return omnipodPodState(pumpManager)?["expiresAt"] as? Date
+        }
+        return nil
     }
 
     static func pumpReservoir(_ pumpManager: PumpManager) -> Decimal? {
-        switch pumpManager.pluginIdentifier {
-        case OmniPumpManager.pluginIdentifier:
+        if isOmnipod(pumpManager) {
             // Pods can't report an exact level above 50 U: reservoirLevel is then
             // nil or the "above threshold" magic number — both mean "> 50 U", for
             // which we substitute the sentinel (rendered as a full pod). At/below
@@ -143,11 +151,12 @@ enum KnownPlugins {
                 return Decimal(0xDEAD_BEEF)
             }
             return Decimal(level)
-        case MedtrumPumpManager.pluginIdentifier:
+        }
+        if pumpManager.pluginIdentifier == MedtrumPumpManager.pluginIdentifier {
             guard let reservoir = (pumpManager as? MedtrumPumpManager)?.state.reservoir else { return nil }
             return Decimal(reservoir)
-        default: return nil
         }
+        return nil
     }
 
     /// Full reservoir capacity (U100-equivalent) for pumps whose level is drawn
@@ -157,13 +166,13 @@ enum KnownPlugins {
     /// upstream updates don't clobber it. Omnipod holds 200 U; `nil` for pumps
     /// that keep the plain cylinder icon (Dana, Medtronic).
     static func pumpReservoirCapacity(_ pumpManager: PumpManager) -> Decimal? {
-        switch pumpManager.pluginIdentifier {
-        case OmniPumpManager.pluginIdentifier:
+        if isOmnipod(pumpManager) {
             return 200
-        case MedtrumPumpManager.pluginIdentifier:
-            return (pumpManager as? MedtrumPumpManager)?.state.model == "MD8301" ? 300 : 200
-        default: return nil
         }
+        if pumpManager.pluginIdentifier == MedtrumPumpManager.pluginIdentifier {
+            return (pumpManager as? MedtrumPumpManager)?.state.model == "MD8301" ? 300 : 200
+        }
+        return nil
     }
 
     static func cgmInfo(for cgmManager: CGMManager) -> GlucoseSourceInfo? {
