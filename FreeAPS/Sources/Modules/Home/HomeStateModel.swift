@@ -668,16 +668,14 @@ extension Home {
         var debugPumpInfo: String {
             let pm = provider.deviceManager.pumpManager
             let res = reservoir.map { NSDecimalNumber(decimal: $0).stringValue } ?? "nil"
-            let exp = pumpExpiresAtDate != nil ? "exp✓" : "exp✗"
-            let pmFlag = pm != nil ? "pm✓" : "pm✗"
-            var raw = "ps✗"
+            let pmFlag = pm != nil ? "p1" : "p0"
+            var raw = "ps0"
             if let podState = pm?.rawState["podState"] as? [String: Any] {
                 let m = podState["lastInsulinMeasurements"] as? [String: Any]
                 let rl = m?["reservoirLevel"] as? Double
-                let hasExp = podState["expiresAt"] is Date
-                raw = "rl=\(rl.map { String(format: "%.1f", $0) } ?? "nil") rexp=\(hasExp ? "✓" : "✗")"
+                raw = "L\(rl.map { String(format: "%.1f", $0) } ?? "nil") x\(podState["expiresAt"] is Date ? "1" : "0")"
             }
-            return "\(res) \(exp) \(pmFlag) \(raw)"
+            return "R\(res) e\(pumpExpiresAtDate != nil ? "1" : "0") \(pmFlag) \(raw)"
         }
 
         private func setupBattery() {

@@ -88,7 +88,8 @@ struct AuroraStatBadge: View {
                 Text(sub)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(AuroraPalette.textFaint(scheme))
-                    .lineLimit(1)
+                    .lineLimit(2) // TEMP: allow the diagnostic line to wrap
+                    .minimumScaleFactor(0.5) // TEMP: shrink so nothing truncates
             }
         }
         .frame(maxWidth: .infinity, alignment: .center)
