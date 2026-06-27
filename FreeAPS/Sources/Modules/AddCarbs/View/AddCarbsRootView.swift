@@ -239,7 +239,9 @@ extension AddCarbs {
                         color: BreathePalette.salbei
                     )
 
-                    otherNutritionButton
+                    if state.mealViewMicronutrients {
+                        otherNutritionButton
+                    }
 
                     timeRow
                 }
