@@ -1077,14 +1077,17 @@ struct AuroraStatusSheet: View {
 
     @ViewBuilder private var reasoningCard: some View {
         if let suggestion = state.data.suggestion {
-            VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 12) {
                 Text(hubT("aur.reason"))
                     .font(.system(size: 12.5, weight: .semibold))
                     .kerning(0.4)
                     .foregroundStyle(AuroraPalette.textMuted(scheme))
-                Text(suggestion.reasonConclusion.capitalizingFirstLetter())
-                    .font(.system(size: 18, weight: .regular))
-                    .lineSpacing(4)
+
+                // Raw oref metrics as colored chips, matching Trio's Loop status popup.
+                TagCloudView(tags: suggestion.reasonParts, style: .prominent)
+
+                Text(reasoningConclusion(for: suggestion).capitalizingFirstLetter())
+                    .font(.system(size: 14, weight: .regular))
                     .foregroundStyle(AuroraPalette.textPrimary(scheme))
                     .fixedSize(horizontal: false, vertical: true)
             }
@@ -1092,5 +1095,17 @@ struct AuroraStatusSheet: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .auroraGlass(radius: 22)
         }
+    }
+
+    /// The reasoning conclusion without the verbose `Auto ISF { … }` block that iAPS
+    /// appends to the reason string (see OpenAPS.swift). The detailed autoISF reasoning
+    /// will live in a dedicated autoISF history view; here we keep the conclusion concise
+    /// like Trio's Loop status.
+    private func reasoningConclusion(for suggestion: Suggestion) -> String {
+        var text = suggestion.reasonConclusion
+        if let range = text.range(of: "Auto ISF {") {
+            text = String(text[..<range.lowerBound])
+        }
+        return text.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 }

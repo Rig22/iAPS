@@ -4,17 +4,32 @@ import SwiftUI
 import Swinject
 
 struct TagCloudView: View {
-    var tags: [String]
+    /// Visual treatment of the chips.
+    /// - `compact`: the legacy iAPS look (small monospaced text, thin border) used in the
+    ///   non-Aurora home popup.
+    /// - `prominent`: Trio's Loop status look (larger system semibold text, 2pt border,
+    ///   stronger fill) used in the Aurora Loop status sheet.
+    enum Style {
+        case compact
+        case prominent
+    }
 
-    @State private var totalHeight
-        = CGFloat.infinity
+    var tags: [String]
+    var style: Style = .compact
+
+    @Environment(\.colorScheme) private var colorScheme
+
+    // Height-based variant: reports a definite height to the parent so the cloud also
+    // lays out correctly inside a ScrollView/List (e.g. the Aurora Loop status sheet),
+    // not only inside a tightly-sized overlay.
+    @State private var totalHeight = CGFloat.zero
     var body: some View {
         VStack {
             GeometryReader { geometry in
                 self.generateContent(in: geometry)
             }
         }
-        .frame(maxHeight: totalHeight)
+        .frame(height: totalHeight)
     }
 
     private func generateContent(in g: GeometryProxy) -> some View {
@@ -74,18 +89,26 @@ struct TagCloudView: View {
             }
         }
 
+        let isProminent = style == .prominent
+        let tagFont: Font = isProminent
+            ? .subheadline.weight(.semibold)
+            : .system(size: 11, weight: .medium, design: .monospaced)
+        let fillOpacity = isProminent ? (colorScheme == .dark ? 0.15 : 0.25) : 0.15
+        let strokeOpacity = isProminent ? 0.4 : 0.3
+        let strokeWidth: CGFloat = isProminent ? 2 : 1
+
         return Text(textTag)
-            .padding(.vertical, 4)
-            .padding(.horizontal, 8)
-            .font(.system(size: 11, weight: .medium, design: .monospaced))
+            .padding(.vertical, isProminent ? 6 : 4)
+            .padding(.horizontal, isProminent ? 11 : 8)
+            .font(tagFont)
             .background(
                 Capsule()
-                    .fill(colorOfTag.opacity(0.15))
+                    .fill(colorOfTag.opacity(fillOpacity))
             )
             .foregroundColor(colorOfTag)
             .overlay(
                 Capsule()
-                    .stroke(colorOfTag.opacity(0.3), lineWidth: 1)
+                    .stroke(colorOfTag.opacity(strokeOpacity), lineWidth: strokeWidth)
             )
     }
 
