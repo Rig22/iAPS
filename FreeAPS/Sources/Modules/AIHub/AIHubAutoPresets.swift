@@ -102,6 +102,38 @@ enum AIHubAutoPresets {
     /// keine Ziel-Aktivität mehr gemeldet wird, gilt sie als beendet.
     static let dropGraceSeconds: TimeInterval = 30
 
+    // MARK: - GPS-Speed-Gate (Rad vs. Auto)
+
+    /// CoreMotion klassifiziert eine Straßen-Radfahrt auf dem iPhone (ohne Apple
+    /// Watch) häufig fälschlich als `automotive`. Um Radfahren dennoch zu
+    /// erkennen, *ohne* echte Autofahrten mit auszulösen, prüfen wir bei
+    /// `automotive` zusätzlich die GPS-Geschwindigkeit. Die Schwellen sind
+    /// bewusst konservativ und hier zentral änderbar.
+
+    /// Untergrenze, ab der eine Geschwindigkeit als „radtypisch" zählt (km/h).
+    /// Darunter: Stehen, Schieben, Ampel — kein Radsignal.
+    static let cyclingSpeedMinKmh: Double = 8
+
+    /// Ab dieser Geschwindigkeit gilt die Fahrt als eindeutig motorisiert
+    /// (km/h). Über Renn-Rad-Abfahrten (~kurzzeitig) liegend, damit eine kurze
+    /// Abfahrt nicht sofort als Auto zählt — siehe Sample-Count.
+    static let vehicleSpeedKmh: Double = 50
+
+    /// So viele Messwerte ≥ `vehicleSpeedKmh` (in Folge der Messung gesammelt)
+    /// werten die Fahrt endgültig als Kfz → Radfahren wird nicht aktiviert.
+    /// Filtert einzelne GPS-Ausreißer und sehr kurze Abfahrten.
+    static let vehicleSpeedSampleCount = 5
+
+    /// Wurde eine Fahrt als Kfz erkannt, bleibt das GPS-Gate so lange gesperrt
+    /// (kein erneutes Anwerfen bei weiter gemeldetem `automotive`) — schont den
+    /// Akku während echter Autofahrten.
+    static let vehicleLockoutSeconds: TimeInterval = 600
+
+    /// Kann das GPS-Verdikt beim Ablauf des Sustained-Countdowns noch nicht
+    /// entscheiden (GPS kalt / zu wenig Bewegung), wird nach dieser Zeit erneut
+    /// geprüft, statt die Fahrt zu verpassen.
+    static let cyclingVerdictRetrySeconds: TimeInterval = 45
+
     private static let configKey = "iAPS.aiHubAutoPresets"
 
     /// Geändert-Notification: Settings-View postet nach jedem Schreiben,

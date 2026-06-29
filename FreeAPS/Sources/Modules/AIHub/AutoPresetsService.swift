@@ -1,7 +1,104 @@
 import Combine
+import CoreLocation
 import CoreMotion
 import Foundation
 import Swinject
+
+/// GPS-Geschwindigkeits-Gate: trennt Radfahren von echtem Autofahren, wenn
+/// CoreMotion eine Radfahrt fälschlich als `automotive` meldet (auf dem iPhone
+/// ohne Apple Watch häufig). Liefert ausschließlich ein Geschwindigkeits-Verdikt
+/// — die Bewegungsklassifikation bleibt bei CoreMotion.
+///
+/// Datenschutz/Akku: läuft NUR, solange AutoPresets aktiv ist UND ein
+/// Rad-Kandidat (`automotive` bei live geschaltetem Radfahren) plausibel ist.
+/// Es wird keine Position gespeichert oder hochgeladen — nur die momentane
+/// Geschwindigkeit ausgewertet.
+final class AutoPresetsSpeedGate: NSObject, CLLocationManagerDelegate {
+    enum Verdict {
+        /// Noch kein eindeutiges Signal (zu wenig Bewegung / kein Fix / keine
+        /// Berechtigung) — vorsichtshalber NICHT als Radfahren aktivieren.
+        case undetermined
+        /// Radtypische Geschwindigkeit gesehen, keine eindeutige Kfz-Geschwindigkeit.
+        case cycling
+        /// Eindeutig motorisiert.
+        case vehicle
+    }
+
+    private let manager = CLLocationManager()
+    private var running = false
+    private var sawCyclingSpeed = false
+    private var vehicleSamples = 0
+    private var latestSpeedKmh: Double?
+
+    override init() {
+        super.init()
+        manager.delegate = self
+        manager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+        manager.activityType = .fitness
+        manager.pausesLocationUpdatesAutomatically = false
+    }
+
+    var isRunning: Bool { running }
+
+    /// Aktuelle Geschwindigkeit (km/h) für die Diagnose-Zeile, falls bekannt.
+    var diagnosticSpeedKmh: Double? { running ? latestSpeedKmh : nil }
+
+    var verdict: Verdict {
+        if vehicleSamples >= AIHubAutoPresets.vehicleSpeedSampleCount { return .vehicle }
+        if sawCyclingSpeed { return .cycling }
+        return .undetermined
+    }
+
+    /// Berechtigung anfordern (z. B. sobald Radfahren live wird), damit der
+    /// System-Dialog erscheint, während der Nutzer in der App ist — nicht erst
+    /// mitten auf dem Rad.
+    func requestAuthorizationIfNeeded() {
+        if manager.authorizationStatus == .notDetermined {
+            manager.requestWhenInUseAuthorization()
+        }
+    }
+
+    func start() {
+        guard !running else { return }
+        running = true
+        sawCyclingSpeed = false
+        vehicleSamples = 0
+        latestSpeedKmh = nil
+        manager.startUpdatingLocation()
+    }
+
+    func stop() {
+        guard running else { return }
+        running = false
+        manager.stopUpdatingLocation()
+        sawCyclingSpeed = false
+        vehicleSamples = 0
+        latestSpeedKmh = nil
+    }
+
+    func locationManager(_: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last, location.speed >= 0 else { return }
+        let kmh = location.speed * 3.6
+        latestSpeedKmh = kmh
+        if kmh >= AIHubAutoPresets.cyclingSpeedMinKmh, kmh < AIHubAutoPresets.vehicleSpeedKmh {
+            sawCyclingSpeed = true
+        }
+        if kmh >= AIHubAutoPresets.vehicleSpeedKmh {
+            vehicleSamples += 1
+        }
+    }
+
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        // Berechtigung entzogen/verweigert → Messung sauber beenden.
+        switch manager.authorizationStatus {
+        case .denied,
+             .restricted:
+            stop()
+        default:
+            break
+        }
+    }
+}
 
 /// Langlebiger Service, der per CoreMotion erkannte Bewegung (Gehen, Laufen,
 /// Radfahren) auf Override-Presets abbildet: Hält eine Aktivität lange genug
@@ -29,11 +126,21 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
     private let overrideStorage = OverrideStorage()
     private let motionQueue = OperationQueue()
 
+    /// GPS-Gate, das Radfahren von Autofahren trennt, wenn CoreMotion eine
+    /// Radfahrt als `automotive` fehlklassifiziert. Nur auf Main zugreifen.
+    private let speedGate = AutoPresetsSpeedGate()
+
     private var isMonitoring = false
     private var config = AIHubAutoPresets.Config.defaultConfig
 
     /// Aktuell erkannte Ziel-Aktivität (nil = keine relevante Bewegung).
     private var detectedActivity: AIHubAutoPresets.Activity?
+    /// True, wenn die aktuelle Rad-Erkennung aus einem `automotive`-Kandidaten
+    /// stammt (nicht aus dem echten `cycling`-Flag) → GPS-Gate muss bestätigen.
+    private var cyclingViaSpeedGate = false
+    /// Bis dahin gilt eine als Kfz erkannte Fahrt als gesperrt (kein neuer
+    /// Rad-Kandidat, GPS bleibt aus) — siehe vehicleLockoutSeconds.
+    private var speedGateVehicleUntil: Date?
     private var startWorkItem: DispatchWorkItem?
     private var endWorkItem: DispatchWorkItem?
     private var dropWorkItem: DispatchWorkItem?
@@ -74,6 +181,13 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
         let shouldMonitor = config.masterEnabled
             && AIHubAutoPresets.Activity.allCases.contains { config.isLive($0) }
 
+        // Standort-Berechtigung anfragen, sobald Radfahren live ist (auch wenn
+        // Monitoring schon läuft) — der System-Dialog soll erscheinen, während
+        // der Nutzer in der App ist, nicht erst mitten auf dem Rad.
+        if config.isLive(.cycling) {
+            DispatchQueue.main.async { [weak self] in self?.speedGate.requestAuthorizationIfNeeded() }
+        }
+
         if shouldMonitor {
             startMonitoring()
         } else {
@@ -100,6 +214,9 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
         motionManager.stopActivityUpdates()
         cancelTimers()
         detectedActivity = nil
+        cyclingViaSpeedGate = false
+        speedGateVehicleUntil = nil
+        DispatchQueue.main.async { [weak self] in self?.speedGate.stop() }
     }
 
     // MARK: - Bewegungs-Auswertung
@@ -109,8 +226,21 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
     /// (stationary/automotive/unknown oder nicht konfiguriert) zählt als
     /// „keine Aktivität". Läuft auf Main (siehe startMonitoring).
     private func handle(_ activity: CMMotionActivity) {
+        // GPS-Gate nur laufen lassen, solange ein Rad-Kandidat (automotive bei
+        // live geschaltetem Radfahren) plausibel ist. Idempotent — start/stop
+        // prüfen selbst, ob sich der Zustand ändert.
+        if isCyclingCandidate(activity) {
+            speedGate.start()
+        }
+
         recordDiagnostic(activity)
         if let mapped = acceptedActivity(activity) {
+            // Zuverlässige Nicht-Rad-Aktivität (Gehen/Laufen) → GPS-Gate hier
+            // irrelevant; zugleich Kfz-Sperre lösen (Auto wurde verlassen).
+            if mapped != .cycling {
+                speedGate.stop()
+                speedGateVehicleUntil = nil
+            }
             // Ziel-Aktivität mit ausreichender Konfidenz erkannt → ein evtl.
             // laufendes Drop-Fenster war nur ein kurzer Aussetzer.
             dropWorkItem?.cancel()
@@ -118,6 +248,9 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
 
             guard mapped != detectedActivity else { return }
             detectedActivity = mapped
+            // Kam die Rad-Erkennung aus dem automotive-Kandidaten (kein echtes
+            // cycling-Flag)? Dann muss das GPS-Gate beim Aktivieren bestätigen.
+            cyclingViaSpeedGate = (mapped == .cycling && !activity.cycling)
             startWorkItem?.cancel()
             startWorkItem = nil
             endWorkItem?.cancel()
@@ -150,6 +283,9 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
     private func activityDidStop() {
         dropWorkItem = nil
         detectedActivity = nil
+        cyclingViaSpeedGate = false
+        speedGateVehicleUntil = nil
+        speedGate.stop()
         startWorkItem?.cancel()
         startWorkItem = nil
         endWorkItem?.cancel()
@@ -184,14 +320,40 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.dateFormat = "HH:mm:ss"
-        let text = "\(flags.isEmpty ? "—" : flags.joined(separator: ", ")) · \(confidence) · \(formatter.string(from: Date()))"
+        var parts = [flags.isEmpty ? "—" : flags.joined(separator: ", "), confidence]
+        // GPS-Geschwindigkeit nur zeigen, wenn das Gate gerade misst (Rad-
+        // Kandidat) — macht beim Radfahren sichtbar, wie das Gate entscheidet.
+        if let kmh = speedGate.diagnosticSpeedKmh {
+            parts.append(String(format: "%.0f km/h", kmh))
+        }
+        parts.append(formatter.string(from: Date()))
+        let text = parts.joined(separator: " · ")
         UserDefaults.standard.set(text, forKey: Self.lastDetectionKey)
     }
 
     private func acceptedActivity(_ activity: CMMotionActivity) -> AIHubAutoPresets.Activity? {
-        guard let mapped = mappedActivity(activity) else { return nil }
-        if mapped == .cycling { return .cycling }
-        return activity.confidence != .low ? mapped : nil
+        if let mapped = mappedActivity(activity) {
+            if mapped == .cycling { return .cycling }
+            return activity.confidence != .low ? mapped : nil
+        }
+        // Rad→automotive-Fehlklassifikation: als Rad-Kandidat starten, damit der
+        // Sustained-Countdown läuft. Ob wirklich aktiviert wird, entscheidet
+        // beim Auslösen das GPS-Verdikt (siehe activate).
+        if isCyclingCandidate(activity) { return .cycling }
+        return nil
+    }
+
+    /// Radfahren wird von CoreMotion auf dem iPhone häufig als `automotive`
+    /// fehlklassifiziert. Solche Ereignisse gelten als Rad-Kandidat, wenn
+    /// Radfahren live ist und keine zuverlässigere Aktivität (Gehen/Laufen)
+    /// gleichzeitig gemeldet wird. Die endgültige Trennung Rad↔Auto macht das
+    /// GPS-Speed-Gate beim Aktivieren.
+    private func isCyclingCandidate(_ activity: CMMotionActivity) -> Bool {
+        guard config.isLive(.cycling) else { return false }
+        guard !activity.walking, !activity.running else { return false }
+        // Kürzlich als Kfz erkannt → gesperrt (GPS aus, kein neuer Kandidat).
+        if let until = speedGateVehicleUntil, until > Date() { return false }
+        return activity.automotive
     }
 
     /// Höchste relevante Bewegungsart, sofern live konfiguriert (ohne
@@ -217,6 +379,37 @@ final class BaseAutoPresetsService: AutoPresetsService, Injectable {
     private func activate(_ activity: AIHubAutoPresets.Activity) {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
+            // GPS-Gate: Rad-Kandidaten aus „automotive" müssen per Geschwindigkeit
+            // bestätigt werden. Echte cycling-Erkennung und Gehen/Laufen
+            // (cyclingViaSpeedGate == false) brauchen kein GPS.
+            if activity == .cycling, self.cyclingViaSpeedGate {
+                // Ohne laufendes GPS (Berechtigung fehlt / nicht verfügbar) lässt
+                // sich Rad nicht von Auto trennen → sicherheitshalber NICHT aktivieren.
+                guard self.speedGate.isRunning else { return }
+                switch self.speedGate.verdict {
+                case .cycling:
+                    break // bestätigt → aktivieren
+                case .vehicle:
+                    // Eindeutig Auto → verwerfen und für eine Weile sperren,
+                    // damit das GPS während der Fahrt nicht dauernd neu startet.
+                    self.speedGate.stop()
+                    self.detectedActivity = nil
+                    self.cyclingViaSpeedGate = false
+                    self.speedGateVehicleUntil = Date().addingTimeInterval(AIHubAutoPresets.vehicleLockoutSeconds)
+                    return
+                case .undetermined:
+                    // GPS noch nicht warm / zu wenig Bewegung → später erneut
+                    // prüfen, statt die Fahrt zu verpassen.
+                    guard self.detectedActivity == .cycling else { return }
+                    let retry = DispatchWorkItem { [weak self] in self?.activate(.cycling) }
+                    self.startWorkItem = retry
+                    DispatchQueue.main.asyncAfter(
+                        deadline: .now() + AIHubAutoPresets.cyclingVerdictRetrySeconds,
+                        execute: retry
+                    )
+                    return
+                }
+            }
             let activityConfig = self.config.config(for: activity)
             guard self.config.isLive(activity), let presetID = activityConfig.presetID else { return }
             guard let preset = self.overrideStorage.fetchProfiles().first(where: { $0.id == presetID })
