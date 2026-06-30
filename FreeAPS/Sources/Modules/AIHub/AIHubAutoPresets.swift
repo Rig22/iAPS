@@ -92,9 +92,11 @@ enum AIHubAutoPresets {
     /// Wählbare Haltezeiten (Sekunden) für den Picker.
     static let sustainedOptions = [0, 15, 30, 60, 120, 300]
 
-    /// Grace-Period nach Aktivitätsende, bevor das Auto-Override beendet
-    /// wird — filtert kurze Pausen (Ampel, Verschnaufen). Richards Wahl: ~5 min.
-    static let autoEndGraceSeconds: TimeInterval = 300
+    /// Grace-Period nach Aktivitätsende, bevor das Auto-Override beendet wird —
+    /// filtert kurze Pausen (Ampel, Verschnaufen). Auf 2 min gesenkt: überbrückt
+    /// normale Ampelstopps, beendet aber ein (z. B. fälschlich gestartetes)
+    /// Preset deutlich schneller als die früheren 5 min.
+    static let autoEndGraceSeconds: TimeInterval = 120
 
     /// Flacker-Toleranz: Ein einzelnes Ereignis OHNE Ziel-Aktivität (kurze
     /// Fehlklassifikation während der Fahrt, z. B. „automotive"/„stationary")
@@ -104,15 +106,24 @@ enum AIHubAutoPresets {
 
     // MARK: - GPS-Speed-Gate (Rad vs. Auto)
 
-    /// CoreMotion klassifiziert eine Straßen-Radfahrt auf dem iPhone (ohne Apple
-    /// Watch) häufig fälschlich als `automotive`. Um Radfahren dennoch zu
-    /// erkennen, *ohne* echte Autofahrten mit auszulösen, prüfen wir bei
-    /// `automotive` zusätzlich die GPS-Geschwindigkeit. Die Schwellen sind
-    /// bewusst konservativ und hier zentral änderbar.
+    /// CoreMotions Rad-Erkennung ist auf dem iPhone (ohne Apple Watch) in beide
+    /// Richtungen unzuverlässig: Echtes Radfahren wird oft als `automotive`
+    /// gemeldet, und das `cycling`-Flag feuert gelegentlich fälschlich (z. B. bei
+    /// langsamem, ungleichmäßigem Gehen). Deshalb gilt JEDES Rad-/Kfz-Signal nur
+    /// als Kandidat — ob wirklich Radfahren, entscheidet allein die GPS-
+    /// Geschwindigkeit. Die Schwellen sind bewusst konservativ und hier zentral
+    /// änderbar.
 
     /// Untergrenze, ab der eine Geschwindigkeit als „radtypisch" zählt (km/h).
-    /// Darunter: Stehen, Schieben, Ampel — kein Radsignal.
-    static let cyclingSpeedMinKmh: Double = 8
+    /// Bewusst klar über Geh-/Lauf-Tempo (auch zügiges Gehen ~7 km/h), damit
+    /// Gehen niemals als Radfahren durchgeht. Darunter: Stehen, Gehen, Ampel.
+    static let cyclingSpeedMinKmh: Double = 12
+
+    /// So viele Messwerte im radtypischen Band (≥ `cyclingSpeedMinKmh`,
+    /// < `vehicleSpeedKmh`) müssen *anhaltend* zusammenkommen, bevor Radfahren
+    /// als bestätigt gilt — ein einzelner GPS-Ausreißer (etwa beim Gehen) reicht
+    /// damit nicht.
+    static let cyclingSpeedSampleCount = 6
 
     /// Ab dieser Geschwindigkeit gilt die Fahrt als eindeutig motorisiert
     /// (km/h). Über Renn-Rad-Abfahrten (~kurzzeitig) liegend, damit eine kurze
@@ -120,9 +131,11 @@ enum AIHubAutoPresets {
     static let vehicleSpeedKmh: Double = 50
 
     /// So viele Messwerte ≥ `vehicleSpeedKmh` (in Folge der Messung gesammelt)
-    /// werten die Fahrt endgültig als Kfz → Radfahren wird nicht aktiviert.
-    /// Filtert einzelne GPS-Ausreißer und sehr kurze Abfahrten.
-    static let vehicleSpeedSampleCount = 5
+    /// werten die Fahrt endgültig als Kfz → Radfahren wird nicht aktiviert
+    /// bzw. ein laufendes Rad-Override sofort beendet. ≈8 s anhaltend >50 km/h:
+    /// ein Auto schafft das mühelos, eine kurze Rad-Abfahrt selten — schützt
+    /// laufende Radfahrten vor Fehl-Abbruch.
+    static let vehicleSpeedSampleCount = 8
 
     /// Wurde eine Fahrt als Kfz erkannt, bleibt das GPS-Gate so lange gesperrt
     /// (kein erneutes Anwerfen bei weiter gemeldetem `automotive`) — schont den
@@ -133,6 +146,12 @@ enum AIHubAutoPresets {
     /// entscheiden (GPS kalt / zu wenig Bewegung), wird nach dieser Zeit erneut
     /// geprüft, statt die Fahrt zu verpassen.
     static let cyclingVerdictRetrySeconds: TimeInterval = 45
+
+    /// Obergrenze für die GPS-Beobachtung eines Rad-Kandidaten ohne Ergebnis:
+    /// Wird in dieser Zeit nie radtypisches Tempo erreicht (z. B. zäher Stau,
+    /// „unknown" ohne Bewegung), gilt es nicht als Radfahren und das GPS wird
+    /// abgeschaltet — schützt den Akku bei der bewusst breiten Kandidaten-Logik.
+    static let cyclingObserveMaxSeconds: TimeInterval = 300
 
     private static let configKey = "iAPS.aiHubAutoPresets"
 
